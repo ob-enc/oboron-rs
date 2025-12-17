@@ -1,0 +1,268 @@
+[package]
+name = "oboron"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.74.0"
+license = "MIT"
+repository = "https://github.com/ob-encoding/oboron"
+authors = ["Bojan Đuričković"]
+description = "Encryption and encoding library for developer ergonomics: compact outputs, reversible references, high performance"
+keywords = ["encryption", "obfuscation", "encoding", "crypto", "id"]
+categories = ["cryptography", "encoding"]
+readme = "README.md"
+
+[features]
+# Default: Secure, production-ready defaults
+default = ["std"]
+
+# Core configurations
+# ===================
+std = ["secure-schemes"]
+secure-min = ["ob32"]  # Minimum secure setup
+full = ["all-schemes", "all-alt-keys", "keyless", "legacy", "non-crypto"]
+
+dev = ["full"]  # Development setup
+
+# Key format features
+# ===================
+hex-keys = []  # Alternative to base64 keys
+bytes-keys = []  # Raw bytes key input
+all-alt-keys = ["hex-keys", "bytes-keys"]
+
+keyless = []  # Hardcoded key methods (dev/testing only)
+
+# Algorithm family groups (BINARY SIZE OPTIMIZATION)
+# ==================================================
+all-cbc-schemes = ["ob01", "ob21p"]  # Shares AES+CBC deps
+all-gcm-schemes = ["ob31", "ob31p"]  # Shares AES-GCM-SIV deps  
+all-siv-schemes = ["ob32", "ob32p"]  # Shares AES-SIV deps
+
+# Individual schemes
+# ==================
+ob01 = ["aes", "cipher", "cbc"]
+ob21p = ["aes", "cipher", "cbc"]
+ob31 = ["aes-gcm-siv"]
+ob31p = ["aes-gcm-siv"]
+ob32 = ["aes-siv"]
+ob32p = ["aes-siv"]
+# Testing only
+ob70 = []  # identity, non-crypto
+ob71 = []  # string reversal, non-crypto
+# Legacy
+ob00 = ["aes", "cipher", "cbc"]  # backward compatibility
+
+# Scheme categories
+# =================
+ob0x = ["ob01"] # insecure, not authenticated
+ob1x = []  # insecure, authenticated
+ob2x = ["ob21p"]  # secure, not authenticated
+ob3x = ["ob31", "ob31p", "ob32", "ob32p"]  # secure, authenticated
+ob7x = ["ob70", "ob71"]  # testing
+insecure-schemes = ["ob0x", "ob1x"]
+secure-schemes = ["ob2x", "ob3x"]
+authenticated-schemes = ["ob3x"]
+deterministic-schemes = ["ob01", "ob31", "ob32"]
+probabilistic-schemes = ["ob21p", "ob31p", "ob32p"]
+all-schemes = ["ob0x", "ob1x", "ob2x", "ob3x"]
+
+# Special purpose groups
+# ======================
+non-crypto = ["ob70", "ob71"]
+legacy = ["ob00"]  # For backward compatibility only -> use ob01 instead
+experimental = []  # Experimental algorithms
+
+[dependencies]
+# Always needed
+data-encoding = "2.5"
+generic-array = "1.0"
+num-bigint = "0.4.6"
+thiserror = "1.0"
+hex = "0.4"
+
+# Conditionally included based on features
+aes = { version = "0.8", optional = true }
+cipher = { version = "0.4", optional = true }
+cbc = { version = "0.1", optional = true }
+aes-gcm-siv = { version = "0.11", optional = true }
+aes-siv = { version = "0.7", optional = true }
+once_cell = "1.21.3"
+
+# rand with getrandom - use default features on native, add getrandom/js on wasm
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+rand = "0.8"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+rand = { version = "0.8", features = ["getrandom"] }
+getrandom = { version = "0.2", features = ["js"] }
+
+[profile.release]
+opt-level = "z"     # Optimize for size
+lto = true
+codegen-units = 1
+
+[lib]
+name = "oboron"
+path = "src/lib.rs"
+crate-type = ["rlib"]  # Standard Rust library crate (WASM compatible)
+
+[[bin]]
+name = "keygen"
+path = "src/bin/keygen.rs"
+
+[dev-dependencies]
+oboron = { path = ".", features = ["dev"]}
+criterion = { version = "0.5", features = ["html_reports"] }
+hex = "0.4"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+sha2 = "0.10"
+jsonwebtoken = "9.3"
+
+[[test]]
+name = "test_ob70"
+path = "tests/test_ob70.rs"
+harness = true
+
+[[test]]
+name = "integration_test"
+path = "tests/integration_tests.rs"
+harness = true
+
+# [[bench]]
+# name = "obstatic"
+# harness = false
+
+[[bench]]
+name = "obflex"
+harness = false
+
+[[bench]]
+name = "ob"
+harness = false
+
+[[bench]]
+name = "obmulti"
+harness = false
+
+[[bench]]
+name = "ob01"
+harness = false
+
+[[bench]]
+name = "ob01_b32"
+harness = false
+
+[[bench]]
+name = "ob01_b64"
+harness = false
+
+[[bench]]
+name = "ob01_hex"
+harness = false
+
+[[bench]]
+name = "ob21p"
+harness = false
+
+[[bench]]
+name = "ob21p_b32"
+harness = false
+
+[[bench]]
+name = "ob21p_b64"
+harness = false
+
+[[bench]]
+name = "ob21p_hex"
+harness = false
+
+[[bench]]
+name = "ob31"
+harness = false
+
+[[bench]]
+name = "ob31_b32"
+harness = false
+
+[[bench]]
+name = "ob31_b64"
+harness = false
+
+[[bench]]
+name = "ob31_hex"
+harness = false
+
+[[bench]]
+name = "ob31p"
+harness = false
+
+[[bench]]
+name = "ob31p_b32"
+harness = false
+
+[[bench]]
+name = "ob31p_b64"
+harness = false
+
+[[bench]]
+name = "ob31p_hex"
+harness = false
+
+[[bench]]
+name = "ob32"
+harness = false
+
+[[bench]]
+name = "ob32_b32"
+harness = false
+
+[[bench]]
+name = "ob32_b64"
+harness = false
+
+[[bench]]
+name = "ob32_hex"
+harness = false
+
+[[bench]]
+name = "ob32p"
+harness = false
+
+[[bench]]
+name = "ob32p_b32"
+harness = false
+
+[[bench]]
+name = "ob32p_b64"
+harness = false
+
+[[bench]]
+name = "ob32p_hex"
+harness = false
+
+[[bench]]
+name = "ob00"
+harness = false
+
+[[bench]]
+name = "ob00_b32"
+harness = false
+
+[[bench]]
+name = "ob00_b64"
+harness = false
+
+[[bench]]
+name = "ob00_hex"
+harness = false
+
+[[bench]]
+name = "test123"
+harness = false
+
+[[bench]]
+name = "z_sha256"
+harness = false
+
+[[bench]]
+name = "z_jwt"
