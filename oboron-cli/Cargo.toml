@@ -1,0 +1,49 @@
+[package]
+name = "oboron-cli"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.74.0"
+authors = ["Bojan Đuričković"]
+license = "MIT"
+repository = "https://github.com/ob-encoding/oboron"
+description = "CLI tool for Oboron - reversible, encrypted reference strings"
+keywords = ["cli", "encryption", "obfuscation", "encoding"]
+categories = ["command-line-utilities", "cryptography"]
+readme = "README.md"
+
+[features]
+default = ["all-schemes", "legacy", "experimental", "ob70"]
+
+ob00 = ["oboron/ob00"]
+ob01 = ["oboron/ob01"]
+ob31 = ["oboron/ob31"]
+ob32 = ["oboron/ob32"]
+ob21p = ["oboron/ob21p"]
+ob31p = ["oboron/ob31p"]
+ob32p = ["oboron/ob32p"]
+ob70 = ["oboron/ob70"]
+ob71 = ["oboron/ob71"]
+all-schemes = ["ob01", "ob21p", "ob31", "ob31p", "ob32", "ob32p"]
+legacy = ["ob00"]  # For compatibility/testing
+testing = ["ob70", "ob71"]
+experimental = []  # Experimental algorithms
+
+[[bin]]
+name = "ob"
+path = "src/main.rs"
+
+[dependencies]
+oboron = { path = "../oboron", default-features = false, features=["keyless"] }
+clap = { version = "4.5", features = ["derive", "cargo"] }
+clap_complete = "4.5"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+anyhow = "1.0"
+dirs = "5.0"
+data-encoding = "2.6"
+rand = "0.8"
+
+[dev-dependencies]
+assert_cmd = "2.0"
+predicates = "3.0"
+tempfile = "3.8"
