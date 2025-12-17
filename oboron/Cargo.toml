@@ -4,10 +4,10 @@ version = "0.1.0"
 edition = "2021"
 rust-version = "1.74.0"
 license = "MIT"
-repository = "https://github.com/ob-encoding/oboron"
+repository = "https://github.com/ob-enc/oboron-rs"
 authors = ["Bojan Đuričković"]
-description = "Encryption and encoding library for developer ergonomics: compact outputs, reversible references, high performance"
-keywords = ["encryption", "obfuscation", "encoding", "crypto", "id"]
+description = "Encryption and encoding library for developer ergonomics: prefix entropy, compact outputs, high performance"
+keywords = ["encryption", "obfuscation", "encoding", "base32", "identifiers"]
 categories = ["cryptography", "encoding"]
 readme = "README.md"
 
