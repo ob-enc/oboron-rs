@@ -49,7 +49,7 @@ name = "ob"
 path = "src/main.rs"
 
 [dependencies]
-oboron = { version = "0.2", path = "../oboron", features=["keyless"] }
+oboron = { version = "0.3", path = "../oboron", features=["keyless"] }
 clap = { version = "4.5", features = ["derive", "cargo"] }
 clap_complete = "4.5"
 serde = { version = "1.0", features = ["derive"] }
