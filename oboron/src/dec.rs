@@ -45,7 +45,11 @@ pub(crate) fn dec_from_format(
         return Err(Error::EmptyPayload);
     }
 
-    // Step 2: Extract the scheme byte from tail
+    // Step 2: Get scheme byte
+    // XOR the last byte with the first to undo mixing
+    let len = buffer.len();
+    buffer[len - 1] ^= buffer[0];
+    // Extract the scheme byte from tail
     let scheme_byte = buffer.pop().unwrap();
     // Validate scheme tail byte
     if scheme_byte != format.scheme().byte() {

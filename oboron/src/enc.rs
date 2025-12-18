@@ -76,6 +76,9 @@ pub(crate) fn enc_to_format(
         payload.extend_from_slice(&ciphertext);
         payload.push(format.scheme().byte()); // scheme byte at tail
     }
+    // XOR the scheme byte with the first byte for entropy
+    let len = payload.len();
+    payload[len - 1] ^= payload[0];
 
     // Step 4: Encode to specified format
     match format.encoding() {

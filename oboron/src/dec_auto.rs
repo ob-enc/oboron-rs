@@ -51,6 +51,10 @@ pub fn dec_any_scheme(
         return Err(Error::EmptyPayload);
     }
 
+    // XOR last byte with first byte for unmixing the scheme byte
+    let len = buffer.len();
+    buffer[len - 1] ^= buffer[0];
+
     // Step 2: Extract scheme byte from end (last byte)
     let scheme_byte = buffer.pop().unwrap(); // Remove scheme byte in-place
 

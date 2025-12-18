@@ -28,7 +28,7 @@ legacy = ["ob00"]  # For compatibility/testing
 experimental = []  # Experimental algorithms
 
 [dependencies]
-oboron = { path = "../oboron", default-features = false, features=["full"] }
+oboron = { version = "0.2", path = "../oboron", default-features = false, features=["full"] }
 pyo3 = { version = "0.22", features = ["extension-module"] }
 hex = "0.4"
 

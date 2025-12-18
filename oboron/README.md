@@ -265,9 +265,35 @@ enc operation:
 dec operation:
     [obtext] -> decoding -> [payload] -> oboron unpack -> [ciphertext] -> decryption -> [plaintext]
 ```
-Here:
-- `[payload] = [reverse(ciphertext)][scheme-byte]` for reversed schemes (`ob01`, `ob21p`),
-- `[payload] = [ciphertext][scheme-byte]` for all other schemes.
+
+### Payload Structure
+
+The payload construction is what gives the obtext its Oboron flavor. The
+two goals achieved with the payload structure are:
+1. Reversing the ciphertext for schemes in which this improves the
+   prefix entropy
+2. Including a scheme marker which allows scheme autodetection in
+   decoding
+
+The first step gives a transformed ciphertext:
+- `[ciphertext'] = [reverse(ciphertext)]` for reversed schemes (`ob01`,
+  `ob21p`),
+- `[ciphertext'] = [ciphertext]` for all other schemes (no change).
+
+The second step is achieved by appending a single byte marker to the
+payload prior to encoding.
+
+- `[payload] = [ciphertext'][marker]`
+
+This marker byte is the result of an XOR operation on a constant byte
+identifier for the scheme (e.g., `oboron::constants::OB01_BYTE = 0x02`),
+and the first byte of the transformed ciphertext (`ciphertext'[0]`).
+
+- `marker = ciphertext'[0] XOR scheme-byte`
+
+The purpose of this XOR is entropy mix-in: by using the constant scheme
+byte directly, all `ob01` obtexts would have a constant suffix.
+
 
 > **FAQ:** *Why do some schemes reverse the ciphertext, while others
 > don't?*

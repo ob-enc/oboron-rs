@@ -12,7 +12,7 @@ categories = ["command-line-utilities", "cryptography"]
 readme = "README.md"
 
 [features]
-default = ["all-schemes", "legacy", "experimental", "ob70"]
+default = ["all-schemes"]
 
 ob00 = ["oboron/ob00"]
 ob01 = ["oboron/ob01"]
@@ -49,7 +49,7 @@ name = "ob"
 path = "src/main.rs"
 
 [dependencies]
-oboron = { version = "0.1.0", path = "../oboron", default-features = false, features=["keyless"] }
+oboron = { version = "0.2", path = "../oboron", features=["keyless"] }
 clap = { version = "4.5", features = ["derive", "cargo"] }
 clap_complete = "4.5"
 serde = { version = "1.0", features = ["derive"] }
@@ -63,3 +63,4 @@ rand = "0.8"
 assert_cmd = "2.0"
 predicates = "3.0"
 tempfile = "3.8"
+clap-markdown = "0.1.5"
