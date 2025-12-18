@@ -863,9 +863,9 @@ let pt2 = obm.autodec(&ot);
 Note performance implications: autodetection uses trial-and-error across
 encodings, with worst-case performance ~3x slower than known-format
 dec operations. Meanwhile, scheme autodetection in other interfaces (e.g.,
-`Ob.dec()`, `ObFlex.dec()`, `Ob32Base64.dec()`) has negligible overhead
-as the scheme is detected based on the scheme byte in the payload, and
-the logic follows a direct path with no retries.
+`Ob.dec()`, `ObFlex.dec()`, `Ob32Base64.dec()`) has zero overhead, as the
+scheme is detected based on the scheme byte in the payload, and the logic
+follows a direct path with no retries.
 
 ### Using Format Constants
 
