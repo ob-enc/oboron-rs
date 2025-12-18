@@ -1,0 +1,52 @@
+name: WASM
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # Build for WASM with different feature combinations
+  build-wasm:
+    name: WASM - ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: "default (all schemes)"
+            features: ""
+          - name: "ob32 only (deterministic)"
+            features: "--no-default-features --features ob32"
+          - name: "ob32p only (probabilistic)"
+            features: "--no-default-features --features ob32p"
+          - name: "ob31 only"
+            features: "--no-default-features --features ob31"
+          - name: "modern schemes"
+            features: "--no-default-features --features ob31,ob32"
+          - name: "SIV schemes (both)"
+            features: "--no-default-features --features all-siv-schemes"
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: wasm-${{ matrix.name }}
+      
+      - name: Build for WASM
+        run: |
+          cd oboron
+          cargo build --target wasm32-unknown-unknown --release ${{ matrix.features }}
+      
+      - name: Check build artifacts
+        run: |
+          echo "✅ WASM build successful for: ${{ matrix.name }}"
+          ls -lh target/wasm32-unknown-unknown/release/

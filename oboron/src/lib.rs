@@ -33,10 +33,10 @@
 //! # {
 //! # use oboron;
 //! # let key = oboron::generate_key();
-//! # let ob = oboron::ObMulti::new(&key)?;
+//! # let obm = oboron::ObMulti::new(&key)?;
 //! // Operations: data, format
-//! let ot = ob.enc("plaintext", "ob32:b64")?;
-//! ob.dec(&ot, "ob32:b64")?;
+//! let ot = obm.enc("plaintext", "ob32:b64")?;
+//! obm.dec(&ot, "ob32:b64")?;
 //!
 //! // Constructors: format, key
 //! oboron::Ob::new("ob32:b64", &key)?;
@@ -140,15 +140,15 @@
 //! # {
 //! # use oboron::ObMulti;
 //! # let key = oboron::generate_key();
-//! let ob = ObMulti::new(&key)?;
+//! let obm = ObMulti::new(&key)?;
 //!
 //! // Encode to different formats
-//! let ot_b32 = ob.enc("data", "ob32:c32")?;
-//! let ot_b64 = ob.enc("data", "ob32:b64")?;
-//! let ot_hex = ob.enc("data", "ob32:hex")?;
+//! let ot_b32 = obm.enc("data", "ob32:c32")?;
+//! let ot_b64 = obm.enc("data", "ob32:b64")?;
+//! let ot_hex = obm.enc("data", "ob32:hex")?;
 //!
 //! // Decode with automatic format detection
-//! let pt2 = ob.autodec(&ot_b64)?;
+//! let pt2 = obm.autodec(&ot_b64)?;
 //! # }
 //! # Ok(())
 //! # }
@@ -427,8 +427,8 @@ pub mod prelude {
 /// # Ok(())
 /// # }
 /// ```
-pub fn enc(plaintext: &str, format: &str, key_base64: &str) -> Result<String, Error> {
-    ObMulti::new(key_base64)?.enc(plaintext, format)
+pub fn enc(plaintext: &str, format: &str, key: &str) -> Result<String, Error> {
+    ObMulti::new(key)?.enc(plaintext, format)
 }
 
 /// Encrypt+encode plaintext with a specified format using the hardcoded key (testing only).
@@ -476,8 +476,8 @@ pub fn enc_keyless(plaintext: &str, format: &str) -> Result<String, Error> {
 /// # Ok(())
 /// # }
 /// ```
-pub fn dec(obtext: &str, format: &str, key_base64: &str) -> Result<String, Error> {
-    ObMulti::new(key_base64)?.dec(obtext, format)
+pub fn dec(obtext: &str, format: &str, key: &str) -> Result<String, Error> {
+    ObMulti::new(key)?.dec(obtext, format)
 }
 
 /// Decode+decrypt obtext with a specified format using the hardcoded key (testing only).
@@ -527,8 +527,8 @@ pub fn dec_keyless(obtext: &str, format: &str) -> Result<String, Error> {
 /// # Ok(())
 /// # }
 /// ```
-pub fn autodec(obtext: &str, key_base64: &str) -> Result<String, Error> {
-    ObMulti::new(key_base64)?.autodec(obtext)
+pub fn autodec(obtext: &str, key: &str) -> Result<String, Error> {
+    ObMulti::new(key)?.autodec(obtext)
 }
 
 /// Decode+decrypt obtext with automatic format detection using the hardcoded key (testing only).

@@ -13,9 +13,9 @@ pub(crate) struct ObCore {
 
 impl ObCore {
     /// Create a new ObCore with the specified format string and base64 key.
-    pub(crate) fn new(fmt: &str, key_b64: &str) -> Result<Self, Error> {
+    pub(crate) fn new(fmt: &str, key: &str) -> Result<Self, Error> {
         Ok(Self {
-            keychain: Keychain::from_base64(key_b64)?,
+            keychain: Keychain::from_base64(key)?,
             format: Format::from_str(fmt)?,
         })
     }
@@ -25,10 +25,10 @@ impl ObCore {
     // 1. Alt format input ---
     //
     /// Create a new ObCore with a pre-parsed Format and base64 key.
-    pub(crate) fn new_with_format(format: Format, key_b64: &str) -> Result<Self, Error> {
+    pub(crate) fn new_with_format(format: Format, key: &str) -> Result<Self, Error> {
         Ok(Self {
             format,
-            keychain: Keychain::from_base64(key_b64)?,
+            keychain: Keychain::from_base64(key)?,
         })
     }
 
@@ -63,18 +63,22 @@ impl ObCore {
     /// Create a new ObCore from the specified format string and raw bytes.
     #[inline]
     #[cfg(feature = "bytes-keys")]
-    pub(crate) fn from_bytes(fmt: &str, key: &[u8; 64]) -> Result<Self, Error> {
+    pub(crate) fn from_bytes(fmt: &str, key_bytes: &[u8; 64]) -> Result<Self, Error> {
         Ok(Self {
-            keychain: Keychain::from_bytes(key)?,
+            keychain: Keychain::from_bytes(key_bytes)?,
             format: Format::from_str(fmt)?,
         })
     }
+
     /// Create a new ObCore from a pre-parsed Format and raw bytes.
     #[inline]
     #[cfg(feature = "bytes-keys")]
-    pub(crate) fn from_bytes_with_format(format: Format, key: &[u8; 64]) -> Result<Self, Error> {
+    pub(crate) fn from_bytes_with_format(
+        format: Format,
+        key_bytes: &[u8; 64],
+    ) -> Result<Self, Error> {
         Ok(Self {
-            keychain: Keychain::from_bytes(key)?,
+            keychain: Keychain::from_bytes(key_bytes)?,
             format,
         })
     }
@@ -91,6 +95,7 @@ impl ObCore {
             format: Format::from_str(fmt)?,
         })
     }
+
     /// Create a new ObCore with a pre-parsed Format and hex key.
     #[inline]
     #[cfg(feature = "hex-keys")]

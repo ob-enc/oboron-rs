@@ -63,10 +63,10 @@ impl ObFlex {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn new(format: impl IntoFormat, key_b64: &str) -> Result<Self, Error> {
+    pub fn new(format: impl IntoFormat, key: &str) -> Result<Self, Error> {
         let format = format.into_format()?;
         Ok(Self {
-            core: ObCore::new_with_format(format, key_b64)?,
+            core: ObCore::new_with_format(format, key)?,
         })
     }
 

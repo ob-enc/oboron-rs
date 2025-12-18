@@ -1,0 +1,124 @@
+name: Tests
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs: 
+  # Test the core oboron library
+  test-oboron:
+    name: Test oboron
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix: 
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        rust: [stable, beta]
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+      
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: "oboron -> target"
+      
+      - name:  Run tests
+        run: |
+          cd oboron
+          cargo test --all-features
+      
+      - name: Run tests (no default features)
+        run: |
+          cd oboron
+          cargo test --no-default-features --features ob32
+
+  # Test the CLI
+  test-cli:
+    name: Test oboron-cli
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:  [ubuntu-latest, macos-latest, windows-latest]
+        rust: [stable]
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: dtolnay/rust-toolchain@stable
+      
+      - uses: Swatinem/rust-cache@v2
+        with: 
+          workspaces: "oboron-cli -> target"
+      
+      - name: Run tests
+        run: |
+          cd oboron-cli
+          cargo test
+      
+      - name: Build CLI
+        run: |
+          cd oboron-cli
+          cargo build --release
+      
+      - name:  Verify CLI works
+        shell: bash
+        run: |
+          cd oboron-cli
+          cargo run --release -- --version
+
+  # Doc tests
+  test-docs:
+    name: Test documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: dtolnay/rust-toolchain@stable
+      
+      - uses: Swatinem/rust-cache@v2
+      
+      - name: Test documentation
+        run: |
+          cd oboron
+          cargo test --doc --all-features
+      
+      - name: Check documentation builds
+        run: |
+          cd oboron
+          cargo doc --no-deps --all-features
+
+  # Minimal Supported Rust Version (MSRV)
+  msrv: 
+    name: Check MSRV (1.77.0)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: dtolnay/rust-toolchain@1.77.0
+      
+      # Regenerate Cargo.lock with MSRV-compatible version
+      - name: Regenerate Cargo.lock with MSRV
+        run:  |
+          cd oboron
+          rm -f Cargo.lock
+          cargo +1.77.0 generate-lockfile
+      
+      - uses: Swatinem/rust-cache@v2
+      
+      - name: Check oboron builds
+        run: |
+          cd oboron
+          cargo check --all-features
+      
+      - name: Check oboron-cli builds
+        run: |
+          cd oboron-cli
+          cargo check

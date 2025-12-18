@@ -1,5 +1,25 @@
+# Rust
+/target/
+**/*.rs.bk
+*.pdb
+
+# IDEs
+.vscode/
+.idea/
 *.sw[o-z]
-*.so
-target
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local config (not the template)
+.ob/
+
+# Dev scripts
 scripts
+
+# Misc
 err
+out
+**/err

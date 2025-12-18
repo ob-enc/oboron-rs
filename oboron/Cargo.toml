@@ -1,8 +1,8 @@
 [package]
 name = "oboron"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
-rust-version = "1.74.0"
+rust-version = "1.77.0"
 license = "MIT"
 repository = "https://github.com/ob-enc/oboron-rs"
 authors = ["Bojan Đuričković"]
@@ -94,11 +94,6 @@ rand = "0.8"
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 rand = { version = "0.8", features = ["getrandom"] }
 getrandom = { version = "0.2", features = ["js"] }
-
-[profile.release]
-opt-level = "z"     # Optimize for size
-lto = true
-codegen-units = 1
 
 [lib]
 name = "oboron"

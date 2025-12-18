@@ -5,9 +5,9 @@ edition = "2021"
 rust-version = "1.74.0"
 authors = ["Bojan Đuričković"]
 license = "MIT"
-repository = "https://github.com/ob-encoding/oboron"
-description = "CLI tool for Oboron - reversible, encrypted reference strings"
-keywords = ["cli", "encryption", "obfuscation", "encoding"]
+repository = "https://github.com/ob-enc/oboron-rs"
+description = "CLI tool for Oboron - general purpose encryption and encoding library"
+keywords = ["cli", "encryption", "obfuscation", "encoding", "base32"]
 categories = ["command-line-utilities", "cryptography"]
 readme = "README.md"
 
@@ -23,9 +23,25 @@ ob31p = ["oboron/ob31p"]
 ob32p = ["oboron/ob32p"]
 ob70 = ["oboron/ob70"]
 ob71 = ["oboron/ob71"]
-all-schemes = ["ob01", "ob21p", "ob31", "ob31p", "ob32", "ob32p"]
-legacy = ["ob00"]  # For compatibility/testing
-testing = ["ob70", "ob71"]
+
+# Scheme categories
+# =================
+ob0x = ["ob01"] # insecure, not authenticated
+ob1x = []  # insecure, authenticated
+ob2x = ["ob21p"]  # secure, not authenticated
+ob3x = ["ob31", "ob31p", "ob32", "ob32p"]  # secure, authenticated
+ob7x = ["ob70", "ob71"]  # testing
+insecure-schemes = ["ob0x", "ob1x"]
+secure-schemes = ["ob2x", "ob3x"]
+authenticated-schemes = ["ob3x"]
+deterministic-schemes = ["ob01", "ob31", "ob32"]
+probabilistic-schemes = ["ob21p", "ob31p", "ob32p"]
+all-schemes = ["ob0x", "ob1x", "ob2x", "ob3x"]
+
+# Special purpose groups
+# ======================
+non-crypto = ["ob70", "ob71"]
+legacy = ["ob00"]  # For backward compatibility only -> use ob01 instead
 experimental = []  # Experimental algorithms
 
 [[bin]]
@@ -33,7 +49,7 @@ name = "ob"
 path = "src/main.rs"
 
 [dependencies]
-oboron = { path = "../oboron", default-features = false, features=["keyless"] }
+oboron = { version = "0.1.0", path = "../oboron", default-features = false, features=["keyless"] }
 clap = { version = "4.5", features = ["derive", "cargo"] }
 clap_complete = "4.5"
 serde = { version = "1.0", features = ["derive"] }

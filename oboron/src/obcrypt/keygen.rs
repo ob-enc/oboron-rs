@@ -19,9 +19,9 @@ use rand::RngCore;
 #[must_use]
 pub fn generate_key_base64() -> String {
     loop {
-        let mut key = [0u8; 64];
-        rand::thread_rng().fill_bytes(&mut key);
-        let key_base64 = BASE64URL_NOPAD.encode(&key);
+        let mut key_bytes = [0u8; 64];
+        rand::thread_rng().fill_bytes(&mut key_bytes);
+        let key_base64 = BASE64URL_NOPAD.encode(&key_bytes);
         if !key_base64.contains('-') && !key_base64.contains('_') {
             return key_base64;
         }

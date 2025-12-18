@@ -71,9 +71,9 @@ impl Ob {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn new(fmt: &str, key_b64: &str) -> Result<Self, Error> {
+    pub fn new(fmt: &str, key: &str) -> Result<Self, Error> {
         Ok(Self {
-            core: ObCore::new(fmt, key_b64)?,
+            core: ObCore::new(fmt, key)?,
         })
     }
 
@@ -121,9 +121,9 @@ impl Ob {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn new_with_format(format: Format, key_b64: &str) -> Result<Self, Error> {
+    pub fn new_with_format(format: Format, key: &str) -> Result<Self, Error> {
         Ok(Self {
-            core: ObCore::new_with_format(format, key_b64)?,
+            core: ObCore::new_with_format(format, key)?,
         })
     }
 

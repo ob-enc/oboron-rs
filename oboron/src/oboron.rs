@@ -69,18 +69,18 @@ macro_rules! impl_oboron {
         impl $name {
             /// Create a new instance with a 86-character base64 string key.
             #[inline]
-            pub fn new(key_b64: &str) -> Result<Self, Error> {
+            pub fn new(key: &str) -> Result<Self, Error> {
                 Ok(Self {
-                    keychain: Keychain::from_base64(key_b64)?,
+                    keychain: Keychain::from_base64(key)?,
                 })
             }
 
             /// Create a new instance from a 64-byte key.
             #[inline]
             #[cfg(any(feature = "keyless", feature = "bytes-keys"))]
-            fn from_bytes_internal(key: &[u8; 64]) -> Result<Self, Error> {
+            fn from_bytes_internal(key_bytes: &[u8; 64]) -> Result<Self, Error> {
                 Ok(Self {
-                    keychain: Keychain::from_bytes(key)?,
+                    keychain: Keychain::from_bytes(key_bytes)?,
                 })
             }
 
@@ -105,9 +105,9 @@ macro_rules! impl_oboron {
             /// Create a new instance from a 64-byte key.
             #[inline]
             #[cfg(feature = "bytes-keys")]
-            pub fn from_bytes(key: &[u8; 64]) -> Result<Self, Error> {
+            pub fn from_bytes(key_bytes: &[u8; 64]) -> Result<Self, Error> {
                 Ok(Self {
-                    keychain: Keychain::from_bytes(key)?,
+                    keychain: Keychain::from_bytes(key_bytes)?,
                 })
             }
         }
@@ -487,26 +487,18 @@ impl ObAny {
     /// Create a new instance with a 128-character hex string key.
     ///
     /// Defaults to ob70:c32 format.
-    pub fn new(key_b64: &str) -> Result<Self, Error> {
+    pub fn new(key: &str) -> Result<Self, Error> {
         #[cfg(feature = "ob70")]
-        return Ok(ObAny::Ob70Base32Crockford(Ob70Base32Crockford::new(
-            key_b64,
-        )?));
+        return Ok(ObAny::Ob70Base32Crockford(Ob70Base32Crockford::new(key)?));
         #[cfg(feature = "ob71")]
         #[cfg(not(feature = "ob70"))]
-        return Ok(ObAny::Ob71Base32Crockford(Ob71Base32Crockford::new(
-            key_b64,
-        )?));
+        return Ok(ObAny::Ob71Base32Crockford(Ob71Base32Crockford::new(key)?));
         #[cfg(feature = "ob01")]
         #[cfg(not(any(feature = "ob70", feature = "ob71")))]
-        return Ok(ObAny::Ob01Base32Crockford(Ob01Base32Crockford::new(
-            key_b64,
-        )?));
+        return Ok(ObAny::Ob01Base32Crockford(Ob01Base32Crockford::new(key)?));
         #[cfg(feature = "ob21p")]
         #[cfg(not(any(feature = "ob70", feature = "ob71", feature = "ob01")))]
-        return Ok(ObAny::Ob21pBase32Crockford(Ob21pBase32Crockford::new(
-            key_b64,
-        )?));
+        return Ok(ObAny::Ob21pBase32Crockford(Ob21pBase32Crockford::new(key)?));
         #[cfg(feature = "ob31")]
         #[cfg(not(any(
             feature = "ob70",
@@ -514,9 +506,7 @@ impl ObAny {
             feature = "ob01",
             feature = "ob21p"
         )))]
-        return Ok(ObAny::Ob31Base32Crockford(Ob31Base32Crockford::new(
-            key_b64,
-        )?));
+        return Ok(ObAny::Ob31Base32Crockford(Ob31Base32Crockford::new(key)?));
         #[cfg(feature = "ob31p")]
         #[cfg(not(any(
             feature = "ob70",
@@ -525,9 +515,7 @@ impl ObAny {
             feature = "ob21p",
             feature = "ob31"
         )))]
-        return Ok(ObAny::Ob31pBase32Crockford(Ob31pBase32Crockford::new(
-            key_b64,
-        )?));
+        return Ok(ObAny::Ob31pBase32Crockford(Ob31pBase32Crockford::new(key)?));
         #[cfg(feature = "ob32")]
         #[cfg(not(any(
             feature = "ob70",
@@ -537,9 +525,7 @@ impl ObAny {
             feature = "ob31",
             feature = "ob31p"
         )))]
-        return Ok(ObAny::Ob32Base32Crockford(Ob32Base32Crockford::new(
-            key_b64,
-        )?));
+        return Ok(ObAny::Ob32Base32Crockford(Ob32Base32Crockford::new(key)?));
         #[cfg(feature = "ob32p")]
         #[cfg(not(any(
             feature = "ob70",
@@ -550,9 +536,7 @@ impl ObAny {
             feature = "ob31p",
             feature = "ob32"
         )))]
-        return Ok(ObAny::Ob32pBase32Crockford(Ob32pBase32Crockford::new(
-            key_b64,
-        )?));
+        return Ok(ObAny::Ob32pBase32Crockford(Ob32pBase32Crockford::new(key)?));
         #[cfg(feature = "ob00")]
         #[cfg(not(any(
             feature = "ob70",
@@ -564,9 +548,7 @@ impl ObAny {
             feature = "ob32",
             feature = "ob32p"
         )))]
-        return Ok(ObAny::Ob00Base32Crockford(Ob00Base32Crockford::new(
-            key_b64,
-        )?));
+        return Ok(ObAny::Ob00Base32Crockford(Ob00Base32Crockford::new(key)?));
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
@@ -586,25 +568,25 @@ impl ObAny {
     /// Defaults to ob70:c32 format.
     #[inline]
     #[cfg(feature = "bytes-keys")]
-    pub fn from_bytes(key: &[u8; 64]) -> Result<Self, Error> {
+    pub fn from_bytes(key_bytes: &[u8; 64]) -> Result<Self, Error> {
         #[cfg(feature = "ob70")]
         return Ok(ObAny::Ob70Base32Crockford(Ob70Base32Crockford {
-            keychain: Keychain::from_bytes(key)?,
+            keychain: Keychain::from_bytes(key_bytes)?,
         }));
         #[cfg(feature = "ob71")]
         #[cfg(not(feature = "ob70"))]
         return Ok(ObAny::Ob71Base32Crockford(Ob71Base32Crockford {
-            keychain: Keychain::from_bytes(key)?,
+            keychain: Keychain::from_bytes(key_bytes)?,
         }));
         #[cfg(feature = "ob01")]
         #[cfg(not(any(feature = "ob70", feature = "ob71")))]
         return Ok(ObAny::Ob01Base32Crockford(Ob01Base32Crockford {
-            keychain: Keychain::from_bytes(key)?,
+            keychain: Keychain::from_bytes(key_bytes)?,
         }));
         #[cfg(feature = "ob21p")]
         #[cfg(not(any(feature = "ob70", feature = "ob71", feature = "ob01")))]
         return Ok(ObAny::Ob21pBase32Crockford(Ob21pBase32Crockford {
-            keychain: Keychain::from_bytes(key)?,
+            keychain: Keychain::from_bytes(key_bytes)?,
         }));
         #[cfg(feature = "ob31")]
         #[cfg(not(any(
@@ -614,7 +596,7 @@ impl ObAny {
             feature = "ob21p"
         )))]
         return Ok(ObAny::Ob31Base32Crockford(Ob31Base32Crockford {
-            keychain: Keychain::from_bytes(key)?,
+            keychain: Keychain::from_bytes(key_bytes)?,
         }));
         #[cfg(feature = "ob31p")]
         #[cfg(not(any(
@@ -625,7 +607,7 @@ impl ObAny {
             feature = "ob31"
         )))]
         return Ok(ObAny::Ob31pBase32Crockford(Ob31pBase32Crockford {
-            keychain: Keychain::from_bytes(key)?,
+            keychain: Keychain::from_bytes(key_bytes)?,
         }));
         #[cfg(feature = "ob32")]
         #[cfg(not(any(
@@ -637,7 +619,7 @@ impl ObAny {
             feature = "ob31p"
         )))]
         return Ok(ObAny::Ob32Base32Crockford(Ob32Base32Crockford {
-            keychain: Keychain::from_bytes(key)?,
+            keychain: Keychain::from_bytes(key_bytes)?,
         }));
         #[cfg(feature = "ob32p")]
         #[cfg(not(any(
@@ -650,7 +632,7 @@ impl ObAny {
             feature = "ob32"
         )))]
         return Ok(ObAny::Ob32pBase32Crockford(Ob32pBase32Crockford {
-            keychain: Keychain::from_bytes(key)?,
+            keychain: Keychain::from_bytes(key_bytes)?,
         }));
         #[cfg(feature = "ob00")]
         #[cfg(not(any(
@@ -664,7 +646,7 @@ impl ObAny {
             feature = "ob32p"
         )))]
         return Ok(ObAny::Ob00Base32Crockford(Ob00Base32Crockford {
-            keychain: Keychain::from_bytes(key)?,
+            keychain: Keychain::from_bytes(key_bytes)?,
         }));
         #[cfg(not(any(
             feature = "ob70",
@@ -680,27 +662,27 @@ impl ObAny {
         compile_error!("At least one oboron scheme must be enabled");
     }
 
-    #[cfg(feature = "bytes-keys")]
+    #[cfg(feature = "hex-keys")]
     pub fn from_hex_key(key_hex: &str) -> Result<Self, Error> {
         #[cfg(feature = "ob70")]
-        return Ok(ObAny::Ob70Base32Crockford(Ob70Base32Crockford::new(
-            key_hex,
-        )?));
+        return Ok(ObAny::Ob70Base32Crockford(
+            Ob70Base32Crockford::from_hex_key(key_hex)?,
+        ));
         #[cfg(feature = "ob71")]
         #[cfg(not(feature = "ob70"))]
-        return Ok(ObAny::Ob71Base32Crockford(Ob71Base32Crockford::new(
-            key_hex,
-        )?));
+        return Ok(ObAny::Ob71Base32Crockford(
+            Ob71Base32Crockford::from_hex_key(key_hex)?,
+        ));
         #[cfg(feature = "ob01")]
         #[cfg(not(any(feature = "ob70", feature = "ob71")))]
-        return Ok(ObAny::Ob01Base32Crockford(Ob01Base32Crockford::new(
-            key_hex,
-        )?));
+        return Ok(ObAny::Ob01Base32Crockford(
+            Ob01Base32Crockford::from_hex_key(key_hex)?,
+        ));
         #[cfg(feature = "ob21p")]
         #[cfg(not(any(feature = "ob70", feature = "ob71", feature = "ob01")))]
-        return Ok(ObAny::Ob21pBase32Crockford(Ob21pBase32Crockford::new(
-            key_hex,
-        )?));
+        return Ok(ObAny::Ob21pBase32Crockford(
+            Ob21pBase32Crockford::from_hex_key(key_hex)?,
+        ));
         #[cfg(feature = "ob31")]
         #[cfg(not(any(
             feature = "ob70",
@@ -708,9 +690,9 @@ impl ObAny {
             feature = "ob01",
             feature = "ob21p"
         )))]
-        return Ok(ObAny::Ob31Base32Crockford(Ob31Base32Crockford::new(
-            key_hex,
-        )?));
+        return Ok(ObAny::Ob31Base32Crockford(
+            Ob31Base32Crockford::from_hex_key(key_hex)?,
+        ));
         #[cfg(feature = "ob31p")]
         #[cfg(not(any(
             feature = "ob70",
@@ -719,9 +701,9 @@ impl ObAny {
             feature = "ob21p",
             feature = "ob31"
         )))]
-        return Ok(ObAny::Ob31pBase32Crockford(Ob31pBase32Crockford::new(
-            key_hex,
-        )?));
+        return Ok(ObAny::Ob31pBase32Crockford(
+            Ob31pBase32Crockford::from_hex_key(key_hex)?,
+        ));
         #[cfg(feature = "ob32")]
         #[cfg(not(any(
             feature = "ob70",
@@ -731,9 +713,9 @@ impl ObAny {
             feature = "ob31",
             feature = "ob31p"
         )))]
-        return Ok(ObAny::Ob32Base32Crockford(Ob32Base32Crockford::new(
-            key_hex,
-        )?));
+        return Ok(ObAny::Ob32Base32Crockford(
+            Ob32Base32Crockford::from_hex_key(key_hex)?,
+        ));
         #[cfg(feature = "ob32p")]
         #[cfg(not(any(
             feature = "ob70",
@@ -744,9 +726,9 @@ impl ObAny {
             feature = "ob31p",
             feature = "ob32"
         )))]
-        return Ok(ObAny::Ob32pBase32Crockford(Ob32pBase32Crockford::new(
-            key_hex,
-        )?));
+        return Ok(ObAny::Ob32pBase32Crockford(
+            Ob32pBase32Crockford::from_hex_key(key_hex)?,
+        ));
         #[cfg(feature = "ob00")]
         #[cfg(not(any(
             feature = "ob70",
@@ -758,9 +740,9 @@ impl ObAny {
             feature = "ob32",
             feature = "ob32p"
         )))]
-        return Ok(ObAny::Ob00Base32Crockford(Ob00Base32Crockford::new(
-            key_hex,
-        )?));
+        return Ok(ObAny::Ob00Base32Crockford(
+            Ob00Base32Crockford::from_hex_key(key_hex)?,
+        ));
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
@@ -875,260 +857,266 @@ impl ObAny {
 }
 
 /// Create an encoder from a format string and base64 key.
-pub fn new(fmt: &str, key_b64: &str) -> Result<ObAny, Error> {
+pub fn new(fmt: &str, key: &str) -> Result<ObAny, Error> {
     let format = Format::from_str(fmt)?;
-    new_with_format(format, key_b64)
+    new_with_format(format, key)
 }
 
 /// Create an encoder from a pre-parsed Format and base64 key.
-pub fn new_with_format(format: Format, key_b64: &str) -> Result<ObAny, Error> {
+pub fn new_with_format(format: Format, key: &str) -> Result<ObAny, Error> {
     match (format.scheme(), format.encoding()) {
         #[cfg(feature = "ob01")]
-        (Scheme::Ob01, Encoding::Base32Crockford) => Ok(ObAny::Ob01Base32Crockford(
-            Ob01Base32Crockford::new(key_b64)?,
-        )),
-        #[cfg(feature = "ob01")]
-        (Scheme::Ob01, Encoding::Base32Rfc) => {
-            Ok(ObAny::Ob01Base32Rfc(Ob01Base32Rfc::new(key_b64)?))
+        (Scheme::Ob01, Encoding::Base32Crockford) => {
+            Ok(ObAny::Ob01Base32Crockford(Ob01Base32Crockford::new(key)?))
         }
         #[cfg(feature = "ob01")]
-        (Scheme::Ob01, Encoding::Base64) => Ok(ObAny::Ob01Base64(Ob01Base64::new(key_b64)?)),
+        (Scheme::Ob01, Encoding::Base32Rfc) => Ok(ObAny::Ob01Base32Rfc(Ob01Base32Rfc::new(key)?)),
         #[cfg(feature = "ob01")]
-        (Scheme::Ob01, Encoding::Hex) => Ok(ObAny::Ob01Hex(Ob01Hex::new(key_b64)?)),
+        (Scheme::Ob01, Encoding::Base64) => Ok(ObAny::Ob01Base64(Ob01Base64::new(key)?)),
+        #[cfg(feature = "ob01")]
+        (Scheme::Ob01, Encoding::Hex) => Ok(ObAny::Ob01Hex(Ob01Hex::new(key)?)),
         #[cfg(feature = "ob21p")]
-        (Scheme::Ob21p, Encoding::Base32Crockford) => Ok(ObAny::Ob21pBase32Crockford(
-            Ob21pBase32Crockford::new(key_b64)?,
-        )),
+        (Scheme::Ob21p, Encoding::Base32Crockford) => {
+            Ok(ObAny::Ob21pBase32Crockford(Ob21pBase32Crockford::new(key)?))
+        }
         #[cfg(feature = "ob21p")]
         (Scheme::Ob21p, Encoding::Base32Rfc) => {
-            Ok(ObAny::Ob21pBase32Rfc(Ob21pBase32Rfc::new(key_b64)?))
+            Ok(ObAny::Ob21pBase32Rfc(Ob21pBase32Rfc::new(key)?))
         }
         #[cfg(feature = "ob21p")]
-        (Scheme::Ob21p, Encoding::Base64) => Ok(ObAny::Ob21pBase64(Ob21pBase64::new(key_b64)?)),
+        (Scheme::Ob21p, Encoding::Base64) => Ok(ObAny::Ob21pBase64(Ob21pBase64::new(key)?)),
         #[cfg(feature = "ob21p")]
-        (Scheme::Ob21p, Encoding::Hex) => Ok(ObAny::Ob21pHex(Ob21pHex::new(key_b64)?)),
+        (Scheme::Ob21p, Encoding::Hex) => Ok(ObAny::Ob21pHex(Ob21pHex::new(key)?)),
         #[cfg(feature = "ob31")]
-        (Scheme::Ob31, Encoding::Base32Crockford) => Ok(ObAny::Ob31Base32Crockford(
-            Ob31Base32Crockford::new(key_b64)?,
-        )),
-        #[cfg(feature = "ob31")]
-        (Scheme::Ob31, Encoding::Base32Rfc) => {
-            Ok(ObAny::Ob31Base32Rfc(Ob31Base32Rfc::new(key_b64)?))
+        (Scheme::Ob31, Encoding::Base32Crockford) => {
+            Ok(ObAny::Ob31Base32Crockford(Ob31Base32Crockford::new(key)?))
         }
         #[cfg(feature = "ob31")]
-        (Scheme::Ob31, Encoding::Base64) => Ok(ObAny::Ob31Base64(Ob31Base64::new(key_b64)?)),
+        (Scheme::Ob31, Encoding::Base32Rfc) => Ok(ObAny::Ob31Base32Rfc(Ob31Base32Rfc::new(key)?)),
         #[cfg(feature = "ob31")]
-        (Scheme::Ob31, Encoding::Hex) => Ok(ObAny::Ob31Hex(Ob31Hex::new(key_b64)?)),
+        (Scheme::Ob31, Encoding::Base64) => Ok(ObAny::Ob31Base64(Ob31Base64::new(key)?)),
+        #[cfg(feature = "ob31")]
+        (Scheme::Ob31, Encoding::Hex) => Ok(ObAny::Ob31Hex(Ob31Hex::new(key)?)),
         #[cfg(feature = "ob31p")]
-        (Scheme::Ob31p, Encoding::Base32Crockford) => Ok(ObAny::Ob31pBase32Crockford(
-            Ob31pBase32Crockford::new(key_b64)?,
-        )),
+        (Scheme::Ob31p, Encoding::Base32Crockford) => {
+            Ok(ObAny::Ob31pBase32Crockford(Ob31pBase32Crockford::new(key)?))
+        }
         #[cfg(feature = "ob31p")]
         (Scheme::Ob31p, Encoding::Base32Rfc) => {
-            Ok(ObAny::Ob31pBase32Rfc(Ob31pBase32Rfc::new(key_b64)?))
+            Ok(ObAny::Ob31pBase32Rfc(Ob31pBase32Rfc::new(key)?))
         }
         #[cfg(feature = "ob31p")]
-        (Scheme::Ob31p, Encoding::Base64) => Ok(ObAny::Ob31pBase64(Ob31pBase64::new(key_b64)?)),
+        (Scheme::Ob31p, Encoding::Base64) => Ok(ObAny::Ob31pBase64(Ob31pBase64::new(key)?)),
         #[cfg(feature = "ob31p")]
-        (Scheme::Ob31p, Encoding::Hex) => Ok(ObAny::Ob31pHex(Ob31pHex::new(key_b64)?)),
+        (Scheme::Ob31p, Encoding::Hex) => Ok(ObAny::Ob31pHex(Ob31pHex::new(key)?)),
         #[cfg(feature = "ob32")]
-        (Scheme::Ob32, Encoding::Base32Crockford) => Ok(ObAny::Ob32Base32Crockford(
-            Ob32Base32Crockford::new(key_b64)?,
-        )),
-        #[cfg(feature = "ob32")]
-        (Scheme::Ob32, Encoding::Base32Rfc) => {
-            Ok(ObAny::Ob32Base32Rfc(Ob32Base32Rfc::new(key_b64)?))
+        (Scheme::Ob32, Encoding::Base32Crockford) => {
+            Ok(ObAny::Ob32Base32Crockford(Ob32Base32Crockford::new(key)?))
         }
         #[cfg(feature = "ob32")]
-        (Scheme::Ob32, Encoding::Base64) => Ok(ObAny::Ob32Base64(Ob32Base64::new(key_b64)?)),
+        (Scheme::Ob32, Encoding::Base32Rfc) => Ok(ObAny::Ob32Base32Rfc(Ob32Base32Rfc::new(key)?)),
         #[cfg(feature = "ob32")]
-        (Scheme::Ob32, Encoding::Hex) => Ok(ObAny::Ob32Hex(Ob32Hex::new(key_b64)?)),
+        (Scheme::Ob32, Encoding::Base64) => Ok(ObAny::Ob32Base64(Ob32Base64::new(key)?)),
+        #[cfg(feature = "ob32")]
+        (Scheme::Ob32, Encoding::Hex) => Ok(ObAny::Ob32Hex(Ob32Hex::new(key)?)),
         #[cfg(feature = "ob32p")]
-        (Scheme::Ob32p, Encoding::Base32Crockford) => Ok(ObAny::Ob32pBase32Crockford(
-            Ob32pBase32Crockford::new(key_b64)?,
-        )),
+        (Scheme::Ob32p, Encoding::Base32Crockford) => {
+            Ok(ObAny::Ob32pBase32Crockford(Ob32pBase32Crockford::new(key)?))
+        }
         #[cfg(feature = "ob32p")]
         (Scheme::Ob32p, Encoding::Base32Rfc) => {
-            Ok(ObAny::Ob32pBase32Rfc(Ob32pBase32Rfc::new(key_b64)?))
+            Ok(ObAny::Ob32pBase32Rfc(Ob32pBase32Rfc::new(key)?))
         }
         #[cfg(feature = "ob32p")]
-        (Scheme::Ob32p, Encoding::Base64) => Ok(ObAny::Ob32pBase64(Ob32pBase64::new(key_b64)?)),
+        (Scheme::Ob32p, Encoding::Base64) => Ok(ObAny::Ob32pBase64(Ob32pBase64::new(key)?)),
         #[cfg(feature = "ob32p")]
-        (Scheme::Ob32p, Encoding::Hex) => Ok(ObAny::Ob32pHex(Ob32pHex::new(key_b64)?)),
+        (Scheme::Ob32p, Encoding::Hex) => Ok(ObAny::Ob32pHex(Ob32pHex::new(key)?)),
         // Testing
         #[cfg(feature = "ob70")]
-        (Scheme::Ob70, Encoding::Base32Crockford) => Ok(ObAny::Ob70Base32Crockford(
-            Ob70Base32Crockford::new(key_b64)?,
-        )),
-        #[cfg(feature = "ob70")]
-        (Scheme::Ob70, Encoding::Base32Rfc) => {
-            Ok(ObAny::Ob70Base32Rfc(Ob70Base32Rfc::new(key_b64)?))
+        (Scheme::Ob70, Encoding::Base32Crockford) => {
+            Ok(ObAny::Ob70Base32Crockford(Ob70Base32Crockford::new(key)?))
         }
         #[cfg(feature = "ob70")]
-        (Scheme::Ob70, Encoding::Base64) => Ok(ObAny::Ob70Base64(Ob70Base64::new(key_b64)?)),
+        (Scheme::Ob70, Encoding::Base32Rfc) => Ok(ObAny::Ob70Base32Rfc(Ob70Base32Rfc::new(key)?)),
         #[cfg(feature = "ob70")]
-        (Scheme::Ob70, Encoding::Hex) => Ok(ObAny::Ob70Hex(Ob70Hex::new(key_b64)?)),
+        (Scheme::Ob70, Encoding::Base64) => Ok(ObAny::Ob70Base64(Ob70Base64::new(key)?)),
+        #[cfg(feature = "ob70")]
+        (Scheme::Ob70, Encoding::Hex) => Ok(ObAny::Ob70Hex(Ob70Hex::new(key)?)),
         #[cfg(feature = "ob71")]
-        (Scheme::Ob71, Encoding::Base32Crockford) => Ok(ObAny::Ob71Base32Crockford(
-            Ob71Base32Crockford::new(key_b64)?,
-        )),
-        #[cfg(feature = "ob71")]
-        (Scheme::Ob71, Encoding::Base32Rfc) => {
-            Ok(ObAny::Ob71Base32Rfc(Ob71Base32Rfc::new(key_b64)?))
+        (Scheme::Ob71, Encoding::Base32Crockford) => {
+            Ok(ObAny::Ob71Base32Crockford(Ob71Base32Crockford::new(key)?))
         }
         #[cfg(feature = "ob71")]
-        (Scheme::Ob71, Encoding::Base64) => Ok(ObAny::Ob71Base64(Ob71Base64::new(key_b64)?)),
+        (Scheme::Ob71, Encoding::Base32Rfc) => Ok(ObAny::Ob71Base32Rfc(Ob71Base32Rfc::new(key)?)),
         #[cfg(feature = "ob71")]
-        (Scheme::Ob71, Encoding::Hex) => Ok(ObAny::Ob71Hex(Ob71Hex::new(key_b64)?)),
+        (Scheme::Ob71, Encoding::Base64) => Ok(ObAny::Ob71Base64(Ob71Base64::new(key)?)),
+        #[cfg(feature = "ob71")]
+        (Scheme::Ob71, Encoding::Hex) => Ok(ObAny::Ob71Hex(Ob71Hex::new(key)?)),
         // Legacy
         #[cfg(feature = "ob00")]
-        (Scheme::Ob00, Encoding::Base32Crockford) => Ok(ObAny::Ob00Base32Crockford(
-            Ob00Base32Crockford::new(key_b64)?,
-        )),
-        #[cfg(feature = "ob00")]
-        (Scheme::Ob00, Encoding::Base32Rfc) => {
-            Ok(ObAny::Ob00Base32Rfc(Ob00Base32Rfc::new(key_b64)?))
+        (Scheme::Ob00, Encoding::Base32Crockford) => {
+            Ok(ObAny::Ob00Base32Crockford(Ob00Base32Crockford::new(key)?))
         }
         #[cfg(feature = "ob00")]
-        (Scheme::Ob00, Encoding::Base64) => Ok(ObAny::Ob00Base64(Ob00Base64::new(key_b64)?)),
+        (Scheme::Ob00, Encoding::Base32Rfc) => Ok(ObAny::Ob00Base32Rfc(Ob00Base32Rfc::new(key)?)),
         #[cfg(feature = "ob00")]
-        (Scheme::Ob00, Encoding::Hex) => Ok(ObAny::Ob00Hex(Ob00Hex::new(key_b64)?)),
+        (Scheme::Ob00, Encoding::Base64) => Ok(ObAny::Ob00Base64(Ob00Base64::new(key)?)),
+        #[cfg(feature = "ob00")]
+        (Scheme::Ob00, Encoding::Hex) => Ok(ObAny::Ob00Hex(Ob00Hex::new(key)?)),
         #[allow(unreachable_patterns)]
         _ => Err(Error::UnknownScheme),
     }
 }
 
 #[cfg(any(feature = "keyless", feature = "bytes-keys", feature = "hex-keys"))]
-fn from_bytes_with_format_internal(format: Format, key: &[u8; 64]) -> Result<ObAny, Error> {
+fn from_bytes_with_format_internal(format: Format, key_bytes: &[u8; 64]) -> Result<ObAny, Error> {
     match (format.scheme(), format.encoding()) {
         #[cfg(feature = "ob01")]
         (Scheme::Ob01, Encoding::Base32Crockford) => Ok(ObAny::Ob01Base32Crockford(
-            Ob01Base32Crockford::from_bytes_internal(key)?,
+            Ob01Base32Crockford::from_bytes_internal(key_bytes)?,
         )),
         #[cfg(feature = "ob01")]
         (Scheme::Ob01, Encoding::Base32Rfc) => Ok(ObAny::Ob01Base32Rfc(
-            Ob01Base32Rfc::from_bytes_internal(key)?,
+            Ob01Base32Rfc::from_bytes_internal(key_bytes)?,
         )),
         #[cfg(feature = "ob01")]
-        (Scheme::Ob01, Encoding::Base64) => {
-            Ok(ObAny::Ob01Base64(Ob01Base64::from_bytes_internal(key)?))
-        }
+        (Scheme::Ob01, Encoding::Base64) => Ok(ObAny::Ob01Base64(Ob01Base64::from_bytes_internal(
+            key_bytes,
+        )?)),
         #[cfg(feature = "ob01")]
-        (Scheme::Ob01, Encoding::Hex) => Ok(ObAny::Ob01Hex(Ob01Hex::from_bytes_internal(key)?)),
+        (Scheme::Ob01, Encoding::Hex) => {
+            Ok(ObAny::Ob01Hex(Ob01Hex::from_bytes_internal(key_bytes)?))
+        }
         #[cfg(feature = "ob21p")]
         (Scheme::Ob21p, Encoding::Base32Crockford) => Ok(ObAny::Ob21pBase32Crockford(
-            Ob21pBase32Crockford::from_bytes_internal(key)?,
+            Ob21pBase32Crockford::from_bytes_internal(key_bytes)?,
         )),
         #[cfg(feature = "ob21p")]
         (Scheme::Ob21p, Encoding::Base32Rfc) => Ok(ObAny::Ob21pBase32Rfc(
-            Ob21pBase32Rfc::from_bytes_internal(key)?,
+            Ob21pBase32Rfc::from_bytes_internal(key_bytes)?,
         )),
         #[cfg(feature = "ob21p")]
-        (Scheme::Ob21p, Encoding::Base64) => {
-            Ok(ObAny::Ob21pBase64(Ob21pBase64::from_bytes_internal(key)?))
-        }
+        (Scheme::Ob21p, Encoding::Base64) => Ok(ObAny::Ob21pBase64(
+            Ob21pBase64::from_bytes_internal(key_bytes)?,
+        )),
         #[cfg(feature = "ob21p")]
-        (Scheme::Ob21p, Encoding::Hex) => Ok(ObAny::Ob21pHex(Ob21pHex::from_bytes_internal(key)?)),
+        (Scheme::Ob21p, Encoding::Hex) => {
+            Ok(ObAny::Ob21pHex(Ob21pHex::from_bytes_internal(key_bytes)?))
+        }
         #[cfg(feature = "ob31")]
         (Scheme::Ob31, Encoding::Base32Crockford) => Ok(ObAny::Ob31Base32Crockford(
-            Ob31Base32Crockford::from_bytes_internal(key)?,
+            Ob31Base32Crockford::from_bytes_internal(key_bytes)?,
         )),
         #[cfg(feature = "ob31")]
         (Scheme::Ob31, Encoding::Base32Rfc) => Ok(ObAny::Ob31Base32Rfc(
-            Ob31Base32Rfc::from_bytes_internal(key)?,
+            Ob31Base32Rfc::from_bytes_internal(key_bytes)?,
         )),
         #[cfg(feature = "ob31")]
-        (Scheme::Ob31, Encoding::Base64) => {
-            Ok(ObAny::Ob31Base64(Ob31Base64::from_bytes_internal(key)?))
-        }
+        (Scheme::Ob31, Encoding::Base64) => Ok(ObAny::Ob31Base64(Ob31Base64::from_bytes_internal(
+            key_bytes,
+        )?)),
         #[cfg(feature = "ob31")]
-        (Scheme::Ob31, Encoding::Hex) => Ok(ObAny::Ob31Hex(Ob31Hex::from_bytes_internal(key)?)),
+        (Scheme::Ob31, Encoding::Hex) => {
+            Ok(ObAny::Ob31Hex(Ob31Hex::from_bytes_internal(key_bytes)?))
+        }
         #[cfg(feature = "ob31p")]
         (Scheme::Ob31p, Encoding::Base32Crockford) => Ok(ObAny::Ob31pBase32Crockford(
-            Ob31pBase32Crockford::from_bytes_internal(key)?,
+            Ob31pBase32Crockford::from_bytes_internal(key_bytes)?,
         )),
         #[cfg(feature = "ob31p")]
         (Scheme::Ob31p, Encoding::Base32Rfc) => Ok(ObAny::Ob31pBase32Rfc(
-            Ob31pBase32Rfc::from_bytes_internal(key)?,
+            Ob31pBase32Rfc::from_bytes_internal(key_bytes)?,
         )),
         #[cfg(feature = "ob31p")]
-        (Scheme::Ob31p, Encoding::Base64) => {
-            Ok(ObAny::Ob31pBase64(Ob31pBase64::from_bytes_internal(key)?))
-        }
+        (Scheme::Ob31p, Encoding::Base64) => Ok(ObAny::Ob31pBase64(
+            Ob31pBase64::from_bytes_internal(key_bytes)?,
+        )),
         #[cfg(feature = "ob31p")]
-        (Scheme::Ob31p, Encoding::Hex) => Ok(ObAny::Ob31pHex(Ob31pHex::from_bytes_internal(key)?)),
+        (Scheme::Ob31p, Encoding::Hex) => {
+            Ok(ObAny::Ob31pHex(Ob31pHex::from_bytes_internal(key_bytes)?))
+        }
         #[cfg(feature = "ob32")]
         (Scheme::Ob32, Encoding::Base32Crockford) => Ok(ObAny::Ob32Base32Crockford(
-            Ob32Base32Crockford::from_bytes_internal(key)?,
+            Ob32Base32Crockford::from_bytes_internal(key_bytes)?,
         )),
         #[cfg(feature = "ob32")]
         (Scheme::Ob32, Encoding::Base32Rfc) => Ok(ObAny::Ob32Base32Rfc(
-            Ob32Base32Rfc::from_bytes_internal(key)?,
+            Ob32Base32Rfc::from_bytes_internal(key_bytes)?,
         )),
         #[cfg(feature = "ob32")]
-        (Scheme::Ob32, Encoding::Base64) => {
-            Ok(ObAny::Ob32Base64(Ob32Base64::from_bytes_internal(key)?))
-        }
+        (Scheme::Ob32, Encoding::Base64) => Ok(ObAny::Ob32Base64(Ob32Base64::from_bytes_internal(
+            key_bytes,
+        )?)),
         #[cfg(feature = "ob32")]
-        (Scheme::Ob32, Encoding::Hex) => Ok(ObAny::Ob32Hex(Ob32Hex::from_bytes_internal(key)?)),
+        (Scheme::Ob32, Encoding::Hex) => {
+            Ok(ObAny::Ob32Hex(Ob32Hex::from_bytes_internal(key_bytes)?))
+        }
         #[cfg(feature = "ob32p")]
         (Scheme::Ob32p, Encoding::Base32Crockford) => Ok(ObAny::Ob32pBase32Crockford(
-            Ob32pBase32Crockford::from_bytes_internal(key)?,
+            Ob32pBase32Crockford::from_bytes_internal(key_bytes)?,
         )),
         #[cfg(feature = "ob32p")]
         (Scheme::Ob32p, Encoding::Base32Rfc) => Ok(ObAny::Ob32pBase32Rfc(
-            Ob32pBase32Rfc::from_bytes_internal(key)?,
+            Ob32pBase32Rfc::from_bytes_internal(key_bytes)?,
         )),
         #[cfg(feature = "ob32p")]
-        (Scheme::Ob32p, Encoding::Base64) => {
-            Ok(ObAny::Ob32pBase64(Ob32pBase64::from_bytes_internal(key)?))
-        }
+        (Scheme::Ob32p, Encoding::Base64) => Ok(ObAny::Ob32pBase64(
+            Ob32pBase64::from_bytes_internal(key_bytes)?,
+        )),
         #[cfg(feature = "ob32p")]
-        (Scheme::Ob32p, Encoding::Hex) => Ok(ObAny::Ob32pHex(Ob32pHex::from_bytes_internal(key)?)),
+        (Scheme::Ob32p, Encoding::Hex) => {
+            Ok(ObAny::Ob32pHex(Ob32pHex::from_bytes_internal(key_bytes)?))
+        }
         // Testing
         #[cfg(feature = "ob70")]
         (Scheme::Ob70, Encoding::Base32Crockford) => Ok(ObAny::Ob70Base32Crockford(
-            Ob70Base32Crockford::from_bytes_internal(key)?,
+            Ob70Base32Crockford::from_bytes_internal(key_bytes)?,
         )),
         #[cfg(feature = "ob70")]
         (Scheme::Ob70, Encoding::Base32Rfc) => Ok(ObAny::Ob70Base32Rfc(
-            Ob70Base32Rfc::from_bytes_internal(key)?,
+            Ob70Base32Rfc::from_bytes_internal(key_bytes)?,
         )),
         #[cfg(feature = "ob70")]
-        (Scheme::Ob70, Encoding::Base64) => {
-            Ok(ObAny::Ob70Base64(Ob70Base64::from_bytes_internal(key)?))
-        }
+        (Scheme::Ob70, Encoding::Base64) => Ok(ObAny::Ob70Base64(Ob70Base64::from_bytes_internal(
+            key_bytes,
+        )?)),
         #[cfg(feature = "ob70")]
-        (Scheme::Ob70, Encoding::Hex) => Ok(ObAny::Ob70Hex(Ob70Hex::from_bytes_internal(key)?)),
+        (Scheme::Ob70, Encoding::Hex) => {
+            Ok(ObAny::Ob70Hex(Ob70Hex::from_bytes_internal(key_bytes)?))
+        }
         #[cfg(feature = "ob71")]
         (Scheme::Ob71, Encoding::Base32Crockford) => Ok(ObAny::Ob71Base32Crockford(
-            Ob71Base32Crockford::from_bytes_internal(key)?,
+            Ob71Base32Crockford::from_bytes_internal(key_bytes)?,
         )),
         #[cfg(feature = "ob71")]
         (Scheme::Ob71, Encoding::Base32Rfc) => Ok(ObAny::Ob71Base32Rfc(
-            Ob71Base32Rfc::from_bytes_internal(key)?,
+            Ob71Base32Rfc::from_bytes_internal(key_bytes)?,
         )),
         #[cfg(feature = "ob71")]
-        (Scheme::Ob71, Encoding::Base64) => {
-            Ok(ObAny::Ob71Base64(Ob71Base64::from_bytes_internal(key)?))
-        }
+        (Scheme::Ob71, Encoding::Base64) => Ok(ObAny::Ob71Base64(Ob71Base64::from_bytes_internal(
+            key_bytes,
+        )?)),
         #[cfg(feature = "ob71")]
-        (Scheme::Ob71, Encoding::Hex) => Ok(ObAny::Ob71Hex(Ob71Hex::from_bytes_internal(key)?)),
+        (Scheme::Ob71, Encoding::Hex) => {
+            Ok(ObAny::Ob71Hex(Ob71Hex::from_bytes_internal(key_bytes)?))
+        }
         // Legacy
         #[cfg(feature = "ob00")]
         (Scheme::Ob00, Encoding::Base32Crockford) => Ok(ObAny::Ob00Base32Crockford(
-            Ob00Base32Crockford::from_bytes_internal(key)?,
+            Ob00Base32Crockford::from_bytes_internal(key_bytes)?,
         )),
         #[cfg(feature = "ob00")]
         (Scheme::Ob00, Encoding::Base32Rfc) => Ok(ObAny::Ob00Base32Rfc(
-            Ob00Base32Rfc::from_bytes_internal(key)?,
+            Ob00Base32Rfc::from_bytes_internal(key_bytes)?,
         )),
         #[cfg(feature = "ob00")]
-        (Scheme::Ob00, Encoding::Base64) => {
-            Ok(ObAny::Ob00Base64(Ob00Base64::from_bytes_internal(key)?))
-        }
+        (Scheme::Ob00, Encoding::Base64) => Ok(ObAny::Ob00Base64(Ob00Base64::from_bytes_internal(
+            key_bytes,
+        )?)),
         #[cfg(feature = "ob00")]
-        (Scheme::Ob00, Encoding::Hex) => Ok(ObAny::Ob00Hex(Ob00Hex::from_bytes_internal(key)?)),
+        (Scheme::Ob00, Encoding::Hex) => {
+            Ok(ObAny::Ob00Hex(Ob00Hex::from_bytes_internal(key_bytes)?))
+        }
         #[allow(unreachable_patterns)]
         _ => Err(Error::UnknownScheme),
     }
@@ -1156,15 +1144,15 @@ pub fn from_hex_key_with_format(format: Format, key_hex: &str) -> Result<ObAny, 
 
 /// Create an encoder from a format string and raw bytes.
 #[cfg(feature = "bytes-keys")]
-pub fn from_bytes(fmt: &str, key: &[u8; 64]) -> Result<ObAny, Error> {
+pub fn from_bytes(fmt: &str, key_bytes: &[u8; 64]) -> Result<ObAny, Error> {
     let format = Format::from_str(fmt)?;
-    from_bytes_with_format_internal(format, &key)
+    from_bytes_with_format_internal(format, &key_bytes)
 }
 
 /// Create an encoder from a pre-parsed Format and raw bytes.
 #[cfg(feature = "bytes-keys")]
-pub fn from_bytes_with_format(format: Format, key: &[u8; 64]) -> Result<ObAny, Error> {
-    from_bytes_with_format_internal(format, key)
+pub fn from_bytes_with_format(format: Format, key_bytes: &[u8; 64]) -> Result<ObAny, Error> {
+    from_bytes_with_format_internal(format, key_bytes)
 }
 
 /// Create an encoder from a format string using the hardcoded key (testing only).

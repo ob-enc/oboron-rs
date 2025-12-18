@@ -7,14 +7,14 @@ pub struct Keychain {
 
 impl Keychain {
     /// Create a new Keychain from a 64-byte key.
-    pub fn from_bytes(key: &[u8; 64]) -> Result<Self, Error> {
-        Ok(Keychain { key: *key })
+    pub fn from_bytes(key_bytes: &[u8; 64]) -> Result<Self, Error> {
+        Ok(Keychain { key: *key_bytes })
     }
 
     /// Create a new Keychain from a 86-character base64 string key.
-    pub fn from_base64(key_b64: &str) -> Result<Self, Error> {
+    pub fn from_base64(key_base64: &str) -> Result<Self, Error> {
         let key: [u8; 64] = BASE64URL_NOPAD
-            .decode(key_b64.as_bytes())
+            .decode(key_base64.as_bytes())
             .map_err(|_| Error::InvalidBase64)?
             .try_into()
             .map_err(|_| Error::InvalidKeyLength)?;
@@ -25,11 +25,11 @@ impl Keychain {
     /// Create a new Keychain from a 128-character hex string.
     #[cfg(feature = "hex-keys")]
     pub fn from_hex(key_hex: &str) -> Result<Self, Error> {
-        let key: [u8; 64] = hex::decode(key_hex)? // Uses From<FromHexError>
+        let key_bytes: [u8; 64] = hex::decode(key_hex)? // Uses From<FromHexError>
             .try_into()
             .map_err(|_| Error::InvalidKeyLength)?;
 
-        Self::from_bytes(&key)
+        Self::from_bytes(&key_bytes)
     }
 
     // Formatted keys - Convenience method for higher level

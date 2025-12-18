@@ -817,12 +817,12 @@ formats, requiring format specification in each operation:
 ```rust
 use oboron::{ObMulti, Oboron};
 
-let om = ObMulti::new(&key)?;
+let obm = ObMulti::new(&key)?;
 
 // Format specification per operation
-let ot = om.enc("test", "ob32p:b64");
-let pt2 = om.dec(&ot, "ob32p:b64");
-let pt_other = om.dec(&other, "ob01:c32");
+let ot = obm.enc("test", "ob32p:b64");
+let pt2 = obm.dec(&ot, "ob32p:b64");
+let pt_other = obm.dec(&other, "ob01:c32");
 ```
 
 **Autodecode:** While other interfaces perform *scheme* autodetection in
@@ -831,7 +831,7 @@ including encoding (base32rfc, base32crockford, base64, or hex).  Other
 structs decode only encodings matching their format.
 ```rust
 // Autodecode when format is unknown
-let pt2 = om.autodec(&ot);
+let pt2 = obm.autodec(&ot);
 ```
 
 Note performance implications: autodetection uses trial-and-error across
@@ -855,9 +855,9 @@ let key = oboron:: generate_key();
 let ob = Ob::new(OB32_B64, &key)?;
 
 // With ObMulti (multi-format operations)
-let om = ObMulti::new(&key)?;
-let ot_b64 = om.enc("data", OB32_B64)?;
-let ot_hex = om.enc("data", OB32_HEX)?;
+let obm = ObMulti::new(&key)?;
+let ot_b64 = obm.enc("data", OB32_B64)?;
+let ot_hex = obm.enc("data", OB32_HEX)?;
 ```
 
 **Available constants:**

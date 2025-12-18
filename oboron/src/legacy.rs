@@ -188,7 +188,7 @@ macro_rules! impl_ob00_oboron {
             ///
             /// # Arguments
             ///
-            /// * `key_b64` - A 86-character base64 string representing 64 bytes
+            /// * `key` - A 86-character base64 string representing 64 bytes
             ///
             /// # Examples
             ///
@@ -198,8 +198,8 @@ macro_rules! impl_ob00_oboron {
             /// let ob = Ob00Base32Rfc::new(&key)? ;
             /// # Ok::<(), oboron::Error>(())
             /// ```
-            pub fn new(key_b64: &str) -> Result<Self, Error> {
-                let keychain = Keychain::from_base64(key_b64)?;
+            pub fn new(key: &str) -> Result<Self, Error> {
+                let keychain = Keychain::from_base64(key)?;
                 Ok(Self {
                     keychain,
                     format: Format::new(Scheme::Ob00, $encoding),

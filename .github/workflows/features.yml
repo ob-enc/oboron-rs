@@ -1,0 +1,135 @@
+name: Feature Flags
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  # Test individual schemes
+  test-individual-schemes:
+    name: Test ${{ matrix.feature }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        feature:
+          - ob00
+          - ob01
+          - ob21p
+          - ob31
+          - ob31p
+          - ob32
+          - ob32p
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Test with only ${{ matrix.feature }}
+        run: |
+          cd oboron
+          cargo test --no-default-features --features ${{ matrix.feature }}
+
+  # Test convenience groups
+  test-feature-groups:
+    name: Test ${{ matrix.group }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        group:
+          - all-cbc-schemes
+          - all-gcm-schemes
+          - all-siv-schemes
+          - insecure-schemes
+          - deterministic-schemes
+          - probabilistic-schemes
+          - authenticated-schemes
+          - all-schemes
+          - keyless
+          - hex-keys
+          - bytes-keys
+          - all-alt-keys
+          - legacy
+          - experimental
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Test ${{ matrix.group }} group
+        run: |
+          cd oboron
+          cargo test --no-default-features --features ${{ matrix.group }}
+
+  # Test default features (backwards compatibility)
+  test-default:
+    name: Test default features
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Test with default features
+        run: |
+          cd oboron
+          cargo test
+
+  # Test some common combinations
+  test-combinations:
+    name: Test combination - ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: "deterministic only"
+            features: "ob01,ob31,ob32"
+          - name: "probabilistic only"
+            features: "ob21p,ob31p,ob32p"
+          - name: "modern schemes"
+            features: "ob31,ob32"
+          - name: "ob32 only"
+            features: "ob32,keyless"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Test ${{ matrix.name }}
+        run: |
+          cd oboron
+          cargo test --no-default-features --features ${{ matrix.features }}
+
+  # Test WASM target with minimal features
+  test-wasm-minimal:
+    name: Test WASM build (ob32 only)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - name: Build for WASM with minimal features
+        run: |
+          cd oboron
+          cargo build --target wasm32-unknown-unknown --release --no-default-features --features ob32 --lib
+      - name: Check binary size
+        run: |
+          ls -lh target/wasm32-unknown-unknown/release/
+          SIZE=$(stat -c%s target/wasm32-unknown-unknown/release/liboboron.rlib)
+          echo "WASM library size: $SIZE bytes"
+          echo "WASM library size (human readable): $(numfmt --to=iec-i --suffix=B $SIZE)"
+
+  # Ensure CLI and Python bindings still work with default features
+  test-dependents:
+    name: Test ${{ matrix.crate }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        crate:
+          - oboron-cli
+          - oboron-py
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Test ${{ matrix.crate }}
+        run: |
+          cd ${{ matrix.crate }}
+          cargo test
