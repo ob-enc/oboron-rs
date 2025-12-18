@@ -100,8 +100,17 @@ pub fn dec_any_scheme(
     };
 
     // Step 5: Convert to string
-    // SAFETY: Plaintext was originally valid UTF-8, and encryption preserves byte sequences
-    Ok(unsafe { String::from_utf8_unchecked(plaintext_bytes) })
+
+    // Unchecked (Assuming plaintext was originally valid UTF-8, and correct key is used)
+    #[cfg(feature = "unchecked-utf8")]
+    {
+        Ok(unsafe { String::from_utf8_unchecked(plaintext_bytes) })
+    }
+
+    #[cfg(not(feature = "unchecked-utf8"))]
+    {
+        String::from_utf8(plaintext_bytes).map_err(|_| Error::DecryptionFailed)
+    }
 }
 
 /// Validate ob00 output to prevent false positives from encoding mismatches

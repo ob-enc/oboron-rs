@@ -21,6 +21,7 @@ All encodings (`:c32`-Crockford base32, `:b32`-standard base32, `:b64`-URL-safe 
 - the `keyless` feature providing Oboron functionality with the hardcoded
   key
 - alternative key input formats `hex-keys`, `bytes-keys`
+- `unchecked-utf8`
 
 These features must be enabled explicitly in your application.
 
@@ -49,6 +50,13 @@ hex/bytes key interfaces and the keyless testing feature.
 Testing schemes (non-cryptographic):
 - `ob70` - identity transformation (ciphertext = plaintext bytes)
 - `ob71` - uses reversed `ob70` ciphertext
+
+### Unsafe Performance Enhancement
+
+- `unchecked-utf8` - Skips UTF-8 validation after decryption.  Use for a
+  minor performance improvement in dec operations in trusted source
+  scenarios.  Note that using a wrong key may produce garbage out rather
+  than an error.
 
 ### Experimental and Legacy Schemes
 

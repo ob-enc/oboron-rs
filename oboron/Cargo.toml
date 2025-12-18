@@ -1,6 +1,6 @@
 [package]
 name = "oboron"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 rust-version = "1.77.0"
 license = "MIT"
@@ -50,6 +50,10 @@ ob70 = []  # identity, non-crypto
 ob71 = []  # string reversal, non-crypto
 # Legacy
 ob00 = ["aes", "cipher", "cbc"]  # backward compatibility
+
+# Unsafe performance enhacement
+# =============================
+unchecked-utf8 = []
 
 # Scheme categories
 # =================
