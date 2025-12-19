@@ -427,6 +427,7 @@ pub mod prelude {
 /// # Ok(())
 /// # }
 /// ```
+#[cfg(feature = "convenience")]
 pub fn enc(plaintext: &str, format: &str, key: &str) -> Result<String, Error> {
     ObMulti::new(key)?.enc(plaintext, format)
 }
@@ -448,6 +449,7 @@ pub fn enc(plaintext: &str, format: &str, key: &str) -> Result<String, Error> {
 /// # Ok(())
 /// # }
 /// ```
+#[cfg(feature = "convenience")]
 #[cfg(feature = "keyless")]
 pub fn enc_keyless(plaintext: &str, format: &str) -> Result<String, Error> {
     ObMulti::new_keyless()?.enc(plaintext, format)
@@ -476,6 +478,7 @@ pub fn enc_keyless(plaintext: &str, format: &str) -> Result<String, Error> {
 /// # Ok(())
 /// # }
 /// ```
+#[cfg(feature = "convenience")]
 pub fn dec(obtext: &str, format: &str, key: &str) -> Result<String, Error> {
     ObMulti::new(key)?.dec(obtext, format)
 }
@@ -499,6 +502,7 @@ pub fn dec(obtext: &str, format: &str, key: &str) -> Result<String, Error> {
 /// # Ok(())
 /// # }
 /// ```
+#[cfg(feature = "convenience")]
 #[cfg(feature = "keyless")]
 pub fn dec_keyless(obtext: &str, format: &str) -> Result<String, Error> {
     ObMulti::new_keyless()?.dec(obtext, format)
@@ -527,6 +531,7 @@ pub fn dec_keyless(obtext: &str, format: &str) -> Result<String, Error> {
 /// # Ok(())
 /// # }
 /// ```
+#[cfg(feature = "convenience")]
 pub fn autodec(obtext: &str, key: &str) -> Result<String, Error> {
     ObMulti::new(key)?.autodec(obtext)
 }
@@ -550,6 +555,7 @@ pub fn autodec(obtext: &str, key: &str) -> Result<String, Error> {
 /// # Ok(())
 /// # }
 /// ```
+#[cfg(feature = "convenience")]
 #[cfg(feature = "keyless")]
 pub fn autodec_keyless(obtext: &str) -> Result<String, Error> {
     ObMulti::new_keyless()?.autodec(obtext)

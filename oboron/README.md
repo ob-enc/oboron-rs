@@ -3,7 +3,7 @@
 [![Crates.io](https://img.shields.io/crates/v/oboron.svg)](https://crates.io/crates/oboron)
 [![Documentation](https://docs.rs/oboron/badge.svg)](https://docs.rs/oboron)
 [![License:  MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![MSRV](https://img.shields.io/badge/MSRV-1.74-blue.svg)](https://blog.rust-lang.org/2023/11/16/Rust-1.74.0.html)
+[![MSRV](https://img.shields.io/badge/MSRV-1.77-blue.svg)](https://blog.rust-lang.org/2023/11/16/Rust-1.77.0.html)
 
 Oboron is a general-purpose encryption library focused on developer
 ergonomics:
@@ -71,15 +71,17 @@ Crockford's base32 variant) for enc/dec:
 ```rust
 use oboron::{Ob32, Oboron};
 
-let key = env::var("OBORON_KEY")?;  // get the key
+let key = env::var("OBORON_KEY")?; // get the key
 
-let ob = Ob32::new(&key)?;          // create Oboron instance
+let ob = Ob32::new(&key)?; // create Oboron instance
 
-let ot = ob.enc("Hello World")?;    // encrypt+encode
-let pt2 = ob.dec(&ot)?;             // decode+decrypt
+let ot = ob.enc("hello, world")?; // encrypt+encode
+let pt2 = ob.dec(&ot)?; // decode+decrypt
 
-println!("obtext: {}", ot);  // e.g., "uf2glao2xd7fnbq5..."
-assert_eq!(pt2, "Hello World");
+println!("obtext: {}", ot);
+// "obtext: cbv74r1m7a7cf8n6gzdy6tf2vjddkhwdtwa5ssgv78v5c1g"
+
+assert_eq!(pt2, "hello, world");
 ```
 
 ## Formats
@@ -155,13 +157,13 @@ maintaining the pattern: even scheme tiers = non-authenticated;
 odd = authenticated.
 
 | Scheme  | Algorithm   | Deterministic? | Authenticated? | Notes |
-| :------ | :---------- | :------------- | :------------- | :--- |
+| :------ | :---------- | :------------- | :------------- | :---- |
 | `ob01`  | AES-CBC     | Yes            | No             | Legacy; uses constant IV. Prioritizes determinism and performance over security. |
-| `ob21p` | AES-CBC     | No             | No             | |
-| `ob31`  | AES-GCM-SIV | Yes            | Yes            | |
-| `ob31p` | AES-GCM-SIV | No             | Yes            | |
-| `ob32`  | AES-SIV     | Yes            | Yes            | |
-| `ob32p` | AES-SIV     | No             | Yes            | |
+| `ob21p` | AES-CBC     | No             | No             |       |
+| `ob31`  | AES-GCM-SIV | Yes            | Yes            |       |
+| `ob31p` | AES-GCM-SIV | No             | Yes            |       |
+| `ob32`  | AES-SIV     | Yes            | Yes            |       |
+| `ob32p` | AES-SIV     | No             | Yes            |       |
 
 **Key Concepts:**
 * **Deterministic:** Same input (key + plaintext) always produces same

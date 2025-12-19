@@ -19,7 +19,7 @@ default = ["std"]
 # ===================
 std = ["secure-schemes"]
 secure-min = ["ob32"]  # Minimum secure setup
-full = ["all-schemes", "all-alt-keys", "keyless", "legacy", "non-crypto"]
+full = ["all-schemes", "all-alt-keys", "keyless", "legacy", "non-crypto", "convenience"]
 
 dev = ["full"]  # Development setup
 
@@ -51,9 +51,11 @@ ob71 = []  # string reversal, non-crypto
 # Legacy
 ob00 = ["aes", "cipher", "cbc"]  # backward compatibility
 
-# Unsafe performance enhacement
-# =============================
-unchecked-utf8 = []
+# Misc features
+# =============
+convenience = [] # Convenience functions
+experimental = [] # Experimental algorithms
+unchecked-utf8 = [] # Unsafe performance enhacement
 
 # Scheme categories
 # =================
@@ -73,7 +75,6 @@ all-schemes = ["ob0x", "ob1x", "ob2x", "ob3x"]
 # ======================
 non-crypto = ["ob70", "ob71"]
 legacy = ["ob00"]  # For backward compatibility only -> use ob01 instead
-experimental = []  # Experimental algorithms
 
 [dependencies]
 # Always needed
