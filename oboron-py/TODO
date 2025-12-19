@@ -1,0 +1,16 @@
+>>> Ob01.format
+AttributeError
+- Static types do not have a format property, only scheme and encoding
+
+>>> Ob01.scheme
+'Ob01'
+- Should be 'ob01' (lowercase) (same for Ob)
+
+>>> Ob01.encoding
+'Base32Crockford'
+- Should be 'c32' (same for Ob)
+
+>>> Ob.format
+<function Ob.format()>
+- Should be a property
+

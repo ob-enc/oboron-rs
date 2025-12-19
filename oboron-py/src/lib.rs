@@ -121,49 +121,6 @@ macro_rules! impl_cipher_class {
     };
 }
 
-// Ob00 - LEGACY variants
-// ----------------------
-#[cfg(feature = "ob00")]
-impl_cipher_class!(
-    Ob00Base32Crockford,
-    ::oboron::Ob00Base32Crockford,
-    "Ob00 cipher with Base32Crockford encoding (LEGACY AES-CBC with custom padding)\n\n\
-     **LEGACY**: This scheme is maintained for backward compatibility only.\n\
-     For new projects, use Ob01 or more secure schemes like Ob31/Ob32."
-);
-#[cfg(feature = "ob00")]
-impl_cipher_class!(
-    Ob00Base32Rfc,
-    ::oboron::Ob00Base32Rfc,
-    "Ob00 cipher with Base32Rfc encoding (LEGACY AES-CBC with custom padding)\n\n\
-     **LEGACY**: This scheme is maintained for backward compatibility only.\n\
-     For new projects, use Ob01 or more secure schemes like Ob31/Ob32."
-);
-#[cfg(feature = "ob00")]
-impl_cipher_class!(
-    Ob00,
-    ::oboron::Ob00,
-    "Ob00 cipher with default Base32Rfc encoding (LEGACY AES-CBC with custom padding)\n\n\
-     **LEGACY**: This scheme is maintained for backward compatibility only.\n\
-     For new projects, use Ob01 or more secure schemes like Ob31/Ob32."
-);
-#[cfg(feature = "ob00")]
-impl_cipher_class!(
-    Ob00Base64,
-    ::oboron::Ob00Base64,
-    "Ob00 cipher with Base64 encoding (LEGACY AES-CBC with custom padding)\n\n\
-     **LEGACY**: This scheme is maintained for backward compatibility only.\n\
-     For new projects, use Ob01 or more secure schemes like Ob31/Ob32."
-);
-#[cfg(feature = "ob00")]
-impl_cipher_class!(
-    Ob00Hex,
-    ::oboron::Ob00Hex,
-    "Ob00 cipher with Hex encoding (LEGACY AES-CBC with custom padding)\n\n\
-     **LEGACY**: This scheme is maintained for backward compatibility only.\n\
-     For new projects, use Ob01 or more secure schemes like Ob31/Ob32."
-);
-
 // Ob01 variants
 // -------------
 #[cfg(feature = "ob01")]
@@ -362,6 +319,8 @@ impl_cipher_class!(
     "Ob32p cipher with Hex encoding (Probabilistic AES-SIV)"
 );
 
+// --- TESTING CLASSES ---
+
 // Ob70 variants
 // -------------
 impl_cipher_class!(
@@ -416,6 +375,49 @@ impl_cipher_class!(
     Ob71Hex,
     ::oboron::Ob71Hex,
     "Ob71 cipher with Hex encoding (Reverse scheme, for testing)"
+);
+
+// Ob00 - LEGACY variants
+// ----------------------
+#[cfg(feature = "ob00")]
+impl_cipher_class!(
+    Ob00Base32Crockford,
+    ::oboron::Ob00Base32Crockford,
+    "Ob00 cipher with Base32Crockford encoding (LEGACY AES-CBC with custom padding)\n\n\
+     **LEGACY**: This scheme is maintained for backward compatibility only.\n\
+     For new projects, use Ob01 or more secure schemes like Ob31/Ob32."
+);
+#[cfg(feature = "ob00")]
+impl_cipher_class!(
+    Ob00Base32Rfc,
+    ::oboron::Ob00Base32Rfc,
+    "Ob00 cipher with Base32Rfc encoding (LEGACY AES-CBC with custom padding)\n\n\
+     **LEGACY**: This scheme is maintained for backward compatibility only.\n\
+     For new projects, use Ob01 or more secure schemes like Ob31/Ob32."
+);
+#[cfg(feature = "ob00")]
+impl_cipher_class!(
+    Ob00,
+    ::oboron::Ob00,
+    "Ob00 cipher with default Base32Rfc encoding (LEGACY AES-CBC with custom padding)\n\n\
+     **LEGACY**: This scheme is maintained for backward compatibility only.\n\
+     For new projects, use Ob01 or more secure schemes like Ob31/Ob32."
+);
+#[cfg(feature = "ob00")]
+impl_cipher_class!(
+    Ob00Base64,
+    ::oboron::Ob00Base64,
+    "Ob00 cipher with Base64 encoding (LEGACY AES-CBC with custom padding)\n\n\
+     **LEGACY**: This scheme is maintained for backward compatibility only.\n\
+     For new projects, use Ob01 or more secure schemes like Ob31/Ob32."
+);
+#[cfg(feature = "ob00")]
+impl_cipher_class!(
+    Ob00Hex,
+    ::oboron::Ob00Hex,
+    "Ob00 cipher with Hex encoding (LEGACY AES-CBC with custom padding)\n\n\
+     **LEGACY**: This scheme is maintained for backward compatibility only.\n\
+     For new projects, use Ob01 or more secure schemes like Ob31/Ob32."
 );
 
 /// Ob - Flexible cipher with runtime format selection.   
