@@ -132,9 +132,8 @@ OboronBase.register(_oboron.Ob70Base32Rfc)
 OboronBase.register(_oboron.Ob70Base64)
 OboronBase.register(_oboron.Ob70Hex)
 
-# Flexible interfaces
+# Flexible interface
 OboronBase.register(_oboron.Ob)
-OboronBase.register(_oboron.ObMulti)
 
 # ============================================================================
 # Re-export all classes and functions
@@ -142,7 +141,6 @@ OboronBase.register(_oboron.ObMulti)
 
 # Main flexible interface
 Ob = _oboron.Ob
-ObMulti = _oboron.ObMulti
 
 # Ob00 variants (LEGACY)
 Ob00 = _oboron.Ob00
@@ -229,7 +227,6 @@ __all__ = [
 
     # Main interfaces
     'Ob',
-    'ObMulti',
 
     # Ob00 (LEGACY)
     'Ob00',
