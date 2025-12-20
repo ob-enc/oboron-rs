@@ -683,30 +683,44 @@ the required features explicitly in your `Cargo.toml`.
 ##### Approach 1: Full Oboron Output (Reversible)
 ```rust
 let ob = Ob01::new_keyless(); // Obfuscation context
-let full_id = ob.enc(format!("user:{}", user_id))?;
-// "uf2glao2xd7fnbq5z53cb63ukc" (28 base32 chars, reversible)
+let full_id = ob.enc("user:alice")?;
+// "mdwsx9rdwkntyqcf806r9jhsp6gg" (28 base32 chars, reversible)
 ```
 
-- **Pros:** Reversible (decodes to "user:123"), full Oboron functionality
-- **Cons:** With hardcoded key: Anyone can decode; reveals structure
-- **Best for:** Internal systems where reversibility is useful and
-  structure transparency acceptable.
+- Pros:
+  - Reversible (decodes to "user:alice"),
+  - Opaque structure: When decoded with base32, the obtext produces a binary blob, revealing no input patterns.
+  - Oboron detects scheme, can decrypt with hardcoded key
+- Cons:
+  - Using hardcoded key: Given the context (keyless Oboron), anyone can
+    decode
+- Best for:
+  - Internal systems where reversibility is useful
+  - Strong obfuscation where attackers have no context of Oboron use
 
-Alternatively, keep the payload securely encrypted by having a shared
-secret (`env::var("OBORON_KEY")`).
+Possible security tightening if reversibility is needed:
+- Use `ob31` or `ob32` for strong 256-bit tamper-proof encryption.
+  (Trade-off: longer output: 44 chars; 2-3x slower than `ob01` but still
+  comparable performance to SHA256)
+- Keep the payload securely encrypted by having a shared secret:
+  `env::var("OBORON_KEY")` (Trade-off: shared secret management)
+
 
 ##### Approach 2: Trimmed Prefix (Hash-like, Non-reversible)
 ```rust
 let ob = Ob01::new_keyless();
-// Domain separator for multiple blocks
-let full = ob.enc(format!("myapp:user:{}", user_id))?;
-let short_id = &full[0..20]; // "uf2glao2xd7fnbq5z53" (28 base32 chars)
+let full = ob.enc("user:alice")?;
+let short_id = &full[0..20];
 ```
 
-- **Pros:** Non-reversible even with hardcoded key, no key management,
-  adjustable length
-- **Best for:** Public-facing identifiers requiring opacity and
-  referenceable prefixes.
+- Pros:
+  - Non-reversible even with hardcoded key
+  - No key management
+  - Adjustable length
+- Cons:
+  - Not reversible
+- Best for:
+  - Public-facing identifiers requiring opacity and referenceable short IDs.
 
 #### Oboron for Hash-like Identifier Generation
 
@@ -720,12 +734,10 @@ SHA256 in this context may have drawbacks:
 - performance is not optimal (optimized for large files)
 
 **Performance considerations:**
-- **SHA256 + hex:** ~190 ns, 64 hex characters (128-bit collision
-  resistance)
-- **Oboron ob01 (one block):** ~130 ns, 28 base32/34 hex chars (37%
-  faster)
-- **Oboron ob01 (two blocks):** ~147 ns, 53 base32/66 hex chars (27%
-  faster, stronger than SHA256)
+- SHA256 + hex: ~190 ns, 64 hex characters (128-bit collision resistance)
+- Oboron ob01 (one block): ~130 ns, 28 base32/34 hex chars (37% faster)
+- Oboron ob01 (two blocks): ~147 ns, 53 base32/66 hex chars (27% faster,
+  stronger than SHA256)
 (Times from benchmarks run on an Intel i5 laptop.)
 
 **Collision resistance comparison:**
@@ -740,21 +752,21 @@ when using a fixed key, the collision problem for full Oboron outputs
 [disappears altogether](#deterministic-injectivity).
 
 **Oboron advantages:**
-1. **Better performance** - 27-37% faster than SHA256 for short strings
-2. **More compact encoding** - Base32 provides 5 bits per char vs hex's 4
+1. *Better performance* - 27-37% faster than SHA256 for short strings
+2. *More compact encoding* - Base32 provides 5 bits per char vs hex's 4
    bits
-3. **Referenceable prefixes** - High entropy from initial characters
-4. **Tunable security** - Select prefix length for specific collision
+3. *Referenceable prefixes* - High entropy from initial characters
+4. *Tunable security* - Select prefix length for specific collision
    resistance requirements
-5. **Deterministic guarantee** - Different inputs always produce
+5. *Deterministic guarantee* - Different inputs always produce
    different outputs
 
 **When to choose which approach:**
-- **Oboron (28 chars)**: General-purpose quasi-hashing with deterministic
+- Oboron (28 chars): General-purpose quasi-hashing with deterministic
   non-collision guarantee, and improved performance over SHA256
-- **Oboron (53 chars)**: Stronger-than-SHA256 collision resistance
-  (in a scenario without a fixed key)
-- **Shorter prefixes (6 chars)**: Git-like short references
+- Oboron (53 chars): Stronger-than-SHA256 collision resistance (in a
+  scenario without a fixed key)
+- Shorter prefixes (6 chars): Git-like short references
 
 **Note:** Oboron provides strong collision resistance for identifier
 generation but is not a comprehensive replacement for cryptographic
@@ -875,9 +887,9 @@ For type safety and discoverability, use the provided format constants
 instead of string literals:
 
 ```rust
-use oboron: :{Ob, ObMulti, Oboron, OB32_B64, OB32_HEX};
+use oboron::{Ob, ObMulti, Oboron, OB32_B64, OB32_HEX};
 
-let key = oboron:: generate_key();
+let key = oboron::generate_key();
 
 // With Ob (runtime format selection)
 let ob = Ob::new(OB32_B64, &key)?;
@@ -888,7 +900,7 @@ let ot_b64 = obm.enc("data", OB32_B64)?;
 let ot_hex = obm.enc("data", OB32_HEX)?;
 ```
 
-**Available constants:**
+Available constants:
 - `OB01_C32`, `OB01_B32`, `OB01_B64`, `OB01_HEX`
 - `OB21P_C32`, `OB21P_B32`, `OB21P_B64`, `OB21P_HEX`
 - `OB31_C32`, `OB31_B32`, `OB31_B64`, `OB31_HEX`
