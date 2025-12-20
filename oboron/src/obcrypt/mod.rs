@@ -7,10 +7,10 @@ mod keychain;
 mod adgs; //  AES-GCM-SIV (deterministic)
 #[cfg(feature = "apgs")]
 mod apgs; // AES-GCM-SIV (probabilistic)
+#[cfg(feature = "apsv")]
+mod apsv;
 #[cfg(feature = "ob32")]
 mod ob32; //  AES-SIV (deterministic)
-#[cfg(feature = "ob32p")]
-mod ob32p;
 #[cfg(feature = "upc")]
 mod upc; // AES-CBC (probabilistic)
 #[cfg(feature = "zdc")]
@@ -32,10 +32,10 @@ pub use keychain::Keychain;
 pub use adgs::{decrypt as decrypt_adgs, encrypt as encrypt_adgs};
 #[cfg(feature = "apgs")]
 pub use apgs::{decrypt as decrypt_apgs, encrypt as encrypt_apgs};
+#[cfg(feature = "apsv")]
+pub use apsv::{decrypt as decrypt_apsv, encrypt as encrypt_apsv};
 #[cfg(feature = "ob32")]
 pub use ob32::{decrypt as decrypt_ob32, encrypt as encrypt_ob32};
-#[cfg(feature = "ob32p")]
-pub use ob32p::{decrypt as decrypt_ob32p, encrypt as encrypt_ob32p};
 #[cfg(feature = "upc")]
 pub use upc::{decrypt as decrypt_upc, encrypt as encrypt_upc};
 #[cfg(feature = "zdc")]

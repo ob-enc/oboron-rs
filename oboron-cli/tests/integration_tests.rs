@@ -41,15 +41,15 @@ fn test_enc_keyless() {
     cleanup_test_home(&test_home);
 }
 
-#[cfg(feature = "ob32p")]
+#[cfg(feature = "apsv")]
 #[test]
-fn test_enc_keyless_ob32p() {
+fn test_enc_keyless_apsv() {
     let test_home = test_home_dir();
     let mut cmd = Command::cargo_bin("ob").unwrap();
     cmd.env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("-z")
-        .arg("--ob32p")
+        .arg("--apsv")
         .arg("--base32rfc")
         .arg("test123")
         .assert()
@@ -58,7 +58,7 @@ fn test_enc_keyless_ob32p() {
     cleanup_test_home(&test_home);
 }
 
-#[cfg(feature = "ob32p")]
+#[cfg(feature = "apsv")]
 #[test]
 fn test_enc_dec_roundtrip_keyless() {
     let test_home = test_home_dir();
@@ -69,7 +69,7 @@ fn test_enc_dec_roundtrip_keyless() {
         .env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("-z")
-        .arg("--ob32p")
+        .arg("--apsv")
         .arg("--base32rfc")
         .arg("hello_world")
         .output()
@@ -88,7 +88,7 @@ fn test_enc_dec_roundtrip_keyless() {
         .env("HOME", test_home.as_os_str())
         .arg("dec")
         .arg("-z")
-        .arg("--ob32p")
+        .arg("--apsv")
         .arg("--base32rfc")
         .arg(&encd)
         .assert()
@@ -117,9 +117,9 @@ fn test_enc_with_explicit_key() {
     cleanup_test_home(&test_home);
 }
 
-#[cfg(feature = "ob32p")]
+#[cfg(feature = "apsv")]
 #[test]
-fn test_enc_with_explicit_key_ob32p() {
+fn test_enc_with_explicit_key_apsv() {
     let test_home = test_home_dir();
 
     let mut cmd = Command::cargo_bin("ob").unwrap();
@@ -127,7 +127,7 @@ fn test_enc_with_explicit_key_ob32p() {
         .arg("enc")
         .arg("--key")
         .arg(TEST_KEY_B64)
-        .arg("--ob32p")
+        .arg("--apsv")
         .arg("--base32rfc")
         .arg("test_data")
         .assert()
@@ -223,11 +223,11 @@ fn test_enc_dec_with_explicit_key_adgs() {
 #[cfg(feature = "ob32")]
 #[cfg(feature = "upc")]
 #[cfg(feature = "apgs")]
-#[cfg(feature = "ob32p")]
+#[cfg(feature = "apsv")]
 #[test]
 fn test_enc_different_schemes() {
     let test_home = test_home_dir();
-    let schemes = vec!["--zdc", "--adgs", "--ob32", "--upc", "--apgs", "--ob32p"];
+    let schemes = vec!["--zdc", "--adgs", "--ob32", "--upc", "--apgs", "--apsv"];
 
     for scheme in schemes {
         let mut cmd = Command::cargo_bin("ob").unwrap();

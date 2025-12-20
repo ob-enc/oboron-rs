@@ -21,7 +21,7 @@ jobs:
           - adgs
           - apgs
           - ob32
-          - ob32p
+          - apsv
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -83,7 +83,7 @@ jobs:
           - name: "deterministic only"
             features: "zdc,adgs,ob32"
           - name: "probabilistic only"
-            features: "upc,apgs,ob32p"
+            features: "upc,apgs,apsv"
           - name: "modern schemes"
             features: "adgs,ob32"
           - name: "ob32 only"

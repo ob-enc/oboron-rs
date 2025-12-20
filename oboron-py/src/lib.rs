@@ -265,31 +265,31 @@ impl_cipher_class!(
     "Ob32 cipher with Hex encoding (AES-SIV, deterministic, nonce-misuse resistant)"
 );
 
-// Ob32p variants
+// Apsv variants
 // --------------
-#[cfg(feature = "ob32p")]
+#[cfg(feature = "apsv")]
 impl_cipher_class!(
-    Ob32pBase32Crockford,
-    ::oboron::Ob32pBase32Crockford,
-    "Ob32p cipher with Base32Crockford encoding (Probabilistic AES-SIV)"
+    ApsvC32,
+    ::oboron::ApsvC32,
+    "Apsv cipher with Base32Crockford encoding (Probabilistic AES-SIV)"
 );
-#[cfg(feature = "ob32p")]
+#[cfg(feature = "apsv")]
 impl_cipher_class!(
-    Ob32pBase32Rfc,
-    ::oboron::Ob32pBase32Rfc,
-    "Ob32p cipher with Base32Rfc encoding (Probabilistic AES-SIV)"
+    ApsvB32,
+    ::oboron::ApsvB32,
+    "Apsv cipher with Base32Rfc encoding (Probabilistic AES-SIV)"
 );
-#[cfg(feature = "ob32p")]
+#[cfg(feature = "apsv")]
 impl_cipher_class!(
-    Ob32pBase64,
-    ::oboron::Ob32pBase64,
-    "Ob32p cipher with Base64 encoding (Probabilistic AES-SIV)"
+    ApsvB64,
+    ::oboron::ApsvB64,
+    "Apsv cipher with Base64 encoding (Probabilistic AES-SIV)"
 );
-#[cfg(feature = "ob32p")]
+#[cfg(feature = "apsv")]
 impl_cipher_class!(
-    Ob32pHex,
-    ::oboron::Ob32pHex,
-    "Ob32p cipher with Hex encoding (Probabilistic AES-SIV)"
+    ApsvHex,
+    ::oboron::ApsvHex,
+    "Apsv cipher with Hex encoding (Probabilistic AES-SIV)"
 );
 
 // --- TESTING CLASSES ---
@@ -392,7 +392,7 @@ impl Ob {
     /// Create a new Ob instance.
     ///
     /// Args:
-    ///     format: Format string like "zdc:c32", "zdc:b32", "adgs:b64", "ob32p:hex", etc.
+    ///     format: Format string like "zdc:c32", "zdc:b32", "adgs:b64", "apsv:hex", etc.
     ///     key:     86-character base64 string key (512 bits). Optional if keyless=True.
     ///     keyless: If True, uses the hardcoded key (testing only, NOT SECURE).
     ///
@@ -467,7 +467,7 @@ impl Ob {
     /// Change the format (scheme + encoding).   
     ///
     /// Args:
-    ///     format: Format string like "zdc:c32", "zdc:b32", "adgs:b64", "ob32p:hex", etc.
+    ///     format: Format string like "zdc:c32", "zdc:b32", "adgs:b64", "apsv:hex", etc.
     ///
     /// Raises:
     ///     ValueError: If format is invalid.
@@ -480,7 +480,7 @@ impl Ob {
     /// Change the scheme while keeping the current encoding.
     ///
     /// Args:
-    ///     scheme: Scheme name like "Zdc", "Adgs", "Ob32p", etc.  
+    ///     scheme: Scheme name like "Zdc", "Adgs", "Apsv", etc.  
     ///
     /// Raises:
     ///     ValueError: If scheme is invalid.
@@ -596,7 +596,7 @@ impl ObMulti {
     ///
     /// Args:
     ///     plaintext: The plaintext string to encrypt+encode.
-    ///     format: Format string like "zdc:c32", "zdc:b32", "adgs:b64", "ob32p:hex", etc.
+    ///     format: Format string like "zdc:c32", "zdc:b32", "adgs:b64", "apsv:hex", etc.
     ///
     /// Returns:
     ///     The obtext string.
@@ -613,7 +613,7 @@ impl ObMulti {
     ///
     /// Args:
     ///     obtext: The encrypted+encoded string to decode+decrypt.  
-    ///     format: Format string like "zdc:c32", "zdc:b32", "adgs:b64", "ob32p:hex", etc.
+    ///     format: Format string like "zdc:c32", "zdc:b32", "adgs:b64", "apsv:hex", etc.
     ///
     /// Returns:
     ///     The decoded+decrypted plaintext string.
@@ -685,7 +685,7 @@ fn generate_key_bytes(py: Python) -> PyResult<Py<PyBytes>> {
 ///
 /// Args:
 ///     plaintext: The plaintext string to encode.
-///     format: Format string like "zdc:b32", "adgs:b64", "ob32p:hex", etc.
+///     format: Format string like "zdc:b32", "adgs:b64", "apsv:hex", etc.
 ///     key:     86-character base64 string key (512 bits).
 ///
 /// Returns:
@@ -703,7 +703,7 @@ fn enc(plaintext: &str, format: &str, key: &str) -> PyResult<String> {
 ///
 /// Args:
 ///     plaintext: The plaintext string to encrypt+encode.
-///     format: Format string like "zdc:b32", "adgs:b64", "ob32p:hex", etc.
+///     format: Format string like "zdc:b32", "adgs:b64", "apsv:hex", etc.
 ///
 /// Returns:
 ///     The obtext string.
@@ -721,7 +721,7 @@ fn enc_keyless(plaintext: &str, format: &str) -> PyResult<String> {
 ///
 /// Args:
 ///     obtext: The encrypted+encoded string to decode+decrypt
-///     format: Format string like "zdc:b32", "adgs:b64", "ob32p:hex", etc.
+///     format: Format string like "zdc:b32", "adgs:b64", "apsv:hex", etc.
 ///     key:    86-character base64 string key (512 bits).
 ///
 /// Returns:
@@ -739,7 +739,7 @@ fn dec(obtext: &str, format: &str, key: &str) -> PyResult<String> {
 ///
 /// Args:
 ///     obtext: The encrypted+encoded string to decode+decrypt.
-///     format: Format string like "zdc:b32", "adgs:b64", "ob32p:hex", etc.
+///     format: Format string like "zdc:b32", "adgs:b64", "apsv:hex", etc.
 ///
 /// Returns:
 ///     The decoded+decrypted plaintext string.
@@ -853,13 +853,13 @@ fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m.add_class::<Ob32Hex>()?;
     }
 
-    // Ob32p variants
-    #[cfg(feature = "ob32p")]
+    // Apsv variants
+    #[cfg(feature = "apsv")]
     {
-        m.add_class::<Ob32pBase32Crockford>()?;
-        m.add_class::<Ob32pBase32Rfc>()?;
-        m.add_class::<Ob32pBase64>()?;
-        m.add_class::<Ob32pHex>()?;
+        m.add_class::<ApsvC32>()?;
+        m.add_class::<ApsvB32>()?;
+        m.add_class::<ApsvB64>()?;
+        m.add_class::<ApsvHex>()?;
     }
 
     // Ob71 variants

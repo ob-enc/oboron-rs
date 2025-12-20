@@ -185,13 +185,8 @@ impl_oboron!(
     Encoding::Base32Crockford,
     "ob32:c32"
 );
-#[cfg(feature = "ob32p")]
-impl_oboron!(
-    Ob32pBase32Crockford,
-    Scheme::Ob32p,
-    Encoding::Base32Crockford,
-    "ob32p:c32"
-);
+#[cfg(feature = "apsv")]
+impl_oboron!(ApsvC32, Scheme::Apsv, Encoding::Base32Crockford, "apsv:c32");
 
 // Base32Rfc variants
 #[cfg(feature = "zdc")]
@@ -204,13 +199,8 @@ impl_oboron!(AdgsB32, Scheme::Adgs, Encoding::Base32Rfc, "adgs:b32");
 impl_oboron!(ApgsB32, Scheme::Apgs, Encoding::Base32Rfc, "apgs:b32");
 #[cfg(feature = "ob32")]
 impl_oboron!(Ob32Base32Rfc, Scheme::Ob32, Encoding::Base32Rfc, "ob32:b32");
-#[cfg(feature = "ob32p")]
-impl_oboron!(
-    Ob32pBase32Rfc,
-    Scheme::Ob32p,
-    Encoding::Base32Rfc,
-    "ob32p:b32"
-);
+#[cfg(feature = "apsv")]
+impl_oboron!(ApsvB32, Scheme::Apsv, Encoding::Base32Rfc, "apsv:b32");
 
 // Base64 variants - with Base64 suffix
 #[cfg(feature = "zdc")]
@@ -223,8 +213,8 @@ impl_oboron!(AdgsB64, Scheme::Adgs, Encoding::Base64, "adgs:b64");
 impl_oboron!(ApgsB64, Scheme::Apgs, Encoding::Base64, "apgs:b64");
 #[cfg(feature = "ob32")]
 impl_oboron!(Ob32Base64, Scheme::Ob32, Encoding::Base64, "ob32:b64");
-#[cfg(feature = "ob32p")]
-impl_oboron!(Ob32pBase64, Scheme::Ob32p, Encoding::Base64, "ob32p:b64");
+#[cfg(feature = "apsv")]
+impl_oboron!(ApsvB64, Scheme::Apsv, Encoding::Base64, "apsv:b64");
 
 // Hex variants - with Hex suffix
 #[cfg(feature = "zdc")]
@@ -237,8 +227,8 @@ impl_oboron!(AdgsHex, Scheme::Adgs, Encoding::Hex, "adgs:hex");
 impl_oboron!(ApgsHex, Scheme::Apgs, Encoding::Hex, "apgs:hex");
 #[cfg(feature = "ob32")]
 impl_oboron!(Ob32Hex, Scheme::Ob32, Encoding::Hex, "ob32:hex");
-#[cfg(feature = "ob32p")]
-impl_oboron!(Ob32pHex, Scheme::Ob32p, Encoding::Hex, "ob32p:hex");
+#[cfg(feature = "apsv")]
+impl_oboron!(ApsvHex, Scheme::Apsv, Encoding::Hex, "apsv:hex");
 
 // Testing
 
@@ -318,14 +308,14 @@ pub enum ObAny {
     Ob32Base64(Ob32Base64),
     #[cfg(feature = "ob32")]
     Ob32Hex(Ob32Hex),
-    #[cfg(feature = "ob32p")]
-    Ob32pBase32Crockford(Ob32pBase32Crockford),
-    #[cfg(feature = "ob32p")]
-    Ob32pBase32Rfc(Ob32pBase32Rfc),
-    #[cfg(feature = "ob32p")]
-    Ob32pBase64(Ob32pBase64),
-    #[cfg(feature = "ob32p")]
-    Ob32pHex(Ob32pHex),
+    #[cfg(feature = "apsv")]
+    ApsvC32(ApsvC32),
+    #[cfg(feature = "apsv")]
+    ApsvB32(ApsvB32),
+    #[cfg(feature = "apsv")]
+    ApsvB64(ApsvB64),
+    #[cfg(feature = "apsv")]
+    ApsvHex(ApsvHex),
     // Testing
     #[cfg(feature = "ob70")]
     Ob70Base32Crockford(Ob70Base32Crockford),
@@ -399,14 +389,14 @@ macro_rules! delegate_to_inner {
                 ObAny::Ob32Base64(ob) => ob.$method($($arg),*),
                 #[cfg(feature = "ob32")]
                 ObAny::Ob32Hex(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "ob32p")]
-                ObAny::Ob32pBase32Crockford(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "ob32p")]
-                ObAny::Ob32pBase32Rfc(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "ob32p")]
-                ObAny::Ob32pBase64(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "ob32p")]
-                ObAny::Ob32pHex(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "apsv")]
+                ObAny::ApsvC32(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "apsv")]
+                ObAny::ApsvB32(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "apsv")]
+                ObAny::ApsvB64(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "apsv")]
+                ObAny::ApsvHex(ob) => ob.$method($($arg),*),
                 // Testing
                 #[cfg(feature = "ob70")]
                 ObAny::Ob70Base32Crockford(ob) => ob.$method($($arg),*),
@@ -491,7 +481,7 @@ impl ObAny {
             feature = "apgs"
         )))]
         return Ok(ObAny::Ob32Base32Crockford(Ob32Base32Crockford::new(key)?));
-        #[cfg(feature = "ob32p")]
+        #[cfg(feature = "apsv")]
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
@@ -501,7 +491,7 @@ impl ObAny {
             feature = "apgs",
             feature = "ob32"
         )))]
-        return Ok(ObAny::Ob32pBase32Crockford(Ob32pBase32Crockford::new(key)?));
+        return Ok(ObAny::ApsvC32(ApsvC32::new(key)?));
         #[cfg(feature = "ob00")]
         #[cfg(not(any(
             feature = "ob70",
@@ -511,7 +501,7 @@ impl ObAny {
             feature = "adgs",
             feature = "apgs",
             feature = "ob32",
-            feature = "ob32p"
+            feature = "apsv"
         )))]
         return Ok(ObAny::Ob00Base32Crockford(Ob00Base32Crockford::new(key)?));
         #[cfg(not(any(
@@ -522,7 +512,7 @@ impl ObAny {
             feature = "adgs",
             feature = "apgs",
             feature = "ob32",
-            feature = "ob32p",
+            feature = "apsv",
             feature = "ob00"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
@@ -581,7 +571,7 @@ impl ObAny {
         return Ok(ObAny::Ob32Base32Crockford(Ob32Base32Crockford {
             keychain: Keychain::from_bytes(key_bytes)?,
         }));
-        #[cfg(feature = "ob32p")]
+        #[cfg(feature = "apsv")]
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
@@ -591,7 +581,7 @@ impl ObAny {
             feature = "apgs",
             feature = "ob32"
         )))]
-        return Ok(ObAny::Ob32pBase32Crockford(Ob32pBase32Crockford {
+        return Ok(ObAny::ApsvC32(ApsvC32 {
             keychain: Keychain::from_bytes(key_bytes)?,
         }));
         #[cfg(feature = "ob00")]
@@ -603,7 +593,7 @@ impl ObAny {
             feature = "adgs",
             feature = "apgs",
             feature = "ob32",
-            feature = "ob32p"
+            feature = "apsv"
         )))]
         return Ok(ObAny::Ob00Base32Crockford(Ob00Base32Crockford {
             keychain: Keychain::from_bytes(key_bytes)?,
@@ -616,7 +606,7 @@ impl ObAny {
             feature = "adgs",
             feature = "apgs",
             feature = "ob32",
-            feature = "ob32p",
+            feature = "apsv",
             feature = "ob00"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
@@ -663,7 +653,7 @@ impl ObAny {
         return Ok(ObAny::Ob32Base32Crockford(
             Ob32Base32Crockford::from_hex_key(key_hex)?,
         ));
-        #[cfg(feature = "ob32p")]
+        #[cfg(feature = "apsv")]
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
@@ -673,9 +663,7 @@ impl ObAny {
             feature = "apgs",
             feature = "ob32"
         )))]
-        return Ok(ObAny::Ob32pBase32Crockford(
-            Ob32pBase32Crockford::from_hex_key(key_hex)?,
-        ));
+        return Ok(ObAny::ApsvC32(ApsvC32::from_hex_key(key_hex)?));
         #[cfg(feature = "ob00")]
         #[cfg(not(any(
             feature = "ob70",
@@ -685,7 +673,7 @@ impl ObAny {
             feature = "adgs",
             feature = "apgs",
             feature = "ob32",
-            feature = "ob32p"
+            feature = "apsv"
         )))]
         return Ok(ObAny::Ob00Base32Crockford(
             Ob00Base32Crockford::from_hex_key(key_hex)?,
@@ -698,7 +686,7 @@ impl ObAny {
             feature = "adgs",
             feature = "apgs",
             feature = "ob32",
-            feature = "ob32p",
+            feature = "apsv",
             feature = "ob00"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
@@ -756,7 +744,7 @@ impl ObAny {
         return Ok(ObAny::Ob32Base32Crockford(Ob32Base32Crockford {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
         }));
-        #[cfg(feature = "ob32p")]
+        #[cfg(feature = "apsv")]
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
@@ -766,7 +754,7 @@ impl ObAny {
             feature = "apgs",
             feature = "ob32"
         )))]
-        return Ok(ObAny::Ob32pBase32Crockford(Ob32pBase32Crockford {
+        return Ok(ObAny::ApsvC32(ApsvC32 {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
         }));
         #[cfg(feature = "ob00")]
@@ -778,7 +766,7 @@ impl ObAny {
             feature = "adgs",
             feature = "apgs",
             feature = "ob32",
-            feature = "ob32p"
+            feature = "apsv"
         )))]
         return Ok(ObAny::Ob00Base32Crockford(Ob00Base32Crockford {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
@@ -791,7 +779,7 @@ impl ObAny {
             feature = "adgs",
             feature = "apgs",
             feature = "ob32",
-            feature = "ob32p",
+            feature = "apsv",
             feature = "ob00"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
@@ -849,18 +837,14 @@ pub fn new_with_format(format: Format, key: &str) -> Result<ObAny, Error> {
         (Scheme::Ob32, Encoding::Base64) => Ok(ObAny::Ob32Base64(Ob32Base64::new(key)?)),
         #[cfg(feature = "ob32")]
         (Scheme::Ob32, Encoding::Hex) => Ok(ObAny::Ob32Hex(Ob32Hex::new(key)?)),
-        #[cfg(feature = "ob32p")]
-        (Scheme::Ob32p, Encoding::Base32Crockford) => {
-            Ok(ObAny::Ob32pBase32Crockford(Ob32pBase32Crockford::new(key)?))
-        }
-        #[cfg(feature = "ob32p")]
-        (Scheme::Ob32p, Encoding::Base32Rfc) => {
-            Ok(ObAny::Ob32pBase32Rfc(Ob32pBase32Rfc::new(key)?))
-        }
-        #[cfg(feature = "ob32p")]
-        (Scheme::Ob32p, Encoding::Base64) => Ok(ObAny::Ob32pBase64(Ob32pBase64::new(key)?)),
-        #[cfg(feature = "ob32p")]
-        (Scheme::Ob32p, Encoding::Hex) => Ok(ObAny::Ob32pHex(Ob32pHex::new(key)?)),
+        #[cfg(feature = "apsv")]
+        (Scheme::Apsv, Encoding::Base32Crockford) => Ok(ObAny::ApsvC32(ApsvC32::new(key)?)),
+        #[cfg(feature = "apsv")]
+        (Scheme::Apsv, Encoding::Base32Rfc) => Ok(ObAny::ApsvB32(ApsvB32::new(key)?)),
+        #[cfg(feature = "apsv")]
+        (Scheme::Apsv, Encoding::Base64) => Ok(ObAny::ApsvB64(ApsvB64::new(key)?)),
+        #[cfg(feature = "apsv")]
+        (Scheme::Apsv, Encoding::Hex) => Ok(ObAny::ApsvHex(ApsvHex::new(key)?)),
         // Testing
         #[cfg(feature = "ob70")]
         (Scheme::Ob70, Encoding::Base32Crockford) => {
@@ -977,21 +961,21 @@ fn from_bytes_with_format_internal(format: Format, key_bytes: &[u8; 64]) -> Resu
         (Scheme::Ob32, Encoding::Hex) => {
             Ok(ObAny::Ob32Hex(Ob32Hex::from_bytes_internal(key_bytes)?))
         }
-        #[cfg(feature = "ob32p")]
-        (Scheme::Ob32p, Encoding::Base32Crockford) => Ok(ObAny::Ob32pBase32Crockford(
-            Ob32pBase32Crockford::from_bytes_internal(key_bytes)?,
-        )),
-        #[cfg(feature = "ob32p")]
-        (Scheme::Ob32p, Encoding::Base32Rfc) => Ok(ObAny::Ob32pBase32Rfc(
-            Ob32pBase32Rfc::from_bytes_internal(key_bytes)?,
-        )),
-        #[cfg(feature = "ob32p")]
-        (Scheme::Ob32p, Encoding::Base64) => Ok(ObAny::Ob32pBase64(
-            Ob32pBase64::from_bytes_internal(key_bytes)?,
-        )),
-        #[cfg(feature = "ob32p")]
-        (Scheme::Ob32p, Encoding::Hex) => {
-            Ok(ObAny::Ob32pHex(Ob32pHex::from_bytes_internal(key_bytes)?))
+        #[cfg(feature = "apsv")]
+        (Scheme::Apsv, Encoding::Base32Crockford) => {
+            Ok(ObAny::ApsvC32(ApsvC32::from_bytes_internal(key_bytes)?))
+        }
+        #[cfg(feature = "apsv")]
+        (Scheme::Apsv, Encoding::Base32Rfc) => {
+            Ok(ObAny::ApsvB32(ApsvB32::from_bytes_internal(key_bytes)?))
+        }
+        #[cfg(feature = "apsv")]
+        (Scheme::Apsv, Encoding::Base64) => {
+            Ok(ObAny::ApsvB64(ApsvB64::from_bytes_internal(key_bytes)?))
+        }
+        #[cfg(feature = "apsv")]
+        (Scheme::Apsv, Encoding::Hex) => {
+            Ok(ObAny::ApsvHex(ApsvHex::from_bytes_internal(key_bytes)?))
         }
         // Testing
         #[cfg(feature = "ob70")]
@@ -1115,8 +1099,8 @@ mod tests {
             Scheme::Apgs,
             #[cfg(feature = "ob32")]
             Scheme::Ob32,
-            #[cfg(feature = "ob32p")]
-            Scheme::Ob32p,
+            #[cfg(feature = "apsv")]
+            Scheme::Apsv,
             // Testing
             #[cfg(feature = "ob70")]
             Scheme::Ob70,
@@ -1186,8 +1170,8 @@ mod tests {
             Scheme::Apgs,
             #[cfg(feature = "ob32")]
             Scheme::Ob32,
-            #[cfg(feature = "ob32p")]
-            Scheme::Ob32p,
+            #[cfg(feature = "apsv")]
+            Scheme::Apsv,
         ];
 
         // Define all encodings

@@ -100,7 +100,7 @@ for example:
 - `zdc:c32` - zdc scheme, Crockford base32 encoding
 - `upc:b32` - upc scheme, standard RFC 4648 base32 encoding
 - `adgs:hex` - adgs scheme, hex encoding
-- `ob32p:b64` - ob32p scheme (`p`=probabilistic), base64 encoding
+- `apsv:b64` - apsv scheme (`p`=probabilistic), base64 encoding
 
 A format thus defines the complete transformation, specifying not just
 the output encoding but also the encryption algorithm and payload byte
@@ -158,7 +158,7 @@ odd = authenticated.
 | `adgs`  | AES-GCM-SIV | Yes            | Yes            |       |
 | `apgs` | AES-GCM-SIV | No             | Yes            |       |
 | `ob32`  | AES-SIV     | Yes            | Yes            |       |
-| `ob32p` | AES-SIV     | No             | Yes            |       |
+| `apsv` | AES-SIV     | No             | Yes            |       |
 
 **Key Concepts:**
 * **Deterministic:** Same input (key + plaintext) always produces same
@@ -337,7 +337,7 @@ increase per-operation latency by several multiples and dominate runtime
 for the intended workloads.
 
 Subkeys are fixed, non-adaptive slices of the master key. With the
-exception of `ob32` / `ob32p` (AES-SIV schemes), which intentionally use
+exception of `ob32` / `apsv` (AES-SIV schemes), which intentionally use
 the full 512-bit key, subkeys do not overlap.
 
 This implies related-key structure by construction. Oboron does not claim
@@ -354,7 +354,7 @@ following way:
 - `zdc`, `upc`: use the first 16 bytes (128 bits) for AES key
 - `zdc`: uses the second 16 bytes for IV
 - `adgs`, `apgs`: use the last 32 bytes (256 bits) for AES-GCM-SIV key
-- `ob32`, `ob32p`: use the full 64 bytes (512 bits) for AES-SIV key
+- `ob32`, `apsv`: use the full 64 bytes (512 bits) for AES-SIV key
 
 The master key never leaves your application. Algorithm-specific keys
 are extracted on-the-fly and never cached or stored.
@@ -490,7 +490,7 @@ performed on the same machine is available here:
 |---------------|----------------------------|
 | Oboron zdc:  | 28 characters              |
 | Oboron ob32:  | 34-47 characters           |
-| Oboron ob32p: | 60-72 characters           |
+| Oboron apsv: | 60-72 characters           |
 | SHA256:       | 64 characters              |
 | JWT:          | 150+ characters            |
 
@@ -503,7 +503,7 @@ A more complete output length comparison is given in the
   compactness
 - **ob32**: General-purpose secure encryption with deterministic output
   and compact size
-- **ob32p**: Maximum privacy protection with probabilistic output
+- **apsv**: Maximum privacy protection with probabilistic output
   (larger size due to nonce)
 
 **Choose zdc when:**
@@ -514,7 +514,7 @@ A more complete output length comparison is given in the
 - Cryptographic security with compact output is needed (~34-47 chars)
 - Deterministic behavior is beneficial (lookup keys, caching)
 
-**Choose ob32p when:**
+**Choose apsv when:**
 - Cryptographic security with maximum privacy is required (~60-72 chars)
 - Hiding plaintext relationships is critical
 
@@ -902,7 +902,7 @@ assert pt2 == "hello"
 ```
 
 Available types include all combinations of scheme variants (e.g.,
-`Zdc`, `Upc`, `Adgs`, `Apgs`, `Ob32`, `Ob32p`) with encoding
+`Zdc`, `Upc`, `Adgs`, `Apgs`, `Ob32`, `Apsv`) with encoding
 specifications (`Base64`, `Hex`, `Base32Rfc`, or `Base32Crockford`),
 and concatenates the two in class names, for example:
 - `ZdcB32` - encoder for `zdc:b32` format
@@ -946,8 +946,8 @@ from oboron import ObMulti
 obm = ObMulti(key)
 
 # Format specification per operation
-ot = obm.enc("test", "ob32p:b64")
-pt2 = obm.dec(ot, "ob32p:b64")
+ot = obm.enc("test", "apsv:b64")
+pt2 = obm.dec(ot, "apsv:b64")
 pt_other = obm.dec(other, "zdc:c32")
 ```
 
@@ -992,7 +992,7 @@ Available constants:
 - `ADGS_C32`, `ADGS_B32`, `ADGS_B64`, `ADGS_HEX`
 - `APGS_C32`, `APGS_B32`, `APGS_B64`, `APGS_HEX`
 - `OB32_C32`, `OB32_B32`, `OB32_B64`, `OB32_HEX`
-- `OB32P_C32`, `OB32P_B32`, `OB32P_B64`, `OB32P_HEX`
+- `APSV_C32`, `APSV_B32`, `APSV_B64`, `APSV_HEX`
 - Testing:  `OB70_*`, `OB71_*`
 - Legacy: `OB00_*`
 
@@ -1089,7 +1089,7 @@ group.)
 | ob32   | b32/c32  | 34  | 40  | 47  | 53  | 66  | 79  | 130  | 232  |
 | upc  | b32/c32  | 53  | 53  | 53  | 53  | 79  | 79  | 130  | 232  |
 | apgs  | b32/c32  | 53  | 60  | 66  | 72  | 85  | 98  | 149  | 252  |
-| ob32p  | b32/c32  | 60  | 66  | 72  | 79  | 92  | 104 | 156  | 258  |
+| apsv  | b32/c32  | 60  | 66  | 72  | 79  | 92  | 104 | 156  | 258  |
 
 ## Base64 Encoding (b64)
 
@@ -1101,7 +1101,7 @@ group.)
 | ob32   | b64      | 28  | 34  | 39  | 44  | 55  | 66  | 108  | 194  |
 | upc  | b64      | 44  | 44  | 44  | 44  | 66  | 66  | 108  | 215  |
 | apgs  | b64      | 40  | 50  | 55  | 60  | 71  | 82  | 124  | 210  |
-| ob32p  | b64      | 46  | 55  | 60  | 66  | 76  | 87  | 130  | 215  |
+| apsv  | b64      | 46  | 55  | 60  | 66  | 76  | 87  | 130  | 215  |
 
 ## Hex Encoding (hex)
 
@@ -1113,5 +1113,5 @@ group.)
 | ob32   | hex      | 42  | 50  | 58  | 66  | 82  | 98  | 162  | 290  |
 | upc  | hex      | 66  | 66  | 66  | 66  | 98  | 98  | 162  | 290  |
 | apgs  | hex      | 66  | 74  | 82  | 90  | 106 | 122 | 186  | 314  |
-| ob32p  | hex      | 74  | 82  | 90  | 98  | 114 | 130 | 194  | 322  |
+| apsv  | hex      | 74  | 82  | 90  | 98  | 114 | 130 | 194  | 322  |
 

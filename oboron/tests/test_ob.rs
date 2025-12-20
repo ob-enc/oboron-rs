@@ -27,16 +27,16 @@ fn test_ob_deterministic() {
 }
 
 #[test]
-#[cfg(feature = "ob32p")]
+#[cfg(feature = "apsv")]
 fn test_ob_probabilistic() {
     let key = [0u8; 64];
-    let ob = Ob::from_bytes("ob32p:b64", &key).expect("Failed to create Ob with ob32p");
+    let ob = Ob::from_bytes("apsv:b64", &key).expect("Failed to create Ob with apsv");
 
     let plaintext = "Probabilistic test";
     let encd1 = ob.enc(plaintext).expect("Failed to enc");
     let encd2 = ob.enc(plaintext).expect("Failed to enc");
 
-    // Ob32p is probabilistic
+    // Apsv is probabilistic
     assert_ne!(encd1, encd2);
 
     // But both dec correctly

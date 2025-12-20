@@ -11,10 +11,10 @@ use data_encoding::{BASE64URL_NOPAD, HEXLOWER};
 use crate::decrypt_adgs;
 #[cfg(feature = "apgs")]
 use crate::decrypt_apgs;
+#[cfg(feature = "apsv")]
+use crate::decrypt_apsv;
 #[cfg(feature = "ob32")]
 use crate::decrypt_ob32;
-#[cfg(feature = "ob32p")]
-use crate::decrypt_ob32p;
 #[cfg(feature = "upc")]
 use crate::decrypt_upc;
 #[cfg(feature = "zdc")]
@@ -73,8 +73,8 @@ pub(crate) fn dec_from_format(
         Scheme::Apgs => decrypt_apgs(keychain, &buffer)?,
         #[cfg(feature = "ob32")]
         Scheme::Ob32 => decrypt_ob32(keychain, &buffer)?,
-        #[cfg(feature = "ob32p")]
-        Scheme::Ob32p => decrypt_ob32p(keychain, &buffer)?,
+        #[cfg(feature = "apsv")]
+        Scheme::Apsv => decrypt_apsv(keychain, &buffer)?,
         // Testing
         #[cfg(feature = "ob70")]
         Scheme::Ob70 => decrypt_ob70(keychain, &buffer)?,

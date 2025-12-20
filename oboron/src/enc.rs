@@ -10,10 +10,10 @@ use data_encoding::{BASE64URL_NOPAD, HEXLOWER};
 use crate::encrypt_adgs;
 #[cfg(feature = "apgs")]
 use crate::encrypt_apgs;
+#[cfg(feature = "apsv")]
+use crate::encrypt_apsv;
 #[cfg(feature = "ob32")]
 use crate::encrypt_ob32;
-#[cfg(feature = "ob32p")]
-use crate::encrypt_ob32p;
 #[cfg(feature = "upc")]
 use crate::encrypt_upc;
 #[cfg(feature = "zdc")]
@@ -52,8 +52,8 @@ pub(crate) fn enc_to_format(
         Scheme::Apgs => encrypt_apgs(keychain, plaintext.as_bytes())?,
         #[cfg(feature = "ob32")]
         Scheme::Ob32 => encrypt_ob32(keychain, plaintext.as_bytes())?,
-        #[cfg(feature = "ob32p")]
-        Scheme::Ob32p => encrypt_ob32p(keychain, plaintext.as_bytes())?,
+        #[cfg(feature = "apsv")]
+        Scheme::Apsv => encrypt_apsv(keychain, plaintext.as_bytes())?,
         // Testing
         #[cfg(feature = "ob70")]
         Scheme::Ob70 => encrypt_ob70(keychain, plaintext.as_bytes())?,

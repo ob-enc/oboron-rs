@@ -105,11 +105,11 @@ OboronBase.register(_oboron.Ob32Base32Rfc)
 OboronBase.register(_oboron.Ob32Base64)
 OboronBase.register(_oboron.Ob32Hex)
 
-# Ob32p variants
-OboronBase.register(_oboron.Ob32pBase32Crockford)
-OboronBase.register(_oboron.Ob32pBase32Rfc)
-OboronBase.register(_oboron.Ob32pBase64)
-OboronBase.register(_oboron.Ob32pHex)
+# Apsv variants
+OboronBase.register(_oboron.ApsvC32)
+OboronBase.register(_oboron.ApsvB32)
+OboronBase.register(_oboron.ApsvB64)
+OboronBase.register(_oboron.ApsvHex)
 
 # Ob71 variants (testing)
 OboronBase.register(_oboron.Ob71Base32Crockford)
@@ -169,11 +169,11 @@ Ob32Base32Rfc = _oboron.Ob32Base32Rfc
 Ob32Base64 = _oboron.Ob32Base64
 Ob32Hex = _oboron.Ob32Hex
 
-# Ob32p variants
-Ob32pBase32Crockford = _oboron.Ob32pBase32Crockford
-Ob32pBase32Rfc = _oboron.Ob32pBase32Rfc
-Ob32pBase64 = _oboron.Ob32pBase64
-Ob32pHex = _oboron.Ob32pHex
+# Apsv variants
+ApsvC32 = _oboron.ApsvC32
+ApsvB32 = _oboron.ApsvB32
+ApsvB64 = _oboron.ApsvB64
+ApsvHex = _oboron.ApsvHex
 
 # Ob70 variants (testing)
 Ob70Base32Crockford = _oboron.Ob70Base32Crockford
@@ -247,11 +247,11 @@ __all__ = [
     'Ob32Base64',
     'Ob32Hex',
 
-    # Ob32p
-    'Ob32pBase32Crockford',
-    'Ob32pBase32Rfc',
-    'Ob32pBase64',
-    'Ob32pHex',
+    # Apsv
+    'ApsvC32',
+    'ApsvB32',
+    'ApsvB64',
+    'ApsvHex',
 
     # Ob70 (testing)
     'Ob70Base32Crockford',

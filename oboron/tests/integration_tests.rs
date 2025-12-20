@@ -25,14 +25,14 @@ fn test_available_schemes() {
 
     #[cfg(feature = "adgs")]
     {
-        let ob = oboron::Adgs::new(&key).unwrap();
+        let ob = oboron::AdgsC32::new(&key).unwrap();
         let enc = ob.enc("test").unwrap();
         assert_eq!(ob.dec(&enc).unwrap(), "test");
     }
 
     #[cfg(feature = "apgs")]
     {
-        let ob = oboron::Apgs::new(&key).unwrap();
+        let ob = oboron::ApgsC32::new(&key).unwrap();
         let enc = ob.enc("test").unwrap();
         assert_eq!(ob.dec(&enc).unwrap(), "test");
     }
@@ -44,9 +44,9 @@ fn test_available_schemes() {
         assert_eq!(ob.dec(&enc).unwrap(), "test");
     }
 
-    #[cfg(feature = "ob32p")]
+    #[cfg(feature = "apsv")]
     {
-        let ob = oboron::Ob32p::new(&key).unwrap();
+        let ob = oboron::ApsvC32::new(&key).unwrap();
         let enc = ob.enc("test").unwrap();
         assert_eq!(ob.dec(&enc).unwrap(), "test");
     }

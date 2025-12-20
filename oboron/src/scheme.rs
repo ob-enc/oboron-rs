@@ -15,8 +15,8 @@ pub enum Scheme {
     Apgs,
     #[cfg(feature = "ob32")]
     Ob32,
-    #[cfg(feature = "ob32p")]
-    Ob32p,
+    #[cfg(feature = "apsv")]
+    Apsv,
     // Testing
     #[cfg(feature = "ob70")]
     Ob70,
@@ -41,8 +41,8 @@ impl Scheme {
             Scheme::Apgs => "apgs",
             #[cfg(feature = "ob32")]
             Scheme::Ob32 => "ob32",
-            #[cfg(feature = "ob32p")]
-            Scheme::Ob32p => "ob32p",
+            #[cfg(feature = "apsv")]
+            Scheme::Apsv => "apsv",
             // Testing
             #[cfg(feature = "ob70")]
             Scheme::Ob70 => "ob70",
@@ -72,8 +72,8 @@ impl Scheme {
             Scheme::Apgs => false,
             #[cfg(feature = "ob32")]
             Scheme::Ob32 => true,
-            #[cfg(feature = "ob32p")]
-            Scheme::Ob32p => false,
+            #[cfg(feature = "apsv")]
+            Scheme::Apsv => false,
             // Testing
             #[cfg(feature = "ob70")]
             Scheme::Ob70 => true,
@@ -108,8 +108,8 @@ impl Scheme {
             Scheme::Apgs => constants::APGS_BYTE,
             #[cfg(feature = "ob32")]
             Scheme::Ob32 => constants::OB32_BYTE,
-            #[cfg(feature = "ob32p")]
-            Scheme::Ob32p => constants::OB32P_BYTE,
+            #[cfg(feature = "apsv")]
+            Scheme::Apsv => constants::APSV_BYTE,
             // Testing
             #[cfg(feature = "ob70")]
             Scheme::Ob70 => constants::OB70_BYTE,
@@ -137,8 +137,8 @@ impl std::str::FromStr for Scheme {
             "apgs" => Ok(Scheme::Apgs),
             #[cfg(feature = "ob32")]
             "ob32" => Ok(Scheme::Ob32),
-            #[cfg(feature = "ob32p")]
-            "ob32p" => Ok(Scheme::Ob32p),
+            #[cfg(feature = "apsv")]
+            "apsv" => Ok(Scheme::Apsv),
             // Testing
             #[cfg(feature = "ob70")]
             "ob70" => Ok(Scheme::Ob70),

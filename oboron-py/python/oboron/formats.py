@@ -1,7 +1,7 @@
 """Format string constants for Oboron. 
 
 All constants follow the pattern:  {SCHEME}_{ENCODING}
-- Schemes: ZDC, UPC, ADGS, APGS, OB32, OB32P, OB70, OB71, OB00 (legacy)
+- Schemes: ZDC, UPC, ADGS, APGS, OB32, APSV, OB70, OB71, OB00 (legacy)
 - Encodings: C32 (Base32Crockford), B32 (Base32Rfc), B64 (Base64), HEX
 
 Example:
@@ -42,11 +42,11 @@ OB32_B32: str = "ob32:b32"
 OB32_B64: str = "ob32:b64"
 OB32_HEX: str = "ob32:hex"
 
-# ob32p - AES-SIV (probabilistic, secure and authenticated)
-OB32P_C32: str = "ob32p:c32"
-OB32P_B32: str = "ob32p:b32"
-OB32P_B64: str = "ob32p:b64"
-OB32P_HEX: str = "ob32p:hex"
+# apsv - AES-SIV (probabilistic, secure and authenticated)
+APSV_C32: str = "apsv:c32"
+APSV_B32: str = "apsv:b32"
+APSV_B64: str = "apsv:b64"
+APSV_HEX: str = "apsv:hex"
 
 # Testing schemes (no encryption)
 OB70_C32: str = "ob70:c32"
@@ -76,8 +76,8 @@ __all__ = [
     "APGS_C32", "APGS_B32", "APGS_B64", "APGS_HEX",
     # ob32
     "OB32_C32", "OB32_B32", "OB32_B64", "OB32_HEX",
-    # ob32p
-    "OB32P_C32", "OB32P_B32", "OB32P_B64", "OB32P_HEX",
+    # apsv
+    "APSV_C32", "APSV_B32", "APSV_B64", "APSV_HEX",
     # Testing
     "OB70_C32", "OB70_B32", "OB70_B64", "OB70_HEX",
     "OB71_C32", "OB71_B32", "OB71_B64", "OB71_HEX",

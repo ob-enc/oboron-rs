@@ -119,10 +119,10 @@ fn test_autodetect_all_formats() {
         let pt2 = ob.autodec(&ot).unwrap();
         assert_eq!(original, pt2, "Failed for format ob32");
     }
-    #[cfg(feature = "ob32p")]
+    #[cfg(feature = "apsv")]
     {
-        let ot = ob.enc(original, "ob32p:c32").unwrap();
+        let ot = ob.enc(original, "apsv:c32").unwrap();
         let pt2 = ob.autodec(&ot).unwrap();
-        assert_eq!(original, pt2, "Failed for format ob32p");
+        assert_eq!(original, pt2, "Failed for format apsv");
     }
 }

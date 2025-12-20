@@ -16,10 +16,10 @@ adgs = ["oboron/adgs"]
 ob32 = ["oboron/ob32"]
 upc = ["oboron/upc"]
 apgs = ["oboron/apgs"]
-ob32p = ["oboron/ob32p"]
+apsv = ["oboron/apsv"]
 ob70 = ["oboron/ob70"]
 ob71 = ["oboron/ob71"]
-all-schemes = ["zdc", "upc", "adgs", "apgs", "ob32", "ob32p"]
+all-schemes = ["zdc", "upc", "adgs", "apgs", "ob32", "apsv"]
 
 keyless = ["oboron/keyless"]
 

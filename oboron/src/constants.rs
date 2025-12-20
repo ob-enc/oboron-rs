@@ -41,9 +41,9 @@ pub const APGS_BYTE: u8 = 0x63;
 #[cfg(feature = "ob32")]
 pub const OB32_BYTE: u8 = 0x64;
 
-// ob32p: tier=3 (011), scheme=2 (0010), probabilistic=1 -> 01100101 = 0x65 (decimal: 101)
-#[cfg(feature = "ob32p")]
-pub const OB32P_BYTE: u8 = 0x65;
+// apsv: tier=3 (011), scheme=2 (0010), probabilistic=1 -> 01100101 = 0x65 (decimal: 101)
+#[cfg(feature = "apsv")]
+pub const APSV_BYTE: u8 = 0x65;
 
 // Tier ob7x - Testing
 // -------------------
@@ -82,8 +82,8 @@ pub const ADGS_C32: &str = "adgs:c32";
 pub const APGS_C32: &str = "apgs:c32";
 #[cfg(feature = "ob32")]
 pub const OB32_C32: &str = "ob32:c32";
-#[cfg(feature = "ob32p")]
-pub const OB32P_C32: &str = "ob32p:c32";
+#[cfg(feature = "apsv")]
+pub const APSV_C32: &str = "apsv:c32";
 // Tier ob7x - Testing
 #[cfg(feature = "ob70")]
 pub const OB70_C32: &str = "ob70:c32";
@@ -104,8 +104,8 @@ pub const ADGS_B32: &str = "adgs:b32";
 pub const APGS_B32: &str = "apgs:b32";
 #[cfg(feature = "ob32")]
 pub const OB32_B32: &str = "ob32:b32";
-#[cfg(feature = "ob32p")]
-pub const OB32P_B32: &str = "ob32p:b32";
+#[cfg(feature = "apsv")]
+pub const APSV_B32: &str = "apsv:b32";
 // Tier ob7x - Testing
 #[cfg(feature = "ob70")]
 pub const OB70_B32: &str = "ob70:b32";
@@ -126,8 +126,8 @@ pub const ADGS_B64: &str = "adgs:b64";
 pub const APGS_B64: &str = "apgs:b64";
 #[cfg(feature = "ob32")]
 pub const OB32_B64: &str = "ob32:b64";
-#[cfg(feature = "ob32p")]
-pub const OB32P_B64: &str = "ob32p:b64";
+#[cfg(feature = "apsv")]
+pub const APSV_B64: &str = "apsv:b64";
 // Tier ob7x - Testing
 #[cfg(feature = "ob70")]
 pub const OB70_B64: &str = "ob70:b64";
@@ -148,8 +148,8 @@ pub const ADGS_HEX: &str = "adgs:hex";
 pub const APGS_HEX: &str = "apgs:hex";
 #[cfg(feature = "ob32")]
 pub const OB32_HEX: &str = "ob32:hex";
-#[cfg(feature = "ob32p")]
-pub const OB32P_HEX: &str = "ob32p:hex";
+#[cfg(feature = "apsv")]
+pub const APSV_HEX: &str = "apsv:hex";
 // Tier ob7x - Testing
 #[cfg(feature = "ob70")]
 pub const OB70_HEX: &str = "ob70:hex";

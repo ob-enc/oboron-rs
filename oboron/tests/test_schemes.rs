@@ -6,11 +6,11 @@ use oboron::UpcB64;
 use oboron::ZdcB64;
 #[cfg(feature = "apgs")]
 use oboron::{Apgs, ApgsB64, ApgsHex};
+#[cfg(feature = "apsv")]
+use oboron::{ApsvB64, ApsvC32, ApsvHex};
 use oboron::{Encoding, ObFlex, Oboron, Scheme};
 #[cfg(feature = "ob32")]
 use oboron::{Ob32, Ob32Base64, Ob32Hex};
-#[cfg(feature = "ob32p")]
-use oboron::{Ob32p, Ob32pBase64, Ob32pHex};
 
 #[test]
 #[cfg(feature = "apgs")]
@@ -115,19 +115,19 @@ fn test_ob32_all_encodings() {
 }
 
 #[test]
-#[cfg(feature = "ob32p")]
-fn test_ob32p_basic() {
+#[cfg(feature = "apsv")]
+fn test_apsv_basic() {
     let key = [0u8; 64];
-    let ob = Ob32p::from_bytes(&key).expect("Failed to create Ob32p");
+    let ob = ApsvC32::from_bytes(&key).expect("Failed to create ApsvC32");
 
-    let plaintext = "Testing Ob32p scheme";
+    let plaintext = "Testing ApsvC32 scheme";
     let encd1 = ob.enc(plaintext).expect("Failed to enc");
     let encd2 = ob.enc(plaintext).expect("Failed to enc");
 
-    // Ob32p is probabilistic, so two encodings should be different
+    // ApsvC32 is probabilistic, so two encodings should be different
     assert_ne!(
         encd1, encd2,
-        "Ob32p should produce different ciphertexts for the same plaintext"
+        "ApsvC32 should produce different ciphertexts for the same plaintext"
     );
 
     // But both should dec to the same plaintext
@@ -137,34 +137,34 @@ fn test_ob32p_basic() {
     assert_eq!(decd1, plaintext);
     assert_eq!(decd2, plaintext);
 
-    eprintln!("✓ Ob32p basic test passed");
+    eprintln!("✓ ApsvC32 basic test passed");
 }
 
 #[test]
-#[cfg(feature = "ob32p")]
-fn test_ob32p_all_encodings() {
+#[cfg(feature = "apsv")]
+fn test_apsv_all_encodings() {
     let key = [0u8; 64];
-    let plaintext = "Test ob32p with different encodings";
+    let plaintext = "Test apsv with different encodings";
 
     // Base32Crockford (default)
-    let ob_b32 = Ob32p::from_bytes(&key).expect("Failed to create Ob32p with base32");
+    let ob_b32 = ApsvC32::from_bytes(&key).expect("Failed to create ApsvC32");
     let encd = ob_b32.enc(plaintext).expect("Failed to enc with base32");
     let decd = ob_b32.dec(&encd).expect("Failed to dec with base32");
     assert_eq!(decd, plaintext, "Decoding mismatch for base32");
 
     // Base64
-    let ob_b64 = Ob32pBase64::from_bytes(&key).expect("Failed to create Ob32p with base64");
+    let ob_b64 = ApsvB64::from_bytes(&key).expect("Failed to create ApsvB64");
     let encd = ob_b64.enc(plaintext).expect("Failed to enc with base64");
     let decd = ob_b64.dec(&encd).expect("Failed to dec with base64");
     assert_eq!(decd, plaintext, "Decoding mismatch for base64");
 
     // Hex
-    let ob_hex = Ob32pHex::from_bytes(&key).expect("Failed to create Ob32p with hex");
+    let ob_hex = ApsvHex::from_bytes(&key).expect("Failed to create ApsvHex");
     let encd = ob_hex.enc(plaintext).expect("Failed to enc with hex");
     let decd = ob_hex.dec(&encd).expect("Failed to dec with hex");
     assert_eq!(decd, plaintext, "Decoding mismatch for hex");
 
-    eprintln!("✓ Ob32p all encodings test passed");
+    eprintln!("✓ ApsvC32 all encodings test passed");
 }
 
 #[test]
@@ -173,7 +173,7 @@ fn test_ob32p_all_encodings() {
 #[cfg(feature = "adgs")]
 #[cfg(feature = "apgs")]
 #[cfg(feature = "ob32")]
-#[cfg(feature = "ob32p")]
+#[cfg(feature = "apsv")]
 fn test_obflex_basic() {
     let key = [0u8; 64];
     let mut ob = ObFlex::from_bytes("zdc:c32", &key).expect("Failed to create ObFlex");
@@ -187,7 +187,7 @@ fn test_obflex_basic() {
         Scheme::Adgs,
         Scheme::Apgs,
         Scheme::Ob32,
-        Scheme::Ob32p,
+        Scheme::Apsv,
     ] {
         ob.set_scheme(*scheme)
             .expect(&format!("Failed to set scheme {:?}", scheme));
@@ -211,7 +211,7 @@ fn test_obflex_basic() {
 #[cfg(feature = "adgs")]
 #[cfg(feature = "apgs")]
 #[cfg(feature = "ob32")]
-#[cfg(feature = "ob32p")]
+#[cfg(feature = "apsv")]
 fn test_obflex_all_formats() {
     let key = [0u8; 64];
     let mut ob = ObFlex::from_bytes("zdc:c32", &key).expect("Failed to create ObFlex");
@@ -219,24 +219,9 @@ fn test_obflex_all_formats() {
     let plaintext = "Testing all ObFlex formats";
 
     let formats = [
-        "zdc:c32",
-        "zdc:b64",
-        "zdc:hex",
-        "upc:c32",
-        "upc:b64",
-        "upc:hex",
-        "adgs:c32",
-        "adgs:b64",
-        "adgs:hex",
-        "apgs:c32",
-        "apgs:b64",
-        "apgs:hex",
-        "ob32:c32",
-        "ob32:b64",
-        "ob32:hex",
-        "ob32p:c32",
-        "ob32p:b64",
-        "ob32p:hex",
+        "zdc:c32", "zdc:b64", "zdc:hex", "upc:c32", "upc:b64", "upc:hex", "adgs:c32", "adgs:b64",
+        "adgs:hex", "apgs:c32", "apgs:b64", "apgs:hex", "ob32:c32", "ob32:b64", "ob32:hex",
+        "apsv:c32", "apsv:b64", "apsv:hex",
     ];
 
     for format in &formats {
@@ -288,13 +273,13 @@ fn test_obflex_encoding_changes() {
 #[test]
 #[cfg(feature = "apgs")]
 #[cfg(feature = "ob32")]
-#[cfg(feature = "ob32p")]
+#[cfg(feature = "apsv")]
 fn test_all_schemes_special_characters() {
     let key = [0u8; 64];
     let plaintext = "Special: !@#$%^&*(){}[]|\\:;\"'<>,.?/~`±§";
 
     // Test Apgs
-    let apgs = ApgsB64::from_bytes(&key).expect("Failed to create Apgs");
+    let apgs = ApgsB64::from_bytes(&key).expect("Failed to create ApgsB64");
     let encd = apgs.enc(plaintext).expect("Failed to enc with apgs");
     let decd = apgs.dec(&encd).expect("Failed to dec with apgs");
     assert_eq!(
@@ -311,13 +296,13 @@ fn test_all_schemes_special_characters() {
         "Special characters decoding mismatch for ob32"
     );
 
-    // Test Ob32p
-    let ob32p = Ob32pBase64::from_bytes(&key).expect("Failed to create Ob32p");
-    let encd = ob32p.enc(plaintext).expect("Failed to enc with ob32p");
-    let decd = ob32p.dec(&encd).expect("Failed to dec with ob32p");
+    // Test Apsv
+    let apsv = ApsvB64::from_bytes(&key).expect("Failed to create ApsvB64");
+    let encd = apsv.enc(plaintext).expect("Failed to enc with apsv");
+    let decd = apsv.dec(&encd).expect("Failed to dec with apsv");
     assert_eq!(
         decd, plaintext,
-        "Special characters decoding mismatch for ob32p"
+        "Special characters decoding mismatch for apsv"
     );
 
     eprintln!("✓ All schemes special characters test passed");
@@ -326,7 +311,7 @@ fn test_all_schemes_special_characters() {
 #[test]
 #[cfg(feature = "apgs")]
 #[cfg(feature = "ob32")]
-#[cfg(feature = "ob32p")]
+#[cfg(feature = "apsv")]
 fn test_all_schemes_empty_string() {
     let key = [0u8; 64];
     let plaintext = "";
@@ -335,19 +320,19 @@ fn test_all_schemes_empty_string() {
     // Test that all schemes correctly reject empty strings
 
     // Test Apgs
-    let apgs = ApgsB64::from_bytes(&key).expect("Failed to create Apgs");
+    let apgs = ApgsB64::from_bytes(&key).expect("Failed to create ApgsB64");
     let result = apgs.enc(plaintext);
-    assert!(result.is_err(), "Apgs should reject empty string");
+    assert!(result.is_err(), "ApgsB64 should reject empty string");
 
     // Test Ob32
     let ob32 = Ob32Base64::from_bytes(&key).expect("Failed to create Ob32");
     let result = ob32.enc(plaintext);
     assert!(result.is_err(), "Ob32 should reject empty string");
 
-    // Test Ob32p
-    let ob32p = Ob32pBase64::from_bytes(&key).expect("Failed to create Ob32p");
-    let result = ob32p.enc(plaintext);
-    assert!(result.is_err(), "Ob32p should reject empty string");
+    // Test Apsv
+    let apsv = ApsvB64::from_bytes(&key).expect("Failed to create ApsvB64");
+    let result = apsv.enc(plaintext);
+    assert!(result.is_err(), "ApsvB64 should reject empty string");
 
     eprintln!("✓ All schemes correctly reject empty strings");
 }
@@ -355,7 +340,7 @@ fn test_all_schemes_empty_string() {
 #[test]
 #[cfg(feature = "apgs")]
 #[cfg(feature = "ob32")]
-#[cfg(feature = "ob32p")]
+#[cfg(feature = "apsv")]
 fn test_all_schemes_long_string() {
     let key = [0u8; 64];
     let plaintext = "a".repeat(10000);
@@ -380,15 +365,15 @@ fn test_all_schemes_long_string() {
         .expect("Failed to dec long string with ob32");
     assert_eq!(decd, plaintext, "Long string decoding mismatch for ob32");
 
-    // Test Ob32p
-    let ob32p = Ob32pBase64::from_bytes(&key).expect("Failed to create Ob32p");
-    let encd = ob32p
+    // Test ApsvB64
+    let apsv = ApsvB64::from_bytes(&key).expect("Failed to create ApsvB64");
+    let encd = apsv
         .enc(&plaintext)
-        .expect("Failed to enc long string with ob32p");
-    let decd = ob32p
+        .expect("Failed to enc long string with apsv");
+    let decd = apsv
         .dec(&encd)
-        .expect("Failed to dec long string with ob32p");
-    assert_eq!(decd, plaintext, "Long string decoding mismatch for ob32p");
+        .expect("Failed to dec long string with apsv");
+    assert_eq!(decd, plaintext, "Long string decoding mismatch for apsv");
 
     eprintln!("✓ All schemes long string test passed");
 }
@@ -419,7 +404,7 @@ fn test_cross_scheme_decoding_should_fail() {
 #[test]
 #[cfg(feature = "upc")]
 #[cfg(feature = "apgs")]
-#[cfg(feature = "ob32p")]
+#[cfg(feature = "apsv")]
 fn test_probabilistic_schemes_uniqueness() {
     let key = [0u8; 64];
     let plaintext = "Testing probabilistic uniqueness";
@@ -449,21 +434,21 @@ fn test_probabilistic_schemes_uniqueness() {
     assert_eq!(
         encodings.len(),
         iterations,
-        "Apgs should produce {} unique ciphertexts",
+        "ApgsB64 should produce {} unique ciphertexts",
         iterations
     );
 
-    // Test Ob32p
-    let ob32p = Ob32pBase64::from_bytes(&key).expect("Failed to create ob32p");
+    // Test ApsvB64
+    let apsv = ApsvB64::from_bytes(&key).expect("Failed to create ApsvB64");
     encodings.clear();
     for _ in 0..iterations {
-        let encd = ob32p.enc(plaintext).expect("Failed to enc with ob32p");
+        let encd = apsv.enc(plaintext).expect("Failed to enc with ApsvB64");
         encodings.insert(encd);
     }
     assert_eq!(
         encodings.len(),
         iterations,
-        "Ob32p should produce {} unique ciphertexts",
+        "ApsvB64 should produce {} unique ciphertexts",
         iterations
     );
 

@@ -203,7 +203,7 @@
 //! - `Zdc`: AES-CBC (deterministic)
 //! - `Adgs`: AES-GCM-SIV (deterministic)
 //! - `Ob32`: AES-SIV (deterministic, nonce-misuse resistant)
-//! - `Upc`, `Apgs`, `Ob32p`: Probabilistic variants (different output each time)
+//! - `Upc`, `Apgs`, `Apsv`: Probabilistic variants (different output each time)
 //!
 //! Testing/Demo only schemes using no encryption (`non-crypto` feature group):
 //! - `Ob70`: Identity
@@ -273,10 +273,10 @@ pub(crate) use obcrypt::Keychain;
 pub(crate) use obcrypt::{decrypt_adgs, encrypt_adgs};
 #[cfg(feature = "apgs")]
 pub(crate) use obcrypt::{decrypt_apgs, encrypt_apgs};
+#[cfg(feature = "apsv")]
+pub(crate) use obcrypt::{decrypt_apsv, encrypt_apsv};
 #[cfg(feature = "ob32")]
 pub(crate) use obcrypt::{decrypt_ob32, encrypt_ob32};
-#[cfg(feature = "ob32p")]
-pub(crate) use obcrypt::{decrypt_ob32p, encrypt_ob32p};
 #[cfg(feature = "upc")]
 pub(crate) use obcrypt::{decrypt_upc, encrypt_upc};
 #[cfg(feature = "zdc")]
@@ -317,8 +317,8 @@ pub use oboron::{new_keyless, new_keyless_with_format};
 pub use constants::{ADGS_B32, ADGS_B64, ADGS_C32, ADGS_HEX};
 #[cfg(feature = "apgs")]
 pub use constants::{APGS_B32, APGS_B64, APGS_C32, APGS_HEX};
-#[cfg(feature = "ob32p")]
-pub use constants::{OB32P_B32, OB32P_B64, OB32P_C32, OB32P_HEX};
+#[cfg(feature = "apsv")]
+pub use constants::{APSV_B32, APSV_B64, APSV_C32, APSV_HEX};
 #[cfg(feature = "ob32")]
 pub use constants::{OB32_B32, OB32_B64, OB32_C32, OB32_HEX};
 #[cfg(feature = "upc")]
@@ -339,10 +339,10 @@ pub use constants::{OB00_B32, OB00_B64, OB00_C32, OB00_HEX};
 pub use oboron::{AdgsB32, AdgsB64, AdgsC32, AdgsHex};
 #[cfg(feature = "apgs")]
 pub use oboron::{ApgsB32, ApgsB64, ApgsC32, ApgsHex};
+#[cfg(feature = "apsv")]
+pub use oboron::{ApsvB32, ApsvB64, ApsvC32, ApsvHex};
 #[cfg(feature = "ob32")]
 pub use oboron::{Ob32Base32Crockford, Ob32Base32Rfc, Ob32Base64, Ob32Hex};
-#[cfg(feature = "ob32p")]
-pub use oboron::{Ob32pBase32Crockford, Ob32pBase32Rfc, Ob32pBase64, Ob32pHex};
 #[cfg(feature = "upc")]
 pub use oboron::{UpcB32, UpcB64, UpcC32, UpcHex};
 #[cfg(feature = "zdc")]
@@ -367,8 +367,8 @@ pub type Adgs = AdgsC32;
 pub type Apgs = ApgsC32;
 #[cfg(feature = "ob32")]
 pub type Ob32 = Ob32Base32Crockford;
-#[cfg(feature = "ob32p")]
-pub type Ob32p = Ob32pBase32Crockford;
+#[cfg(feature = "apsv")]
+pub type Apsv = ApsvC32;
 // Testing
 #[cfg(feature = "ob70")]
 pub type Ob70 = Ob70Base32Crockford;
@@ -388,10 +388,10 @@ pub use ob_multi::ObMulti;
 /// use oboron::prelude::*;
 /// ```
 pub mod prelude {
+    #[cfg(feature = "apsv")]
+    pub use crate::Apsv;
     #[cfg(feature = "ob32")]
     pub use crate::Ob32;
-    #[cfg(feature = "ob32p")]
-    pub use crate::Ob32p;
     pub use crate::{Encoding, Error, Format, Oboron, Scheme};
     pub use crate::{Ob, ObFlex, ObMulti};
 }
