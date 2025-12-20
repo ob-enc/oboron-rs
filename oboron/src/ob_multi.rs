@@ -53,7 +53,7 @@ impl ObMulti {
 
     /// Encrypt+encode with a specific format string.
     ///
-    /// Accepts format strings like "ob01:c32", "ob31:b64", etc.
+    /// Accepts format strings like "zdc:c32", "ob31:b64", etc.
     /// For pre-parsed Format instances, use [`enc_with_format`](Self::enc_with_format).
     ///
     /// # Examples

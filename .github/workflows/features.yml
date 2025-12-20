@@ -16,7 +16,7 @@ jobs:
       matrix:
         feature:
           - ob00
-          - ob01
+          - zdc
           - ob21p
           - ob31
           - ob31p
@@ -81,7 +81,7 @@ jobs:
       matrix:
         include:
           - name: "deterministic only"
-            features: "ob01,ob31,ob32"
+            features: "zdc,ob31,ob32"
           - name: "probabilistic only"
             features: "ob21p,ob31p,ob32p"
           - name: "modern schemes"

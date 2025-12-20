@@ -57,7 +57,7 @@ macro_rules! impl_oboron {
         $name:ident,           // Type name (e.g., Ob01Base32Crockford)
         $scheme:expr,          // Scheme constant (e.g., Scheme::Ob01)
         $encoding:expr,        // Encoding constant (e.g., Encoding::Base32Crockford)
-        $format_str:expr       // Format string for docs (e.g., "ob01:c32")
+        $format_str:expr       // Format string for docs (e.g., "zdc:c32")
     ) => {
         #[doc = concat!("Oboron implementation for ", $format_str, " format.\n\n")]
         #[doc = concat!("Corresponds to format string: `\"", $format_str, "\"`")]
@@ -170,12 +170,12 @@ macro_rules! impl_oboron {
 // Generate all scheme+encoding combinations using the optimized macro
 
 // Base32Crockford (default) variants
-#[cfg(feature = "ob01")]
+#[cfg(feature = "zdc")]
 impl_oboron!(
     Ob01Base32Crockford,
     Scheme::Ob01,
     Encoding::Base32Crockford,
-    "ob01:c32"
+    "zdc:c32"
 );
 #[cfg(feature = "ob21p")]
 impl_oboron!(
@@ -214,8 +214,8 @@ impl_oboron!(
 );
 
 // Base32Rfc variants
-#[cfg(feature = "ob01")]
-impl_oboron!(Ob01Base32Rfc, Scheme::Ob01, Encoding::Base32Rfc, "ob01:b32");
+#[cfg(feature = "zdc")]
+impl_oboron!(Ob01Base32Rfc, Scheme::Ob01, Encoding::Base32Rfc, "zdc:b32");
 #[cfg(feature = "ob21p")]
 impl_oboron!(
     Ob21pBase32Rfc,
@@ -243,8 +243,8 @@ impl_oboron!(
 );
 
 // Base64 variants - with Base64 suffix
-#[cfg(feature = "ob01")]
-impl_oboron!(Ob01Base64, Scheme::Ob01, Encoding::Base64, "ob01:b64");
+#[cfg(feature = "zdc")]
+impl_oboron!(Ob01Base64, Scheme::Ob01, Encoding::Base64, "zdc:b64");
 #[cfg(feature = "ob21p")]
 impl_oboron!(Ob21pBase64, Scheme::Ob21p, Encoding::Base64, "ob21p:b64");
 #[cfg(feature = "ob31")]
@@ -257,8 +257,8 @@ impl_oboron!(Ob32Base64, Scheme::Ob32, Encoding::Base64, "ob32:b64");
 impl_oboron!(Ob32pBase64, Scheme::Ob32p, Encoding::Base64, "ob32p:b64");
 
 // Hex variants - with Hex suffix
-#[cfg(feature = "ob01")]
-impl_oboron!(Ob01Hex, Scheme::Ob01, Encoding::Hex, "ob01:hex");
+#[cfg(feature = "zdc")]
+impl_oboron!(Ob01Hex, Scheme::Ob01, Encoding::Hex, "zdc:hex");
 #[cfg(feature = "ob21p")]
 impl_oboron!(Ob21pHex, Scheme::Ob21p, Encoding::Hex, "ob21p:hex");
 #[cfg(feature = "ob31")]
@@ -308,13 +308,13 @@ impl_oboron!(Ob71Hex, Scheme::Ob71, Encoding::Hex, "ob71:hex");
 /// It's returned by the `oboron::new()` factory function.
 #[allow(non_camel_case_types)]
 pub enum ObAny {
-    #[cfg(feature = "ob01")]
+    #[cfg(feature = "zdc")]
     Ob01Base32Crockford(Ob01Base32Crockford),
-    #[cfg(feature = "ob01")]
+    #[cfg(feature = "zdc")]
     Ob01Base32Rfc(Ob01Base32Rfc),
-    #[cfg(feature = "ob01")]
+    #[cfg(feature = "zdc")]
     Ob01Base64(Ob01Base64),
-    #[cfg(feature = "ob01")]
+    #[cfg(feature = "zdc")]
     Ob01Hex(Ob01Hex),
     #[cfg(feature = "ob21p")]
     Ob21pBase32Crockford(Ob21pBase32Crockford),
@@ -389,13 +389,13 @@ macro_rules! delegate_to_inner {
     (fn $method:ident(&self $(, $arg:ident: $argty:ty)*) -> $ret:ty) => {
         fn $method(&self $(, $arg: $argty)*) -> $ret {
             match self {
-                #[cfg(feature = "ob01")]
+                #[cfg(feature = "zdc")]
                 ObAny::Ob01Base32Crockford(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "ob01")]
+                #[cfg(feature = "zdc")]
                 ObAny::Ob01Base32Rfc(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "ob01")]
+                #[cfg(feature = "zdc")]
                 ObAny::Ob01Base64(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "ob01")]
+                #[cfg(feature = "zdc")]
                 ObAny::Ob01Hex(ob) => ob.$method($($arg),*),
                 #[cfg(feature = "ob21p")]
                 ObAny::Ob21pBase32Crockford(ob) => ob.$method($($arg),*),
@@ -493,25 +493,20 @@ impl ObAny {
         #[cfg(feature = "ob71")]
         #[cfg(not(feature = "ob70"))]
         return Ok(ObAny::Ob71Base32Crockford(Ob71Base32Crockford::new(key)?));
-        #[cfg(feature = "ob01")]
+        #[cfg(feature = "zdc")]
         #[cfg(not(any(feature = "ob70", feature = "ob71")))]
         return Ok(ObAny::Ob01Base32Crockford(Ob01Base32Crockford::new(key)?));
         #[cfg(feature = "ob21p")]
-        #[cfg(not(any(feature = "ob70", feature = "ob71", feature = "ob01")))]
+        #[cfg(not(any(feature = "ob70", feature = "ob71", feature = "zdc")))]
         return Ok(ObAny::Ob21pBase32Crockford(Ob21pBase32Crockford::new(key)?));
         #[cfg(feature = "ob31")]
-        #[cfg(not(any(
-            feature = "ob70",
-            feature = "ob71",
-            feature = "ob01",
-            feature = "ob21p"
-        )))]
+        #[cfg(not(any(feature = "ob70", feature = "ob71", feature = "zdc", feature = "ob21p")))]
         return Ok(ObAny::Ob31Base32Crockford(Ob31Base32Crockford::new(key)?));
         #[cfg(feature = "ob31p")]
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
-            feature = "ob01",
+            feature = "zdc",
             feature = "ob21p",
             feature = "ob31"
         )))]
@@ -520,7 +515,7 @@ impl ObAny {
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
-            feature = "ob01",
+            feature = "zdc",
             feature = "ob21p",
             feature = "ob31",
             feature = "ob31p"
@@ -530,7 +525,7 @@ impl ObAny {
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
-            feature = "ob01",
+            feature = "zdc",
             feature = "ob21p",
             feature = "ob31",
             feature = "ob31p",
@@ -541,7 +536,7 @@ impl ObAny {
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
-            feature = "ob01",
+            feature = "zdc",
             feature = "ob21p",
             feature = "ob31",
             feature = "ob31p",
@@ -552,7 +547,7 @@ impl ObAny {
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
-            feature = "ob01",
+            feature = "zdc",
             feature = "ob21p",
             feature = "ob31",
             feature = "ob31p",
@@ -578,23 +573,18 @@ impl ObAny {
         return Ok(ObAny::Ob71Base32Crockford(Ob71Base32Crockford {
             keychain: Keychain::from_bytes(key_bytes)?,
         }));
-        #[cfg(feature = "ob01")]
+        #[cfg(feature = "zdc")]
         #[cfg(not(any(feature = "ob70", feature = "ob71")))]
         return Ok(ObAny::Ob01Base32Crockford(Ob01Base32Crockford {
             keychain: Keychain::from_bytes(key_bytes)?,
         }));
         #[cfg(feature = "ob21p")]
-        #[cfg(not(any(feature = "ob70", feature = "ob71", feature = "ob01")))]
+        #[cfg(not(any(feature = "ob70", feature = "ob71", feature = "zdc")))]
         return Ok(ObAny::Ob21pBase32Crockford(Ob21pBase32Crockford {
             keychain: Keychain::from_bytes(key_bytes)?,
         }));
         #[cfg(feature = "ob31")]
-        #[cfg(not(any(
-            feature = "ob70",
-            feature = "ob71",
-            feature = "ob01",
-            feature = "ob21p"
-        )))]
+        #[cfg(not(any(feature = "ob70", feature = "ob71", feature = "zdc", feature = "ob21p")))]
         return Ok(ObAny::Ob31Base32Crockford(Ob31Base32Crockford {
             keychain: Keychain::from_bytes(key_bytes)?,
         }));
@@ -602,7 +592,7 @@ impl ObAny {
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
-            feature = "ob01",
+            feature = "zdc",
             feature = "ob21p",
             feature = "ob31"
         )))]
@@ -613,7 +603,7 @@ impl ObAny {
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
-            feature = "ob01",
+            feature = "zdc",
             feature = "ob21p",
             feature = "ob31",
             feature = "ob31p"
@@ -625,7 +615,7 @@ impl ObAny {
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
-            feature = "ob01",
+            feature = "zdc",
             feature = "ob21p",
             feature = "ob31",
             feature = "ob31p",
@@ -638,7 +628,7 @@ impl ObAny {
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
-            feature = "ob01",
+            feature = "zdc",
             feature = "ob21p",
             feature = "ob31",
             feature = "ob31p",
@@ -651,7 +641,7 @@ impl ObAny {
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
-            feature = "ob01",
+            feature = "zdc",
             feature = "ob21p",
             feature = "ob31",
             feature = "ob31p",
@@ -673,23 +663,18 @@ impl ObAny {
         return Ok(ObAny::Ob71Base32Crockford(
             Ob71Base32Crockford::from_hex_key(key_hex)?,
         ));
-        #[cfg(feature = "ob01")]
+        #[cfg(feature = "zdc")]
         #[cfg(not(any(feature = "ob70", feature = "ob71")))]
         return Ok(ObAny::Ob01Base32Crockford(
             Ob01Base32Crockford::from_hex_key(key_hex)?,
         ));
         #[cfg(feature = "ob21p")]
-        #[cfg(not(any(feature = "ob70", feature = "ob71", feature = "ob01")))]
+        #[cfg(not(any(feature = "ob70", feature = "ob71", feature = "zdc")))]
         return Ok(ObAny::Ob21pBase32Crockford(
             Ob21pBase32Crockford::from_hex_key(key_hex)?,
         ));
         #[cfg(feature = "ob31")]
-        #[cfg(not(any(
-            feature = "ob70",
-            feature = "ob71",
-            feature = "ob01",
-            feature = "ob21p"
-        )))]
+        #[cfg(not(any(feature = "ob70", feature = "ob71", feature = "zdc", feature = "ob21p")))]
         return Ok(ObAny::Ob31Base32Crockford(
             Ob31Base32Crockford::from_hex_key(key_hex)?,
         ));
@@ -697,7 +682,7 @@ impl ObAny {
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
-            feature = "ob01",
+            feature = "zdc",
             feature = "ob21p",
             feature = "ob31"
         )))]
@@ -708,7 +693,7 @@ impl ObAny {
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
-            feature = "ob01",
+            feature = "zdc",
             feature = "ob21p",
             feature = "ob31",
             feature = "ob31p"
@@ -720,7 +705,7 @@ impl ObAny {
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
-            feature = "ob01",
+            feature = "zdc",
             feature = "ob21p",
             feature = "ob31",
             feature = "ob31p",
@@ -733,7 +718,7 @@ impl ObAny {
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
-            feature = "ob01",
+            feature = "zdc",
             feature = "ob21p",
             feature = "ob31",
             feature = "ob31p",
@@ -746,7 +731,7 @@ impl ObAny {
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
-            feature = "ob01",
+            feature = "zdc",
             feature = "ob21p",
             feature = "ob31",
             feature = "ob31p",
@@ -771,23 +756,18 @@ impl ObAny {
         return Ok(ObAny::Ob71Base32Crockford(Ob71Base32Crockford {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
         }));
-        #[cfg(feature = "ob01")]
+        #[cfg(feature = "zdc")]
         #[cfg(not(any(feature = "ob70", feature = "ob71")))]
         return Ok(ObAny::Ob01Base32Crockford(Ob01Base32Crockford {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
         }));
         #[cfg(feature = "ob21p")]
-        #[cfg(not(any(feature = "ob70", feature = "ob71", feature = "ob01")))]
+        #[cfg(not(any(feature = "ob70", feature = "ob71", feature = "zdc")))]
         return Ok(ObAny::Ob21pBase32Crockford(Ob21pBase32Crockford {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
         }));
         #[cfg(feature = "ob31")]
-        #[cfg(not(any(
-            feature = "ob70",
-            feature = "ob71",
-            feature = "ob01",
-            feature = "ob21p"
-        )))]
+        #[cfg(not(any(feature = "ob70", feature = "ob71", feature = "zdc", feature = "ob21p")))]
         return Ok(ObAny::Ob31Base32Crockford(Ob31Base32Crockford {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
         }));
@@ -795,7 +775,7 @@ impl ObAny {
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
-            feature = "ob01",
+            feature = "zdc",
             feature = "ob21p",
             feature = "ob31"
         )))]
@@ -806,7 +786,7 @@ impl ObAny {
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
-            feature = "ob01",
+            feature = "zdc",
             feature = "ob21p",
             feature = "ob31",
             feature = "ob31p"
@@ -818,7 +798,7 @@ impl ObAny {
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
-            feature = "ob01",
+            feature = "zdc",
             feature = "ob21p",
             feature = "ob31",
             feature = "ob31p",
@@ -831,7 +811,7 @@ impl ObAny {
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
-            feature = "ob01",
+            feature = "zdc",
             feature = "ob21p",
             feature = "ob31",
             feature = "ob31p",
@@ -844,7 +824,7 @@ impl ObAny {
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
-            feature = "ob01",
+            feature = "zdc",
             feature = "ob21p",
             feature = "ob31",
             feature = "ob31p",
@@ -865,15 +845,15 @@ pub fn new(fmt: &str, key: &str) -> Result<ObAny, Error> {
 /// Create an encoder from a pre-parsed Format and base64 key.
 pub fn new_with_format(format: Format, key: &str) -> Result<ObAny, Error> {
     match (format.scheme(), format.encoding()) {
-        #[cfg(feature = "ob01")]
+        #[cfg(feature = "zdc")]
         (Scheme::Ob01, Encoding::Base32Crockford) => {
             Ok(ObAny::Ob01Base32Crockford(Ob01Base32Crockford::new(key)?))
         }
-        #[cfg(feature = "ob01")]
+        #[cfg(feature = "zdc")]
         (Scheme::Ob01, Encoding::Base32Rfc) => Ok(ObAny::Ob01Base32Rfc(Ob01Base32Rfc::new(key)?)),
-        #[cfg(feature = "ob01")]
+        #[cfg(feature = "zdc")]
         (Scheme::Ob01, Encoding::Base64) => Ok(ObAny::Ob01Base64(Ob01Base64::new(key)?)),
-        #[cfg(feature = "ob01")]
+        #[cfg(feature = "zdc")]
         (Scheme::Ob01, Encoding::Hex) => Ok(ObAny::Ob01Hex(Ob01Hex::new(key)?)),
         #[cfg(feature = "ob21p")]
         (Scheme::Ob21p, Encoding::Base32Crockford) => {
@@ -971,19 +951,19 @@ pub fn new_with_format(format: Format, key: &str) -> Result<ObAny, Error> {
 #[cfg(any(feature = "keyless", feature = "bytes-keys", feature = "hex-keys"))]
 fn from_bytes_with_format_internal(format: Format, key_bytes: &[u8; 64]) -> Result<ObAny, Error> {
     match (format.scheme(), format.encoding()) {
-        #[cfg(feature = "ob01")]
+        #[cfg(feature = "zdc")]
         (Scheme::Ob01, Encoding::Base32Crockford) => Ok(ObAny::Ob01Base32Crockford(
             Ob01Base32Crockford::from_bytes_internal(key_bytes)?,
         )),
-        #[cfg(feature = "ob01")]
+        #[cfg(feature = "zdc")]
         (Scheme::Ob01, Encoding::Base32Rfc) => Ok(ObAny::Ob01Base32Rfc(
             Ob01Base32Rfc::from_bytes_internal(key_bytes)?,
         )),
-        #[cfg(feature = "ob01")]
+        #[cfg(feature = "zdc")]
         (Scheme::Ob01, Encoding::Base64) => Ok(ObAny::Ob01Base64(Ob01Base64::from_bytes_internal(
             key_bytes,
         )?)),
-        #[cfg(feature = "ob01")]
+        #[cfg(feature = "zdc")]
         (Scheme::Ob01, Encoding::Hex) => {
             Ok(ObAny::Ob01Hex(Ob01Hex::from_bytes_internal(key_bytes)?))
         }
@@ -1179,7 +1159,7 @@ mod tests {
 
         // Define all schemes
         let schemes = vec![
-            #[cfg(feature = "ob01")]
+            #[cfg(feature = "zdc")]
             Scheme::Ob01,
             #[cfg(feature = "ob21p")]
             Scheme::Ob21p,
@@ -1250,7 +1230,7 @@ mod tests {
             Scheme::Ob70,
             #[cfg(feature = "ob00")]
             Scheme::Ob00,
-            #[cfg(feature = "ob01")]
+            #[cfg(feature = "zdc")]
             Scheme::Ob01,
             #[cfg(feature = "ob21p")]
             Scheme::Ob21p,
@@ -1309,7 +1289,7 @@ mod tests {
         let schemes = vec![
             Scheme::Ob71,
             Scheme::Ob70,
-            #[cfg(feature = "ob01")]
+            #[cfg(feature = "zdc")]
             Scheme::Ob01,
             #[cfg(feature = "ob31")]
             Scheme::Ob31,

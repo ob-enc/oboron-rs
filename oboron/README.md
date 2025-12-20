@@ -102,7 +102,7 @@ encryption key, the format thus uniquely specifies the complete
 transformation from a plaintext string to an encoded "obtext" string.
 Formats are represented by compact identifiers: `{scheme}:{encoding}`,
 for example:
-- `ob01:c32` - ob01 scheme, Crockford base32 encoding
+- `zdc:c32` - zdc scheme, Crockford base32 encoding
 - `ob21p:b32` - ob21p scheme, standard RFC 4648 base32 encoding
 - `ob31:hex` - ob31 scheme, hex encoding
 - `ob32p:b64` - ob32p scheme (`p`=probabilistic), base64 encoding
@@ -158,7 +158,7 @@ odd = authenticated.
 
 | Scheme  | Algorithm   | Deterministic? | Authenticated? | Notes |
 | :------ | :---------- | :------------- | :------------- | :---- |
-| `ob01`  | AES-CBC     | Yes            | No             | Legacy; uses constant IV. Prioritizes determinism and performance over security. |
+| `zdc`  | AES-CBC     | Yes            | No             | Legacy; uses constant IV. Prioritizes determinism and performance over security. |
 | `ob21p` | AES-CBC     | No             | No             |       |
 | `ob31`  | AES-GCM-SIV | Yes            | Yes            |       |
 | `ob31p` | AES-GCM-SIV | No             | Yes            |       |
@@ -180,15 +180,15 @@ odd = authenticated.
 All schemes use well-regarded cryptographic primitives. However, note
 the following:
 
-* **`ob01` and `ob21p` are not authenticated** and vulnerable to
+* **`zdc` and `ob21p` are not authenticated** and vulnerable to
   tampering.
-* **SECURITY WARNING:** **`ob01` is cryptographically broken** due to
+* **SECURITY WARNING:** **`zdc` is cryptographically broken** due to
   its use of a constant IV (by design, in order to achieve deterministic
   output).  This scheme leaks equality and prefix structure and is
   vulnerable to chosen-plaintext attacks.  
-  **Do not use `ob01` for encrypting sensitive data** or any application
+  **Do not use `zdc` for encrypting sensitive data** or any application
   where confidentiality or integrity matters.
-  **Use `ob01` only for** maximum compactness and strong prefix entropy
+  **Use `zdc` only for** maximum compactness and strong prefix entropy
   in non-security-critical contexts (e.g., development or obfuscation).
   For sensitive data, **always use authenticated schemes** (ob3x tier:
   ob31 or ob32).
@@ -206,10 +206,10 @@ one (see [Scheme Tiers](#scheme-tiers) above):
 > domain extend beyond encryption.  For applications such as obfuscation
 > or hashing alternative (see Application section below), ob0x schemes
 > are sufficient, while outperforming ob2x and ob3x schemes by 2x to 4x.
-> In our benchmarks, `ob01` shows ~40% lower latency than SHA256 for
+> In our benchmarks, `zdc` shows ~40% lower latency than SHA256 for
 > short inputs on modern x86 CPUs.
 
-> **FAQ:** *Why use numeric identifiers (e.g., `ob01`) instead of
+> **FAQ:** *Why use numeric identifiers (e.g., `zdc`) instead of
 > algorithm names (e.g., `AES-CBC`)?*
 >
 > Oboron's main target audience is developers who are not cryptography
@@ -219,7 +219,7 @@ one (see [Scheme Tiers](#scheme-tiers) above):
 > (`p` = probabilistic), while relegating actual algorithm names to the
 > documentation.  Besides, each algorithm is used in two different
 > variants: deterministic and probabilistic, so to identify a scheme one
-> would have to speak of "deterministic AES-CBC", as opposed to "ob01",
+> would have to speak of "deterministic AES-CBC", as opposed to "zdc",
 > or "probabilistic AES-CBC" as opposed to "ob21p", which is a mouthful.
 
 
@@ -278,7 +278,7 @@ two goals achieved with the payload structure are:
    decoding
 
 The first step gives a transformed ciphertext:
-- `[ciphertext'] = [reverse(ciphertext)]` for reversed schemes (`ob01`,
+- `[ciphertext'] = [reverse(ciphertext)]` for reversed schemes (`zdc`,
   `ob21p`),
 - `[ciphertext'] = [ciphertext]` for all other schemes (no change).
 
@@ -288,19 +288,19 @@ payload prior to encoding.
 - `[payload] = [ciphertext'][marker]`
 
 This marker byte is the result of an XOR operation on a constant byte
-identifier for the scheme (e.g., `oboron::constants::OB01_BYTE = 0x02`),
+identifier for the scheme (e.g., `oboron::constants::ZDC_BYTE = 0x02`),
 and the first byte of the transformed ciphertext (`ciphertext'[0]`).
 
 - `marker = ciphertext'[0] XOR scheme-byte`
 
 The purpose of this XOR is entropy mix-in: by using the constant scheme
-byte directly, all `ob01` obtexts would have a constant suffix.
+byte directly, all `zdc` obtexts would have a constant suffix.
 
 
 > **FAQ:** *Why do some schemes reverse the ciphertext, while others
 > don't?*
 >
-> The reversal step in `ob01` and `ob21p` schemes moves the final AES
+> The reversal step in `zdc` and `ob21p` schemes moves the final AES
 > block to the beginning of the output, ensuring maximal entropy in the
 > encoded prefix.  Both of these schemes use AES-CBC, a block-chaining
 > algorithm: each 16-byte block's ciphertext becomes the IV for the next.
@@ -356,8 +356,8 @@ for Oboron’s threat model.
 
 The master-key is partitioned into algorithm-specific keys in the
 following way:
-- `ob01`, `ob21p`: use the first 16 bytes (128 bits) for AES key
-- `ob01`: uses the second 16 bytes for IV
+- `zdc`, `ob21p`: use the first 16 bytes (128 bits) for AES key
+- `zdc`: uses the second 16 bytes for IV
 - `ob31`, `ob31p`: use the last 32 bytes (256 bits) for AES-GCM-SIV key
 - `ob32`, `ob32p`: use the full 64 bytes (512 bits) for AES-SIV key
 
@@ -462,7 +462,7 @@ both SHA256 and JWT performance while providing reversible encryption.
 
 | Scheme | 8B Encode | 8B Decode | Security      | Use Case                        |
 |--------|----------:|-----------|---------------|---------------------------------|
-| ob01   | 132 ns    | 126 ns    | Insecure      | Maximum speed + compactness     |
+| zdc   | 132 ns    | 126 ns    | Insecure      | Maximum speed + compactness     |
 | ob32   | 334 ns    | 364 ns    | Secure + Auth | Balanced performance + security |
 | JWT    | 550 ns    | 846 ns    | Auth only`*`  | Signature without encryption    |
 | SHA256 | 191 ns    | N/A       | One-way       | Hashing only                    |
@@ -480,16 +480,16 @@ performed on the same machine is available here:
 - [BASELINE_BENCHMARKS.md](BASELINE_BENCHMARKS.md)
 
 **Performance advantages:**
-- ob01 encoding is 4.1x faster than JWT with 4.5x smaller output
+- zdc encoding is 4.1x faster than JWT with 4.5x smaller output
 - All Oboron schemes outperform JWT for both encoding and decoding
-- ob01 shows lower latency than SHA256+hex for short strings while
+- zdc shows lower latency than SHA256+hex for short strings while
   providing reversible (cryptographically insecure) encryption
 
 ### Output Length Comparison
 
 | Method        | Small string output length |
 |---------------|----------------------------|
-| Oboron ob01:  | 28 characters              |
+| Oboron zdc:  | 28 characters              |
 | Oboron ob32:  | 34-47 characters           |
 | Oboron ob32p: | 60-72 characters           |
 | SHA256:       | 64 characters              |
@@ -500,14 +500,14 @@ A more complete output length comparison is given in the
 
 ### Scheme Selection Guidelines
 
-- **ob01**: Non-security-critical applications prioritizing speed and
+- **zdc**: Non-security-critical applications prioritizing speed and
   compactness
 - **ob32**: General-purpose secure encryption with deterministic output
   and compact size
 - **ob32p**: Maximum privacy protection with probabilistic output
   (larger size due to nonce)
 
-**Choose ob01 when:**
+**Choose zdc when:**
 - Performance and compactness are primary requirements (~28 chars)
 - Security requirements are minimal (obfuscation contexts)
 
@@ -526,7 +526,7 @@ Oboron supports optional feature flags to reduce binary size by including
 only necessary encryption schemes. This is especially useful for
 WebAssembly builds where bundle size matters.
 
-**Default:** All secure production-ready schemes are enabled; `ob01` is
+**Default:** All secure production-ready schemes are enabled; `zdc` is
 not-it has to be enabled explicitly in your application.
 
 For details on available features, scheme groups, and optimization
@@ -573,7 +573,7 @@ prefix entropy and compactness—enables specialized applications:
 
 | Use Case            | Traditional Solution | Oboron Approach |
 |---------------------|----------------------|------------------|
-| Short unique IDs    | UUIDv4 (36 chars)    | ob01:c32 (28 chars, reversible) |
+| Short unique IDs    | UUIDv4 (36 chars)    | zdc:c32 (28 chars, reversible) |
 | URL parameters      | JWT (150+ chars)     | ob32:b64 (4.5x smaller, 4x faster) |
 | Database ID masking | Hashids (not secure) | Proper encryption |
 | Simple encryption   | Libsodium (complex)  | String in, string out API |
@@ -676,7 +676,7 @@ let token = ob.enc(&state)?; // ~50 characters
 Oboron provides efficient alternatives to UUIDs and SHA256 for
 generating unique, referenceable identifiers.
 
-The examples in this section use `ob01` and `keyless` features, which are
+The examples in this section use `zdc` and `keyless` features, which are
 not included by default as cryptographically insecure.  Enable
 the required features explicitly in your `Cargo.toml`.
 
@@ -700,7 +700,7 @@ let full_id = ob.enc("user:alice")?;
 
 Possible security tightening if reversibility is needed:
 - Use `ob31` or `ob32` for strong 256-bit tamper-proof encryption.
-  (Trade-off: longer output: 44 chars; 2-3x slower than `ob01` but still
+  (Trade-off: longer output: 44 chars; 2-3x slower than `zdc` but still
   comparable performance to SHA256)
 - Keep the payload securely encrypted by having a shared secret:
   `env::var("OBORON_KEY")` (Trade-off: shared secret management)
@@ -735,8 +735,8 @@ SHA256 in this context may have drawbacks:
 
 **Performance considerations:**
 - SHA256 + hex: ~190 ns, 64 hex characters (128-bit collision resistance)
-- Oboron ob01 (one block): ~130 ns, 28 base32/34 hex chars (37% faster)
-- Oboron ob01 (two blocks): ~147 ns, 53 base32/66 hex chars (27% faster,
+- Oboron zdc (one block): ~130 ns, 28 base32/34 hex chars (37% faster)
+- Oboron zdc (two blocks): ~147 ns, 53 base32/66 hex chars (27% faster,
   stronger than SHA256)
 (Times from benchmarks run on an Intel i5 laptop.)
 
@@ -800,7 +800,7 @@ Available types include all combinations of scheme variants (e.g.,
 `Ob01`, `Ob21p`, `Ob31`, `Ob31p`, `Ob32`, `Ob32p`) with encoding
 specifications (`Base64`, `Hex`, `Base32Rfc`, or `Base32Crockford`),
 and concatenates the two in struct names, for example:
-- `Ob01Base32Rfc` - encoder for `ob01:b32` format
+- `Ob01Base32Rfc` - encoder for `zdc:b32` format
 - `Ob21pHex` - encoder for `ob21p:hex` format
 - `Ob31Base64` - encoder for `ob31:b64` format
 - `Ob32Base32Crockford = Ob32` - encoder for `ob32:c32` format.
@@ -808,10 +808,10 @@ and concatenates the two in struct names, for example:
 All Base32Crockford-encoding (default) variants have short aliases with
 no explicit encoding (defaulting to `c32`): `Ob01`, `Ob21p`, etc.
 
-Note that the `ob01` scheme is not included by default as
+Note that the `zdc` scheme is not included by default as
 cryptographically insecure.  In order to use the associated structs
 `Ob01 = Ob01Base32Crockford`, `Ob01Base32Rfc`, `Ob01Base64`, or `Ob01Hex`,
-you need to enable the `ob01` feature in your `Cargo.toml`
+you need to enable the `zdc` feature in your `Cargo.toml`
 
 ### 2. **Runtime Format Selection** (`Ob`)
 
@@ -862,7 +862,7 @@ let obm = ObMulti::new(&key)?;
 // Format specification per operation
 let ot = obm.enc("test", "ob32p:b64");
 let pt2 = obm.dec(&ot, "ob32p:b64");
-let pt_other = obm.dec(&other, "ob01:c32");
+let pt_other = obm.dec(&other, "zdc:c32");
 ```
 
 **Autodecode:** While other interfaces perform *scheme* autodetection in
@@ -901,7 +901,7 @@ let ot_hex = obm.enc("data", OB32_HEX)?;
 ```
 
 Available constants:
-- `OB01_C32`, `OB01_B32`, `OB01_B64`, `OB01_HEX`
+- `ZDC_C32`, `ZDC_B32`, `ZDC_B64`, `ZDC_HEX`
 - `OB21P_C32`, `OB21P_B32`, `OB21P_B64`, `OB21P_HEX`
 - `OB31_C32`, `OB31_B32`, `OB31_B64`, `OB31_HEX`
 - `OB31P_C32`, `OB31P_B32`, `OB31P_B64`, `OB31P_HEX`
@@ -1020,7 +1020,7 @@ group.)
 | Scheme | Encoding | 4B  | 8B  | 12B | 16B | 24B | 32B | 64B  | 128B |
 |--------|----------|----:|----:|----:|----:|----:|----:|-----:|-----:|
 | ob70   | b32/c32  | 8   | 15  | 21  | 28  | 40  | 53  | 104  | 207  |
-| ob01   | b32/c32  | 28  | 28  | 28  | 28  | 53  | 53  | 104  | 207  |
+| zdc   | b32/c32  | 28  | 28  | 28  | 28  | 53  | 53  | 104  | 207  |
 | ob31   | b32/c32  | 34  | 40  | 47  | 53  | 66  | 79  | 130  | 232  |
 | ob32   | b32/c32  | 34  | 40  | 47  | 53  | 66  | 79  | 130  | 232  |
 | ob21p  | b32/c32  | 53  | 53  | 53  | 53  | 79  | 79  | 130  | 232  |
@@ -1032,7 +1032,7 @@ group.)
 | Scheme | Encoding | 4B  | 8B  | 12B | 16B | 24B | 32B | 64B  | 128B |
 |--------|----------|----:|----:|----:|----:|----:|----:|-----:|-----:|
 | ob70   | b64      | 7   | 12  | 18  | 23  | 34  | 44  | 87   | 172  |
-| ob01   | b64      | 23  | 23  | 23  | 23  | 44  | 44  | 87   | 172  |
+| zdc   | b64      | 23  | 23  | 23  | 23  | 44  | 44  | 87   | 172  |
 | ob31   | b64      | 28  | 34  | 39  | 44  | 55  | 66  | 108  | 194  |
 | ob32   | b64      | 28  | 34  | 39  | 44  | 55  | 66  | 108  | 194  |
 | ob21p  | b64      | 44  | 44  | 44  | 44  | 66  | 66  | 108  | 215  |
@@ -1044,7 +1044,7 @@ group.)
 | Scheme | Encoding | 4B  | 8B  | 12B | 16B | 24B | 32B | 64B  | 128B |
 |--------|---------:|----:|----:|----:|----:|----:|----:|-----:|-----:|
 | ob70   | hex      | 10  | 18  | 26  | 34  | 50  | 66  | 130  | 258  |
-| ob01   | hex      | 34  | 34  | 34  | 34  | 66  | 66  | 130  | 258  |
+| zdc   | hex      | 34  | 34  | 34  | 34  | 66  | 66  | 130  | 258  |
 | ob31   | hex      | 42  | 50  | 58  | 66  | 82  | 98  | 162  | 290  |
 | ob32   | hex      | 42  | 50  | 58  | 66  | 82  | 98  | 162  | 290  |
 | ob21p  | hex      | 66  | 66  | 66  | 66  | 98  | 98  | 162  | 290  |

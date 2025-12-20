@@ -25,10 +25,10 @@ struct SchemeFlags {
     #[arg(short = '0', long, alias = "00")]
     ob00: bool,
 
-    /// Use ob01 scheme (optimized AES-CBC, recommended)
-    #[cfg(feature = "ob01")]
+    /// Use zdc scheme (optimized AES-CBC, recommended)
+    #[cfg(feature = "zdc")]
     #[arg(short = '1', long, alias = "01")]
-    ob01: bool,
+    zdc: bool,
 
     /// Use ob21p scheme (probabilistic AES-CBC with PKCS#7)
     #[cfg(feature = "ob21p")]
@@ -69,7 +69,7 @@ struct SchemeFlags {
 impl SchemeFlags {
     /// Convert flags to Option<Scheme>, returning error if multiple are set
     #[cfg(any(
-        feature = "ob01",
+        feature = "zdc",
         feature = "ob21p",
         feature = "ob31",
         feature = "ob31p",
@@ -88,8 +88,8 @@ impl SchemeFlags {
             count += 1;
             scheme = Some(Scheme::Ob00);
         }
-        #[cfg(feature = "ob01")]
-        if self.ob01 {
+        #[cfg(feature = "zdc")]
+        if self.zdc {
             count += 1;
             scheme = Some(Scheme::Ob01);
         }
@@ -138,7 +138,7 @@ impl SchemeFlags {
 
     /// Check if any scheme flag is set
     #[cfg(any(
-        feature = "ob01",
+        feature = "zdc",
         feature = "ob21p",
         feature = "ob31",
         feature = "ob31p",
@@ -153,8 +153,8 @@ impl SchemeFlags {
         if self.ob00 {
             return true;
         }
-        #[cfg(feature = "ob01")]
-        if self.ob01 {
+        #[cfg(feature = "zdc")]
+        if self.zdc {
             return true;
         }
         #[cfg(feature = "ob31")]
@@ -263,7 +263,7 @@ impl FormatSpec {
     ) -> Result<Self> {
         // Check for conflicts between --format and individual flags
         if format_str.is_some() && scheme_flags.is_set() {
-            anyhow::bail!("Cannot use --format together with scheme flags (--ob00, --ob01, etc.)");
+            anyhow::bail!("Cannot use --format together with scheme flags (--ob00, --zdc, etc.)");
         }
         if format_str.is_some() && encoding_flags.is_set() {
             anyhow::bail!(
@@ -287,7 +287,7 @@ impl FormatSpec {
         Ok(Self { scheme, encoding })
     }
 
-    /// Convert to format string (e.g., "ob01:b64")
+    /// Convert to format string (e.g., "zdc:b64")
     fn to_string(&self) -> String {
         format!("{}:{}", self.scheme.as_str(), self.encoding.as_short_str())
     }
@@ -313,7 +313,7 @@ enum Commands {
         #[arg(short = 'z', long)]
         keyless: bool,
 
-        /// Format specification (e.g., "ob01:b64", "ob31:b32")
+        /// Format specification (e.g., "zdc:b64", "ob31:b32")
         /// Cannot be combined with scheme or encoding flags
         #[arg(short, long)]
         format: Option<String>,
@@ -345,7 +345,7 @@ enum Commands {
         #[arg(short = 'z', long)]
         keyless: bool,
 
-        /// Format specification (e.g., "ob01:b64", "ob31:b32")
+        /// Format specification (e.g., "zdc:b64", "ob31:b32")
         /// Cannot be combined with scheme or encoding flags
         #[arg(short, long)]
         format: Option<String>,
@@ -816,7 +816,7 @@ mod tests {
     #[cfg(feature = "ob70")]
     fn test_scheme_flags_to_scheme_single() {
         #[cfg(not(any(
-            feature = "ob01",
+            feature = "zdc",
             feature = "ob21p",
             feature = "ob31",
             feature = "ob31p",
@@ -830,8 +830,8 @@ mod tests {
         let flags = SchemeFlags {
             #[cfg(feature = "ob00")]
             ob00: false,
-            #[cfg(feature = "ob01")]
-            ob01: false,
+            #[cfg(feature = "zdc")]
+            zdc: false,
             #[cfg(feature = "ob21p")]
             ob21p: false,
             #[cfg(feature = "ob31")]
@@ -855,7 +855,7 @@ mod tests {
     #[cfg(feature = "ob32p")]
     fn test_scheme_flags_to_scheme_multiple_errors() {
         #[cfg(not(any(
-            feature = "ob01",
+            feature = "zdc",
             feature = "ob21p",
             feature = "ob31",
             feature = "ob31p",
@@ -869,8 +869,8 @@ mod tests {
         let flags = SchemeFlags {
             #[cfg(feature = "ob00")]
             ob00: false,
-            #[cfg(feature = "ob01")]
-            ob01: false,
+            #[cfg(feature = "zdc")]
+            zdc: false,
             #[cfg(feature = "ob21p")]
             ob21p: false,
             #[cfg(feature = "ob31")]
@@ -892,7 +892,7 @@ mod tests {
     #[test]
     fn test_scheme_flags_to_scheme_none() {
         #[cfg(not(any(
-            feature = "ob01",
+            feature = "zdc",
             feature = "ob21p",
             feature = "ob31",
             feature = "ob31p",
@@ -906,8 +906,8 @@ mod tests {
         let flags = SchemeFlags {
             #[cfg(feature = "ob00")]
             ob00: false,
-            #[cfg(feature = "ob01")]
-            ob01: false,
+            #[cfg(feature = "zdc")]
+            zdc: false,
             #[cfg(feature = "ob21p")]
             ob21p: false,
             #[cfg(feature = "ob31")]
@@ -958,7 +958,7 @@ mod tests {
         };
 
         #[cfg(not(any(
-            feature = "ob01",
+            feature = "zdc",
             feature = "ob21p",
             feature = "ob31",
             feature = "ob31p",
@@ -972,8 +972,8 @@ mod tests {
         let scheme_flags = SchemeFlags {
             #[cfg(feature = "ob00")]
             ob00: false,
-            #[cfg(feature = "ob01")]
-            ob01: false,
+            #[cfg(feature = "zdc")]
+            zdc: false,
             #[cfg(feature = "ob21p")]
             ob21p: false,
             #[cfg(feature = "ob31")]
@@ -1012,7 +1012,7 @@ mod tests {
     #[cfg(feature = "ob70")]
     fn test_format_spec_conflicts_with_scheme_flag() {
         #[cfg(not(any(
-            feature = "ob01",
+            feature = "zdc",
             feature = "ob21p",
             feature = "ob31",
             feature = "ob31p",
@@ -1026,8 +1026,8 @@ mod tests {
         let scheme_flags = SchemeFlags {
             #[cfg(feature = "ob00")]
             ob00: false,
-            #[cfg(feature = "ob01")]
-            ob01: false,
+            #[cfg(feature = "zdc")]
+            zdc: false,
             #[cfg(feature = "ob21p")]
             ob21p: false,
             #[cfg(feature = "ob31")]
@@ -1067,7 +1067,7 @@ mod tests {
     #[test]
     fn test_format_spec_conflicts_with_encoding_flag() {
         #[cfg(not(any(
-            feature = "ob01",
+            feature = "zdc",
             feature = "ob21p",
             feature = "ob31",
             feature = "ob31p",
@@ -1081,8 +1081,8 @@ mod tests {
         let scheme_flags = SchemeFlags {
             #[cfg(feature = "ob00")]
             ob00: false,
-            #[cfg(feature = "ob01")]
-            ob01: false,
+            #[cfg(feature = "zdc")]
+            zdc: false,
             #[cfg(feature = "ob21p")]
             ob21p: false,
             #[cfg(feature = "ob31")]
@@ -1129,7 +1129,7 @@ mod tests {
         };
 
         #[cfg(not(any(
-            feature = "ob01",
+            feature = "zdc",
             feature = "ob21p",
             feature = "ob31",
             feature = "ob31p",
@@ -1143,8 +1143,8 @@ mod tests {
         let scheme_flags = SchemeFlags {
             #[cfg(feature = "ob00")]
             ob00: false,
-            #[cfg(feature = "ob01")]
-            ob01: false,
+            #[cfg(feature = "zdc")]
+            zdc: false,
             #[cfg(feature = "ob21p")]
             ob21p: false,
             #[cfg(feature = "ob31")]
@@ -1184,7 +1184,7 @@ mod tests {
         };
 
         #[cfg(not(any(
-            feature = "ob01",
+            feature = "zdc",
             feature = "ob21p",
             feature = "ob31",
             feature = "ob31p",
@@ -1198,8 +1198,8 @@ mod tests {
         let scheme_flags = SchemeFlags {
             #[cfg(feature = "ob00")]
             ob00: false,
-            #[cfg(feature = "ob01")]
-            ob01: false,
+            #[cfg(feature = "zdc")]
+            zdc: false,
             #[cfg(feature = "ob21p")]
             ob21p: false,
             #[cfg(feature = "ob31")]

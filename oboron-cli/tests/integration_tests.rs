@@ -218,7 +218,7 @@ fn test_enc_dec_with_explicit_key_ob31() {
     cleanup_test_home(&test_home);
 }
 
-#[cfg(feature = "ob01")]
+#[cfg(feature = "zdc")]
 #[cfg(feature = "ob31")]
 #[cfg(feature = "ob32")]
 #[cfg(feature = "ob21p")]
@@ -227,9 +227,7 @@ fn test_enc_dec_with_explicit_key_ob31() {
 #[test]
 fn test_enc_different_schemes() {
     let test_home = test_home_dir();
-    let schemes = vec![
-        "--ob01", "--ob31", "--ob32", "--ob21p", "--ob31p", "--ob32p",
-    ];
+    let schemes = vec!["--zdc", "--ob31", "--ob32", "--ob21p", "--ob31p", "--ob32p"];
 
     for scheme in schemes {
         let mut cmd = Command::cargo_bin("ob").unwrap();
@@ -246,7 +244,7 @@ fn test_enc_different_schemes() {
     cleanup_test_home(&test_home);
 }
 
-#[cfg(feature = "ob01")]
+#[cfg(feature = "zdc")]
 #[test]
 fn test_enc_different_encodings() {
     let test_home = test_home_dir();
@@ -257,7 +255,7 @@ fn test_enc_different_encodings() {
         cmd.env("HOME", test_home.as_os_str())
             .arg("enc")
             .arg("-z")
-            .arg("--ob01")
+            .arg("--zdc")
             .arg(encoding)
             .arg("test")
             .assert()
@@ -267,13 +265,13 @@ fn test_enc_different_encodings() {
     cleanup_test_home(&test_home);
 }
 
-#[cfg(feature = "ob01")]
+#[cfg(feature = "zdc")]
 #[cfg(feature = "ob31")]
 #[cfg(feature = "ob32")]
 #[test]
 fn test_enc_with_format_string() {
     let test_home = test_home_dir();
-    let formats = vec!["ob01:b32", "ob31:b64", "ob32:hex"];
+    let formats = vec!["zdc:b32", "ob31:b64", "ob32:hex"];
 
     for format in formats {
         let mut cmd = Command::cargo_bin("ob").unwrap();

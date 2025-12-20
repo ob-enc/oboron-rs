@@ -269,8 +269,6 @@ pub use error::Error;
 // Re-export from obcrypt
 pub(crate) use obcrypt::Keychain;
 
-#[cfg(feature = "ob01")]
-pub(crate) use obcrypt::{decrypt_ob01, encrypt_ob01};
 #[cfg(feature = "ob21p")]
 pub(crate) use obcrypt::{decrypt_ob21p, encrypt_ob21p};
 #[cfg(feature = "ob31")]
@@ -281,6 +279,8 @@ pub(crate) use obcrypt::{decrypt_ob31p, encrypt_ob31p};
 pub(crate) use obcrypt::{decrypt_ob32, encrypt_ob32};
 #[cfg(feature = "ob32p")]
 pub(crate) use obcrypt::{decrypt_ob32p, encrypt_ob32p};
+#[cfg(feature = "zdc")]
+pub(crate) use obcrypt::{decrypt_zdc, encrypt_zdc};
 
 // Testing
 #[cfg(feature = "ob70")]
@@ -313,8 +313,6 @@ pub use oboron::{new, new_with_format, ObAny, Oboron};
 pub use oboron::{new_keyless, new_keyless_with_format};
 
 // Conditionally export format string constants (scheme+encoding combinations)
-#[cfg(feature = "ob01")]
-pub use constants::{OB01_B32, OB01_B64, OB01_C32, OB01_HEX};
 #[cfg(feature = "ob21p")]
 pub use constants::{OB21P_B32, OB21P_B64, OB21P_C32, OB21P_HEX};
 #[cfg(feature = "ob31p")]
@@ -325,6 +323,8 @@ pub use constants::{OB31_B32, OB31_B64, OB31_C32, OB31_HEX};
 pub use constants::{OB32P_B32, OB32P_B64, OB32P_C32, OB32P_HEX};
 #[cfg(feature = "ob32")]
 pub use constants::{OB32_B32, OB32_B64, OB32_C32, OB32_HEX};
+#[cfg(feature = "zdc")]
+pub use constants::{ZDC_B32, ZDC_B64, ZDC_C32, ZDC_HEX};
 // Testing
 #[cfg(feature = "ob70")]
 pub use constants::{OB70_B32, OB70_B64, OB70_C32, OB70_HEX};
@@ -335,7 +335,7 @@ pub use constants::{OB71_B32, OB71_B64, OB71_C32, OB71_HEX};
 pub use constants::{OB00_B32, OB00_B64, OB00_C32, OB00_HEX};
 
 // Conditionally export format-specific structs (scheme+encoding combinations)
-#[cfg(feature = "ob01")]
+#[cfg(feature = "zdc")]
 pub use oboron::{Ob01Base32Crockford, Ob01Base32Rfc, Ob01Base64, Ob01Hex};
 #[cfg(feature = "ob21p")]
 pub use oboron::{Ob21pBase32Crockford, Ob21pBase32Rfc, Ob21pBase64, Ob21pHex};
@@ -357,7 +357,7 @@ pub use oboron::{Ob71Base32Crockford, Ob71Base32Rfc, Ob71Base64, Ob71Hex};
 pub use legacy::{Ob00Base32Crockford, Ob00Base32Rfc, Ob00Base64, Ob00Hex};
 
 // Aliases for default encoding:
-#[cfg(feature = "ob01")]
+#[cfg(feature = "zdc")]
 pub type Ob01 = Ob01Base32Crockford;
 #[cfg(feature = "ob21p")]
 pub type Ob21p = Ob21pBase32Crockford;

@@ -1,4 +1,4 @@
-#[cfg(feature = "ob01")]
+#[cfg(feature = "zdc")]
 use oboron::Ob01Base64;
 #[cfg(feature = "ob21p")]
 use oboron::Ob21pBase64;
@@ -168,7 +168,7 @@ fn test_ob32p_all_encodings() {
 }
 
 #[test]
-#[cfg(feature = "ob01")]
+#[cfg(feature = "zdc")]
 #[cfg(feature = "ob21p")]
 #[cfg(feature = "ob31")]
 #[cfg(feature = "ob31p")]
@@ -176,7 +176,7 @@ fn test_ob32p_all_encodings() {
 #[cfg(feature = "ob32p")]
 fn test_obflex_basic() {
     let key = [0u8; 64];
-    let mut ob = ObFlex::from_bytes("ob01:c32", &key).expect("Failed to create ObFlex");
+    let mut ob = ObFlex::from_bytes("zdc:c32", &key).expect("Failed to create ObFlex");
 
     let plaintext = "Testing ObFlex";
 
@@ -206,7 +206,7 @@ fn test_obflex_basic() {
 }
 
 #[test]
-#[cfg(feature = "ob01")]
+#[cfg(feature = "zdc")]
 #[cfg(feature = "ob21p")]
 #[cfg(feature = "ob31")]
 #[cfg(feature = "ob31p")]
@@ -214,14 +214,14 @@ fn test_obflex_basic() {
 #[cfg(feature = "ob32p")]
 fn test_obflex_all_formats() {
     let key = [0u8; 64];
-    let mut ob = ObFlex::from_bytes("ob01:c32", &key).expect("Failed to create ObFlex");
+    let mut ob = ObFlex::from_bytes("zdc:c32", &key).expect("Failed to create ObFlex");
 
     let plaintext = "Testing all ObFlex formats";
 
     let formats = [
-        "ob01:c32",
-        "ob01:b64",
-        "ob01:hex",
+        "zdc:c32",
+        "zdc:b64",
+        "zdc:hex",
         "ob21p:c32",
         "ob21p:b64",
         "ob21p:hex",
@@ -474,7 +474,7 @@ fn test_probabilistic_schemes_uniqueness() {
 }
 
 #[test]
-#[cfg(feature = "ob01")]
+#[cfg(feature = "zdc")]
 #[cfg(feature = "ob31")]
 #[cfg(feature = "ob32")]
 fn test_deterministic_schemes_consistency() {
@@ -483,10 +483,10 @@ fn test_deterministic_schemes_consistency() {
     let iterations = 100;
 
     // Test Ob01
-    let ob01 = Ob01Base64::from_bytes(&key).expect("Failed to create ob01");
-    let first = ob01.enc(plaintext).expect("Failed to enc with ob01");
+    let zdc = Ob01Base64::from_bytes(&key).expect("Failed to create zdc");
+    let first = zdc.enc(plaintext).expect("Failed to enc with zdc");
     for _ in 0..iterations {
-        let encd = ob01.enc(plaintext).expect("Failed to enc with ob01");
+        let encd = zdc.enc(plaintext).expect("Failed to enc with zdc");
         assert_eq!(encd, first, "Ob01 should produce identical ciphertexts");
     }
 

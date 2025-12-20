@@ -1,7 +1,7 @@
 """Format string constants for Oboron. 
 
 All constants follow the pattern:  {SCHEME}_{ENCODING}
-- Schemes: OB01, OB21P, OB31, OB31P, OB32, OB32P, OB70, OB71, OB00 (legacy)
+- Schemes: ZDC, OB21P, OB31, OB31P, OB32, OB32P, OB70, OB71, OB00 (legacy)
 - Encodings: C32 (Base32Crockford), B32 (Base32Rfc), B64 (Base64), HEX
 
 Example:
@@ -12,11 +12,11 @@ Example:
     >>> ot = ob.enc("secret")
 """
 
-# ob01 - AES-CBC (deterministic, insecure - obfuscation only)
-OB01_C32: str = "ob01:c32"
-OB01_B32: str = "ob01:b32"
-OB01_B64: str = "ob01:b64"
-OB01_HEX: str = "ob01:hex"
+# zdc - AES-CBC (deterministic, insecure - obfuscation only)
+ZDC_C32: str = "zdc:c32"
+ZDC_B32: str = "zdc:b32"
+ZDC_B64: str = "zdc:b64"
+ZDC_HEX: str = "zdc:hex"
 
 # ob21p - AES-CBC (probabilistic, secure but not authenticated)
 OB21P_C32: str = "ob21p:c32"
@@ -59,15 +59,15 @@ OB71_B32: str = "ob71:b32"
 OB71_B64: str = "ob71:b64"
 OB71_HEX: str = "ob71:hex"
 
-# Legacy (ob00 - deprecated, use ob01 instead)
+# Legacy (ob00 - deprecated, use zdc instead)
 OB00_C32: str = "ob00:c32"
 OB00_B32: str = "ob00:b32"
 OB00_B64: str = "ob00:b64"
 OB00_HEX: str = "ob00:hex"
 
 __all__ = [
-    # ob01
-    "OB01_C32", "OB01_B32", "OB01_B64", "OB01_HEX",
+    # zdc
+    "ZDC_C32", "ZDC_B32", "ZDC_B64", "ZDC_HEX",
     # ob21p
     "OB21P_C32", "OB21P_B32", "OB21P_B64", "OB21P_HEX",
     # ob31

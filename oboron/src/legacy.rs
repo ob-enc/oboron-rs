@@ -1,9 +1,9 @@
 //! Legacy AES-CBC scheme (ob00)
 //!
 //! **Deprecated**: This scheme exists only for compatibility with
-//! existing deployments. New code should use `ob01` instead.
+//! existing deployments. New code should use `zdc` instead.
 //!
-//! Differences from `ob01`:
+//! Differences from `zdc`:
 //! - Reverses obtext characters rather than payload bytes
 //! - Uses different padding scheme
 //! - Less optimal prefix entropy distribution
@@ -125,7 +125,7 @@ macro_rules! impl_ob00_oboron {
         #[doc = concat!("Legacy Ob00 Oboron implementation for ", $format_str, " format.\n\n")]
         #[doc = "**LEGACY**: This scheme is maintained for backward compatibility only.\n"]
         #[doc = "The ob00 scheme uses legacy AES-CBC encryption with custom padding.\n"]
-        #[doc = "For new projects, consider using ob01 or more secure schemes like ob31/ob32.\n"]
+        #[doc = "For new projects, consider using zdc or more secure schemes like ob31/ob32.\n"]
         #[doc = concat!("\nCorresponds to format string: `\"", $format_str, "\"`")]
         #[allow(non_camel_case_types)]
         pub struct $name {

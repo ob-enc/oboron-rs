@@ -28,34 +28,34 @@ struct PrecomputeSpec {
 
 fn load_benchmark_specs() -> Vec<BenchmarkSpec> {
     let possible_paths = vec![
-        PathBuf::from("benches/benchmarks_ob01_b32.jsonl"),
-        PathBuf::from("oboron/benches/benchmarks_ob01_b32.jsonl"),
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("benches/benchmarks_ob01_b32.jsonl"),
+        PathBuf::from("benches/benchmarks_zdc_b32.jsonl"),
+        PathBuf::from("oboron/benches/benchmarks_zdc_b32.jsonl"),
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("benches/benchmarks_zdc_b32.jsonl"),
     ];
 
     for path in &possible_paths {
         if path.exists() {
-            eprintln!("Found ob01:b32 benchmarks at: {:?}", path);
+            eprintln!("Found zdc:b32 benchmarks at: {:?}", path);
             let data = fs::read_to_string(path).expect("Failed to read benchmarks");
             let specs: Vec<BenchmarkSpec> = data
                 .lines()
                 .filter(|line| !line.trim().is_empty())
                 .map(|line| serde_json::from_str(line).expect("Failed to parse"))
                 .collect();
-            eprintln!("Loaded {} ob01:b32 benchmark specifications", specs.len());
+            eprintln!("Loaded {} zdc:b32 benchmark specifications", specs.len());
             return specs;
         }
     }
 
-    eprintln!("Warning: benchmarks_ob01_b32.jsonl not found");
+    eprintln!("Warning: benchmarks_zdc_b32.jsonl not found");
     vec![]
 }
 
-fn run_ob01_b32_benchmarks(c: &mut Criterion) {
+fn run_zdc_b32_benchmarks(c: &mut Criterion) {
     let specs = load_benchmark_specs();
 
     if specs.is_empty() {
-        eprintln!("No ob01:b32 specs loaded");
+        eprintln!("No zdc:b32 specs loaded");
         return;
     }
 
@@ -103,8 +103,8 @@ fn run_ob01_b32_benchmarks(c: &mut Criterion) {
             }
         }
     }
-    eprintln!("Registered {} ob01:b32 benchmarks", bench_count);
+    eprintln!("Registered {} zdc:b32 benchmarks", bench_count);
 }
 
-criterion_group!(benches, run_ob01_b32_benchmarks);
+criterion_group!(benches, run_zdc_b32_benchmarks);
 criterion_main!(benches);

@@ -5,7 +5,7 @@ use crate::{constants, error::Error};
 /// Scheme identifier for oboron encoding schemes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Scheme {
-    #[cfg(feature = "ob01")]
+    #[cfg(feature = "zdc")]
     Ob01,
     #[cfg(feature = "ob21p")]
     Ob21p,
@@ -31,8 +31,8 @@ impl Scheme {
     /// Convert scheme to string representation.
     pub fn as_str(&self) -> &'static str {
         match self {
-            #[cfg(feature = "ob01")]
-            Scheme::Ob01 => "ob01",
+            #[cfg(feature = "zdc")]
+            Scheme::Ob01 => "zdc",
             #[cfg(feature = "ob21p")]
             Scheme::Ob21p => "ob21p",
             #[cfg(feature = "ob31")]
@@ -62,7 +62,7 @@ impl Scheme {
     /// Check if this scheme is deterministic (produces the same output for the same input).
     pub fn is_deterministic(&self) -> bool {
         match self {
-            #[cfg(feature = "ob01")]
+            #[cfg(feature = "zdc")]
             Scheme::Ob01 => true,
             #[cfg(feature = "ob21p")]
             Scheme::Ob21p => false,
@@ -98,8 +98,8 @@ impl Scheme {
     /// Get the tail byte for this scheme.
     pub fn byte(&self) -> u8 {
         match self {
-            #[cfg(feature = "ob01")]
-            Scheme::Ob01 => constants::OB01_BYTE,
+            #[cfg(feature = "zdc")]
+            Scheme::Ob01 => constants::ZDC_BYTE,
             #[cfg(feature = "ob21p")]
             Scheme::Ob21p => constants::OB21P_BYTE,
             #[cfg(feature = "ob31")]
@@ -127,8 +127,8 @@ impl std::str::FromStr for Scheme {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.to_lowercase().as_str() {
-            #[cfg(feature = "ob01")]
-            "ob01" => Ok(Scheme::Ob01),
+            #[cfg(feature = "zdc")]
+            "zdc" => Ok(Scheme::Ob01),
             #[cfg(feature = "ob21p")]
             "ob21p" => Ok(Scheme::Ob21p),
             #[cfg(feature = "ob31")]

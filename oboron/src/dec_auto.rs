@@ -5,8 +5,6 @@ use crate::{Format, Scheme};
 // Always available
 use crate::constants::REVERSED_SCHEME_BYTES;
 
-#[cfg(feature = "ob01")]
-use crate::{constants::OB01_BYTE, decrypt_ob01};
 #[cfg(feature = "ob21p")]
 use crate::{constants::OB21P_BYTE, decrypt_ob21p};
 #[cfg(feature = "ob31p")]
@@ -17,6 +15,8 @@ use crate::{constants::OB31_BYTE, decrypt_ob31};
 use crate::{constants::OB32P_BYTE, decrypt_ob32p};
 #[cfg(feature = "ob32")]
 use crate::{constants::OB32_BYTE, decrypt_ob32};
+#[cfg(feature = "zdc")]
+use crate::{constants::ZDC_BYTE, decrypt_zdc};
 // Testing
 #[cfg(feature = "ob70")]
 use crate::{constants::OB70_BYTE, decrypt_ob70};
@@ -36,7 +36,7 @@ pub fn dec_any_scheme(
     let mut buffer = match crate::dec::decode_obtext_to_payload(obtext, encoding) {
         Ok(ct) => ct,
         Err(decode_err) => {
-            // Decoding failed - try ob00 (legacy format with reversal applied to final encoding rather than bytes as in ob01)
+            // Decoding failed - try ob00 (legacy format with reversal applied to final encoding rather than bytes as in zdc)
             #[cfg(feature = "ob00")]
             {
                 let format = Format::new(Scheme::Ob00, encoding);
@@ -67,8 +67,8 @@ pub fn dec_any_scheme(
 
     // Step 4: Match scheme byte and decrypt with available schemes
     let plaintext_bytes = match scheme_byte {
-        #[cfg(feature = "ob01")]
-        OB01_BYTE => decrypt_ob01(keychain, &buffer)?,
+        #[cfg(feature = "zdc")]
+        ZDC_BYTE => decrypt_zdc(keychain, &buffer)?,
         #[cfg(feature = "ob21p")]
         OB21P_BYTE => decrypt_ob21p(keychain, &buffer)?,
         #[cfg(feature = "ob31")]

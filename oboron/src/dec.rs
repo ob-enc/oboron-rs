@@ -7,8 +7,6 @@ use crate::{
 use data_encoding::{BASE64URL_NOPAD, HEXLOWER};
 
 // Conditionally import decrypt functions based on features
-#[cfg(feature = "ob01")]
-use crate::decrypt_ob01;
 #[cfg(feature = "ob21p")]
 use crate::decrypt_ob21p;
 #[cfg(feature = "ob31")]
@@ -19,6 +17,8 @@ use crate::decrypt_ob31p;
 use crate::decrypt_ob32;
 #[cfg(feature = "ob32p")]
 use crate::decrypt_ob32p;
+#[cfg(feature = "zdc")]
+use crate::decrypt_zdc;
 // Testing
 #[cfg(feature = "ob70")]
 use crate::decrypt_ob70;
@@ -63,8 +63,8 @@ pub(crate) fn dec_from_format(
 
     // Step 4: Decrypt using scheme-specific function based on format
     let plaintext_bytes = match format.scheme() {
-        #[cfg(feature = "ob01")]
-        Scheme::Ob01 => decrypt_ob01(keychain, &buffer)?,
+        #[cfg(feature = "zdc")]
+        Scheme::Ob01 => decrypt_zdc(keychain, &buffer)?,
         #[cfg(feature = "ob21p")]
         Scheme::Ob21p => decrypt_ob21p(keychain, &buffer)?,
         #[cfg(feature = "ob31")]

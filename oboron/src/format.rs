@@ -31,19 +31,19 @@ impl Format {
         self.encoding
     }
 
-    /// Parse format from compact string representation (e.g., "ob01:c32", "ob31:b64")
+    /// Parse format from compact string representation (e.g., "zdc:c32", "ob31:b64")
     ///
     /// This uses fast match-based parsing for maximum performance.
     pub fn from_str(s: &str) -> Result<Self, Error> {
         Ok(match s {
-            #[cfg(feature = "ob01")]
-            constants::OB01_C32 => Format::new(Scheme::Ob01, Encoding::Base32Crockford),
-            #[cfg(feature = "ob01")]
-            constants::OB01_B32 => Format::new(Scheme::Ob01, Encoding::Base32Rfc),
-            #[cfg(feature = "ob01")]
-            constants::OB01_B64 => Format::new(Scheme::Ob01, Encoding::Base64),
-            #[cfg(feature = "ob01")]
-            constants::OB01_HEX => Format::new(Scheme::Ob01, Encoding::Hex),
+            #[cfg(feature = "zdc")]
+            constants::ZDC_C32 => Format::new(Scheme::Ob01, Encoding::Base32Crockford),
+            #[cfg(feature = "zdc")]
+            constants::ZDC_B32 => Format::new(Scheme::Ob01, Encoding::Base32Rfc),
+            #[cfg(feature = "zdc")]
+            constants::ZDC_B64 => Format::new(Scheme::Ob01, Encoding::Base64),
+            #[cfg(feature = "zdc")]
+            constants::ZDC_HEX => Format::new(Scheme::Ob01, Encoding::Hex),
 
             #[cfg(feature = "ob21p")]
             constants::OB21P_C32 => Format::new(Scheme::Ob21p, Encoding::Base32Crockford),
@@ -156,7 +156,7 @@ mod tests {
     fn test_format_from_str_all_combinations() {
         // Define all schemes
         let schemes = vec![
-            #[cfg(feature = "ob01")]
+            #[cfg(feature = "zdc")]
             Scheme::Ob01,
             #[cfg(feature = "ob21p")]
             Scheme::Ob21p,
@@ -188,7 +188,7 @@ mod tests {
 
         for scheme in &schemes {
             for encoding in &encodings {
-                // Test short string identifiers (e.g., "ob01:c32", "ob01:b32")
+                // Test short string identifiers (e.g., "zdc:c32", "zdc:b32")
                 let format_str = format!("{}:{}", scheme.as_str(), encoding.as_short_str());
                 let result = Format::from_str(&format_str);
                 assert!(result.is_ok(), "Failed to parse: {}", format_str);
@@ -213,8 +213,8 @@ mod tests {
     fn test_format_from_str_invalid() {
         // Test invalid format strings
         assert!(Format::from_str("invalid").is_err());
-        assert!(Format::from_str("ob01").is_err());
-        assert!(Format::from_str("ob01:").is_err());
+        assert!(Format::from_str("zdc").is_err());
+        assert!(Format::from_str("zdc:").is_err());
         assert!(Format::from_str(":b64").is_err());
         assert!(Format::from_str("ob70:invalid").is_err());
     }
@@ -242,12 +242,12 @@ mod tests {
             (Scheme::Ob00, Encoding::Hex, "ob00:hex"),
         ]);
 
-        #[cfg(feature = "ob01")]
+        #[cfg(feature = "zdc")]
         test_cases.extend(vec![
-            (Scheme::Ob01, Encoding::Base32Crockford, "ob01:c32"),
-            (Scheme::Ob01, Encoding::Base32Rfc, "ob01:b32"),
-            (Scheme::Ob01, Encoding::Base64, "ob01:b64"),
-            (Scheme::Ob01, Encoding::Hex, "ob01:hex"),
+            (Scheme::Ob01, Encoding::Base32Crockford, "zdc:c32"),
+            (Scheme::Ob01, Encoding::Base32Rfc, "zdc:b32"),
+            (Scheme::Ob01, Encoding::Base64, "zdc:b64"),
+            (Scheme::Ob01, Encoding::Hex, "zdc:hex"),
         ]);
 
         #[cfg(feature = "ob21p")]
@@ -335,7 +335,7 @@ mod tests {
     fn test_all_schemes_support_both_base32_variants() {
         // All schemes should support both Base32Rfc (b32) and Base32Crockford (c32)
         let schemes = vec![
-            "ob01", "ob21p", "ob31", "ob31p", "ob32", "ob32p", "ob70", "ob71",
+            "zdc", "ob21p", "ob31", "ob31p", "ob32", "ob32p", "ob70", "ob71",
         ];
 
         for scheme_str in schemes {

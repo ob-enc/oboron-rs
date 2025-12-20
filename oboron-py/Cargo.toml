@@ -11,7 +11,7 @@ crate-type = ["cdylib"]
 default = ["all-schemes", "legacy", "experimental", "keyless", "legacy", "ob70"]
 
 ob00 = ["oboron/ob00"]
-ob01 = ["oboron/ob01"]
+zdc = ["oboron/zdc"]
 ob31 = ["oboron/ob31"]
 ob32 = ["oboron/ob32"]
 ob21p = ["oboron/ob21p"]
@@ -19,7 +19,7 @@ ob31p = ["oboron/ob31p"]
 ob32p = ["oboron/ob32p"]
 ob70 = ["oboron/ob70"]
 ob71 = ["oboron/ob71"]
-all-schemes = ["ob01", "ob21p", "ob31", "ob31p", "ob32", "ob32p"]
+all-schemes = ["zdc", "ob21p", "ob31", "ob31p", "ob32", "ob32p"]
 
 keyless = ["oboron/keyless"]
 

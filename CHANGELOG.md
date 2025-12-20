@@ -33,33 +33,33 @@ but note that pre-1.0 releases may not adhere strictly to all guidelines.
     - second letter: determinisim
       - "d": deterministic
       - "p": probabilistic
-  - new scheme names use last 2 letters for algorithms (instead of numbers):
-    - "cb": AES-CBC
+  - "a"-scheme names use last 2 letters for algorithms (instead of numbers):
     - "gs": AES-GCM-SIV
     - "sv": AES-SIV
+  - other tiers use a single letter for a 3 letters total
   - renamed schemes:
-    - ob00  -> zdzz
-    - ob01  -> zdcb
-    - ob21p -> upcb
     - ob31  -> adgs
     - ob31p -> apgs
     - ob32  -> adsv
     - ob32p -> apsv
-    - ob70  -> tdid
-    - ob71  -> tdrv
+    - ob01  -> zdc
+    - ob21p -> upc
+    - ob70  -> tdi
+    - ob71  -> tdr
+  - ob00 remains unchanged (legacy format)
   - new format uses "." as separator instead of colon
   - renamed formats:
-    - ob01:c32  -> zdcb.c32
-    - ob01:b32  -> zdcb.b32
-    - ob21p:b64 -> upcb.b64
+    - ob01:c32  -> zdc.c32
+    - ob01:b32  -> zdc.b32
+    - ob21p:b64 -> upc.b64
     - ob31:hex  -> adgs.hex
     - ob32p:c32 -> adsv.c32
     - etc.
   - renamed structs:
-    - Ob01, Ob01Base32Crockford  -> ZdcbC32
-    - Ob01Base32Rfc              -> ZdcbB32
-    - Ob01Base64                 -> ZdcbB64
-    - Ob01Hex                    -> ZdcbHex
+    - Ob01, Ob01Base32Crockford  -> ZdcC32
+    - Ob01Base32Rfc              -> ZdcB32
+    - Ob01Base64                 -> ZdcB64
+    - Ob01Hex                    -> ZdcHex
     - Ob31, Ob31Base32Crockford  -> AdgsC32
     - Ob31Base32Rfc              -> AdgsB32
     - Ob31Base64                 -> AdgsB64

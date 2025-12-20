@@ -15,7 +15,7 @@ readme = "README.md"
 default = ["all-schemes"]
 
 ob00 = ["oboron/ob00"]
-ob01 = ["oboron/ob01"]
+zdc = ["oboron/zdc"]
 ob31 = ["oboron/ob31"]
 ob32 = ["oboron/ob32"]
 ob21p = ["oboron/ob21p"]
@@ -26,7 +26,7 @@ ob71 = ["oboron/ob71"]
 
 # Scheme categories
 # =================
-ob0x = ["ob01"] # insecure, not authenticated
+ob0x = ["zdc"] # insecure, not authenticated
 ob1x = []  # insecure, authenticated
 ob2x = ["ob21p"]  # secure, not authenticated
 ob3x = ["ob31", "ob31p", "ob32", "ob32p"]  # secure, authenticated
@@ -34,14 +34,14 @@ ob7x = ["ob70", "ob71"]  # testing
 insecure-schemes = ["ob0x", "ob1x"]
 secure-schemes = ["ob2x", "ob3x"]
 authenticated-schemes = ["ob3x"]
-deterministic-schemes = ["ob01", "ob31", "ob32"]
+deterministic-schemes = ["zdc", "ob31", "ob32"]
 probabilistic-schemes = ["ob21p", "ob31p", "ob32p"]
 all-schemes = ["ob0x", "ob1x", "ob2x", "ob3x"]
 
 # Special purpose groups
 # ======================
 non-crypto = ["ob70", "ob71"]
-legacy = ["ob00"]  # For backward compatibility only -> use ob01 instead
+legacy = ["ob00"]  # For backward compatibility only -> use zdc instead
 experimental = []  # Experimental algorithms
 
 [[bin]]

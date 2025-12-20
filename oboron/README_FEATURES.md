@@ -17,7 +17,7 @@ All encodings (`:c32`-Crockford base32, `:b32`-standard base32, `:b64`-URL-safe 
 
 ### NOT INCLUDED BY DEFAULT
 
-- `ob01` scheme (cryptographically broken)
+- `zdc` scheme (cryptographically broken)
 - the `keyless` feature providing Oboron functionality with the hardcoded
   key
 - alternative key input formats `hex-keys`, `bytes-keys`
@@ -40,7 +40,7 @@ hex/bytes key interfaces and the keyless testing feature.
 
 ### Individual Schemes
 
-- `ob01` - AES-CBC (deterministic)
+- `zdc` - AES-CBC (deterministic)
 - `ob21p` - AES-CBC (probabilistic)
 - `ob31` - AES-GCM-SIV (deterministic)
 - `ob31p` - AES-GCM-SIV (probabilistic)
@@ -66,7 +66,7 @@ Feature groups:
   deployments
 
 **Note:** `ob00` is a legacy scheme used internally by early adopters.
-New users should use `ob01` instead, which provides improved prefix
+New users should use `zdc` instead, which provides improved prefix
 entropy and better padding. This feature is only for maintaining
 compatibility with existing encrypted data.
 
@@ -76,19 +76,19 @@ versioning guarantees and may change or be removed in patch releases.
 ### Scheme Groups
 
 By algorithm
-- `all-cbc-schemes` - Includes `ob01`, `ob21p`
+- `all-cbc-schemes` - Includes `zdc`, `ob21p`
 - `all-gcm-schemes` - Includes `ob31`, `ob31p`
 - `all-siv-schemes` - Includes `ob32`, `ob32p`
 
 By properties:
-- `deterministic-schemes` - Includes `ob01`, `ob31`, `ob32`
+- `deterministic-schemes` - Includes `zdc`, `ob31`, `ob32`
 - `probabilistic-schemes` - Includes `ob21p`, `ob31p`, `ob32p`
 - `authenticated-schemes` - Includes `ob31`, `ob31p`, `ob32`, `ob32p`
-- `secure-schemes` - Includes all but `ob01`
-- `insecure-schemes` - Includes `ob01` only
+- `secure-schemes` - Includes all but `zdc`
+- `insecure-schemes` - Includes `zdc` only
 
 By tier:
-- `ob0x` - Includes `ob01` only
+- `ob0x` - Includes `zdc` only
 - `ob1x` - No current members
 - `ob2x` - Includes `ob21p` only
 - `ob3x` - Includes all authenticated schemes (= `authenticated-schemes`)
@@ -122,9 +122,9 @@ All disabled by default:
 ### Quick Selection Guide
 
 - **General purpose**: `ob32` (deterministic) or `ob32p` (probabilistic)
-- **Maximum speed, most compact output**: `ob01` (insecure, deterministic
+- **Maximum speed, most compact output**: `zdc` (insecure, deterministic
   only)
-- **Testing/obfuscation**: `ob01` with `keyless` feature
+- **Testing/obfuscation**: `zdc` with `keyless` feature
 
 ### Binary Size Impact (WASM)
 
