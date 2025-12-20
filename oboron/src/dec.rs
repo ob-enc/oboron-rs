@@ -64,7 +64,7 @@ pub(crate) fn dec_from_format(
     // Step 4: Decrypt using scheme-specific function based on format
     let plaintext_bytes = match format.scheme() {
         #[cfg(feature = "zdc")]
-        Scheme::Ob01 => decrypt_zdc(keychain, &buffer)?,
+        Scheme::Zdc => decrypt_zdc(keychain, &buffer)?,
         #[cfg(feature = "ob21p")]
         Scheme::Ob21p => decrypt_ob21p(keychain, &buffer)?,
         #[cfg(feature = "ob31")]

@@ -1,6 +1,6 @@
 [package]
 name = "oboron"
-version = "0.3.0"
+version = "0.4.0"
 edition = "2021"
 rust-version = "1.77.0"
 license = "MIT"
@@ -145,7 +145,7 @@ name = "obmulti"
 harness = false
 
 [[bench]]
-name = "zdc"
+name = "zdc_c32"
 harness = false
 
 [[bench]]

@@ -130,37 +130,31 @@ macro_rules! impl_cipher_class {
     };
 }
 
-// Ob01 variants
+// ZdcC32 variants
 // -------------
 #[cfg(feature = "zdc")]
 impl_cipher_class!(
-    Ob01Base32Crockford,
-    ::oboron::Ob01Base32Crockford,
-    "Ob01 cipher with Base32Crockford encoding (AES-CBC, deterministic)"
+    ZdcC32,
+    ::oboron::ZdcC32,
+    "Zdc cipher with Base32Crockford encoding (AES-CBC, deterministic)"
 );
 #[cfg(feature = "zdc")]
 impl_cipher_class!(
-    Ob01Base32Rfc,
-    ::oboron::Ob01Base32Rfc,
-    "Ob01 cipher with Base32Rfc encoding (AES-CBC, deterministic)"
+    ZdcB32,
+    ::oboron::ZdcB32,
+    "Zdc cipher with Base32Rfc encoding (AES-CBC, deterministic)"
 );
 #[cfg(feature = "zdc")]
 impl_cipher_class!(
-    Ob01,
-    ::oboron::Ob01,
-    "Ob01 cipher with default Base32Crockford encoding (AES-CBC, deterministic)"
+    ZdcB64,
+    ::oboron::ZdcB64,
+    "Zdc cipher with Base64 encoding (AES-CBC, deterministic)"
 );
 #[cfg(feature = "zdc")]
 impl_cipher_class!(
-    Ob01Base64,
-    ::oboron::Ob01Base64,
-    "Ob01 cipher with Base64 encoding (AES-CBC, deterministic)"
-);
-#[cfg(feature = "zdc")]
-impl_cipher_class!(
-    Ob01Hex,
-    ::oboron::Ob01Hex,
-    "Ob01 cipher with Hex encoding (AES-CBC, deterministic)"
+    ZdcHex,
+    ::oboron::ZdcHex,
+    "Zdc cipher with Hex encoding (AES-CBC, deterministic)"
 );
 
 // Ob21p variants
@@ -394,7 +388,7 @@ impl_cipher_class!(
     ::oboron::Ob00Base32Crockford,
     "Ob00 cipher with Base32Crockford encoding (LEGACY AES-CBC with custom padding)\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
-     For new projects, use Ob01 or more secure schemes like Ob31/Ob32."
+     For new projects, use Zdc or more secure schemes like Ob31/Ob32."
 );
 #[cfg(feature = "ob00")]
 impl_cipher_class!(
@@ -402,15 +396,7 @@ impl_cipher_class!(
     ::oboron::Ob00Base32Rfc,
     "Ob00 cipher with Base32Rfc encoding (LEGACY AES-CBC with custom padding)\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
-     For new projects, use Ob01 or more secure schemes like Ob31/Ob32."
-);
-#[cfg(feature = "ob00")]
-impl_cipher_class!(
-    Ob00,
-    ::oboron::Ob00,
-    "Ob00 cipher with default Base32Rfc encoding (LEGACY AES-CBC with custom padding)\n\n\
-     **LEGACY**: This scheme is maintained for backward compatibility only.\n\
-     For new projects, use Ob01 or more secure schemes like Ob31/Ob32."
+     For new projects, use Zdc or more secure schemes like Ob31/Ob32."
 );
 #[cfg(feature = "ob00")]
 impl_cipher_class!(
@@ -418,7 +404,7 @@ impl_cipher_class!(
     ::oboron::Ob00Base64,
     "Ob00 cipher with Base64 encoding (LEGACY AES-CBC with custom padding)\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
-     For new projects, use Ob01 or more secure schemes like Ob31/Ob32."
+     For new projects, use Zdc or more secure schemes like Ob31/Ob32."
 );
 #[cfg(feature = "ob00")]
 impl_cipher_class!(
@@ -426,7 +412,7 @@ impl_cipher_class!(
     ::oboron::Ob00Hex,
     "Ob00 cipher with Hex encoding (LEGACY AES-CBC with custom padding)\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
-     For new projects, use Ob01 or more secure schemes like Ob31/Ob32."
+     For new projects, use Zdc or more secure schemes like Ob31/Ob32."
 );
 
 /// Ob - Flexible cipher with runtime format selection.   
@@ -534,7 +520,7 @@ impl Ob {
     /// Change the scheme while keeping the current encoding.
     ///
     /// Args:
-    ///     scheme: Scheme name like "Ob01", "Ob31", "Ob32p", etc.  
+    ///     scheme: Scheme name like "Zdc", "Ob31", "Ob32p", etc.  
     ///
     /// Raises:
     ///     ValueError: If scheme is invalid.
@@ -856,27 +842,24 @@ fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
     // Ob00 variants (LEGACY)
     #[cfg(feature = "ob00")]
     {
-        m.add_class::<Ob00>()?;
         m.add_class::<Ob00Base32Crockford>()?;
         m.add_class::<Ob00Base32Rfc>()?;
         m.add_class::<Ob00Base64>()?;
         m.add_class::<Ob00Hex>()?;
     }
 
-    // Ob01 variants
+    // Zdc variants
     #[cfg(feature = "zdc")]
     {
-        m.add_class::<Ob01>()?;
-        m.add_class::<Ob01Base32Crockford>()?;
-        m.add_class::<Ob01Base32Rfc>()?;
-        m.add_class::<Ob01Base64>()?;
-        m.add_class::<Ob01Hex>()?;
+        m.add_class::<ZdcC32>()?;
+        m.add_class::<ZdcB32>()?;
+        m.add_class::<ZdcB64>()?;
+        m.add_class::<ZdcHex>()?;
     }
 
     // Ob21p variants
     #[cfg(feature = "ob21p")]
     {
-        m.add_class::<Ob21p>()?;
         m.add_class::<Ob21pBase32Crockford>()?;
         m.add_class::<Ob21pBase32Rfc>()?;
         m.add_class::<Ob21pBase64>()?;
@@ -886,7 +869,6 @@ fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
     // Ob31 variants
     #[cfg(feature = "ob31")]
     {
-        m.add_class::<Ob31>()?;
         m.add_class::<Ob31Base32Crockford>()?;
         m.add_class::<Ob31Base32Rfc>()?;
         m.add_class::<Ob31Base64>()?;
@@ -896,7 +878,6 @@ fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
     // Ob31p variants
     #[cfg(feature = "ob31p")]
     {
-        m.add_class::<Ob31p>()?;
         m.add_class::<Ob31pBase32Crockford>()?;
         m.add_class::<Ob31pBase32Rfc>()?;
         m.add_class::<Ob31pBase64>()?;
@@ -906,7 +887,6 @@ fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
     // Ob32 variants
     #[cfg(feature = "ob32")]
     {
-        m.add_class::<Ob32>()?;
         m.add_class::<Ob32Base32Crockford>()?;
         m.add_class::<Ob32Base32Rfc>()?;
         m.add_class::<Ob32Base64>()?;
@@ -916,7 +896,6 @@ fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
     // Ob32p variants
     #[cfg(feature = "ob32p")]
     {
-        m.add_class::<Ob32p>()?;
         m.add_class::<Ob32pBase32Crockford>()?;
         m.add_class::<Ob32pBase32Rfc>()?;
         m.add_class::<Ob32pBase64>()?;
@@ -924,14 +903,12 @@ fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
     }
 
     // Ob71 variants
-    m.add_class::<Ob71>()?;
     m.add_class::<Ob71Base32Crockford>()?;
     m.add_class::<Ob71Base32Rfc>()?;
     m.add_class::<Ob71Base64>()?;
     m.add_class::<Ob71Hex>()?;
 
     // Ob70 variants
-    m.add_class::<Ob70>()?;
     m.add_class::<Ob70Base32Crockford>()?;
     m.add_class::<Ob70Base32Rfc>()?;
     m.add_class::<Ob70Base64>()?;

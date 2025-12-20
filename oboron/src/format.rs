@@ -37,13 +37,13 @@ impl Format {
     pub fn from_str(s: &str) -> Result<Self, Error> {
         Ok(match s {
             #[cfg(feature = "zdc")]
-            constants::ZDC_C32 => Format::new(Scheme::Ob01, Encoding::Base32Crockford),
+            constants::ZDC_C32 => Format::new(Scheme::Zdc, Encoding::Base32Crockford),
             #[cfg(feature = "zdc")]
-            constants::ZDC_B32 => Format::new(Scheme::Ob01, Encoding::Base32Rfc),
+            constants::ZDC_B32 => Format::new(Scheme::Zdc, Encoding::Base32Rfc),
             #[cfg(feature = "zdc")]
-            constants::ZDC_B64 => Format::new(Scheme::Ob01, Encoding::Base64),
+            constants::ZDC_B64 => Format::new(Scheme::Zdc, Encoding::Base64),
             #[cfg(feature = "zdc")]
-            constants::ZDC_HEX => Format::new(Scheme::Ob01, Encoding::Hex),
+            constants::ZDC_HEX => Format::new(Scheme::Zdc, Encoding::Hex),
 
             #[cfg(feature = "ob21p")]
             constants::OB21P_C32 => Format::new(Scheme::Ob21p, Encoding::Base32Crockford),
@@ -157,7 +157,7 @@ mod tests {
         // Define all schemes
         let schemes = vec![
             #[cfg(feature = "zdc")]
-            Scheme::Ob01,
+            Scheme::Zdc,
             #[cfg(feature = "ob21p")]
             Scheme::Ob21p,
             #[cfg(feature = "ob31")]
@@ -244,10 +244,10 @@ mod tests {
 
         #[cfg(feature = "zdc")]
         test_cases.extend(vec![
-            (Scheme::Ob01, Encoding::Base32Crockford, "zdc:c32"),
-            (Scheme::Ob01, Encoding::Base32Rfc, "zdc:b32"),
-            (Scheme::Ob01, Encoding::Base64, "zdc:b64"),
-            (Scheme::Ob01, Encoding::Hex, "zdc:hex"),
+            (Scheme::Zdc, Encoding::Base32Crockford, "zdc:c32"),
+            (Scheme::Zdc, Encoding::Base32Rfc, "zdc:b32"),
+            (Scheme::Zdc, Encoding::Base64, "zdc:b64"),
+            (Scheme::Zdc, Encoding::Hex, "zdc:hex"),
         ]);
 
         #[cfg(feature = "ob21p")]

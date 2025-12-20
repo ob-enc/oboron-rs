@@ -200,7 +200,7 @@
 //!
 //! # Encryption Schemes
 //!
-//! - `Ob01`: AES-CBC (deterministic)
+//! - `Zdc`: AES-CBC (deterministic)
 //! - `Ob31`: AES-GCM-SIV (deterministic)
 //! - `Ob32`: AES-SIV (deterministic, nonce-misuse resistant)
 //! - `Ob21p`, `Ob31p`, `Ob32p`: Probabilistic variants (different output each time)
@@ -335,8 +335,6 @@ pub use constants::{OB71_B32, OB71_B64, OB71_C32, OB71_HEX};
 pub use constants::{OB00_B32, OB00_B64, OB00_C32, OB00_HEX};
 
 // Conditionally export format-specific structs (scheme+encoding combinations)
-#[cfg(feature = "zdc")]
-pub use oboron::{Ob01Base32Crockford, Ob01Base32Rfc, Ob01Base64, Ob01Hex};
 #[cfg(feature = "ob21p")]
 pub use oboron::{Ob21pBase32Crockford, Ob21pBase32Rfc, Ob21pBase64, Ob21pHex};
 #[cfg(feature = "ob31")]
@@ -347,6 +345,8 @@ pub use oboron::{Ob31pBase32Crockford, Ob31pBase32Rfc, Ob31pBase64, Ob31pHex};
 pub use oboron::{Ob32Base32Crockford, Ob32Base32Rfc, Ob32Base64, Ob32Hex};
 #[cfg(feature = "ob32p")]
 pub use oboron::{Ob32pBase32Crockford, Ob32pBase32Rfc, Ob32pBase64, Ob32pHex};
+#[cfg(feature = "zdc")]
+pub use oboron::{ZdcB32, ZdcB64, ZdcC32, ZdcHex};
 // Testing
 #[cfg(feature = "ob70")]
 pub use oboron::{Ob70Base32Crockford, Ob70Base32Rfc, Ob70Base64, Ob70Hex};
@@ -358,7 +358,7 @@ pub use legacy::{Ob00Base32Crockford, Ob00Base32Rfc, Ob00Base64, Ob00Hex};
 
 // Aliases for default encoding:
 #[cfg(feature = "zdc")]
-pub type Ob01 = Ob01Base32Crockford;
+pub type Zdc = ZdcC32;
 #[cfg(feature = "ob21p")]
 pub type Ob21p = Ob21pBase32Crockford;
 #[cfg(feature = "ob31")]

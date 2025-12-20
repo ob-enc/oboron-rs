@@ -1,9 +1,9 @@
-#[cfg(feature = "zdc")]
-use oboron::Ob01Base64;
 #[cfg(feature = "ob21p")]
 use oboron::Ob21pBase64;
 #[cfg(feature = "ob31")]
 use oboron::Ob31Base64;
+#[cfg(feature = "zdc")]
+use oboron::ZdcB64;
 use oboron::{Encoding, ObFlex, Oboron, Scheme};
 #[cfg(feature = "ob31p")]
 use oboron::{Ob31p, Ob31pBase64, Ob31pHex};
@@ -182,7 +182,7 @@ fn test_obflex_basic() {
 
     // Test with different schemes
     for scheme in &[
-        Scheme::Ob01,
+        Scheme::Zdc,
         Scheme::Ob21p,
         Scheme::Ob31,
         Scheme::Ob31p,
@@ -482,12 +482,12 @@ fn test_deterministic_schemes_consistency() {
     let plaintext = "Testing deterministic consistency";
     let iterations = 100;
 
-    // Test Ob01
-    let zdc = Ob01Base64::from_bytes(&key).expect("Failed to create zdc");
+    // Test Zdc
+    let zdc = ZdcB64::from_bytes(&key).expect("Failed to create zdc");
     let first = zdc.enc(plaintext).expect("Failed to enc with zdc");
     for _ in 0..iterations {
         let encd = zdc.enc(plaintext).expect("Failed to enc with zdc");
-        assert_eq!(encd, first, "Ob01 should produce identical ciphertexts");
+        assert_eq!(encd, first, "ZdcB64 should produce identical obtexts");
     }
 
     // Test Ob31
@@ -495,7 +495,7 @@ fn test_deterministic_schemes_consistency() {
     let first = ob31.enc(plaintext).expect("Failed to enc with ob31");
     for _ in 0..iterations {
         let encd = ob31.enc(plaintext).expect("Failed to enc with ob31");
-        assert_eq!(encd, first, "Ob31 should produce identical ciphertexts");
+        assert_eq!(encd, first, "Ob31 should produce identical obtexts");
     }
 
     // Test Ob32
@@ -503,7 +503,7 @@ fn test_deterministic_schemes_consistency() {
     let first = ob32.enc(plaintext).expect("Failed to enc with ob32");
     for _ in 0..iterations {
         let encd = ob32.enc(plaintext).expect("Failed to enc with ob32");
-        assert_eq!(encd, first, "Ob32 should produce identical ciphertexts");
+        assert_eq!(encd, first, "Ob32 should produce identical obtexts");
     }
 
     eprintln!(

@@ -91,7 +91,7 @@ impl SchemeFlags {
         #[cfg(feature = "zdc")]
         if self.zdc {
             count += 1;
-            scheme = Some(Scheme::Ob01);
+            scheme = Some(Scheme::Zdc);
         }
         #[cfg(feature = "ob21p")]
         if self.ob21p {

@@ -682,7 +682,7 @@ the required features explicitly in your `Cargo.toml`.
 
 ##### Approach 1: Full Oboron Output (Reversible)
 ```rust
-let ob = Ob01::new_keyless(); // Obfuscation context
+let ob = ZdcC32::new_keyless(); // Obfuscation context
 let full_id = ob.enc("user:alice")?;
 // "mdwsx9rdwkntyqcf806r9jhsp6gg" (28 base32 chars, reversible)
 ```
@@ -708,7 +708,7 @@ Possible security tightening if reversibility is needed:
 
 ##### Approach 2: Trimmed Prefix (Hash-like, Non-reversible)
 ```rust
-let ob = Ob01::new_keyless();
+let ob = ZdcC32::new_keyless();
 let full = ob.enc("user:alice")?;
 let short_id = &full[0..20];
 ```
@@ -797,20 +797,20 @@ assert_eq!(pt2, "hello");
 ```
 
 Available types include all combinations of scheme variants (e.g.,
-`Ob01`, `Ob21p`, `Ob31`, `Ob31p`, `Ob32`, `Ob32p`) with encoding
+`ZdcC32`, `Ob21p`, `Ob31`, `Ob31p`, `Ob32`, `Ob32p`) with encoding
 specifications (`Base64`, `Hex`, `Base32Rfc`, or `Base32Crockford`),
 and concatenates the two in struct names, for example:
-- `Ob01Base32Rfc` - encoder for `zdc:b32` format
+- `ZdcB32` - encoder for `zdc:b32` format
 - `Ob21pHex` - encoder for `ob21p:hex` format
 - `Ob31Base64` - encoder for `ob31:b64` format
 - `Ob32Base32Crockford = Ob32` - encoder for `ob32:c32` format.
 
 All Base32Crockford-encoding (default) variants have short aliases with
-no explicit encoding (defaulting to `c32`): `Ob01`, `Ob21p`, etc.
+no explicit encoding (defaulting to `c32`): `ZdcC32`, `Ob21p`, etc.
 
 Note that the `zdc` scheme is not included by default as
 cryptographically insecure.  In order to use the associated structs
-`Ob01 = Ob01Base32Crockford`, `Ob01Base32Rfc`, `Ob01Base64`, or `Ob01Hex`,
+`ZdcC32`, `ZdcB32`, `ZdcB64`, or `ZdcHex`,
 you need to enable the `zdc` feature in your `Cargo.toml`
 
 ### 2. **Runtime Format Selection** (`Ob`)

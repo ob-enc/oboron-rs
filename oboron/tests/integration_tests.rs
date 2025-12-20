@@ -11,7 +11,7 @@ fn test_available_schemes() {
 
     #[cfg(feature = "zdc")]
     {
-        let ob = oboron::Ob01::new(&key).unwrap();
+        let ob = oboron::ZdcC32::new(&key).unwrap();
         let enc = ob.enc("test").unwrap();
         assert_eq!(ob.dec(&enc).unwrap(), "test");
     }

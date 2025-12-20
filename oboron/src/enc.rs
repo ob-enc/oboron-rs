@@ -43,7 +43,7 @@ pub(crate) fn enc_to_format(
     // Step 1: Encrypt using scheme-specific function based on format
     let ciphertext = match format.scheme() {
         #[cfg(feature = "zdc")]
-        Scheme::Ob01 => encrypt_zdc(keychain, plaintext.as_bytes())?,
+        Scheme::Zdc => encrypt_zdc(keychain, plaintext.as_bytes())?,
         #[cfg(feature = "ob21p")]
         Scheme::Ob21p => encrypt_ob21p(keychain, plaintext.as_bytes())?,
         #[cfg(feature = "ob31")]

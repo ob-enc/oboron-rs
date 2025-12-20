@@ -790,7 +790,7 @@ the required features explicitly in your `Cargo.toml`.
 
 ##### Approach 1: Full Oboron Output (Reversible)
 ```python
-ob = Ob01(keyless=True)  # Obfuscaton context
+ob = ZdcC32(keyless=True)  # Obfuscaton context
 full_id = ob.enc(f"user:alice")
 # "mdwsx9rdwkntyqcf806r9jhsp6gg" (28 base32 chars, reversible)
 ```
@@ -815,7 +815,7 @@ Possible security tightening if reversibility is needed:
 
 ##### Approach 2: Trimmed Prefix (Hash-like, Non-reversible)
 ```rust
-ob = Ob01(keyless=True)
+ob = ZdcC32(keyless=True)
 full = ob.enc("user:alice")
 short_id = full[:20]
 shorter_id = full[:6]  # "mdwsx9" ~ Git 7 char hex commit reference
@@ -902,16 +902,16 @@ assert pt2 == "hello"
 ```
 
 Available types include all combinations of scheme variants (e.g.,
-`Ob01`, `Ob21p`, `Ob31`, `Ob31p`, `Ob32`, `Ob32p`) with encoding
+`ZdcC32`, `Ob21p`, `Ob31`, `Ob31p`, `Ob32`, `Ob32p`) with encoding
 specifications (`Base64`, `Hex`, `Base32Rfc`, or `Base32Crockford`),
 and concatenates the two in class names, for example:
-- `Ob01Base32Rfc` - encoder for `zdc:b32` format
+- `ZdcB32` - encoder for `zdc:b32` format
 - `Ob21pHex` - encoder for `ob21p:hex` format
 - `Ob31Base64` - encoder for `ob31:b64` format
 - `Ob32Base32Crockford = Ob32` - encoder for `ob32:c32` format.
 
 All Base32Crockford-encoding (default) variants have short aliases with
-no explicit encoding (defaulting to `c32`): `Ob01`, `Ob21p`, etc.
+no explicit encoding (defaulting to `c32`): `ZdcC32`, `Ob21p`, etc.
 
 ### 2. Runtime Format Selection (`Ob`)
 

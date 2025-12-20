@@ -5,7 +5,7 @@ use crate::{error::Error, Encoding, Format, Keychain, Scheme};
 
 /// Core trait for Oboron encryption+encoding/decoding+decryption implementations.
 ///
-/// Each scheme+encoding combination (Ob01Base32Crockford, Ob01Base64, etc.) implements this trait
+/// Each scheme+encoding combination (ZdcC32, ZdcB64, etc.) implements this trait
 /// to provide a consistent interface for encoding and decoding operations.
 ///
 /// Note: Construction methods (`new`, `from_bytes`, `new_keyless`) are not part of
@@ -54,8 +54,8 @@ use crate::legacy::{Ob00Base32Crockford, Ob00Base32Rfc, Ob00Base64, Ob00Hex};
 /// - All constants baked in at compile time
 macro_rules! impl_oboron {
     (
-        $name:ident,           // Type name (e.g., Ob01Base32Crockford)
-        $scheme:expr,          // Scheme constant (e.g., Scheme::Ob01)
+        $name:ident,           // Type name (e.g., ZdcC32)
+        $scheme:expr,          // Scheme constant (e.g., Scheme::Zdc)
         $encoding:expr,        // Encoding constant (e.g., Encoding::Base32Crockford)
         $format_str:expr       // Format string for docs (e.g., "zdc:c32")
     ) => {
@@ -171,12 +171,7 @@ macro_rules! impl_oboron {
 
 // Base32Crockford (default) variants
 #[cfg(feature = "zdc")]
-impl_oboron!(
-    Ob01Base32Crockford,
-    Scheme::Ob01,
-    Encoding::Base32Crockford,
-    "zdc:c32"
-);
+impl_oboron!(ZdcC32, Scheme::Zdc, Encoding::Base32Crockford, "zdc:c32");
 #[cfg(feature = "ob21p")]
 impl_oboron!(
     Ob21pBase32Crockford,
@@ -215,7 +210,7 @@ impl_oboron!(
 
 // Base32Rfc variants
 #[cfg(feature = "zdc")]
-impl_oboron!(Ob01Base32Rfc, Scheme::Ob01, Encoding::Base32Rfc, "zdc:b32");
+impl_oboron!(ZdcB32, Scheme::Zdc, Encoding::Base32Rfc, "zdc:b32");
 #[cfg(feature = "ob21p")]
 impl_oboron!(
     Ob21pBase32Rfc,
@@ -244,7 +239,7 @@ impl_oboron!(
 
 // Base64 variants - with Base64 suffix
 #[cfg(feature = "zdc")]
-impl_oboron!(Ob01Base64, Scheme::Ob01, Encoding::Base64, "zdc:b64");
+impl_oboron!(ZdcB64, Scheme::Zdc, Encoding::Base64, "zdc:b64");
 #[cfg(feature = "ob21p")]
 impl_oboron!(Ob21pBase64, Scheme::Ob21p, Encoding::Base64, "ob21p:b64");
 #[cfg(feature = "ob31")]
@@ -258,7 +253,7 @@ impl_oboron!(Ob32pBase64, Scheme::Ob32p, Encoding::Base64, "ob32p:b64");
 
 // Hex variants - with Hex suffix
 #[cfg(feature = "zdc")]
-impl_oboron!(Ob01Hex, Scheme::Ob01, Encoding::Hex, "zdc:hex");
+impl_oboron!(ZdcHex, Scheme::Zdc, Encoding::Hex, "zdc:hex");
 #[cfg(feature = "ob21p")]
 impl_oboron!(Ob21pHex, Scheme::Ob21p, Encoding::Hex, "ob21p:hex");
 #[cfg(feature = "ob31")]
@@ -309,13 +304,13 @@ impl_oboron!(Ob71Hex, Scheme::Ob71, Encoding::Hex, "ob71:hex");
 #[allow(non_camel_case_types)]
 pub enum ObAny {
     #[cfg(feature = "zdc")]
-    Ob01Base32Crockford(Ob01Base32Crockford),
+    ZdcC32(ZdcC32),
     #[cfg(feature = "zdc")]
-    Ob01Base32Rfc(Ob01Base32Rfc),
+    ZdcB32(ZdcB32),
     #[cfg(feature = "zdc")]
-    Ob01Base64(Ob01Base64),
+    ZdcB64(ZdcB64),
     #[cfg(feature = "zdc")]
-    Ob01Hex(Ob01Hex),
+    ZdcHex(ZdcHex),
     #[cfg(feature = "ob21p")]
     Ob21pBase32Crockford(Ob21pBase32Crockford),
     #[cfg(feature = "ob21p")]
@@ -390,13 +385,13 @@ macro_rules! delegate_to_inner {
         fn $method(&self $(, $arg: $argty)*) -> $ret {
             match self {
                 #[cfg(feature = "zdc")]
-                ObAny::Ob01Base32Crockford(ob) => ob.$method($($arg),*),
+                ObAny::ZdcC32(ob) => ob.$method($($arg),*),
                 #[cfg(feature = "zdc")]
-                ObAny::Ob01Base32Rfc(ob) => ob.$method($($arg),*),
+                ObAny::ZdcB32(ob) => ob.$method($($arg),*),
                 #[cfg(feature = "zdc")]
-                ObAny::Ob01Base64(ob) => ob.$method($($arg),*),
+                ObAny::ZdcB64(ob) => ob.$method($($arg),*),
                 #[cfg(feature = "zdc")]
-                ObAny::Ob01Hex(ob) => ob.$method($($arg),*),
+                ObAny::ZdcHex(ob) => ob.$method($($arg),*),
                 #[cfg(feature = "ob21p")]
                 ObAny::Ob21pBase32Crockford(ob) => ob.$method($($arg),*),
                 #[cfg(feature = "ob21p")]
@@ -495,7 +490,7 @@ impl ObAny {
         return Ok(ObAny::Ob71Base32Crockford(Ob71Base32Crockford::new(key)?));
         #[cfg(feature = "zdc")]
         #[cfg(not(any(feature = "ob70", feature = "ob71")))]
-        return Ok(ObAny::Ob01Base32Crockford(Ob01Base32Crockford::new(key)?));
+        return Ok(ObAny::ZdcC32(ZdcC32::new(key)?));
         #[cfg(feature = "ob21p")]
         #[cfg(not(any(feature = "ob70", feature = "ob71", feature = "zdc")))]
         return Ok(ObAny::Ob21pBase32Crockford(Ob21pBase32Crockford::new(key)?));
@@ -575,7 +570,7 @@ impl ObAny {
         }));
         #[cfg(feature = "zdc")]
         #[cfg(not(any(feature = "ob70", feature = "ob71")))]
-        return Ok(ObAny::Ob01Base32Crockford(Ob01Base32Crockford {
+        return Ok(ObAny::ZdcC32(ZdcC32 {
             keychain: Keychain::from_bytes(key_bytes)?,
         }));
         #[cfg(feature = "ob21p")]
@@ -665,9 +660,7 @@ impl ObAny {
         ));
         #[cfg(feature = "zdc")]
         #[cfg(not(any(feature = "ob70", feature = "ob71")))]
-        return Ok(ObAny::Ob01Base32Crockford(
-            Ob01Base32Crockford::from_hex_key(key_hex)?,
-        ));
+        return Ok(ObAny::ZdcC32(ZdcC32::from_hex_key(key_hex)?));
         #[cfg(feature = "ob21p")]
         #[cfg(not(any(feature = "ob70", feature = "ob71", feature = "zdc")))]
         return Ok(ObAny::Ob21pBase32Crockford(
@@ -758,7 +751,7 @@ impl ObAny {
         }));
         #[cfg(feature = "zdc")]
         #[cfg(not(any(feature = "ob70", feature = "ob71")))]
-        return Ok(ObAny::Ob01Base32Crockford(Ob01Base32Crockford {
+        return Ok(ObAny::ZdcC32(ZdcC32 {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
         }));
         #[cfg(feature = "ob21p")]
@@ -846,15 +839,13 @@ pub fn new(fmt: &str, key: &str) -> Result<ObAny, Error> {
 pub fn new_with_format(format: Format, key: &str) -> Result<ObAny, Error> {
     match (format.scheme(), format.encoding()) {
         #[cfg(feature = "zdc")]
-        (Scheme::Ob01, Encoding::Base32Crockford) => {
-            Ok(ObAny::Ob01Base32Crockford(Ob01Base32Crockford::new(key)?))
-        }
+        (Scheme::Zdc, Encoding::Base32Crockford) => Ok(ObAny::ZdcC32(ZdcC32::new(key)?)),
         #[cfg(feature = "zdc")]
-        (Scheme::Ob01, Encoding::Base32Rfc) => Ok(ObAny::Ob01Base32Rfc(Ob01Base32Rfc::new(key)?)),
+        (Scheme::Zdc, Encoding::Base32Rfc) => Ok(ObAny::ZdcB32(ZdcB32::new(key)?)),
         #[cfg(feature = "zdc")]
-        (Scheme::Ob01, Encoding::Base64) => Ok(ObAny::Ob01Base64(Ob01Base64::new(key)?)),
+        (Scheme::Zdc, Encoding::Base64) => Ok(ObAny::ZdcB64(ZdcB64::new(key)?)),
         #[cfg(feature = "zdc")]
-        (Scheme::Ob01, Encoding::Hex) => Ok(ObAny::Ob01Hex(Ob01Hex::new(key)?)),
+        (Scheme::Zdc, Encoding::Hex) => Ok(ObAny::ZdcHex(ZdcHex::new(key)?)),
         #[cfg(feature = "ob21p")]
         (Scheme::Ob21p, Encoding::Base32Crockford) => {
             Ok(ObAny::Ob21pBase32Crockford(Ob21pBase32Crockford::new(key)?))
@@ -952,21 +943,19 @@ pub fn new_with_format(format: Format, key: &str) -> Result<ObAny, Error> {
 fn from_bytes_with_format_internal(format: Format, key_bytes: &[u8; 64]) -> Result<ObAny, Error> {
     match (format.scheme(), format.encoding()) {
         #[cfg(feature = "zdc")]
-        (Scheme::Ob01, Encoding::Base32Crockford) => Ok(ObAny::Ob01Base32Crockford(
-            Ob01Base32Crockford::from_bytes_internal(key_bytes)?,
-        )),
-        #[cfg(feature = "zdc")]
-        (Scheme::Ob01, Encoding::Base32Rfc) => Ok(ObAny::Ob01Base32Rfc(
-            Ob01Base32Rfc::from_bytes_internal(key_bytes)?,
-        )),
-        #[cfg(feature = "zdc")]
-        (Scheme::Ob01, Encoding::Base64) => Ok(ObAny::Ob01Base64(Ob01Base64::from_bytes_internal(
-            key_bytes,
-        )?)),
-        #[cfg(feature = "zdc")]
-        (Scheme::Ob01, Encoding::Hex) => {
-            Ok(ObAny::Ob01Hex(Ob01Hex::from_bytes_internal(key_bytes)?))
+        (Scheme::Zdc, Encoding::Base32Crockford) => {
+            Ok(ObAny::ZdcC32(ZdcC32::from_bytes_internal(key_bytes)?))
         }
+        #[cfg(feature = "zdc")]
+        (Scheme::Zdc, Encoding::Base32Rfc) => {
+            Ok(ObAny::ZdcB32(ZdcB32::from_bytes_internal(key_bytes)?))
+        }
+        #[cfg(feature = "zdc")]
+        (Scheme::Zdc, Encoding::Base64) => {
+            Ok(ObAny::ZdcB64(ZdcB64::from_bytes_internal(key_bytes)?))
+        }
+        #[cfg(feature = "zdc")]
+        (Scheme::Zdc, Encoding::Hex) => Ok(ObAny::ZdcHex(ZdcHex::from_bytes_internal(key_bytes)?)),
         #[cfg(feature = "ob21p")]
         (Scheme::Ob21p, Encoding::Base32Crockford) => Ok(ObAny::Ob21pBase32Crockford(
             Ob21pBase32Crockford::from_bytes_internal(key_bytes)?,
@@ -1160,7 +1149,7 @@ mod tests {
         // Define all schemes
         let schemes = vec![
             #[cfg(feature = "zdc")]
-            Scheme::Ob01,
+            Scheme::Zdc,
             #[cfg(feature = "ob21p")]
             Scheme::Ob21p,
             #[cfg(feature = "ob31")]
@@ -1231,7 +1220,7 @@ mod tests {
             #[cfg(feature = "ob00")]
             Scheme::Ob00,
             #[cfg(feature = "zdc")]
-            Scheme::Ob01,
+            Scheme::Zdc,
             #[cfg(feature = "ob21p")]
             Scheme::Ob21p,
             #[cfg(feature = "ob31")]
@@ -1290,7 +1279,7 @@ mod tests {
             Scheme::Ob71,
             Scheme::Ob70,
             #[cfg(feature = "zdc")]
-            Scheme::Ob01,
+            Scheme::Zdc,
             #[cfg(feature = "ob31")]
             Scheme::Ob31,
             #[cfg(feature = "ob32")]

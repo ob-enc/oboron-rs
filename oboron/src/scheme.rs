@@ -6,7 +6,7 @@ use crate::{constants, error::Error};
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Scheme {
     #[cfg(feature = "zdc")]
-    Ob01,
+    Zdc,
     #[cfg(feature = "ob21p")]
     Ob21p,
     #[cfg(feature = "ob31")]
@@ -32,7 +32,7 @@ impl Scheme {
     pub fn as_str(&self) -> &'static str {
         match self {
             #[cfg(feature = "zdc")]
-            Scheme::Ob01 => "zdc",
+            Scheme::Zdc => "zdc",
             #[cfg(feature = "ob21p")]
             Scheme::Ob21p => "ob21p",
             #[cfg(feature = "ob31")]
@@ -63,7 +63,7 @@ impl Scheme {
     pub fn is_deterministic(&self) -> bool {
         match self {
             #[cfg(feature = "zdc")]
-            Scheme::Ob01 => true,
+            Scheme::Zdc => true,
             #[cfg(feature = "ob21p")]
             Scheme::Ob21p => false,
             #[cfg(feature = "ob31")]
@@ -99,7 +99,7 @@ impl Scheme {
     pub fn byte(&self) -> u8 {
         match self {
             #[cfg(feature = "zdc")]
-            Scheme::Ob01 => constants::ZDC_BYTE,
+            Scheme::Zdc => constants::ZDC_BYTE,
             #[cfg(feature = "ob21p")]
             Scheme::Ob21p => constants::OB21P_BYTE,
             #[cfg(feature = "ob31")]
@@ -128,7 +128,7 @@ impl std::str::FromStr for Scheme {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.to_lowercase().as_str() {
             #[cfg(feature = "zdc")]
-            "zdc" => Ok(Scheme::Ob01),
+            "zdc" => Ok(Scheme::Zdc),
             #[cfg(feature = "ob21p")]
             "ob21p" => Ok(Scheme::Ob21p),
             #[cfg(feature = "ob31")]

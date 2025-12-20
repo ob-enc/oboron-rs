@@ -1,16 +1,16 @@
-#[cfg(feature = "zdc")]
-use oboron::Ob01;
 #[cfg(feature = "ob21p")]
 use oboron::Ob21p;
 #[cfg(feature = "ob31")]
 use oboron::Ob31;
+#[cfg(feature = "zdc")]
+use oboron::ZdcC32;
 use oboron::{ObMulti, Oboron};
 
 #[test]
 #[cfg(feature = "zdc")]
 fn test_zdc_basic() {
     let original = "hello world";
-    let ob = Ob01::new_keyless().unwrap();
+    let ob = ZdcC32::new_keyless().unwrap();
     let ot = ob.enc(original).unwrap();
     let pt2 = ob.dec_strict(&ot).unwrap();
 
@@ -22,7 +22,7 @@ fn test_zdc_basic() {
 #[cfg(feature = "zdc")]
 fn test_empty_string() {
     let original = "";
-    let ob = Ob01::new_keyless().unwrap();
+    let ob = ZdcC32::new_keyless().unwrap();
     assert!(ob.enc(original).is_err());
 }
 
@@ -30,7 +30,7 @@ fn test_empty_string() {
 #[cfg(feature = "zdc")]
 fn test_zdc_all_printable_ascii() {
     let original = (32..127).map(|c| c as u8 as char).collect::<String>();
-    let ob = Ob01::new_keyless().unwrap();
+    let ob = ZdcC32::new_keyless().unwrap();
     let ot = ob.enc(&original).unwrap();
     let pt2 = ob.dec_strict(&ot).unwrap();
 
