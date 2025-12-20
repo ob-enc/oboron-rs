@@ -815,7 +815,7 @@ Possible security tightening if reversibility is needed:
 
 ##### Approach 2: Trimmed Prefix (Hash-like, Non-reversible)
 ```rust
-ob = Ob01(keyless=True);
+ob = Ob01(keyless=True)
 full = ob.enc("user:alice")
 short_id = full[:20]
 shorter_id = full[:6]  # "mdwsx9" ~ Git 7 char hex commit reference
@@ -913,11 +913,6 @@ and concatenates the two in class names, for example:
 All Base32Crockford-encoding (default) variants have short aliases with
 no explicit encoding (defaulting to `c32`): `Ob01`, `Ob21p`, etc.
 
-Note that the `ob01` scheme is not included by default as
-cryptographically insecure.  In order to use the associated structs
-`Ob01 = Ob01Base32Crockford`, `Ob01Base32Rfc`, `Ob01Base64`, or `Ob01Hex`,
-you need to enable the `ob01` feature in your `Cargo.toml`
-
 ### 2. Runtime Format Selection (`Ob`)
 
 When format specification at runtime is required, use `Ob`:
@@ -951,7 +946,7 @@ formats, requiring format specification in each operation:
 ```python
 from oboron import ObMulti
 
-obm = ObMulti::new(key)
+obm = ObMulti(key)
 
 # Format specification per operation
 ot = obm.enc("test", "ob32p:b64")
@@ -962,7 +957,7 @@ pt_other = obm.dec(other, "ob01:c32")
 **Autodecode:** While other interfaces perform *scheme* autodetection in
 `dec()` methods, only `ObMulti` provides full format autodetection
 including encoding (base32rfc, base32crockford, base64, or hex).  Other
-structs decode only encodings matching their format.
+classes decode only encodings matching their format.
 ```python
 # Autodecode when format is unknown
 pt2 = obm.autodec(ot)
@@ -1011,11 +1006,11 @@ provide optimal performance, concise syntax, and strongest type
 guarantees:
 ```python
 from oboron import Ob32Base64
-ob = Ob32Base64::new(key)
+ob = Ob32Base64(key)
 ot = ob.enc("secret")
 ```
-The format is built into the struct, no format strings or constants,
-are needed.
+The format is built into the class, no format strings or constants, are
+needed.
 
 ### `OboronBase` class
 
