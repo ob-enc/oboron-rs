@@ -251,6 +251,7 @@ mod enc;
 mod encoding;
 mod error;
 mod format;
+mod keygen;
 #[cfg(feature = "ob00")]
 mod legacy;
 mod ob;
@@ -287,9 +288,11 @@ pub(crate) use obcrypt::{decrypt_ob70, encrypt_ob70};
 #[cfg(feature = "ob71")]
 pub(crate) use obcrypt::{decrypt_ob71, encrypt_ob71};
 
-pub use obcrypt::{
-    generate_key_base64, generate_key_base64 as generate_key, generate_key_bytes, generate_key_hex,
-};
+pub use keygen::generate_key;
+#[cfg(feature = "bytes-keys")]
+pub use keygen::generate_key_bytes;
+#[cfg(feature = "hex-keys")]
+pub use keygen::generate_key_hex;
 
 // Re-export core types
 pub use encoding::Encoding;

@@ -2,7 +2,6 @@
 
 mod constants;
 mod keychain;
-mod keygen;
 
 #[cfg(feature = "ob01")]
 mod ob01; //  AES-CBC (deterministic, not cryptographically secure - obfuscation only!)
@@ -28,7 +27,6 @@ mod ob71; // String reversal
 mod ob00; //  Legacy AES-CBC
 
 pub use keychain::Keychain;
-pub use keygen::{generate_key_base64, generate_key_bytes, generate_key_hex};
 
 #[cfg(feature = "ob01")]
 pub use ob01::{decrypt as decrypt_ob01, encrypt as encrypt_ob01};

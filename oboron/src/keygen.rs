@@ -11,13 +11,13 @@ use rand::RngCore;
 /// # Examples
 ///
 /// ```
-/// use oboron::generate_key_base64;
+/// use oboron::generate_key;
 ///
-/// let key_hex = generate_key_base64();
+/// let key_hex = generate_key();
 /// assert_eq!(key_hex.len(), 86);
 /// ```
 #[must_use]
-pub fn generate_key_base64() -> String {
+pub fn generate_key() -> String {
     loop {
         let mut key_bytes = [0u8; 64];
         rand::thread_rng().fill_bytes(&mut key_bytes);
@@ -42,9 +42,10 @@ pub fn generate_key_base64() -> String {
 /// assert_eq!(key.len(), 64);
 /// ```
 #[must_use]
+#[cfg(feature = "bytes-keys")]
 pub fn generate_key_bytes() -> [u8; 64] {
     let decoded = BASE64URL_NOPAD
-        .decode(generate_key_base64().as_bytes())
+        .decode(generate_key().as_bytes())
         .expect("Failed to decode base64");
     decoded.try_into().expect("Decoded key is not 64 bytes")
 }
@@ -63,6 +64,11 @@ pub fn generate_key_bytes() -> [u8; 64] {
 /// assert_eq!(key_hex.len(), 128); // 64 bytes * 2 hex chars per byte
 /// ```
 #[must_use]
+#[cfg(feature = "hex-keys")]
 pub fn generate_key_hex() -> String {
-    hex::encode(&generate_key_bytes())
+    let decoded = BASE64URL_NOPAD
+        .decode(generate_key().as_bytes())
+        .expect("Failed to decode base64");
+    let key_bytes: [u8; 64] = decoded.try_into().expect("Decoded key is not 64 bytes");
+    hex::encode(&key_bytes)
 }
