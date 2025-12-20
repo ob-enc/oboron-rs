@@ -55,15 +55,15 @@ struct SchemeFlags {
     #[arg(short = 'S', long, alias = "32p")]
     apsv: bool,
 
-    /// Use tdi scheme (testing, identity)
-    #[cfg(feature = "tdi")]
+    /// Use mock1 scheme (testing, identity)
+    #[cfg(feature = "mock1")]
     #[arg(long, alias = "70", hide = true)]
-    tdi: bool,
+    mock1: bool,
 
-    /// Use tdr scheme (testing, string reversal)
-    #[cfg(feature = "tdr")]
+    /// Use mock2 scheme (testing, string reversal)
+    #[cfg(feature = "mock2")]
     #[arg(long, alias = "71", hide = true)]
-    tdr: bool,
+    mock2: bool,
 }
 
 impl SchemeFlags {
@@ -75,8 +75,8 @@ impl SchemeFlags {
         feature = "apgs",
         feature = "adsv",
         feature = "apsv",
-        feature = "tdi",
-        feature = "tdr",
+        feature = "mock1",
+        feature = "mock2",
         feature = "ob00"
     ))]
     fn to_scheme(&self) -> Result<Option<Scheme>> {
@@ -118,15 +118,15 @@ impl SchemeFlags {
             count += 1;
             scheme = Some(Scheme::Apsv);
         }
-        #[cfg(feature = "tdi")]
-        if self.tdi {
+        #[cfg(feature = "mock1")]
+        if self.mock1 {
             count += 1;
-            scheme = Some(Scheme::Tdi);
+            scheme = Some(Scheme::Mock1);
         }
-        #[cfg(feature = "tdr")]
-        if self.tdr {
+        #[cfg(feature = "mock2")]
+        if self.mock2 {
             count += 1;
-            scheme = Some(Scheme::Tdr);
+            scheme = Some(Scheme::Mock2);
         }
 
         if count > 1 {
@@ -144,8 +144,8 @@ impl SchemeFlags {
         feature = "apgs",
         feature = "adsv",
         feature = "apsv",
-        feature = "tdi",
-        feature = "tdr",
+        feature = "mock1",
+        feature = "mock2",
         feature = "ob00"
     ))]
     fn is_set(&self) -> bool {
@@ -177,12 +177,12 @@ impl SchemeFlags {
         if self.apsv {
             return true;
         }
-        #[cfg(feature = "tdi")]
-        if self.tdi {
+        #[cfg(feature = "mock1")]
+        if self.mock1 {
             return true;
         }
-        #[cfg(feature = "tdr")]
-        if self.tdr {
+        #[cfg(feature = "mock2")]
+        if self.mock2 {
             return true;
         }
         return false;
@@ -642,7 +642,7 @@ fn config_set_command(
 ) -> Result<()> {
     let mut config = config::load_config().unwrap_or(Config {
         profile: "default".to_string(),
-        scheme: "tdi".to_string(),
+        scheme: "mock1".to_string(),
         encoding: "c32".to_string(),
     });
 
@@ -813,7 +813,7 @@ mod tests {
     use super::*;
 
     #[test]
-    #[cfg(feature = "tdi")]
+    #[cfg(feature = "mock1")]
     fn test_scheme_flags_to_scheme_single() {
         #[cfg(not(any(
             feature = "zdc",
@@ -822,8 +822,8 @@ mod tests {
             feature = "apgs",
             feature = "adsv",
             feature = "apsv",
-            feature = "tdi",
-            feature = "tdr",
+            feature = "mock1",
+            feature = "mock2",
             feature = "ob00"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
@@ -842,12 +842,12 @@ mod tests {
             adsv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
-            #[cfg(feature = "tdi")]
-            tdi: true,
-            #[cfg(feature = "tdr")]
-            tdr: false,
+            #[cfg(feature = "mock1")]
+            mock1: true,
+            #[cfg(feature = "mock2")]
+            mock2: false,
         };
-        assert_eq!(flags.to_scheme().unwrap(), Some(Scheme::Tdi));
+        assert_eq!(flags.to_scheme().unwrap(), Some(Scheme::Mock1));
     }
 
     #[test]
@@ -861,8 +861,8 @@ mod tests {
             feature = "apgs",
             feature = "adsv",
             feature = "apsv",
-            feature = "tdi",
-            feature = "tdr",
+            feature = "mock1",
+            feature = "mock2",
             feature = "ob00"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
@@ -881,10 +881,10 @@ mod tests {
             adsv: true,
             #[cfg(feature = "apsv")]
             apsv: true,
-            #[cfg(feature = "tdi")]
-            tdi: false,
-            #[cfg(feature = "tdr")]
-            tdr: false,
+            #[cfg(feature = "mock1")]
+            mock1: false,
+            #[cfg(feature = "mock2")]
+            mock2: false,
         };
         assert!(flags.to_scheme().is_err());
     }
@@ -898,8 +898,8 @@ mod tests {
             feature = "apgs",
             feature = "adsv",
             feature = "apsv",
-            feature = "tdi",
-            feature = "tdr",
+            feature = "mock1",
+            feature = "mock2",
             feature = "ob00"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
@@ -918,10 +918,10 @@ mod tests {
             adsv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
-            #[cfg(feature = "tdi")]
-            tdi: false,
-            #[cfg(feature = "tdr")]
-            tdr: false,
+            #[cfg(feature = "mock1")]
+            mock1: false,
+            #[cfg(feature = "mock2")]
+            mock2: false,
         };
         assert_eq!(flags.to_scheme().unwrap(), None);
     }
@@ -949,11 +949,11 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "tdi")]
+    #[cfg(feature = "mock1")]
     fn test_format_spec_from_format_string() {
         let config = Config {
             profile: "test".to_string(),
-            scheme: "tdi".to_string(),
+            scheme: "mock1".to_string(),
             encoding: "b32".to_string(),
         };
 
@@ -964,8 +964,8 @@ mod tests {
             feature = "apgs",
             feature = "adsv",
             feature = "apsv",
-            feature = "tdi",
-            feature = "tdr",
+            feature = "mock1",
+            feature = "mock2",
             feature = "ob00"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
@@ -984,10 +984,10 @@ mod tests {
             adsv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
-            #[cfg(feature = "tdi")]
-            tdi: false,
-            #[cfg(feature = "tdr")]
-            tdr: false,
+            #[cfg(feature = "mock1")]
+            mock1: false,
+            #[cfg(feature = "mock2")]
+            mock2: false,
         };
         let encoding_flags = EncodingFlags {
             c32: false,
@@ -997,19 +997,19 @@ mod tests {
         };
 
         let result = FormatSpec::parse(
-            Some("tdi:b64".to_string()),
+            Some("mock1:b64".to_string()),
             &scheme_flags,
             &encoding_flags,
             Some(&config),
         )
         .unwrap();
 
-        assert_eq!(result.scheme, Scheme::Tdi);
+        assert_eq!(result.scheme, Scheme::Mock1);
         assert_eq!(result.encoding, Encoding::Base64);
     }
 
     #[test]
-    #[cfg(feature = "tdi")]
+    #[cfg(feature = "mock1")]
     fn test_format_spec_conflicts_with_scheme_flag() {
         #[cfg(not(any(
             feature = "zdc",
@@ -1018,8 +1018,8 @@ mod tests {
             feature = "apgs",
             feature = "adsv",
             feature = "apsv",
-            feature = "tdi",
-            feature = "tdr",
+            feature = "mock1",
+            feature = "mock2",
             feature = "ob00"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
@@ -1038,10 +1038,10 @@ mod tests {
             adsv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
-            #[cfg(feature = "tdi")]
-            tdi: true,
-            #[cfg(feature = "tdr")]
-            tdr: false,
+            #[cfg(feature = "mock1")]
+            mock1: true,
+            #[cfg(feature = "mock2")]
+            mock2: false,
         };
         let encoding_flags = EncodingFlags {
             c32: false,
@@ -1051,7 +1051,7 @@ mod tests {
         };
 
         let result = FormatSpec::parse(
-            Some("tdi:b64".to_string()),
+            Some("mock1:b64".to_string()),
             &scheme_flags,
             &encoding_flags,
             None,
@@ -1073,8 +1073,8 @@ mod tests {
             feature = "apgs",
             feature = "adsv",
             feature = "apsv",
-            feature = "tdi",
-            feature = "tdr",
+            feature = "mock1",
+            feature = "mock2",
             feature = "ob00"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
@@ -1093,10 +1093,10 @@ mod tests {
             adsv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
-            #[cfg(feature = "tdi")]
-            tdi: false,
-            #[cfg(feature = "tdr")]
-            tdr: false,
+            #[cfg(feature = "mock1")]
+            mock1: false,
+            #[cfg(feature = "mock2")]
+            mock2: false,
         };
         let encoding_flags = EncodingFlags {
             c32: false,
@@ -1106,7 +1106,7 @@ mod tests {
         };
 
         let result = FormatSpec::parse(
-            Some("tdi:b64".to_string()),
+            Some("mock1:b64".to_string()),
             &scheme_flags,
             &encoding_flags,
             None,
@@ -1120,11 +1120,11 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "tdi")]
+    #[cfg(feature = "mock1")]
     fn test_format_spec_from_flags() {
         let config = Config {
             profile: "test".to_string(),
-            scheme: "tdr".to_string(),
+            scheme: "mock2".to_string(),
             encoding: "b32".to_string(),
         };
 
@@ -1135,8 +1135,8 @@ mod tests {
             feature = "apgs",
             feature = "adsv",
             feature = "apsv",
-            feature = "tdi",
-            feature = "tdr",
+            feature = "mock1",
+            feature = "mock2",
             feature = "ob00"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
@@ -1155,10 +1155,10 @@ mod tests {
             adsv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
-            #[cfg(feature = "tdi")]
-            tdi: true,
-            #[cfg(feature = "tdr")]
-            tdr: false,
+            #[cfg(feature = "mock1")]
+            mock1: true,
+            #[cfg(feature = "mock2")]
+            mock2: false,
         };
         let encoding_flags = EncodingFlags {
             c32: false,
@@ -1170,16 +1170,16 @@ mod tests {
         let result =
             FormatSpec::parse(None, &scheme_flags, &encoding_flags, Some(&config)).unwrap();
 
-        assert_eq!(result.scheme, Scheme::Tdi);
+        assert_eq!(result.scheme, Scheme::Mock1);
         assert_eq!(result.encoding, Encoding::Base64);
     }
 
     #[test]
-    #[cfg(feature = "tdi")]
+    #[cfg(feature = "mock1")]
     fn test_format_spec_from_config() {
         let config = Config {
             profile: "test".to_string(),
-            scheme: "tdi".to_string(),
+            scheme: "mock1".to_string(),
             encoding: "hex".to_string(),
         };
 
@@ -1190,8 +1190,8 @@ mod tests {
             feature = "apgs",
             feature = "adsv",
             feature = "apsv",
-            feature = "tdi",
-            feature = "tdr",
+            feature = "mock1",
+            feature = "mock2",
             feature = "ob00"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
@@ -1210,10 +1210,10 @@ mod tests {
             adsv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
-            #[cfg(feature = "tdi")]
-            tdi: false,
-            #[cfg(feature = "tdr")]
-            tdr: false,
+            #[cfg(feature = "mock1")]
+            mock1: false,
+            #[cfg(feature = "mock2")]
+            mock2: false,
         };
         let encoding_flags = EncodingFlags {
             c32: false,
@@ -1225,27 +1225,27 @@ mod tests {
         let result =
             FormatSpec::parse(None, &scheme_flags, &encoding_flags, Some(&config)).unwrap();
 
-        assert_eq!(result.scheme, Scheme::Tdi);
+        assert_eq!(result.scheme, Scheme::Mock1);
         assert_eq!(result.encoding, Encoding::Hex);
     }
 
     #[test]
-    #[cfg(feature = "tdi")]
+    #[cfg(feature = "mock1")]
     fn test_get_scheme_from_override() {
-        let result = get_scheme(Some(Scheme::Tdi), None);
-        assert_eq!(result.unwrap(), Scheme::Tdi);
+        let result = get_scheme(Some(Scheme::Mock1), None);
+        assert_eq!(result.unwrap(), Scheme::Mock1);
     }
 
     #[test]
-    #[cfg(feature = "tdi")]
+    #[cfg(feature = "mock1")]
     fn test_get_scheme_from_config() {
         let config = Config {
             profile: "test".to_string(),
-            scheme: "tdi".to_string(),
+            scheme: "mock1".to_string(),
             encoding: "b32".to_string(),
         };
         let result = get_scheme(None, Some(&config));
-        assert_eq!(result.unwrap(), Scheme::Tdi);
+        assert_eq!(result.unwrap(), Scheme::Mock1);
     }
 
     #[test]

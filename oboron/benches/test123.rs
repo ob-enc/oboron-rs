@@ -1,35 +1,35 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use oboron::{
-    AdgsC32, AdsvC32, ApgsC32, ApsvC32, Ob00, ObMulti, Oboron, TdiC32, TdrC32, UpcC32, ZdcC32,
+    AdgsC32, AdsvC32, ApgsC32, ApsvC32, Mock1C32, Mock2C32, Ob00, ObMulti, Oboron, UpcC32, ZdcC32,
 };
 
 // Baseline benchmarks - no crypto, just encoding overhead
-fn benchmark_enc_tdr(c: &mut Criterion) {
-    let ob = TdrC32::new_keyless().unwrap();
-    c.bench_function("test123/TdrC32/enc", |b| {
+fn benchmark_enc_mock2(c: &mut Criterion) {
+    let ob = Mock2C32::new_keyless().unwrap();
+    c.bench_function("test123/Mock2C32/enc", |b| {
         b.iter(|| ob.enc(black_box("test123")).unwrap());
     });
 }
 
-fn benchmark_enc_tdi(c: &mut Criterion) {
-    let ob = TdiC32::new_keyless().unwrap();
-    c.bench_function("test123/TdrC32/enc", |b| {
+fn benchmark_enc_mock1(c: &mut Criterion) {
+    let ob = Mock1C32::new_keyless().unwrap();
+    c.bench_function("test123/Mock2C32/enc", |b| {
         b.iter(|| ob.enc(black_box("test123")).unwrap());
     });
 }
 
-fn benchmark_dec_tdr(c: &mut Criterion) {
-    let ob = TdrC32::new_keyless().unwrap();
+fn benchmark_dec_mock2(c: &mut Criterion) {
+    let ob = Mock2C32::new_keyless().unwrap();
     let ot = ob.enc("test123").unwrap();
-    c.bench_function("dec_tdr", |b| {
+    c.bench_function("dec_mock2", |b| {
         b.iter(|| ob.dec(black_box(&ot)).unwrap());
     });
 }
 
-fn benchmark_dec_tdi(c: &mut Criterion) {
-    let ob = TdiC32::new_keyless().unwrap();
+fn benchmark_dec_mock1(c: &mut Criterion) {
+    let ob = Mock1C32::new_keyless().unwrap();
     let ot = ob.enc("test123").unwrap();
-    c.bench_function("dec_tdi", |b| {
+    c.bench_function("dec_mock1", |b| {
         b.iter(|| ob.dec(black_box(&ot)).unwrap());
     });
 }
@@ -158,10 +158,10 @@ fn benchmark_auto_decode_adsv(c: &mut Criterion) {
 criterion_group!(
     benches,
     // Baseline - encoding overhead only (no crypto)
-    benchmark_enc_tdr,
-    benchmark_enc_tdi,
-    benchmark_dec_tdr,
-    benchmark_dec_tdi,
+    benchmark_enc_mock2,
+    benchmark_enc_mock1,
+    benchmark_dec_mock2,
+    benchmark_dec_mock1,
     // Crypto schemes
     benchmark_enc_ob00,
     benchmark_enc_zdc,

@@ -17,10 +17,10 @@ mod upc; // AES-CBC (probabilistic)
 mod zdc; //  AES-CBC (deterministic, not cryptographically secure - obfuscation only!) // AES-SIV (probabilistic)
 
 // Testing schemes (no encryption - no dependencies)
-#[cfg(feature = "tdi")]
-mod tdi;
-#[cfg(feature = "tdr")]
-mod tdr; // Identity // String reversal
+#[cfg(feature = "mock1")]
+mod mock1;
+#[cfg(feature = "mock2")]
+mod mock2; // Identity // String reversal
 
 // Legacy
 #[cfg(feature = "ob00")]
@@ -42,10 +42,10 @@ pub use upc::{decrypt as decrypt_upc, encrypt as encrypt_upc};
 pub use zdc::{decrypt as decrypt_zdc, encrypt as encrypt_zdc};
 
 // Testing
-#[cfg(feature = "tdi")]
-pub use tdi::{decrypt as decrypt_tdi, encrypt as encrypt_tdi};
-#[cfg(feature = "tdr")]
-pub use tdr::{decrypt as decrypt_tdr, encrypt as encrypt_tdr};
+#[cfg(feature = "mock1")]
+pub use mock1::{decrypt as decrypt_mock1, encrypt as encrypt_mock1};
+#[cfg(feature = "mock2")]
+pub use mock2::{decrypt as decrypt_mock2, encrypt as encrypt_mock2};
 
 // Legacy
 #[cfg(feature = "ob00")]

@@ -1,7 +1,7 @@
 """Format string constants for Oboron. 
 
 All constants follow the pattern:  {SCHEME}_{ENCODING}
-- Schemes: ZDC, UPC, ADGS, APGS, ADSV, APSV, TDI, TDR, OB00 (legacy)
+- Schemes: ZDC, UPC, ADGS, APGS, ADSV, APSV, MOCK1, MOCK2, OB00 (legacy)
 - Encodings: C32 (Base32Crockford), B32 (Base32Rfc), B64 (Base64), HEX
 
 Example:
@@ -49,15 +49,15 @@ APSV_B64: str = "apsv:b64"
 APSV_HEX: str = "apsv:hex"
 
 # Testing schemes (no encryption)
-TDI_C32: str = "tdi:c32"
-TDI_B32: str = "tdi:b32"
-TDI_B64: str = "tdi:b64"
-TDI_HEX: str = "tdi:hex"
+MOCK1_C32: str = "mock1:c32"
+MOCK1_B32: str = "mock1:b32"
+MOCK1_B64: str = "mock1:b64"
+MOCK1_HEX: str = "mock1:hex"
 
-TDR_C32: str = "tdr:c32"
-TDR_B32: str = "tdr:b32"
-TDR_B64: str = "tdr:b64"
-TDR_HEX: str = "tdr:hex"
+MOCK2_C32: str = "mock2:c32"
+MOCK2_B32: str = "mock2:b32"
+MOCK2_B64: str = "mock2:b64"
+MOCK2_HEX: str = "mock2:hex"
 
 # Legacy (ob00 - deprecated, use zdc instead)
 OB00_C32: str = "ob00:c32"
@@ -79,8 +79,8 @@ __all__ = [
     # apsv
     "APSV_C32", "APSV_B32", "APSV_B64", "APSV_HEX",
     # Testing
-    "TDI_C32", "TDI_B32", "TDI_B64", "TDI_HEX",
-    "TDR_C32", "TDR_B32", "TDR_B64", "TDR_HEX",
+    "MOCK1_C32", "MOCK1_B32", "MOCK1_B64", "MOCK1_HEX",
+    "MOCK2_C32", "MOCK2_B32", "MOCK2_B64", "MOCK2_HEX",
     # Legacy
     "OB00_C32", "OB00_B32", "OB00_B64", "OB00_HEX",
 ]

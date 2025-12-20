@@ -18,13 +18,13 @@ use crate::{Error, Format, Keychain};
 /// # fn main() -> Result<(), oboron::Error> {
 /// # #[cfg(all(feature = "adsv", feature="non-crypto"))]
 /// # {
-/// # use oboron::{ObMulti, TDI_B64};
+/// # use oboron::{ObMulti, MOCK1_B64};
 /// # let key = oboron::generate_key();
 /// let obm = ObMulti::new(&key)?;
 ///
 /// // Encode with explicit format
 /// let ot1 = obm.enc("hello", "adsv:c32")?; // using explicit string
-/// let ot2 = obm.enc("world", TDI_B64)?; // using string constant
+/// let ot2 = obm.enc("world", MOCK1_B64)?; // using string constant
 ///
 /// // autodec detects both scheme and encoding
 /// let pt1 = obm.autodec(&ot1)?;
@@ -67,7 +67,7 @@ impl ObMulti {
     /// let obm = ObMulti::new(&key)?;
     ///
     /// let ot = obm.enc("hello", "adsv:c32")?;
-    /// let ot2 = obm.enc("world", "tdi:b64")?;
+    /// let ot2 = obm.enc("world", "mock1:b64")?;
     /// # }
     /// # Ok(())
     /// # }

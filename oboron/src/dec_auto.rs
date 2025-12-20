@@ -18,10 +18,10 @@ use crate::{constants::UPC_BYTE, decrypt_upc};
 #[cfg(feature = "zdc")]
 use crate::{constants::ZDC_BYTE, decrypt_zdc};
 // Testing
-#[cfg(feature = "tdi")]
-use crate::{constants::TDI_BYTE, decrypt_tdi};
-#[cfg(feature = "tdr")]
-use crate::{constants::TDR_BYTE, decrypt_tdr};
+#[cfg(feature = "mock1")]
+use crate::{constants::MOCK1_BYTE, decrypt_mock1};
+#[cfg(feature = "mock2")]
+use crate::{constants::MOCK2_BYTE, decrypt_mock2};
 // Legacy
 #[cfg(feature = "ob00")]
 use crate::legacy;
@@ -80,10 +80,10 @@ pub fn dec_any_scheme(
         #[cfg(feature = "apsv")]
         APSV_BYTE => decrypt_apsv(keychain, &buffer)?,
         // Testing
-        #[cfg(feature = "tdi")]
-        TDI_BYTE => decrypt_tdi(keychain, &buffer)?,
-        #[cfg(feature = "tdr")]
-        TDR_BYTE => decrypt_tdr(keychain, &buffer)?,
+        #[cfg(feature = "mock1")]
+        MOCK1_BYTE => decrypt_mock1(keychain, &buffer)?,
+        #[cfg(feature = "mock2")]
+        MOCK2_BYTE => decrypt_mock2(keychain, &buffer)?,
         _ => {
             // Unknown scheme byte - try ob00 as fallback
             #[cfg(feature = "ob00")]

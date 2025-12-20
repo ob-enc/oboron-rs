@@ -44,8 +44,8 @@ but note that pre-1.0 releases may not adhere strictly to all guidelines.
     - ob31p -> apgs
     - ob32  -> adsv
     - ob32p -> apsv
-    - ob70  -> tdi
-    - ob71  -> tdr
+    - ob70  -> mock1
+    - ob71  -> mock2
   - ob00 remains unchanged (legacy format)
   - new format uses "." as separator instead of colon
   - renamed formats:

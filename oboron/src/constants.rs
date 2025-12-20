@@ -48,13 +48,13 @@ pub const APSV_BYTE: u8 = 0x65;
 // Tier ob7x - Testing
 // -------------------
 // Identity scheme (no encryption)
-// tdi: tier=7 (111), scheme=0 (0000), probabilistic=0 -> 11100000 = 0xE0 (decimal: 224)
-#[cfg(feature = "tdi")]
-pub const TDI_BYTE: u8 = 0xE0;
+// mock1: tier=7 (111), scheme=0 (0000), probabilistic=0 -> 11100000 = 0xE0 (decimal: 224)
+#[cfg(feature = "mock1")]
+pub const MOCK1_BYTE: u8 = 0xE0;
 // String-reversal (no encryption)
-// tdr: tier=7 (111), scheme=1 (0001), probabilistic=0 -> 11100010 = 0xE2 (decimal: 226)
-#[cfg(feature = "tdr")]
-pub const TDR_BYTE: u8 = 0xE2;
+// mock2: tier=7 (111), scheme=1 (0001), probabilistic=0 -> 11100010 = 0xE2 (decimal: 226)
+#[cfg(feature = "mock2")]
+pub const MOCK2_BYTE: u8 = 0xE2;
 
 // For efficient resolution in decode logic, list all scheme bytes of reversed schemes
 const fn get_reversed_schemes() -> &'static [u8] {
@@ -85,10 +85,10 @@ pub const ADSV_C32: &str = "adsv:c32";
 #[cfg(feature = "apsv")]
 pub const APSV_C32: &str = "apsv:c32";
 // Tier ob7x - Testing
-#[cfg(feature = "tdi")]
-pub const TDI_C32: &str = "tdi:c32";
-#[cfg(feature = "tdr")]
-pub const TDR_C32: &str = "tdr:c32";
+#[cfg(feature = "mock1")]
+pub const MOCK1_C32: &str = "mock1:c32";
+#[cfg(feature = "mock2")]
+pub const MOCK2_C32: &str = "mock2:c32";
 // Legacy
 #[cfg(feature = "ob00")]
 pub const OB00_C32: &str = "ob00:c32";
@@ -107,10 +107,10 @@ pub const ADSV_B32: &str = "adsv:b32";
 #[cfg(feature = "apsv")]
 pub const APSV_B32: &str = "apsv:b32";
 // Tier ob7x - Testing
-#[cfg(feature = "tdi")]
-pub const TDI_B32: &str = "tdi:b32";
-#[cfg(feature = "tdr")]
-pub const TDR_B32: &str = "tdr:b32";
+#[cfg(feature = "mock1")]
+pub const MOCK1_B32: &str = "mock1:b32";
+#[cfg(feature = "mock2")]
+pub const MOCK2_B32: &str = "mock2:b32";
 // Legacy
 #[cfg(feature = "ob00")]
 pub const OB00_B32: &str = "ob00:b32";
@@ -129,10 +129,10 @@ pub const ADSV_B64: &str = "adsv:b64";
 #[cfg(feature = "apsv")]
 pub const APSV_B64: &str = "apsv:b64";
 // Tier ob7x - Testing
-#[cfg(feature = "tdi")]
-pub const TDI_B64: &str = "tdi:b64";
-#[cfg(feature = "tdr")]
-pub const TDR_B64: &str = "tdr:b64";
+#[cfg(feature = "mock1")]
+pub const MOCK1_B64: &str = "mock1:b64";
+#[cfg(feature = "mock2")]
+pub const MOCK2_B64: &str = "mock2:b64";
 // Legacy
 #[cfg(feature = "ob00")]
 pub const OB00_B64: &str = "ob00:b64";
@@ -151,10 +151,10 @@ pub const ADSV_HEX: &str = "adsv:hex";
 #[cfg(feature = "apsv")]
 pub const APSV_HEX: &str = "apsv:hex";
 // Tier ob7x - Testing
-#[cfg(feature = "tdi")]
-pub const TDI_HEX: &str = "tdi:hex";
-#[cfg(feature = "tdr")]
-pub const TDR_HEX: &str = "tdr:hex";
+#[cfg(feature = "mock1")]
+pub const MOCK1_HEX: &str = "mock1:hex";
+#[cfg(feature = "mock2")]
+pub const MOCK2_HEX: &str = "mock2:hex";
 // Legacy
 #[cfg(feature = "ob00")]
 pub const OB00_HEX: &str = "ob00:hex";

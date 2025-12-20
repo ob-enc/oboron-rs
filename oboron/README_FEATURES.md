@@ -48,8 +48,8 @@ hex/bytes key interfaces and the keyless testing feature.
 - `apsv` - AES-SIV (probabilistic)
 
 Testing schemes (non-cryptographic):
-- `tdi` - identity transformation (ciphertext = plaintext bytes)
-- `tdr` - uses reversed `tdi` ciphertext
+- `mock1` - identity transformation (ciphertext = plaintext bytes)
+- `mock2` - uses reversed `mock1` ciphertext
 
 ### Unsafe Performance Enhancement
 
@@ -94,7 +94,7 @@ By tier:
 - `ob3x` - Includes all authenticated schemes (= `authenticated-schemes`)
 
 Testing:
-- `non-crypto` - Includes `tdi` and `tdr`
+- `non-crypto` - Includes `mock1` and `mock2`
 
 Comprehensive group
 - `all-schemes` - Includes all schemes (same as default)

@@ -18,10 +18,10 @@ pub enum Scheme {
     #[cfg(feature = "apsv")]
     Apsv,
     // Testing
-    #[cfg(feature = "tdi")]
-    Tdi,
-    #[cfg(feature = "tdr")]
-    Tdr,
+    #[cfg(feature = "mock1")]
+    Mock1,
+    #[cfg(feature = "mock2")]
+    Mock2,
     // Legacy
     #[cfg(feature = "ob00")]
     Ob00,
@@ -44,10 +44,10 @@ impl Scheme {
             #[cfg(feature = "apsv")]
             Scheme::Apsv => "apsv",
             // Testing
-            #[cfg(feature = "tdi")]
-            Scheme::Tdi => "tdi",
-            #[cfg(feature = "tdr")]
-            Scheme::Tdr => "tdr",
+            #[cfg(feature = "mock1")]
+            Scheme::Mock1 => "mock1",
+            #[cfg(feature = "mock2")]
+            Scheme::Mock2 => "mock2",
             // Legacy
             #[cfg(feature = "ob00")]
             Scheme::Ob00 => "ob00",
@@ -75,10 +75,10 @@ impl Scheme {
             #[cfg(feature = "apsv")]
             Scheme::Apsv => false,
             // Testing
-            #[cfg(feature = "tdi")]
-            Scheme::Tdi => true,
-            #[cfg(feature = "tdr")]
-            Scheme::Tdr => true,
+            #[cfg(feature = "mock1")]
+            Scheme::Mock1 => true,
+            #[cfg(feature = "mock2")]
+            Scheme::Mock2 => true,
             // Legacy
             #[cfg(feature = "ob00")]
             Scheme::Ob00 => true,
@@ -111,10 +111,10 @@ impl Scheme {
             #[cfg(feature = "apsv")]
             Scheme::Apsv => constants::APSV_BYTE,
             // Testing
-            #[cfg(feature = "tdi")]
-            Scheme::Tdi => constants::TDI_BYTE,
-            #[cfg(feature = "tdr")]
-            Scheme::Tdr => constants::TDR_BYTE,
+            #[cfg(feature = "mock1")]
+            Scheme::Mock1 => constants::MOCK1_BYTE,
+            #[cfg(feature = "mock2")]
+            Scheme::Mock2 => constants::MOCK2_BYTE,
             // Legacy
             #[cfg(feature = "ob00")]
             Scheme::Ob00 => unreachable!("ob00 does not use a scheme byte"),
@@ -140,10 +140,10 @@ impl std::str::FromStr for Scheme {
             #[cfg(feature = "apsv")]
             "apsv" => Ok(Scheme::Apsv),
             // Testing
-            #[cfg(feature = "tdi")]
-            "tdi" => Ok(Scheme::Tdi),
-            #[cfg(feature = "tdr")]
-            "tdr" => Ok(Scheme::Tdr),
+            #[cfg(feature = "mock1")]
+            "mock1" => Ok(Scheme::Mock1),
+            #[cfg(feature = "mock2")]
+            "mock2" => Ok(Scheme::Mock2),
             // Legacy
             #[cfg(feature = "ob00")]
             "ob00" => Ok(Scheme::Ob00),

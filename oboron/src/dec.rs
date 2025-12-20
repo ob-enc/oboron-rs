@@ -20,10 +20,10 @@ use crate::decrypt_upc;
 #[cfg(feature = "zdc")]
 use crate::decrypt_zdc;
 // Testing
-#[cfg(feature = "tdi")]
-use crate::decrypt_tdi;
-#[cfg(feature = "tdr")]
-use crate::decrypt_tdr;
+#[cfg(feature = "mock1")]
+use crate::decrypt_mock1;
+#[cfg(feature = "mock2")]
+use crate::decrypt_mock2;
 
 /// Generic decoding pipeline for all schemes (except ob00).
 ///
@@ -76,10 +76,10 @@ pub(crate) fn dec_from_format(
         #[cfg(feature = "apsv")]
         Scheme::Apsv => decrypt_apsv(keychain, &buffer)?,
         // Testing
-        #[cfg(feature = "tdi")]
-        Scheme::Tdi => decrypt_tdi(keychain, &buffer)?,
-        #[cfg(feature = "tdr")]
-        Scheme::Tdr => decrypt_tdr(keychain, &buffer)?,
+        #[cfg(feature = "mock1")]
+        Scheme::Mock1 => decrypt_mock1(keychain, &buffer)?,
+        #[cfg(feature = "mock2")]
+        Scheme::Mock2 => decrypt_mock2(keychain, &buffer)?,
         // Legacy - ob00 does not use this call path
         #[cfg(feature = "ob00")]
         Scheme::Ob00 => unreachable!("called generic dec function for ob00"),

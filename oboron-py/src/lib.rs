@@ -294,50 +294,50 @@ impl_cipher_class!(
 
 // --- TESTING CLASSES ---
 
-// Tdi variants
+// Mock1 variants
 // -------------
 impl_cipher_class!(
-    TdiC32,
-    ::oboron::TdiC32,
-    "Tdi cipher with Base32Crockford encoding (Identity scheme, for testing)"
+    Mock1C32,
+    ::oboron::Mock1C32,
+    "Mock1 cipher with Base32Crockford encoding (Identity scheme, for testing)"
 );
 impl_cipher_class!(
-    TdiB32,
-    ::oboron::TdiB32,
-    "Tdi cipher with Base32Rfc encoding (Identity scheme, for testing)"
+    Mock1B32,
+    ::oboron::Mock1B32,
+    "Mock1 cipher with Base32Rfc encoding (Identity scheme, for testing)"
 );
 impl_cipher_class!(
-    TdiB64,
-    ::oboron::TdiB64,
-    "Tdi cipher with Base64 encoding (Identity scheme, for testing)"
+    Mock1B64,
+    ::oboron::Mock1B64,
+    "Mock1 cipher with Base64 encoding (Identity scheme, for testing)"
 );
 impl_cipher_class!(
-    TdiHex,
-    ::oboron::TdiHex,
-    "Tdi cipher with Hex encoding (Identity scheme, for testing)"
+    Mock1Hex,
+    ::oboron::Mock1Hex,
+    "Mock1 cipher with Hex encoding (Identity scheme, for testing)"
 );
 
-// Tdr variants
+// Mock2 variants
 // -------------
 impl_cipher_class!(
-    TdrC32,
-    ::oboron::TdrC32,
-    "Tdr cipher with Base32Crockford encoding (Reverse scheme, for testing)"
+    Mock2C32,
+    ::oboron::Mock2C32,
+    "Mock2 cipher with Base32Crockford encoding (Reverse scheme, for testing)"
 );
 impl_cipher_class!(
-    TdrB32,
-    ::oboron::TdrB32,
-    "Tdr cipher with Base32Rfc encoding (Reverse scheme, for testing)"
+    Mock2B32,
+    ::oboron::Mock2B32,
+    "Mock2 cipher with Base32Rfc encoding (Reverse scheme, for testing)"
 );
 impl_cipher_class!(
-    TdrB64,
-    ::oboron::TdrB64,
-    "Tdr cipher with Base64 encoding (Reverse scheme, for testing)"
+    Mock2B64,
+    ::oboron::Mock2B64,
+    "Mock2 cipher with Base64 encoding (Reverse scheme, for testing)"
 );
 impl_cipher_class!(
-    TdrHex,
-    ::oboron::TdrHex,
-    "Tdr cipher with Hex encoding (Reverse scheme, for testing)"
+    Mock2Hex,
+    ::oboron::Mock2Hex,
+    "Mock2 cipher with Hex encoding (Reverse scheme, for testing)"
 );
 
 // Ob00 - LEGACY variants
@@ -862,17 +862,17 @@ fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m.add_class::<ApsvHex>()?;
     }
 
-    // Tdr variants
-    m.add_class::<TdrC32>()?;
-    m.add_class::<TdrB32>()?;
-    m.add_class::<TdrB64>()?;
-    m.add_class::<TdrHex>()?;
+    // Mock2 variants
+    m.add_class::<Mock2C32>()?;
+    m.add_class::<Mock2B32>()?;
+    m.add_class::<Mock2B64>()?;
+    m.add_class::<Mock2Hex>()?;
 
-    // Tdi variants
-    m.add_class::<TdiC32>()?;
-    m.add_class::<TdiB32>()?;
-    m.add_class::<TdiB64>()?;
-    m.add_class::<TdiHex>()?;
+    // Mock1 variants
+    m.add_class::<Mock1C32>()?;
+    m.add_class::<Mock1B32>()?;
+    m.add_class::<Mock1B64>()?;
+    m.add_class::<Mock1Hex>()?;
 
     // Utility functions
     m.add_function(wrap_pyfunction!(generate_key, m)?)?;

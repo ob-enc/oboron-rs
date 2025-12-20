@@ -227,25 +227,35 @@ impl_oboron!(ApsvHex, Scheme::Apsv, Encoding::Hex, "apsv:hex");
 
 // Testing
 
-// tdi (identity scheme)
-#[cfg(feature = "tdi")]
-impl_oboron!(TdiC32, Scheme::Tdi, Encoding::Base32Crockford, "tdi:c32");
-#[cfg(feature = "tdi")]
-impl_oboron!(TdiB32, Scheme::Tdi, Encoding::Base32Rfc, "tdi:b32");
-#[cfg(feature = "tdi")]
-impl_oboron!(TdiB64, Scheme::Tdi, Encoding::Base64, "tdi:b64");
-#[cfg(feature = "tdi")]
-impl_oboron!(TdiHex, Scheme::Tdi, Encoding::Hex, "tdi:hex");
+// mock1 (identity scheme)
+#[cfg(feature = "mock1")]
+impl_oboron!(
+    Mock1C32,
+    Scheme::Mock1,
+    Encoding::Base32Crockford,
+    "mock1:c32"
+);
+#[cfg(feature = "mock1")]
+impl_oboron!(Mock1B32, Scheme::Mock1, Encoding::Base32Rfc, "mock1:b32");
+#[cfg(feature = "mock1")]
+impl_oboron!(Mock1B64, Scheme::Mock1, Encoding::Base64, "mock1:b64");
+#[cfg(feature = "mock1")]
+impl_oboron!(Mock1Hex, Scheme::Mock1, Encoding::Hex, "mock1:hex");
 
-// tdr (reverse scheme)
-#[cfg(feature = "tdr")]
-impl_oboron!(TdrC32, Scheme::Tdr, Encoding::Base32Crockford, "tdr:c32");
-#[cfg(feature = "tdr")]
-impl_oboron!(TdrB32, Scheme::Tdr, Encoding::Base32Rfc, "tdr:b32");
-#[cfg(feature = "tdr")]
-impl_oboron!(TdrB64, Scheme::Tdr, Encoding::Base64, "tdr:b64");
-#[cfg(feature = "tdr")]
-impl_oboron!(TdrHex, Scheme::Tdr, Encoding::Hex, "tdr:hex");
+// mock2 (reverse scheme)
+#[cfg(feature = "mock2")]
+impl_oboron!(
+    Mock2C32,
+    Scheme::Mock2,
+    Encoding::Base32Crockford,
+    "mock2:c32"
+);
+#[cfg(feature = "mock2")]
+impl_oboron!(Mock2B32, Scheme::Mock2, Encoding::Base32Rfc, "mock2:b32");
+#[cfg(feature = "mock2")]
+impl_oboron!(Mock2B64, Scheme::Mock2, Encoding::Base64, "mock2:b64");
+#[cfg(feature = "mock2")]
+impl_oboron!(Mock2Hex, Scheme::Mock2, Encoding::Hex, "mock2:hex");
 
 /// Type-erased Oboron encoder that can hold any scheme+encoding combination.
 ///
@@ -302,22 +312,22 @@ pub enum ObAny {
     #[cfg(feature = "apsv")]
     ApsvHex(ApsvHex),
     // Testing
-    #[cfg(feature = "tdi")]
-    TdiC32(TdiC32),
-    #[cfg(feature = "tdi")]
-    TdiB32(TdiB32),
-    #[cfg(feature = "tdi")]
-    TdiHex(TdiHex),
-    #[cfg(feature = "tdi")]
-    TdiB64(TdiB64),
-    #[cfg(feature = "tdr")]
-    TdrC32(TdrC32),
-    #[cfg(feature = "tdr")]
-    TdrB32(TdrB32),
-    #[cfg(feature = "tdr")]
-    TdrHex(TdrHex),
-    #[cfg(feature = "tdr")]
-    TdrB64(TdrB64),
+    #[cfg(feature = "mock1")]
+    Mock1C32(Mock1C32),
+    #[cfg(feature = "mock1")]
+    Mock1B32(Mock1B32),
+    #[cfg(feature = "mock1")]
+    Mock1Hex(Mock1Hex),
+    #[cfg(feature = "mock1")]
+    Mock1B64(Mock1B64),
+    #[cfg(feature = "mock2")]
+    Mock2C32(Mock2C32),
+    #[cfg(feature = "mock2")]
+    Mock2B32(Mock2B32),
+    #[cfg(feature = "mock2")]
+    Mock2Hex(Mock2Hex),
+    #[cfg(feature = "mock2")]
+    Mock2B64(Mock2B64),
     // Legacy
     #[cfg(feature = "ob00")]
     Ob00Base32Crockford(Ob00Base32Crockford),
@@ -383,22 +393,22 @@ macro_rules! delegate_to_inner {
                 #[cfg(feature = "apsv")]
                 ObAny::ApsvHex(ob) => ob.$method($($arg),*),
                 // Testing
-                #[cfg(feature = "tdi")]
-                ObAny::TdiC32(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "tdi")]
-                ObAny::TdiB32(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "tdi")]
-                ObAny::TdiB64(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "tdi")]
-                ObAny::TdiHex(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "tdr")]
-                ObAny::TdrC32(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "tdr")]
-                ObAny::TdrB32(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "tdr")]
-                ObAny::TdrB64(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "tdr")]
-                ObAny::TdrHex(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "mock1")]
+                ObAny::Mock1C32(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "mock1")]
+                ObAny::Mock1B32(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "mock1")]
+                ObAny::Mock1B64(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "mock1")]
+                ObAny::Mock1Hex(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "mock2")]
+                ObAny::Mock2C32(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "mock2")]
+                ObAny::Mock2B32(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "mock2")]
+                ObAny::Mock2B64(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "mock2")]
+                ObAny::Mock2Hex(ob) => ob.$method($($arg),*),
                 // Legacy
                 #[cfg(feature = "ob00")]
                 ObAny::Ob00Base32Crockford(ob) => ob.$method($($arg),*),
@@ -431,26 +441,26 @@ impl Oboron for ObAny {
 impl ObAny {
     /// Create a new instance with a 128-character hex string key.
     ///
-    /// Defaults to tdi:c32 format.
+    /// Defaults to mock1:c32 format.
     pub fn new(key: &str) -> Result<Self, Error> {
-        #[cfg(feature = "tdi")]
-        return Ok(ObAny::TdiC32(TdiC32::new(key)?));
-        #[cfg(feature = "tdr")]
-        #[cfg(not(feature = "tdi"))]
-        return Ok(ObAny::TdrC32(TdrC32::new(key)?));
+        #[cfg(feature = "mock1")]
+        return Ok(ObAny::Mock1C32(Mock1C32::new(key)?));
+        #[cfg(feature = "mock2")]
+        #[cfg(not(feature = "mock1"))]
+        return Ok(ObAny::Mock2C32(Mock2C32::new(key)?));
         #[cfg(feature = "zdc")]
-        #[cfg(not(any(feature = "tdi", feature = "tdr")))]
+        #[cfg(not(any(feature = "mock1", feature = "mock2")))]
         return Ok(ObAny::ZdcC32(ZdcC32::new(key)?));
         #[cfg(feature = "upc")]
-        #[cfg(not(any(feature = "tdi", feature = "tdr", feature = "zdc")))]
+        #[cfg(not(any(feature = "mock1", feature = "mock2", feature = "zdc")))]
         return Ok(ObAny::UpcC32(UpcC32::new(key)?));
         #[cfg(feature = "adgs")]
-        #[cfg(not(any(feature = "tdi", feature = "tdr", feature = "zdc", feature = "upc")))]
+        #[cfg(not(any(feature = "mock1", feature = "mock2", feature = "zdc", feature = "upc")))]
         return Ok(ObAny::AdgsC32(AdgsC32::new(key)?));
         #[cfg(feature = "apgs")]
         #[cfg(not(any(
-            feature = "tdi",
-            feature = "tdr",
+            feature = "mock1",
+            feature = "mock2",
             feature = "zdc",
             feature = "upc",
             feature = "adgs"
@@ -458,8 +468,8 @@ impl ObAny {
         return Ok(ObAny::ApgsC32(ApgsC32::new(key)?));
         #[cfg(feature = "adsv")]
         #[cfg(not(any(
-            feature = "tdi",
-            feature = "tdr",
+            feature = "mock1",
+            feature = "mock2",
             feature = "zdc",
             feature = "upc",
             feature = "adgs",
@@ -468,8 +478,8 @@ impl ObAny {
         return Ok(ObAny::AdsvC32(AdsvC32::new(key)?));
         #[cfg(feature = "apsv")]
         #[cfg(not(any(
-            feature = "tdi",
-            feature = "tdr",
+            feature = "mock1",
+            feature = "mock2",
             feature = "zdc",
             feature = "upc",
             feature = "adgs",
@@ -479,8 +489,8 @@ impl ObAny {
         return Ok(ObAny::ApsvC32(ApsvC32::new(key)?));
         #[cfg(feature = "ob00")]
         #[cfg(not(any(
-            feature = "tdi",
-            feature = "tdr",
+            feature = "mock1",
+            feature = "mock2",
             feature = "zdc",
             feature = "upc",
             feature = "adgs",
@@ -490,8 +500,8 @@ impl ObAny {
         )))]
         return Ok(ObAny::Ob00Base32Crockford(Ob00Base32Crockford::new(key)?));
         #[cfg(not(any(
-            feature = "tdi",
-            feature = "tdr",
+            feature = "mock1",
+            feature = "mock2",
             feature = "zdc",
             feature = "upc",
             feature = "adgs",
@@ -505,38 +515,38 @@ impl ObAny {
 
     /// Create a new instance from a 64-byte key.
     ///
-    /// Defaults to tdi:c32 format.
+    /// Defaults to mock1:c32 format.
     #[inline]
     #[cfg(feature = "bytes-keys")]
     pub fn from_bytes(key_bytes: &[u8; 64]) -> Result<Self, Error> {
-        #[cfg(feature = "tdi")]
-        return Ok(ObAny::TdiC32(TdiC32 {
+        #[cfg(feature = "mock1")]
+        return Ok(ObAny::Mock1C32(Mock1C32 {
             keychain: Keychain::from_bytes(key_bytes)?,
         }));
-        #[cfg(feature = "tdr")]
-        #[cfg(not(feature = "tdi"))]
-        return Ok(ObAny::TdrC32(TdrC32 {
+        #[cfg(feature = "mock2")]
+        #[cfg(not(feature = "mock1"))]
+        return Ok(ObAny::Mock2C32(Mock2C32 {
             keychain: Keychain::from_bytes(key_bytes)?,
         }));
         #[cfg(feature = "zdc")]
-        #[cfg(not(any(feature = "tdi", feature = "tdr")))]
+        #[cfg(not(any(feature = "mock1", feature = "mock2")))]
         return Ok(ObAny::ZdcC32(ZdcC32 {
             keychain: Keychain::from_bytes(key_bytes)?,
         }));
         #[cfg(feature = "upc")]
-        #[cfg(not(any(feature = "tdi", feature = "tdr", feature = "zdc")))]
+        #[cfg(not(any(feature = "mock1", feature = "mock2", feature = "zdc")))]
         return Ok(ObAny::UpcC32(UpcC32 {
             keychain: Keychain::from_bytes(key_bytes)?,
         }));
         #[cfg(feature = "adgs")]
-        #[cfg(not(any(feature = "tdi", feature = "tdr", feature = "zdc", feature = "upc")))]
+        #[cfg(not(any(feature = "mock1", feature = "mock2", feature = "zdc", feature = "upc")))]
         return Ok(ObAny::AdgsC32(AdgsC32 {
             keychain: Keychain::from_bytes(key_bytes)?,
         }));
         #[cfg(feature = "apgs")]
         #[cfg(not(any(
-            feature = "tdi",
-            feature = "tdr",
+            feature = "mock1",
+            feature = "mock2",
             feature = "zdc",
             feature = "upc",
             feature = "adgs"
@@ -546,8 +556,8 @@ impl ObAny {
         }));
         #[cfg(feature = "adsv")]
         #[cfg(not(any(
-            feature = "tdi",
-            feature = "tdr",
+            feature = "mock1",
+            feature = "mock2",
             feature = "zdc",
             feature = "upc",
             feature = "adgs",
@@ -558,8 +568,8 @@ impl ObAny {
         }));
         #[cfg(feature = "apsv")]
         #[cfg(not(any(
-            feature = "tdi",
-            feature = "tdr",
+            feature = "mock1",
+            feature = "mock2",
             feature = "zdc",
             feature = "upc",
             feature = "adgs",
@@ -571,8 +581,8 @@ impl ObAny {
         }));
         #[cfg(feature = "ob00")]
         #[cfg(not(any(
-            feature = "tdi",
-            feature = "tdr",
+            feature = "mock1",
+            feature = "mock2",
             feature = "zdc",
             feature = "upc",
             feature = "adgs",
@@ -584,8 +594,8 @@ impl ObAny {
             keychain: Keychain::from_bytes(key_bytes)?,
         }));
         #[cfg(not(any(
-            feature = "tdi",
-            feature = "tdr",
+            feature = "mock1",
+            feature = "mock2",
             feature = "zdc",
             feature = "upc",
             feature = "adgs",
@@ -599,24 +609,24 @@ impl ObAny {
 
     #[cfg(feature = "hex-keys")]
     pub fn from_hex_key(key_hex: &str) -> Result<Self, Error> {
-        #[cfg(feature = "tdi")]
-        return Ok(ObAny::TdiC32(TdiC32::from_hex_key(key_hex)?));
-        #[cfg(feature = "tdr")]
-        #[cfg(not(feature = "tdi"))]
-        return Ok(ObAny::TdrC32(TdrC32::from_hex_key(key_hex)?));
+        #[cfg(feature = "mock1")]
+        return Ok(ObAny::Mock1C32(Mock1C32::from_hex_key(key_hex)?));
+        #[cfg(feature = "mock2")]
+        #[cfg(not(feature = "mock1"))]
+        return Ok(ObAny::Mock2C32(Mock2C32::from_hex_key(key_hex)?));
         #[cfg(feature = "zdc")]
-        #[cfg(not(any(feature = "tdi", feature = "tdr")))]
+        #[cfg(not(any(feature = "mock1", feature = "mock2")))]
         return Ok(ObAny::ZdcC32(ZdcC32::from_hex_key(key_hex)?));
         #[cfg(feature = "upc")]
-        #[cfg(not(any(feature = "tdi", feature = "tdr", feature = "zdc")))]
+        #[cfg(not(any(feature = "mock1", feature = "mock2", feature = "zdc")))]
         return Ok(ObAny::UpcC32(UpcC32::from_hex_key(key_hex)?));
         #[cfg(feature = "adgs")]
-        #[cfg(not(any(feature = "tdi", feature = "tdr", feature = "zdc", feature = "upc")))]
+        #[cfg(not(any(feature = "mock1", feature = "mock2", feature = "zdc", feature = "upc")))]
         return Ok(ObAny::AdgsC32(AdgsC32::from_hex_key(key_hex)?));
         #[cfg(feature = "apgs")]
         #[cfg(not(any(
-            feature = "tdi",
-            feature = "tdr",
+            feature = "mock1",
+            feature = "mock2",
             feature = "zdc",
             feature = "upc",
             feature = "adgs"
@@ -624,8 +634,8 @@ impl ObAny {
         return Ok(ObAny::ApgsC32(ApgsC32::from_hex_key(key_hex)?));
         #[cfg(feature = "adsv")]
         #[cfg(not(any(
-            feature = "tdi",
-            feature = "tdr",
+            feature = "mock1",
+            feature = "mock2",
             feature = "zdc",
             feature = "upc",
             feature = "adgs",
@@ -634,8 +644,8 @@ impl ObAny {
         return Ok(ObAny::AdsvC32(AdsvC32::from_hex_key(key_hex)?));
         #[cfg(feature = "apsv")]
         #[cfg(not(any(
-            feature = "tdi",
-            feature = "tdr",
+            feature = "mock1",
+            feature = "mock2",
             feature = "zdc",
             feature = "upc",
             feature = "adgs",
@@ -645,8 +655,8 @@ impl ObAny {
         return Ok(ObAny::ApsvC32(ApsvC32::from_hex_key(key_hex)?));
         #[cfg(feature = "ob00")]
         #[cfg(not(any(
-            feature = "tdi",
-            feature = "tdr",
+            feature = "mock1",
+            feature = "mock2",
             feature = "zdc",
             feature = "upc",
             feature = "adgs",
@@ -658,8 +668,8 @@ impl ObAny {
             Ob00Base32Crockford::from_hex_key(key_hex)?,
         ));
         #[cfg(not(any(
-            feature = "tdi",
-            feature = "tdr",
+            feature = "mock1",
+            feature = "mock2",
             feature = "zdc",
             feature = "upc",
             feature = "adgs",
@@ -673,37 +683,37 @@ impl ObAny {
 
     /// Create a new instance with hardcoded key (testing only).
     ///
-    /// Defaults to tdi:c32 format.
+    /// Defaults to mock1:c32 format.
     #[cfg(feature = "keyless")]
     pub fn new_keyless() -> Result<Self, Error> {
-        #[cfg(feature = "tdi")]
-        return Ok(ObAny::TdiC32(TdiC32 {
+        #[cfg(feature = "mock1")]
+        return Ok(ObAny::Mock1C32(Mock1C32 {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
         }));
-        #[cfg(feature = "tdr")]
-        #[cfg(not(feature = "tdi"))]
-        return Ok(ObAny::TdrC32(TdrC32 {
+        #[cfg(feature = "mock2")]
+        #[cfg(not(feature = "mock1"))]
+        return Ok(ObAny::Mock2C32(Mock2C32 {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
         }));
         #[cfg(feature = "zdc")]
-        #[cfg(not(any(feature = "tdi", feature = "tdr")))]
+        #[cfg(not(any(feature = "mock1", feature = "mock2")))]
         return Ok(ObAny::ZdcC32(ZdcC32 {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
         }));
         #[cfg(feature = "upc")]
-        #[cfg(not(any(feature = "tdi", feature = "tdr", feature = "zdc")))]
+        #[cfg(not(any(feature = "mock1", feature = "mock2", feature = "zdc")))]
         return Ok(ObAny::UpcC32(UpcC32 {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
         }));
         #[cfg(feature = "adgs")]
-        #[cfg(not(any(feature = "tdi", feature = "tdr", feature = "zdc", feature = "upc")))]
+        #[cfg(not(any(feature = "mock1", feature = "mock2", feature = "zdc", feature = "upc")))]
         return Ok(ObAny::AdgsC32(AdgsC32 {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
         }));
         #[cfg(feature = "apgs")]
         #[cfg(not(any(
-            feature = "tdi",
-            feature = "tdr",
+            feature = "mock1",
+            feature = "mock2",
             feature = "zdc",
             feature = "upc",
             feature = "adgs"
@@ -713,8 +723,8 @@ impl ObAny {
         }));
         #[cfg(feature = "adsv")]
         #[cfg(not(any(
-            feature = "tdi",
-            feature = "tdr",
+            feature = "mock1",
+            feature = "mock2",
             feature = "zdc",
             feature = "upc",
             feature = "adgs",
@@ -725,8 +735,8 @@ impl ObAny {
         }));
         #[cfg(feature = "apsv")]
         #[cfg(not(any(
-            feature = "tdi",
-            feature = "tdr",
+            feature = "mock1",
+            feature = "mock2",
             feature = "zdc",
             feature = "upc",
             feature = "adgs",
@@ -738,8 +748,8 @@ impl ObAny {
         }));
         #[cfg(feature = "ob00")]
         #[cfg(not(any(
-            feature = "tdi",
-            feature = "tdr",
+            feature = "mock1",
+            feature = "mock2",
             feature = "zdc",
             feature = "upc",
             feature = "adgs",
@@ -751,8 +761,8 @@ impl ObAny {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
         }));
         #[cfg(not(any(
-            feature = "tdi",
-            feature = "tdr",
+            feature = "mock1",
+            feature = "mock2",
             feature = "zdc",
             feature = "upc",
             feature = "adgs",
@@ -823,22 +833,22 @@ pub fn new_with_format(format: Format, key: &str) -> Result<ObAny, Error> {
         #[cfg(feature = "apsv")]
         (Scheme::Apsv, Encoding::Hex) => Ok(ObAny::ApsvHex(ApsvHex::new(key)?)),
         // Testing
-        #[cfg(feature = "tdi")]
-        (Scheme::Tdi, Encoding::Base32Crockford) => Ok(ObAny::TdiC32(TdiC32::new(key)?)),
-        #[cfg(feature = "tdi")]
-        (Scheme::Tdi, Encoding::Base32Rfc) => Ok(ObAny::TdiB32(TdiB32::new(key)?)),
-        #[cfg(feature = "tdi")]
-        (Scheme::Tdi, Encoding::Base64) => Ok(ObAny::TdiB64(TdiB64::new(key)?)),
-        #[cfg(feature = "tdi")]
-        (Scheme::Tdi, Encoding::Hex) => Ok(ObAny::TdiHex(TdiHex::new(key)?)),
-        #[cfg(feature = "tdr")]
-        (Scheme::Tdr, Encoding::Base32Crockford) => Ok(ObAny::TdrC32(TdrC32::new(key)?)),
-        #[cfg(feature = "tdr")]
-        (Scheme::Tdr, Encoding::Base32Rfc) => Ok(ObAny::TdrB32(TdrB32::new(key)?)),
-        #[cfg(feature = "tdr")]
-        (Scheme::Tdr, Encoding::Base64) => Ok(ObAny::TdrB64(TdrB64::new(key)?)),
-        #[cfg(feature = "tdr")]
-        (Scheme::Tdr, Encoding::Hex) => Ok(ObAny::TdrHex(TdrHex::new(key)?)),
+        #[cfg(feature = "mock1")]
+        (Scheme::Mock1, Encoding::Base32Crockford) => Ok(ObAny::Mock1C32(Mock1C32::new(key)?)),
+        #[cfg(feature = "mock1")]
+        (Scheme::Mock1, Encoding::Base32Rfc) => Ok(ObAny::Mock1B32(Mock1B32::new(key)?)),
+        #[cfg(feature = "mock1")]
+        (Scheme::Mock1, Encoding::Base64) => Ok(ObAny::Mock1B64(Mock1B64::new(key)?)),
+        #[cfg(feature = "mock1")]
+        (Scheme::Mock1, Encoding::Hex) => Ok(ObAny::Mock1Hex(Mock1Hex::new(key)?)),
+        #[cfg(feature = "mock2")]
+        (Scheme::Mock2, Encoding::Base32Crockford) => Ok(ObAny::Mock2C32(Mock2C32::new(key)?)),
+        #[cfg(feature = "mock2")]
+        (Scheme::Mock2, Encoding::Base32Rfc) => Ok(ObAny::Mock2B32(Mock2B32::new(key)?)),
+        #[cfg(feature = "mock2")]
+        (Scheme::Mock2, Encoding::Base64) => Ok(ObAny::Mock2B64(Mock2B64::new(key)?)),
+        #[cfg(feature = "mock2")]
+        (Scheme::Mock2, Encoding::Hex) => Ok(ObAny::Mock2Hex(Mock2Hex::new(key)?)),
         // Legacy
         #[cfg(feature = "ob00")]
         (Scheme::Ob00, Encoding::Base32Crockford) => {
@@ -951,34 +961,38 @@ fn from_bytes_with_format_internal(format: Format, key_bytes: &[u8; 64]) -> Resu
             Ok(ObAny::ApsvHex(ApsvHex::from_bytes_internal(key_bytes)?))
         }
         // Testing
-        #[cfg(feature = "tdi")]
-        (Scheme::Tdi, Encoding::Base32Crockford) => {
-            Ok(ObAny::TdiC32(TdiC32::from_bytes_internal(key_bytes)?))
+        #[cfg(feature = "mock1")]
+        (Scheme::Mock1, Encoding::Base32Crockford) => {
+            Ok(ObAny::Mock1C32(Mock1C32::from_bytes_internal(key_bytes)?))
         }
-        #[cfg(feature = "tdi")]
-        (Scheme::Tdi, Encoding::Base32Rfc) => {
-            Ok(ObAny::TdiB32(TdiB32::from_bytes_internal(key_bytes)?))
+        #[cfg(feature = "mock1")]
+        (Scheme::Mock1, Encoding::Base32Rfc) => {
+            Ok(ObAny::Mock1B32(Mock1B32::from_bytes_internal(key_bytes)?))
         }
-        #[cfg(feature = "tdi")]
-        (Scheme::Tdi, Encoding::Base64) => {
-            Ok(ObAny::TdiB64(TdiB64::from_bytes_internal(key_bytes)?))
+        #[cfg(feature = "mock1")]
+        (Scheme::Mock1, Encoding::Base64) => {
+            Ok(ObAny::Mock1B64(Mock1B64::from_bytes_internal(key_bytes)?))
         }
-        #[cfg(feature = "tdi")]
-        (Scheme::Tdi, Encoding::Hex) => Ok(ObAny::TdiHex(TdiHex::from_bytes_internal(key_bytes)?)),
-        #[cfg(feature = "tdr")]
-        (Scheme::Tdr, Encoding::Base32Crockford) => {
-            Ok(ObAny::TdrC32(TdrC32::from_bytes_internal(key_bytes)?))
+        #[cfg(feature = "mock1")]
+        (Scheme::Mock1, Encoding::Hex) => {
+            Ok(ObAny::Mock1Hex(Mock1Hex::from_bytes_internal(key_bytes)?))
         }
-        #[cfg(feature = "tdr")]
-        (Scheme::Tdr, Encoding::Base32Rfc) => {
-            Ok(ObAny::TdrB32(TdrB32::from_bytes_internal(key_bytes)?))
+        #[cfg(feature = "mock2")]
+        (Scheme::Mock2, Encoding::Base32Crockford) => {
+            Ok(ObAny::Mock2C32(Mock2C32::from_bytes_internal(key_bytes)?))
         }
-        #[cfg(feature = "tdr")]
-        (Scheme::Tdr, Encoding::Base64) => {
-            Ok(ObAny::TdrB64(TdrB64::from_bytes_internal(key_bytes)?))
+        #[cfg(feature = "mock2")]
+        (Scheme::Mock2, Encoding::Base32Rfc) => {
+            Ok(ObAny::Mock2B32(Mock2B32::from_bytes_internal(key_bytes)?))
         }
-        #[cfg(feature = "tdr")]
-        (Scheme::Tdr, Encoding::Hex) => Ok(ObAny::TdrHex(TdrHex::from_bytes_internal(key_bytes)?)),
+        #[cfg(feature = "mock2")]
+        (Scheme::Mock2, Encoding::Base64) => {
+            Ok(ObAny::Mock2B64(Mock2B64::from_bytes_internal(key_bytes)?))
+        }
+        #[cfg(feature = "mock2")]
+        (Scheme::Mock2, Encoding::Hex) => {
+            Ok(ObAny::Mock2Hex(Mock2Hex::from_bytes_internal(key_bytes)?))
+        }
         // Legacy
         #[cfg(feature = "ob00")]
         (Scheme::Ob00, Encoding::Base32Crockford) => Ok(ObAny::Ob00Base32Crockford(
@@ -1071,10 +1085,10 @@ mod tests {
             #[cfg(feature = "apsv")]
             Scheme::Apsv,
             // Testing
-            #[cfg(feature = "tdi")]
-            Scheme::Tdi,
-            #[cfg(feature = "tdr")]
-            Scheme::Tdr,
+            #[cfg(feature = "mock1")]
+            Scheme::Mock1,
+            #[cfg(feature = "mock2")]
+            Scheme::Mock2,
             // Legacy
             #[cfg(feature = "ob00")]
             Scheme::Ob00,
@@ -1125,8 +1139,8 @@ mod tests {
 
         // Define all schemes
         let schemes = vec![
-            Scheme::Tdr,
-            Scheme::Tdi,
+            Scheme::Mock2,
+            Scheme::Mock1,
             #[cfg(feature = "ob00")]
             Scheme::Ob00,
             #[cfg(feature = "zdc")]
@@ -1186,8 +1200,8 @@ mod tests {
 
         // Define all schemes
         let schemes = vec![
-            Scheme::Tdr,
-            Scheme::Tdi,
+            Scheme::Mock2,
+            Scheme::Mock1,
             #[cfg(feature = "zdc")]
             Scheme::Zdc,
             #[cfg(feature = "adgs")]

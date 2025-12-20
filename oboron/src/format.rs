@@ -92,25 +92,25 @@ impl Format {
 
             // Testing
 
-            // tdi variants
-            #[cfg(feature = "tdi")]
-            constants::TDI_C32 => Format::new(Scheme::Tdi, Encoding::Base32Crockford),
-            #[cfg(feature = "tdi")]
-            constants::TDI_B32 => Format::new(Scheme::Tdi, Encoding::Base32Rfc),
-            #[cfg(feature = "tdi")]
-            constants::TDI_B64 => Format::new(Scheme::Tdi, Encoding::Base64),
-            #[cfg(feature = "tdi")]
-            constants::TDI_HEX => Format::new(Scheme::Tdi, Encoding::Hex),
+            // mock1 variants
+            #[cfg(feature = "mock1")]
+            constants::MOCK1_C32 => Format::new(Scheme::Mock1, Encoding::Base32Crockford),
+            #[cfg(feature = "mock1")]
+            constants::MOCK1_B32 => Format::new(Scheme::Mock1, Encoding::Base32Rfc),
+            #[cfg(feature = "mock1")]
+            constants::MOCK1_B64 => Format::new(Scheme::Mock1, Encoding::Base64),
+            #[cfg(feature = "mock1")]
+            constants::MOCK1_HEX => Format::new(Scheme::Mock1, Encoding::Hex),
 
-            // tdr variants
-            #[cfg(feature = "tdr")]
-            constants::TDR_C32 => Format::new(Scheme::Tdr, Encoding::Base32Crockford),
-            #[cfg(feature = "tdr")]
-            constants::TDR_B32 => Format::new(Scheme::Tdr, Encoding::Base32Rfc),
-            #[cfg(feature = "tdr")]
-            constants::TDR_B64 => Format::new(Scheme::Tdr, Encoding::Base64),
-            #[cfg(feature = "tdr")]
-            constants::TDR_HEX => Format::new(Scheme::Tdr, Encoding::Hex),
+            // mock2 variants
+            #[cfg(feature = "mock2")]
+            constants::MOCK2_C32 => Format::new(Scheme::Mock2, Encoding::Base32Crockford),
+            #[cfg(feature = "mock2")]
+            constants::MOCK2_B32 => Format::new(Scheme::Mock2, Encoding::Base32Rfc),
+            #[cfg(feature = "mock2")]
+            constants::MOCK2_B64 => Format::new(Scheme::Mock2, Encoding::Base64),
+            #[cfg(feature = "mock2")]
+            constants::MOCK2_HEX => Format::new(Scheme::Mock2, Encoding::Hex),
 
             // Legacy
 
@@ -169,10 +169,10 @@ mod tests {
             #[cfg(feature = "apsv")]
             Scheme::Apsv,
             // Testing
-            #[cfg(feature = "tdi")]
-            Scheme::Tdi,
-            #[cfg(feature = "tdr")]
-            Scheme::Tdr,
+            #[cfg(feature = "mock1")]
+            Scheme::Mock1,
+            #[cfg(feature = "mock2")]
+            Scheme::Mock2,
             // Legacy
             #[cfg(feature = "ob00")]
             Scheme::Ob00,
@@ -216,7 +216,7 @@ mod tests {
         assert!(Format::from_str("zdc").is_err());
         assert!(Format::from_str("zdc:").is_err());
         assert!(Format::from_str(":b64").is_err());
-        assert!(Format::from_str("tdi:invalid").is_err());
+        assert!(Format::from_str("mock1:invalid").is_err());
     }
 
     #[test]
@@ -224,14 +224,14 @@ mod tests {
         // Define test cases: (scheme, encoding, expected_string)
         #[cfg(feature = "non-crypto")]
         let mut test_cases = vec![
-            (Scheme::Tdr, Encoding::Base32Crockford, "tdr:c32"),
-            (Scheme::Tdr, Encoding::Base32Rfc, "tdr:b32"),
-            (Scheme::Tdr, Encoding::Base64, "tdr:b64"),
-            (Scheme::Tdr, Encoding::Hex, "tdr:hex"),
-            (Scheme::Tdi, Encoding::Base32Crockford, "tdi:c32"),
-            (Scheme::Tdi, Encoding::Base32Rfc, "tdi:b32"),
-            (Scheme::Tdi, Encoding::Base64, "tdi:b64"),
-            (Scheme::Tdi, Encoding::Hex, "tdi:hex"),
+            (Scheme::Mock2, Encoding::Base32Crockford, "mock2:c32"),
+            (Scheme::Mock2, Encoding::Base32Rfc, "mock2:b32"),
+            (Scheme::Mock2, Encoding::Base64, "mock2:b64"),
+            (Scheme::Mock2, Encoding::Hex, "mock2:hex"),
+            (Scheme::Mock1, Encoding::Base32Crockford, "mock1:c32"),
+            (Scheme::Mock1, Encoding::Base32Rfc, "mock1:b32"),
+            (Scheme::Mock1, Encoding::Base64, "mock1:b64"),
+            (Scheme::Mock1, Encoding::Hex, "mock1:hex"),
         ];
 
         #[cfg(feature = "ob00")]
@@ -334,7 +334,9 @@ mod tests {
     #[cfg(all(feature = "all-schemes", feature = "non-crypto"))]
     fn test_all_schemes_support_both_base32_variants() {
         // All schemes should support both Base32Rfc (b32) and Base32Crockford (c32)
-        let schemes = vec!["zdc", "upc", "adgs", "apgs", "adsv", "apsv", "tdi", "tdr"];
+        let schemes = vec![
+            "zdc", "upc", "adgs", "apgs", "adsv", "apsv", "mock1", "mock2",
+        ];
 
         for scheme_str in schemes {
             // Test Base32Crockford (c32)

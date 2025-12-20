@@ -1,5 +1,5 @@
-#![cfg(feature = "tdi")]
-//! tdi - Identity scheme (no encryption, testing only)
+#![cfg(feature = "mock1")]
+//! mock1 - Identity scheme (no encryption, testing only)
 //!
 //! This scheme performs no encryption and is available by default.
 //! It exists for testing and as a no-op baseline.
@@ -7,7 +7,7 @@
 use super::keychain::Keychain;
 use crate::Error;
 
-/// "Encrypt" plaintext bytes using identity scheme (tdi).
+/// "Encrypt" plaintext bytes using identity scheme (mock1).
 /// Returns the input unchanged (no actual encryption).
 pub fn encrypt(_keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
     if plaintext_bytes.is_empty() {
@@ -17,7 +17,7 @@ pub fn encrypt(_keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, 
     Ok(plaintext_bytes.to_vec())
 }
 
-/// "Decrypt" ciphertext bytes using identity scheme (tdi).
+/// "Decrypt" ciphertext bytes using identity scheme (mock1).
 /// Returns the input unchanged (no actual decryption).
 pub fn decrypt(_keychain: &Keychain, data: &[u8]) -> Result<Vec<u8>, Error> {
     if data.is_empty() {
@@ -32,7 +32,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_tdi_roundtrip() {
+    fn test_mock1_roundtrip() {
         let key = [0u8; 64];
         let keychain = Keychain::from_bytes(&key).unwrap();
 

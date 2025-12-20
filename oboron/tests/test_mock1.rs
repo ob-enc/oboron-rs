@@ -1,14 +1,14 @@
-//! Tests for tdi (identity scheme)
+//! Tests for mock1 (identity scheme)
 //!
-//! tdi is a non-encrypting identity scheme that's always available.
+//! mock1 is a non-encrypting identity scheme that's always available.
 //! It should be tested first since it has no crypto dependencies.
 
 use oboron::{Encoding, Format, Oboron, Scheme};
 
 #[test]
-fn test_tdi_basic_roundtrip() {
+fn test_mock1_basic_roundtrip() {
     let key = oboron::generate_key();
-    let ob = oboron::TdiC32::new(&key).unwrap();
+    let ob = oboron::Mock1C32::new(&key).unwrap();
 
     let plaintext = "hello world";
     let encd = ob.enc(plaintext).unwrap();
@@ -18,42 +18,42 @@ fn test_tdi_basic_roundtrip() {
 }
 
 #[test]
-fn test_tdi_all_encodings() {
+fn test_mock1_all_encodings() {
     let key = oboron::generate_key();
 
     // Base32Crockford (default)
-    let ob_b32 = oboron::TdiC32::new(&key).unwrap();
+    let ob_b32 = oboron::Mock1C32::new(&key).unwrap();
     let enc_b32 = ob_b32.enc("test").unwrap();
     assert_eq!(ob_b32.dec(&enc_b32).unwrap(), "test");
 
     // Base64
-    let ob_b64 = oboron::TdiB64::new(&key).unwrap();
+    let ob_b64 = oboron::Mock1B64::new(&key).unwrap();
     let enc_b64 = ob_b64.enc("test").unwrap();
     assert_eq!(ob_b64.dec(&enc_b64).unwrap(), "test");
 
     // Hex
-    let ob_hex = oboron::TdiHex::new(&key).unwrap();
+    let ob_hex = oboron::Mock1Hex::new(&key).unwrap();
     let enc_hex = ob_hex.enc("test").unwrap();
     assert_eq!(ob_hex.dec(&enc_hex).unwrap(), "test");
 }
 
 #[test]
-fn test_tdi_deterministic() {
+fn test_mock1_deterministic() {
     let key = oboron::generate_key();
-    let ob = oboron::TdiC32::new(&key).unwrap();
+    let ob = oboron::Mock1C32::new(&key).unwrap();
 
     let plaintext = "deterministic test";
     let enc1 = ob.enc(plaintext).unwrap();
     let enc2 = ob.enc(plaintext).unwrap();
 
-    // tdi should be deterministic
+    // mock1 should be deterministic
     assert_eq!(enc1, enc2);
 }
 
 #[test]
-fn test_tdi_empty_string() {
+fn test_mock1_empty_string() {
     let key = oboron::generate_key();
-    let ob = oboron::TdiC32::new(&key).unwrap();
+    let ob = oboron::Mock1C32::new(&key).unwrap();
 
     // Empty string should fail
     let result = ob.enc("");
@@ -61,9 +61,9 @@ fn test_tdi_empty_string() {
 }
 
 #[test]
-fn test_tdi_special_characters() {
+fn test_mock1_special_characters() {
     let key = oboron::generate_key();
-    let ob = oboron::TdiC32::new(&key).unwrap();
+    let ob = oboron::Mock1C32::new(&key).unwrap();
 
     let test_cases = vec![
         "Hello, World!",
@@ -82,9 +82,9 @@ fn test_tdi_special_characters() {
 }
 
 #[test]
-fn test_tdi_long_string() {
+fn test_mock1_long_string() {
     let key = oboron::generate_key();
-    let ob = oboron::TdiC32::new(&key).unwrap();
+    let ob = oboron::Mock1C32::new(&key).unwrap();
 
     // Test with a long string
     let plaintext = "a".repeat(10000);
@@ -95,8 +95,8 @@ fn test_tdi_long_string() {
 }
 
 #[test]
-fn test_tdi_keyless() {
-    let ob = oboron::TdiC32::new_keyless().unwrap();
+fn test_mock1_keyless() {
+    let ob = oboron::Mock1C32::new_keyless().unwrap();
 
     let plaintext = "hardcoded key test";
     let encd = ob.enc(plaintext).unwrap();
@@ -106,66 +106,66 @@ fn test_tdi_keyless() {
 }
 
 #[test]
-fn test_tdi_dec_strict() {
+fn test_mock1_dec_strict() {
     let key = oboron::generate_key();
-    let tdi = oboron::TdiC32::new(&key).unwrap();
+    let mock1 = oboron::Mock1C32::new(&key).unwrap();
 
     let plaintext = "strict dec test";
-    let encd = tdi.enc(plaintext).unwrap();
+    let encd = mock1.enc(plaintext).unwrap();
 
     // Strict dec should work with matching scheme
-    assert_eq!(tdi.dec_strict(&encd).unwrap(), plaintext);
+    assert_eq!(mock1.dec_strict(&encd).unwrap(), plaintext);
 }
 
 #[test]
 #[cfg(feature = "adsv")]
-fn test_tdi_cannot_dec_other_schemes_strict() {
+fn test_mock1_cannot_dec_other_schemes_strict() {
     let key = oboron::generate_key();
-    let tdi = oboron::TdiC32::new(&key).unwrap();
+    let mock1 = oboron::Mock1C32::new(&key).unwrap();
     let adsv = oboron::AdsvC32::new(&key).unwrap();
 
     let plaintext = "cross-scheme test";
     let encd_adsv = adsv.enc(plaintext).unwrap();
 
     // Strict dec should fail when scheme doesn't match
-    assert!(tdi.dec_strict(&encd_adsv).is_err());
+    assert!(mock1.dec_strict(&encd_adsv).is_err());
 
     // But regular dec (with autodetection) should work
-    assert_eq!(tdi.dec(&encd_adsv).unwrap(), plaintext);
+    assert_eq!(mock1.dec(&encd_adsv).unwrap(), plaintext);
 }
 
 #[test]
-fn test_tdi_scheme_info() {
+fn test_mock1_scheme_info() {
     let key = oboron::generate_key();
-    let ob = oboron::TdiC32::new(&key).unwrap();
+    let ob = oboron::Mock1C32::new(&key).unwrap();
 
-    assert_eq!(ob.scheme(), Scheme::Tdi);
+    assert_eq!(ob.scheme(), Scheme::Mock1);
     assert_eq!(ob.encoding(), Encoding::Base32Crockford);
     assert!(ob.scheme().is_deterministic());
 }
 
 #[test]
-fn test_tdi_format_string() {
+fn test_mock1_format_string() {
     let key = oboron::generate_key();
 
     // Test creating via format string
-    let ob = oboron::new("tdi:c32", &key).unwrap();
+    let ob = oboron::new("mock1:c32", &key).unwrap();
     let encd = ob.enc("format test").unwrap();
     let decd = ob.dec(&encd).unwrap();
     assert_eq!(decd, "format test");
 
     // Test all format strings
-    let formats = vec!["tdi:c32", "tdi:b64", "tdi:hex"];
+    let formats = vec!["mock1:c32", "mock1:b64", "mock1:hex"];
     for format_str in formats {
         let ob = oboron::new(format_str, &key).unwrap();
-        assert_eq!(ob.scheme(), Scheme::Tdi);
+        assert_eq!(ob.scheme(), Scheme::Mock1);
     }
 }
 
 #[test]
-fn test_tdi_from_bytes() {
+fn test_mock1_from_bytes() {
     let key_bytes = [0u8; 64];
-    let ob = oboron::TdiC32::from_bytes(&key_bytes).unwrap();
+    let ob = oboron::Mock1C32::from_bytes(&key_bytes).unwrap();
 
     let plaintext = "from bytes test";
     let encd = ob.enc(plaintext).unwrap();
@@ -175,9 +175,9 @@ fn test_tdi_from_bytes() {
 }
 
 #[test]
-fn test_tdi_factory_from_bytes() {
+fn test_mock1_factory_from_bytes() {
     let key_bytes = [0u8; 64];
-    let ob = oboron::from_bytes("tdi:c32", &key_bytes).unwrap();
+    let ob = oboron::from_bytes("mock1:c32", &key_bytes).unwrap();
 
     let plaintext = "factory from bytes";
     let encd = ob.enc(plaintext).unwrap();
@@ -187,23 +187,23 @@ fn test_tdi_factory_from_bytes() {
 }
 
 #[test]
-fn test_tdi_convenience_functions() {
+fn test_mock1_convenience_functions() {
     let key = oboron::generate_key();
 
     // Test enc/dec convenience functions
     let plaintext = "convenience test";
-    let encd = oboron::enc(plaintext, "tdi:c32", &key).unwrap();
-    let decd = oboron::dec(&encd, "tdi:c32", &key).unwrap();
+    let encd = oboron::enc(plaintext, "mock1:c32", &key).unwrap();
+    let decd = oboron::dec(&encd, "mock1:c32", &key).unwrap();
 
     assert_eq!(decd, plaintext);
 }
 
 #[test]
-fn test_tdi_autodec() {
+fn test_mock1_autodec() {
     let key = oboron::generate_key();
 
     let plaintext = "autodec test";
-    let encd = oboron::enc(plaintext, "tdi:c32", &key).unwrap();
+    let encd = oboron::enc(plaintext, "mock1:c32", &key).unwrap();
 
     // Autodec should work without specifying format
     let decd = oboron::autodec(&encd, &key).unwrap();
@@ -211,22 +211,22 @@ fn test_tdi_autodec() {
 }
 
 #[test]
-fn test_tdi_keyless_functions() {
+fn test_mock1_keyless_functions() {
     let plaintext = "keyless convenience";
 
-    let encd = oboron::enc_keyless(plaintext, "tdi:c32").unwrap();
-    let decd = oboron::dec_keyless(&encd, "tdi:c32").unwrap();
+    let encd = oboron::enc_keyless(plaintext, "mock1:c32").unwrap();
+    let decd = oboron::dec_keyless(&encd, "mock1:c32").unwrap();
 
     assert_eq!(decd, plaintext);
 }
 
 #[test]
-fn test_tdi_ob_any_default() {
+fn test_mock1_ob_any_default() {
     let key = oboron::generate_key();
 
-    // ObAny should default to tdi now
+    // ObAny should default to mock1 now
     let ob = oboron::ObAny::new(&key).unwrap();
-    assert_eq!(ob.scheme(), Scheme::Tdi);
+    assert_eq!(ob.scheme(), Scheme::Mock1);
 
     let plaintext = "ObAny default test";
     let encd = ob.enc(plaintext).unwrap();
@@ -236,11 +236,11 @@ fn test_tdi_ob_any_default() {
 }
 
 #[test]
-fn test_tdi_multiple_instances_same_key() {
+fn test_mock1_multiple_instances_same_key() {
     let key = oboron::generate_key();
 
-    let ob1 = oboron::TdiC32::new(&key).unwrap();
-    let ob2 = oboron::TdiC32::new(&key).unwrap();
+    let ob1 = oboron::Mock1C32::new(&key).unwrap();
+    let ob2 = oboron::Mock1C32::new(&key).unwrap();
 
     let plaintext = "multi-instance test";
     let enc1 = ob1.enc(plaintext).unwrap();
@@ -250,48 +250,48 @@ fn test_tdi_multiple_instances_same_key() {
 }
 
 #[test]
-fn test_tdi_different_keys() {
+fn test_mock1_different_keys() {
     let key1 = oboron::generate_key();
     let key2 = oboron::generate_key();
 
-    let ob1 = oboron::TdiC32::new(&key1).unwrap();
-    let ob2 = oboron::TdiC32::new(&key2).unwrap();
+    let ob1 = oboron::Mock1C32::new(&key1).unwrap();
+    let ob2 = oboron::Mock1C32::new(&key2).unwrap();
 
     let plaintext = "different keys test";
     let encd = ob1.enc(plaintext).unwrap();
 
-    // Since tdi is identity, the key doesn't matter for decoding
+    // Since mock1 is identity, the key doesn't matter for decoding
     // (though in production this would be a security issue for real crypto)
     let decd = ob2.dec(&encd).unwrap();
     assert_eq!(decd, plaintext);
 }
 
 #[test]
-fn test_tdi_invalid_hex_key() {
+fn test_mock1_invalid_hex_key() {
     // Invalid hex key (not 128 chars)
-    let result = oboron::TdiC32::new("invalid");
+    let result = oboron::Mock1C32::new("invalid");
     assert!(result.is_err());
 
     // Invalid hex characters
     let bad_key = "Z".repeat(128);
-    let result = oboron::TdiC32::new(&bad_key);
+    let result = oboron::Mock1C32::new(&bad_key);
     assert!(result.is_err());
 }
 
 #[test]
-fn test_tdi_key_getter() {
+fn test_mock1_key_getter() {
     let key_bytes = [42u8; 64];
-    let ob = oboron::TdiC32::from_bytes(&key_bytes).unwrap();
+    let ob = oboron::Mock1C32::from_bytes(&key_bytes).unwrap();
 
     assert_eq!(ob.key_bytes(), &key_bytes);
 }
 
 #[test]
-fn test_tdi_encoding_mismatch() {
+fn test_mock1_encoding_mismatch() {
     let key = oboron::generate_key();
 
-    let ob_b32 = oboron::TdiC32::new(&key).unwrap();
-    let ob_b64 = oboron::TdiB64::new(&key).unwrap();
+    let ob_b32 = oboron::Mock1C32::new(&key).unwrap();
+    let ob_b64 = oboron::Mock1B64::new(&key).unwrap();
 
     let plaintext = "encoding mismatch";
     let enc_b32 = ob_b32.enc(plaintext).unwrap();
@@ -305,41 +305,41 @@ fn test_tdi_encoding_mismatch() {
 }
 
 #[test]
-fn test_tdi_scheme_string() {
-    let scheme = Scheme::Tdi;
+fn test_mock1_scheme_string() {
+    let scheme = Scheme::Mock1;
 
-    assert_eq!(scheme.as_str(), "tdi");
-    assert_eq!(scheme.to_string(), "tdi");
+    assert_eq!(scheme.as_str(), "mock1");
+    assert_eq!(scheme.to_string(), "mock1");
 }
 
 #[test]
-fn test_tdi_parse_scheme() {
-    let scheme: Scheme = "tdi".parse().unwrap();
-    assert_eq!(scheme, Scheme::Tdi);
+fn test_mock1_parse_scheme() {
+    let scheme: Scheme = "mock1".parse().unwrap();
+    assert_eq!(scheme, Scheme::Mock1);
 
-    let scheme: Scheme = "TDI".parse().unwrap(); // case insensitive
-    assert_eq!(scheme, Scheme::Tdi);
+    let scheme: Scheme = "MOCK1".parse().unwrap(); // case insensitive
+    assert_eq!(scheme, Scheme::Mock1);
 }
 
 #[test]
-fn test_tdi_format_parsing() {
-    let format = Format::from_str("tdi:c32").unwrap();
-    assert_eq!(format.scheme(), Scheme::Tdi);
+fn test_mock1_format_parsing() {
+    let format = Format::from_str("mock1:c32").unwrap();
+    assert_eq!(format.scheme(), Scheme::Mock1);
     assert_eq!(format.encoding(), Encoding::Base32Crockford);
 
-    let format = Format::from_str("tdi:b64").unwrap();
-    assert_eq!(format.scheme(), Scheme::Tdi);
+    let format = Format::from_str("mock1:b64").unwrap();
+    assert_eq!(format.scheme(), Scheme::Mock1);
     assert_eq!(format.encoding(), Encoding::Base64);
 
-    let format = Format::from_str("tdi:hex").unwrap();
-    assert_eq!(format.scheme(), Scheme::Tdi);
+    let format = Format::from_str("mock1:hex").unwrap();
+    assert_eq!(format.scheme(), Scheme::Mock1);
     assert_eq!(format.encoding(), Encoding::Hex);
 }
 
 #[test]
-fn test_tdi_binary_data_in_string() {
+fn test_mock1_binary_data_in_string() {
     let key = oboron::generate_key();
-    let ob = oboron::TdiC32::new(&key).unwrap();
+    let ob = oboron::Mock1C32::new(&key).unwrap();
 
     // Test with string containing various byte values
     let plaintext = "Binary: \x01\x02\x03\x7F";
@@ -350,9 +350,9 @@ fn test_tdi_binary_data_in_string() {
 }
 
 #[test]
-fn test_tdi_sequential_operations() {
+fn test_mock1_sequential_operations() {
     let key = oboron::generate_key();
-    let ob = oboron::TdiC32::new(&key).unwrap();
+    let ob = oboron::Mock1C32::new(&key).unwrap();
 
     // Encode multiple values in sequence
     let values = vec!["first", "second", "third"];
@@ -370,7 +370,7 @@ fn test_tdi_sequential_operations() {
 }
 
 #[test]
-fn test_tdi_is_deterministic() {
-    // tdi should report as deterministic
-    assert!(Scheme::Tdi.is_deterministic());
+fn test_mock1_is_deterministic() {
+    // mock1 should report as deterministic
+    assert!(Scheme::Mock1.is_deterministic());
 }

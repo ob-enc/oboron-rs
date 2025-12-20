@@ -20,13 +20,13 @@ use crate::{ob_core::ObCore, Encoding, Error, Format, Oboron, Scheme};
 /// let mut ob = ObFlex::new("adsv:c32", &key)?;
 /// let obtext = ob.enc("hello")?; // adsv:c32 format
 ///
-/// // Switch to tdi scheme (format remains c32)
-/// ob.set_scheme(Scheme::Tdi)?;
-/// let obtext = ob.enc("hello")?; // tdi:c32 format
+/// // Switch to mock1 scheme (format remains c32)
+/// ob.set_scheme(Scheme::Mock1)?;
+/// let obtext = ob.enc("hello")?; // mock1:c32 format
 ///
-/// // Switch to tdr:b64 using Format instance
-/// ob.set_format(Format::new(Scheme::Tdr, Encoding::Base64))?;
-/// let obtext = ob.enc("hello")?; // tdr:b64 format
+/// // Switch to mock2:b64 using Format instance
+/// ob.set_format(Format::new(Scheme::Mock2, Encoding::Base64))?;
+/// let obtext = ob.enc("hello")?; // mock2:b64 format
 ///
 /// // Switch to adsv:hex using string constant
 /// ob.set_format(ADSV_HEX)?;
@@ -134,8 +134,8 @@ impl ObFlex {
     /// # use oboron::{ObFlex, Format, Scheme, Encoding};
     /// # let key = oboron::generate_key();
     /// let mut ob = ObFlex::new("adsv:c32", &key)?;
-    /// ob.set_format("tdi:b64")?; // switch using string
-    /// ob.set_format(Format::new(Scheme::Tdr, Encoding::Hex))?; // switch using Format
+    /// ob.set_format("mock1:b64")?; // switch using string
+    /// ob.set_format(Format::new(Scheme::Mock2, Encoding::Hex))?; // switch using Format
     /// # }
     /// # Ok(())
     /// # }
@@ -156,7 +156,7 @@ impl ObFlex {
     /// # use oboron::{ObFlex, Scheme};
     /// # let key = oboron::generate_key();
     /// let mut ob = ObFlex::new("adsv:c32", &key)? ;
-    /// ob.set_scheme(Scheme::Tdi)?; // switch to tdi, keeping c32 encoding
+    /// ob.set_scheme(Scheme::Mock1)?; // switch to mock1, keeping c32 encoding
     /// # }
     /// # Ok(())
     /// # }

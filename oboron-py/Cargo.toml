@@ -8,7 +8,7 @@ name = "_oboron"
 crate-type = ["cdylib"]
 
 [features]
-default = ["all-schemes", "legacy", "experimental", "keyless", "legacy", "tdi"]
+default = ["all-schemes", "legacy", "experimental", "keyless", "legacy", "mock1"]
 
 ob00 = ["oboron/ob00"]
 zdc = ["oboron/zdc"]
@@ -17,8 +17,8 @@ adsv = ["oboron/adsv"]
 upc = ["oboron/upc"]
 apgs = ["oboron/apgs"]
 apsv = ["oboron/apsv"]
-tdi = ["oboron/tdi"]
-tdr = ["oboron/tdr"]
+mock1 = ["oboron/mock1"]
+mock2 = ["oboron/mock2"]
 all-schemes = ["zdc", "upc", "adgs", "apgs", "adsv", "apsv"]
 
 keyless = ["oboron/keyless"]

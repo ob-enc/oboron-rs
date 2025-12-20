@@ -19,10 +19,10 @@ use crate::encrypt_upc;
 #[cfg(feature = "zdc")]
 use crate::encrypt_zdc;
 // Testing
-#[cfg(feature = "tdi")]
-use crate::encrypt_tdi;
-#[cfg(feature = "tdr")]
-use crate::encrypt_tdr;
+#[cfg(feature = "mock1")]
+use crate::encrypt_mock1;
+#[cfg(feature = "mock2")]
+use crate::encrypt_mock2;
 
 /// Generic encoding pipeline for all schemes (except ob00).
 ///
@@ -55,10 +55,10 @@ pub(crate) fn enc_to_format(
         #[cfg(feature = "apsv")]
         Scheme::Apsv => encrypt_apsv(keychain, plaintext.as_bytes())?,
         // Testing
-        #[cfg(feature = "tdi")]
-        Scheme::Tdi => encrypt_tdi(keychain, plaintext.as_bytes())?,
-        #[cfg(feature = "tdr")]
-        Scheme::Tdr => encrypt_tdr(keychain, plaintext.as_bytes())?,
+        #[cfg(feature = "mock1")]
+        Scheme::Mock1 => encrypt_mock1(keychain, plaintext.as_bytes())?,
+        #[cfg(feature = "mock2")]
+        Scheme::Mock2 => encrypt_mock2(keychain, plaintext.as_bytes())?,
         // Legacy - ob00 does not use this call path
         #[cfg(feature = "ob00")]
         Scheme::Ob00 => unreachable!("called generic dec function for ob00"),
@@ -95,8 +95,8 @@ mod tests {
     use crate::{Keychain, Scheme};
 
     #[test]
-    fn test_enc_pipeline_tdi() {
-        let format = Format::new(Scheme::Tdi, Encoding::Base32Crockford);
+    fn test_enc_pipeline_mock1() {
+        let format = Format::new(Scheme::Mock1, Encoding::Base32Crockford);
 
         // Create a real keychain for testing
         let key = [0u8; 64];

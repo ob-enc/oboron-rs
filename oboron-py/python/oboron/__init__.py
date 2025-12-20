@@ -111,17 +111,17 @@ OboronBase.register(_oboron.ApsvB32)
 OboronBase.register(_oboron.ApsvB64)
 OboronBase.register(_oboron.ApsvHex)
 
-# Tdr variants (testing)
-OboronBase.register(_oboron.TdrC32)
-OboronBase.register(_oboron.TdrB32)
-OboronBase.register(_oboron.TdrB64)
-OboronBase.register(_oboron.TdrHex)
+# Mock2 variants (testing)
+OboronBase.register(_oboron.Mock2C32)
+OboronBase.register(_oboron.Mock2B32)
+OboronBase.register(_oboron.Mock2B64)
+OboronBase.register(_oboron.Mock2Hex)
 
-# Tdi variants (testing)
-OboronBase.register(_oboron.TdiC32)
-OboronBase.register(_oboron.TdiB32)
-OboronBase.register(_oboron.TdiB64)
-OboronBase.register(_oboron.TdiHex)
+# Mock1 variants (testing)
+OboronBase.register(_oboron.Mock1C32)
+OboronBase.register(_oboron.Mock1B32)
+OboronBase.register(_oboron.Mock1B64)
+OboronBase.register(_oboron.Mock1Hex)
 
 # Flexible interface
 OboronBase.register(_oboron.Ob)
@@ -175,17 +175,17 @@ ApsvB32 = _oboron.ApsvB32
 ApsvB64 = _oboron.ApsvB64
 ApsvHex = _oboron.ApsvHex
 
-# Tdi variants (testing)
-TdiC32 = _oboron.TdiC32
-TdiB32 = _oboron.TdiB32
-TdiB64 = _oboron.TdiB64
-TdiHex = _oboron.TdiHex
+# Mock1 variants (testing)
+Mock1C32 = _oboron.Mock1C32
+Mock1B32 = _oboron.Mock1B32
+Mock1B64 = _oboron.Mock1B64
+Mock1Hex = _oboron.Mock1Hex
 
-# Tdr variants (testing)
-TdrC32 = _oboron.TdrC32
-TdrB32 = _oboron.TdrB32
-TdrB64 = _oboron.TdrB64
-TdrHex = _oboron.TdrHex
+# Mock2 variants (testing)
+Mock2C32 = _oboron.Mock2C32
+Mock2B32 = _oboron.Mock2B32
+Mock2B64 = _oboron.Mock2B64
+Mock2Hex = _oboron.Mock2Hex
 
 # Utility functions
 generate_key = _oboron.generate_key
@@ -253,17 +253,17 @@ __all__ = [
     'ApsvB64',
     'ApsvHex',
 
-    # Tdi (testing)
-    'TdiC32',
-    'TdiB32',
-    'TdiB64',
-    'TdiHex',
+    # Mock1 (testing)
+    'Mock1C32',
+    'Mock1B32',
+    'Mock1B64',
+    'Mock1Hex',
 
-    # Tdr (testing)
-    'TdrC32',
-    'TdrB32',
-    'TdrB64',
-    'TdrHex',
+    # Mock2 (testing)
+    'Mock2C32',
+    'Mock2B32',
+    'Mock2B64',
+    'Mock2Hex',
 
     # Format constants module
     'formats',

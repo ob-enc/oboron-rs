@@ -40,11 +40,11 @@ use crate::{ob_core::ObCore, Encoding, Error, Format, Oboron, Scheme};
 ///
 /// // Runtime format, immutable (flexible, still efficient)
 /// let ob = Ob::new("adsv:b64", &key)?;
-/// // assert!(ob.set_format("tdi:64").is_err()); // <- doesn't work! - format is locked
+/// // assert!(ob.set_format("mock1:64").is_err()); // <- doesn't work! - format is locked
 ///
 /// // Runtime format, mutable (maximum flexibility)
 /// let mut flex = ObFlex::new("adsv:b64", &key)?;
-/// flex.set_format("tdi:hex")?; // <- Can change format
+/// flex.set_format("mock1:hex")?; // <- Can change format
 /// # }
 /// # Ok(())
 /// # }

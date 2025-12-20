@@ -46,8 +46,8 @@ apgs = ["aes-gcm-siv"]
 adsv = ["aes-siv"]
 apsv = ["aes-siv"]
 # Testing only
-tdi = []  # identity, non-crypto
-tdr = []  # string reversal, non-crypto
+mock1 = []  # identity, non-crypto
+mock2 = []  # string reversal, non-crypto
 # Legacy
 ob00 = ["aes", "cipher", "cbc"]  # backward compatibility
 
@@ -63,7 +63,7 @@ ob0x = ["zdc"] # insecure, not authenticated
 ob1x = []  # insecure, authenticated
 ob2x = ["upc"]  # secure, not authenticated
 ob3x = ["adgs", "apgs", "adsv", "apsv"]  # secure, authenticated
-ob7x = ["tdi", "tdr"]  # testing
+ob7x = ["mock1", "mock2"]  # testing
 insecure-schemes = ["ob0x", "ob1x"]
 secure-schemes = ["ob2x", "ob3x"]
 authenticated-schemes = ["ob3x"]
@@ -73,7 +73,7 @@ all-schemes = ["ob0x", "ob1x", "ob2x", "ob3x"]
 
 # Special purpose groups
 # ======================
-non-crypto = ["tdi", "tdr"]
+non-crypto = ["mock1", "mock2"]
 legacy = ["ob00"]  # For backward compatibility only -> use zdc instead
 
 [dependencies]
@@ -119,8 +119,8 @@ sha2 = "0.10"
 jsonwebtoken = "9.3"
 
 [[test]]
-name = "test_tdi"
-path = "tests/test_tdi.rs"
+name = "test_mock1"
+path = "tests/test_mock1.rs"
 harness = true
 
 [[test]]

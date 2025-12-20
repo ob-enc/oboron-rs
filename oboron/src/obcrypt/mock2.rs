@@ -1,5 +1,5 @@
-#![cfg(feature = "tdr")]
-//! tdr - Reverse scheme (reverses plaintext, no encryption)
+#![cfg(feature = "mock2")]
+//! mock2 - Reverse scheme (reverses plaintext, no encryption)
 //!  
 //! This scheme is always available and requires no crypto dependencies.
 //!  It simply reverses the plaintext bytes.  Useful for testing cross-scheme
@@ -8,7 +8,7 @@
 use super::keychain::Keychain;
 use crate::Error;
 
-/// "Encrypt" plaintext bytes using reverse scheme (tdr).   
+/// "Encrypt" plaintext bytes using reverse scheme (mock2).   
 /// Simply returns the reversed bytes (no actual encryption).
 pub fn encrypt(_keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
     if plaintext_bytes.is_empty() {
@@ -19,7 +19,7 @@ pub fn encrypt(_keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, 
     Ok(plaintext_bytes.iter().rev().copied().collect())
 }
 
-/// "Decrypt" ciphertext bytes using reverse scheme (tdr).
+/// "Decrypt" ciphertext bytes using reverse scheme (mock2).
 /// Simply reverses the bytes back (no actual decryption).
 pub fn decrypt(_keychain: &Keychain, data: &[u8]) -> Result<Vec<u8>, Error> {
     if data.is_empty() {
@@ -35,7 +35,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_tdr_roundtrip() {
+    fn test_mock2_roundtrip() {
         let key = [0u8; 64];
         let keychain = Keychain::from_bytes(&key).unwrap();
 
@@ -50,7 +50,7 @@ mod tests {
     }
 
     #[test]
-    fn test_tdr_utf8() {
+    fn test_mock2_utf8() {
         let key = [0u8; 64];
         let keychain = Keychain::from_bytes(&key).unwrap();
 
@@ -62,7 +62,7 @@ mod tests {
     }
 
     #[test]
-    fn test_tdr_empty() {
+    fn test_mock2_empty() {
         let key = [0u8; 64];
         let keychain = Keychain::from_bytes(&key).unwrap();
 
