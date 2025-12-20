@@ -109,13 +109,22 @@ macro_rules! impl_cipher_class {
             /// The scheme used by this instance.
             #[getter]
             fn scheme(&self) -> String {
-                format!("{:?}", self.inner.scheme())
+                self.inner.scheme().as_str().to_string()
             }
 
             /// The encoding format used by this instance.
             #[getter]
             fn encoding(&self) -> String {
-                format!("{:?}", self.inner.encoding())
+                self.inner.encoding().as_short_str().to_string()
+            }
+
+            /// Get the current format string.
+            ///
+            /// Returns:
+            ///     Format string like "ob01:c32", "ob01:b32", "ob31:b64", etc.
+            #[getter]
+            fn format(&self) -> String {
+                format!("{}", self.inner.format())
             }
         }
     };
@@ -506,7 +515,7 @@ impl Ob {
         } else {
             self.inner.dec(obtext)
         };
-        result.map_err(|e| PyValueError::new_err(format!("Decoding failed: {}", e)))
+        result.map_err(|e| PyValueError::new_err(format!("Dec operation failed: {}", e)))
     }
 
     /// Change the format (scheme + encoding).   
@@ -530,21 +539,10 @@ impl Ob {
     /// Raises:
     ///     ValueError: If scheme is invalid.
     fn set_scheme(&mut self, scheme: &str) -> PyResult<()> {
-        use ::oboron::Scheme;
-        let scheme = match scheme {
-            "Ob71" => Scheme::Ob71,
-            "Ob70" => Scheme::Ob70,
-            "Ob00" => Scheme::Ob00,
-            "Ob01" => Scheme::Ob01,
-            "Ob21p" => Scheme::Ob21p,
-            "Ob31" => Scheme::Ob31,
-            "Ob31p" => Scheme::Ob31p,
-            "Ob32" => Scheme::Ob32,
-            "Ob32p" => Scheme::Ob32p,
-            _ => return Err(PyValueError::new_err(format!("Unknown scheme: {}", scheme))),
-        };
+        let scheme_enum = ::oboron::Scheme::from_str(scheme)
+            .map_err(|e| PyValueError::new_err(format!("Invalid scheme: {}", e)))?;
         self.inner
-            .set_scheme(scheme)
+            .set_scheme(scheme_enum)
             .map_err(|e| PyValueError::new_err(format!("Failed to set scheme: {}", e)))
     }
 
@@ -557,21 +555,10 @@ impl Ob {
     /// Raises:
     ///     ValueError: If encoding is invalid.
     fn set_encoding(&mut self, encoding: &str) -> PyResult<()> {
-        use ::oboron::Encoding;
-        let encoding = match encoding {
-            "Base32Crockford" | "base32crockford" | "c32" => Encoding::Base32Crockford,
-            "Base32Rfc" | "base32rfc" | "b32" => Encoding::Base32Rfc,
-            "Base64" | "base64" | "b64" => Encoding::Base64,
-            "Hex" | "hex" => Encoding::Hex,
-            _ => {
-                return Err(PyValueError::new_err(format!(
-                    "Unknown encoding: {}",
-                    encoding
-                )))
-            }
-        };
+        let encoding_enum = ::oboron::Encoding::from_str(encoding)
+            .map_err(|e| PyValueError::new_err(format!("Invalid encoding: {}", e)))?;
         self.inner
-            .set_encoding(encoding)
+            .set_encoding(encoding_enum)
             .map_err(|e| PyValueError::new_err(format!("Failed to set encoding: {}", e)))
     }
 
@@ -579,6 +566,7 @@ impl Ob {
     ///
     /// Returns:
     ///     Format string like "ob01:c32", "ob01:b32", "ob31:b64", etc.
+    #[getter]
     fn format(&self) -> String {
         format!("{}", self.inner.format())
     }
@@ -598,13 +586,13 @@ impl Ob {
     /// The scheme used by this instance.  
     #[getter]
     fn scheme(&self) -> String {
-        format!("{:?}", self.inner.scheme())
+        self.inner.scheme().as_str().to_string()
     }
 
     /// The encoding format used by this instance.
     #[getter]
     fn encoding(&self) -> String {
-        format!("{:?}", self.inner.encoding())
+        self.inner.encoding().as_short_str().to_string()
     }
 }
 
@@ -856,6 +844,9 @@ fn autodec_keyless(obtext: &str) -> PyResult<String> {
 /// Python module for Oboron (internal Rust extension)
 #[pymodule]
 fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
+    // Add version from Cargo.toml
+    m.add("__version__", env!("CARGO_PKG_VERSION"))?;
+
     // Main flexible interface
     m.add_class::<Ob>()?;
 
