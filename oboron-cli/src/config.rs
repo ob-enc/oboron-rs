@@ -1,6 +1,6 @@
 use anyhow::{Context, Result};
 use data_encoding::BASE64URL_NOPAD;
-use oboron::generate_key_base64;
+use oboron::generate_key;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
@@ -187,7 +187,7 @@ pub fn init_command(name: &str) -> Result<()> {
     }
 
     // Generate random base64 key
-    let key = generate_key_base64();
+    let key = generate_key();
 
     let profile = KeyProfile { key: key.clone() };
 
