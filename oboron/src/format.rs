@@ -102,15 +102,15 @@ impl Format {
             #[cfg(feature = "tdi")]
             constants::TDI_HEX => Format::new(Scheme::Tdi, Encoding::Hex),
 
-            // ob71 variants
-            #[cfg(feature = "ob71")]
-            constants::OB71_C32 => Format::new(Scheme::Ob71, Encoding::Base32Crockford),
-            #[cfg(feature = "ob71")]
-            constants::OB71_B32 => Format::new(Scheme::Ob71, Encoding::Base32Rfc),
-            #[cfg(feature = "ob71")]
-            constants::OB71_B64 => Format::new(Scheme::Ob71, Encoding::Base64),
-            #[cfg(feature = "ob71")]
-            constants::OB71_HEX => Format::new(Scheme::Ob71, Encoding::Hex),
+            // tdr variants
+            #[cfg(feature = "tdr")]
+            constants::TDR_C32 => Format::new(Scheme::Tdr, Encoding::Base32Crockford),
+            #[cfg(feature = "tdr")]
+            constants::TDR_B32 => Format::new(Scheme::Tdr, Encoding::Base32Rfc),
+            #[cfg(feature = "tdr")]
+            constants::TDR_B64 => Format::new(Scheme::Tdr, Encoding::Base64),
+            #[cfg(feature = "tdr")]
+            constants::TDR_HEX => Format::new(Scheme::Tdr, Encoding::Hex),
 
             // Legacy
 
@@ -171,8 +171,8 @@ mod tests {
             // Testing
             #[cfg(feature = "tdi")]
             Scheme::Tdi,
-            #[cfg(feature = "ob71")]
-            Scheme::Ob71,
+            #[cfg(feature = "tdr")]
+            Scheme::Tdr,
             // Legacy
             #[cfg(feature = "ob00")]
             Scheme::Ob00,
@@ -224,10 +224,10 @@ mod tests {
         // Define test cases: (scheme, encoding, expected_string)
         #[cfg(feature = "non-crypto")]
         let mut test_cases = vec![
-            (Scheme::Ob71, Encoding::Base32Crockford, "ob71:c32"),
-            (Scheme::Ob71, Encoding::Base32Rfc, "ob71:b32"),
-            (Scheme::Ob71, Encoding::Base64, "ob71:b64"),
-            (Scheme::Ob71, Encoding::Hex, "ob71:hex"),
+            (Scheme::Tdr, Encoding::Base32Crockford, "tdr:c32"),
+            (Scheme::Tdr, Encoding::Base32Rfc, "tdr:b32"),
+            (Scheme::Tdr, Encoding::Base64, "tdr:b64"),
+            (Scheme::Tdr, Encoding::Hex, "tdr:hex"),
             (Scheme::Tdi, Encoding::Base32Crockford, "tdi:c32"),
             (Scheme::Tdi, Encoding::Base32Rfc, "tdi:b32"),
             (Scheme::Tdi, Encoding::Base64, "tdi:b64"),
@@ -334,7 +334,7 @@ mod tests {
     #[cfg(all(feature = "all-schemes", feature = "non-crypto"))]
     fn test_all_schemes_support_both_base32_variants() {
         // All schemes should support both Base32Rfc (b32) and Base32Crockford (c32)
-        let schemes = vec!["zdc", "upc", "adgs", "apgs", "adsv", "apsv", "tdi", "ob71"];
+        let schemes = vec!["zdc", "upc", "adgs", "apgs", "adsv", "apsv", "tdi", "tdr"];
 
         for scheme_str in schemes {
             // Test Base32Crockford (c32)

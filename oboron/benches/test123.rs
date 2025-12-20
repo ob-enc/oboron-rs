@@ -1,25 +1,25 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use oboron::{
-    AdgsC32, AdsvC32, ApgsC32, ApsvC32, Ob00, Ob71, ObMulti, Oboron, TdiC32, UpcC32, ZdcC32,
+    AdgsC32, AdsvC32, ApgsC32, ApsvC32, Ob00, ObMulti, Oboron, TdiC32, TdrC32, UpcC32, ZdcC32,
 };
 
 // Baseline benchmarks - no crypto, just encoding overhead
 fn benchmark_enc_tdr(c: &mut Criterion) {
-    let ob = Ob71::new_keyless().unwrap();
-    c.bench_function("test123/Ob71/enc", |b| {
+    let ob = TdrC32::new_keyless().unwrap();
+    c.bench_function("test123/TdrC32/enc", |b| {
         b.iter(|| ob.enc(black_box("test123")).unwrap());
     });
 }
 
 fn benchmark_enc_tdi(c: &mut Criterion) {
     let ob = TdiC32::new_keyless().unwrap();
-    c.bench_function("test123/Ob71/enc", |b| {
+    c.bench_function("test123/TdrC32/enc", |b| {
         b.iter(|| ob.enc(black_box("test123")).unwrap());
     });
 }
 
 fn benchmark_dec_tdr(c: &mut Criterion) {
-    let ob = Ob71::new_keyless().unwrap();
+    let ob = TdrC32::new_keyless().unwrap();
     let ot = ob.enc("test123").unwrap();
     c.bench_function("dec_tdr", |b| {
         b.iter(|| ob.dec(black_box(&ot)).unwrap());

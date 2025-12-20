@@ -52,9 +52,9 @@ pub const APSV_BYTE: u8 = 0x65;
 #[cfg(feature = "tdi")]
 pub const TDI_BYTE: u8 = 0xE0;
 // String-reversal (no encryption)
-// ob71: tier=7 (111), scheme=1 (0001), probabilistic=0 -> 11100010 = 0xE2 (decimal: 226)
-#[cfg(feature = "ob71")]
-pub const OB71_BYTE: u8 = 0xE2;
+// tdr: tier=7 (111), scheme=1 (0001), probabilistic=0 -> 11100010 = 0xE2 (decimal: 226)
+#[cfg(feature = "tdr")]
+pub const TDR_BYTE: u8 = 0xE2;
 
 // For efficient resolution in decode logic, list all scheme bytes of reversed schemes
 const fn get_reversed_schemes() -> &'static [u8] {
@@ -87,8 +87,8 @@ pub const APSV_C32: &str = "apsv:c32";
 // Tier ob7x - Testing
 #[cfg(feature = "tdi")]
 pub const TDI_C32: &str = "tdi:c32";
-#[cfg(feature = "ob71")]
-pub const OB71_C32: &str = "ob71:c32";
+#[cfg(feature = "tdr")]
+pub const TDR_C32: &str = "tdr:c32";
 // Legacy
 #[cfg(feature = "ob00")]
 pub const OB00_C32: &str = "ob00:c32";
@@ -109,8 +109,8 @@ pub const APSV_B32: &str = "apsv:b32";
 // Tier ob7x - Testing
 #[cfg(feature = "tdi")]
 pub const TDI_B32: &str = "tdi:b32";
-#[cfg(feature = "ob71")]
-pub const OB71_B32: &str = "ob71:b32";
+#[cfg(feature = "tdr")]
+pub const TDR_B32: &str = "tdr:b32";
 // Legacy
 #[cfg(feature = "ob00")]
 pub const OB00_B32: &str = "ob00:b32";
@@ -131,8 +131,8 @@ pub const APSV_B64: &str = "apsv:b64";
 // Tier ob7x - Testing
 #[cfg(feature = "tdi")]
 pub const TDI_B64: &str = "tdi:b64";
-#[cfg(feature = "ob71")]
-pub const OB71_B64: &str = "ob71:b64";
+#[cfg(feature = "tdr")]
+pub const TDR_B64: &str = "tdr:b64";
 // Legacy
 #[cfg(feature = "ob00")]
 pub const OB00_B64: &str = "ob00:b64";
@@ -153,8 +153,8 @@ pub const APSV_HEX: &str = "apsv:hex";
 // Tier ob7x - Testing
 #[cfg(feature = "tdi")]
 pub const TDI_HEX: &str = "tdi:hex";
-#[cfg(feature = "ob71")]
-pub const OB71_HEX: &str = "ob71:hex";
+#[cfg(feature = "tdr")]
+pub const TDR_HEX: &str = "tdr:hex";
 // Legacy
 #[cfg(feature = "ob00")]
 pub const OB00_HEX: &str = "ob00:hex";

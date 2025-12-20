@@ -317,27 +317,27 @@ impl_cipher_class!(
     "Tdi cipher with Hex encoding (Identity scheme, for testing)"
 );
 
-// Ob71 variants
+// Tdr variants
 // -------------
 impl_cipher_class!(
-    Ob71Base32Crockford,
-    ::oboron::Ob71Base32Crockford,
-    "Ob71 cipher with Base32Crockford encoding (Reverse scheme, for testing)"
+    TdrC32,
+    ::oboron::TdrC32,
+    "Tdr cipher with Base32Crockford encoding (Reverse scheme, for testing)"
 );
 impl_cipher_class!(
-    Ob71Base32Rfc,
-    ::oboron::Ob71Base32Rfc,
-    "Ob71 cipher with Base32Rfc encoding (Reverse scheme, for testing)"
+    TdrB32,
+    ::oboron::TdrB32,
+    "Tdr cipher with Base32Rfc encoding (Reverse scheme, for testing)"
 );
 impl_cipher_class!(
-    Ob71Base64,
-    ::oboron::Ob71Base64,
-    "Ob71 cipher with Base64 encoding (Reverse scheme, for testing)"
+    TdrB64,
+    ::oboron::TdrB64,
+    "Tdr cipher with Base64 encoding (Reverse scheme, for testing)"
 );
 impl_cipher_class!(
-    Ob71Hex,
-    ::oboron::Ob71Hex,
-    "Ob71 cipher with Hex encoding (Reverse scheme, for testing)"
+    TdrHex,
+    ::oboron::TdrHex,
+    "Tdr cipher with Hex encoding (Reverse scheme, for testing)"
 );
 
 // Ob00 - LEGACY variants
@@ -862,11 +862,11 @@ fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m.add_class::<ApsvHex>()?;
     }
 
-    // Ob71 variants
-    m.add_class::<Ob71Base32Crockford>()?;
-    m.add_class::<Ob71Base32Rfc>()?;
-    m.add_class::<Ob71Base64>()?;
-    m.add_class::<Ob71Hex>()?;
+    // Tdr variants
+    m.add_class::<TdrC32>()?;
+    m.add_class::<TdrB32>()?;
+    m.add_class::<TdrB64>()?;
+    m.add_class::<TdrHex>()?;
 
     // Tdi variants
     m.add_class::<TdiC32>()?;

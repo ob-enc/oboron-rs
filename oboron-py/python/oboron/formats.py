@@ -1,7 +1,7 @@
 """Format string constants for Oboron. 
 
 All constants follow the pattern:  {SCHEME}_{ENCODING}
-- Schemes: ZDC, UPC, ADGS, APGS, ADSV, APSV, TDI, OB71, OB00 (legacy)
+- Schemes: ZDC, UPC, ADGS, APGS, ADSV, APSV, TDI, TDR, OB00 (legacy)
 - Encodings: C32 (Base32Crockford), B32 (Base32Rfc), B64 (Base64), HEX
 
 Example:
@@ -54,10 +54,10 @@ TDI_B32: str = "tdi:b32"
 TDI_B64: str = "tdi:b64"
 TDI_HEX: str = "tdi:hex"
 
-OB71_C32: str = "ob71:c32"
-OB71_B32: str = "ob71:b32"
-OB71_B64: str = "ob71:b64"
-OB71_HEX: str = "ob71:hex"
+TDR_C32: str = "tdr:c32"
+TDR_B32: str = "tdr:b32"
+TDR_B64: str = "tdr:b64"
+TDR_HEX: str = "tdr:hex"
 
 # Legacy (ob00 - deprecated, use zdc instead)
 OB00_C32: str = "ob00:c32"
@@ -80,7 +80,7 @@ __all__ = [
     "APSV_C32", "APSV_B32", "APSV_B64", "APSV_HEX",
     # Testing
     "TDI_C32", "TDI_B32", "TDI_B64", "TDI_HEX",
-    "OB71_C32", "OB71_B32", "OB71_B64", "OB71_HEX",
+    "TDR_C32", "TDR_B32", "TDR_B64", "TDR_HEX",
     # Legacy
     "OB00_C32", "OB00_B32", "OB00_B64", "OB00_HEX",
 ]

@@ -20,8 +20,8 @@ pub enum Scheme {
     // Testing
     #[cfg(feature = "tdi")]
     Tdi,
-    #[cfg(feature = "ob71")]
-    Ob71,
+    #[cfg(feature = "tdr")]
+    Tdr,
     // Legacy
     #[cfg(feature = "ob00")]
     Ob00,
@@ -46,8 +46,8 @@ impl Scheme {
             // Testing
             #[cfg(feature = "tdi")]
             Scheme::Tdi => "tdi",
-            #[cfg(feature = "ob71")]
-            Scheme::Ob71 => "ob71",
+            #[cfg(feature = "tdr")]
+            Scheme::Tdr => "tdr",
             // Legacy
             #[cfg(feature = "ob00")]
             Scheme::Ob00 => "ob00",
@@ -77,8 +77,8 @@ impl Scheme {
             // Testing
             #[cfg(feature = "tdi")]
             Scheme::Tdi => true,
-            #[cfg(feature = "ob71")]
-            Scheme::Ob71 => true,
+            #[cfg(feature = "tdr")]
+            Scheme::Tdr => true,
             // Legacy
             #[cfg(feature = "ob00")]
             Scheme::Ob00 => true,
@@ -113,8 +113,8 @@ impl Scheme {
             // Testing
             #[cfg(feature = "tdi")]
             Scheme::Tdi => constants::TDI_BYTE,
-            #[cfg(feature = "ob71")]
-            Scheme::Ob71 => constants::OB71_BYTE,
+            #[cfg(feature = "tdr")]
+            Scheme::Tdr => constants::TDR_BYTE,
             // Legacy
             #[cfg(feature = "ob00")]
             Scheme::Ob00 => unreachable!("ob00 does not use a scheme byte"),
@@ -142,8 +142,8 @@ impl std::str::FromStr for Scheme {
             // Testing
             #[cfg(feature = "tdi")]
             "tdi" => Ok(Scheme::Tdi),
-            #[cfg(feature = "ob71")]
-            "ob71" => Ok(Scheme::Ob71),
+            #[cfg(feature = "tdr")]
+            "tdr" => Ok(Scheme::Tdr),
             // Legacy
             #[cfg(feature = "ob00")]
             "ob00" => Ok(Scheme::Ob00),

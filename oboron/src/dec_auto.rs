@@ -18,10 +18,10 @@ use crate::{constants::UPC_BYTE, decrypt_upc};
 #[cfg(feature = "zdc")]
 use crate::{constants::ZDC_BYTE, decrypt_zdc};
 // Testing
-#[cfg(feature = "ob71")]
-use crate::{constants::OB71_BYTE, decrypt_ob71};
 #[cfg(feature = "tdi")]
 use crate::{constants::TDI_BYTE, decrypt_tdi};
+#[cfg(feature = "tdr")]
+use crate::{constants::TDR_BYTE, decrypt_tdr};
 // Legacy
 #[cfg(feature = "ob00")]
 use crate::legacy;
@@ -82,8 +82,8 @@ pub fn dec_any_scheme(
         // Testing
         #[cfg(feature = "tdi")]
         TDI_BYTE => decrypt_tdi(keychain, &buffer)?,
-        #[cfg(feature = "ob71")]
-        OB71_BYTE => decrypt_ob71(keychain, &buffer)?,
+        #[cfg(feature = "tdr")]
+        TDR_BYTE => decrypt_tdr(keychain, &buffer)?,
         _ => {
             // Unknown scheme byte - try ob00 as fallback
             #[cfg(feature = "ob00")]

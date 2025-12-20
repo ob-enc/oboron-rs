@@ -49,7 +49,7 @@ hex/bytes key interfaces and the keyless testing feature.
 
 Testing schemes (non-cryptographic):
 - `tdi` - identity transformation (ciphertext = plaintext bytes)
-- `ob71` - uses reversed `tdi` ciphertext
+- `tdr` - uses reversed `tdi` ciphertext
 
 ### Unsafe Performance Enhancement
 
@@ -94,7 +94,7 @@ By tier:
 - `ob3x` - Includes all authenticated schemes (= `authenticated-schemes`)
 
 Testing:
-- `non-crypto` - Includes `tdi` and `ob71`
+- `non-crypto` - Includes `tdi` and `tdr`
 
 Comprehensive group
 - `all-schemes` - Includes all schemes (same as default)

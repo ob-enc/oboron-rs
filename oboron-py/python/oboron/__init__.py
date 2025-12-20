@@ -111,11 +111,11 @@ OboronBase.register(_oboron.ApsvB32)
 OboronBase.register(_oboron.ApsvB64)
 OboronBase.register(_oboron.ApsvHex)
 
-# Ob71 variants (testing)
-OboronBase.register(_oboron.Ob71Base32Crockford)
-OboronBase.register(_oboron.Ob71Base32Rfc)
-OboronBase.register(_oboron.Ob71Base64)
-OboronBase.register(_oboron.Ob71Hex)
+# Tdr variants (testing)
+OboronBase.register(_oboron.TdrC32)
+OboronBase.register(_oboron.TdrB32)
+OboronBase.register(_oboron.TdrB64)
+OboronBase.register(_oboron.TdrHex)
 
 # Tdi variants (testing)
 OboronBase.register(_oboron.TdiC32)
@@ -181,11 +181,11 @@ TdiB32 = _oboron.TdiB32
 TdiB64 = _oboron.TdiB64
 TdiHex = _oboron.TdiHex
 
-# Ob71 variants (testing)
-Ob71Base32Crockford = _oboron.Ob71Base32Crockford
-Ob71Base32Rfc = _oboron.Ob71Base32Rfc
-Ob71Base64 = _oboron.Ob71Base64
-Ob71Hex = _oboron.Ob71Hex
+# Tdr variants (testing)
+TdrC32 = _oboron.TdrC32
+TdrB32 = _oboron.TdrB32
+TdrB64 = _oboron.TdrB64
+TdrHex = _oboron.TdrHex
 
 # Utility functions
 generate_key = _oboron.generate_key
@@ -259,11 +259,11 @@ __all__ = [
     'TdiB64',
     'TdiHex',
 
-    # Ob71 (testing)
-    'Ob71Base32Crockford',
-    'Ob71Base32Rfc',
-    'Ob71Base64',
-    'Ob71Hex',
+    # Tdr (testing)
+    'TdrC32',
+    'TdrB32',
+    'TdrB64',
+    'TdrHex',
 
     # Format constants module
     'formats',

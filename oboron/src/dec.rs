@@ -20,10 +20,10 @@ use crate::decrypt_upc;
 #[cfg(feature = "zdc")]
 use crate::decrypt_zdc;
 // Testing
-#[cfg(feature = "ob71")]
-use crate::decrypt_ob71;
 #[cfg(feature = "tdi")]
 use crate::decrypt_tdi;
+#[cfg(feature = "tdr")]
+use crate::decrypt_tdr;
 
 /// Generic decoding pipeline for all schemes (except ob00).
 ///
@@ -78,8 +78,8 @@ pub(crate) fn dec_from_format(
         // Testing
         #[cfg(feature = "tdi")]
         Scheme::Tdi => decrypt_tdi(keychain, &buffer)?,
-        #[cfg(feature = "ob71")]
-        Scheme::Ob71 => decrypt_ob71(keychain, &buffer)?,
+        #[cfg(feature = "tdr")]
+        Scheme::Tdr => decrypt_tdr(keychain, &buffer)?,
         // Legacy - ob00 does not use this call path
         #[cfg(feature = "ob00")]
         Scheme::Ob00 => unreachable!("called generic dec function for ob00"),

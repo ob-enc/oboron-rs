@@ -19,10 +19,10 @@ use crate::encrypt_upc;
 #[cfg(feature = "zdc")]
 use crate::encrypt_zdc;
 // Testing
-#[cfg(feature = "ob71")]
-use crate::encrypt_ob71;
 #[cfg(feature = "tdi")]
 use crate::encrypt_tdi;
+#[cfg(feature = "tdr")]
+use crate::encrypt_tdr;
 
 /// Generic encoding pipeline for all schemes (except ob00).
 ///
@@ -57,8 +57,8 @@ pub(crate) fn enc_to_format(
         // Testing
         #[cfg(feature = "tdi")]
         Scheme::Tdi => encrypt_tdi(keychain, plaintext.as_bytes())?,
-        #[cfg(feature = "ob71")]
-        Scheme::Ob71 => encrypt_ob71(keychain, plaintext.as_bytes())?,
+        #[cfg(feature = "tdr")]
+        Scheme::Tdr => encrypt_tdr(keychain, plaintext.as_bytes())?,
         // Legacy - ob00 does not use this call path
         #[cfg(feature = "ob00")]
         Scheme::Ob00 => unreachable!("called generic dec function for ob00"),

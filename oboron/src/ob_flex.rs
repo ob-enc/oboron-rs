@@ -24,9 +24,9 @@ use crate::{ob_core::ObCore, Encoding, Error, Format, Oboron, Scheme};
 /// ob.set_scheme(Scheme::Tdi)?;
 /// let obtext = ob.enc("hello")?; // tdi:c32 format
 ///
-/// // Switch to ob71:b64 using Format instance
-/// ob.set_format(Format::new(Scheme::Ob71, Encoding::Base64))?;
-/// let obtext = ob.enc("hello")?; // ob71:b64 format
+/// // Switch to tdr:b64 using Format instance
+/// ob.set_format(Format::new(Scheme::Tdr, Encoding::Base64))?;
+/// let obtext = ob.enc("hello")?; // tdr:b64 format
 ///
 /// // Switch to adsv:hex using string constant
 /// ob.set_format(ADSV_HEX)?;
@@ -135,7 +135,7 @@ impl ObFlex {
     /// # let key = oboron::generate_key();
     /// let mut ob = ObFlex::new("adsv:c32", &key)?;
     /// ob.set_format("tdi:b64")?; // switch using string
-    /// ob.set_format(Format::new(Scheme::Ob71, Encoding::Hex))?; // switch using Format
+    /// ob.set_format(Format::new(Scheme::Tdr, Encoding::Hex))?; // switch using Format
     /// # }
     /// # Ok(())
     /// # }

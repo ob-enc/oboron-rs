@@ -904,7 +904,7 @@ Available constants:
 - `APGS_C32`, `APGS_B32`, `APGS_B64`, `APGS_HEX`
 - `ADSV_C32`, `ADSV_B32`, `ADSV_B64`, `ADSV_HEX`
 - `APSV_C32`, `APSV_B32`, `APSV_B64`, `APSV_HEX`
-- Testing:  `TDI_*`, `OB71_*`
+- Testing:  `TDI_*`, `TDR_*`
 - Legacy: `OB00_*`
 
 ### Advanced: `Format` Objects

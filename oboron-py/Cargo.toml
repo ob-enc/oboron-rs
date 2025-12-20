@@ -18,7 +18,7 @@ upc = ["oboron/upc"]
 apgs = ["oboron/apgs"]
 apsv = ["oboron/apsv"]
 tdi = ["oboron/tdi"]
-ob71 = ["oboron/ob71"]
+tdr = ["oboron/tdr"]
 all-schemes = ["zdc", "upc", "adgs", "apgs", "adsv", "apsv"]
 
 keyless = ["oboron/keyless"]

@@ -60,10 +60,10 @@ struct SchemeFlags {
     #[arg(long, alias = "70", hide = true)]
     tdi: bool,
 
-    /// Use ob71 scheme (testing, string reversal)
-    #[cfg(feature = "ob71")]
+    /// Use tdr scheme (testing, string reversal)
+    #[cfg(feature = "tdr")]
     #[arg(long, alias = "71", hide = true)]
-    ob71: bool,
+    tdr: bool,
 }
 
 impl SchemeFlags {
@@ -76,7 +76,7 @@ impl SchemeFlags {
         feature = "adsv",
         feature = "apsv",
         feature = "tdi",
-        feature = "ob71",
+        feature = "tdr",
         feature = "ob00"
     ))]
     fn to_scheme(&self) -> Result<Option<Scheme>> {
@@ -123,10 +123,10 @@ impl SchemeFlags {
             count += 1;
             scheme = Some(Scheme::Tdi);
         }
-        #[cfg(feature = "ob71")]
-        if self.ob71 {
+        #[cfg(feature = "tdr")]
+        if self.tdr {
             count += 1;
-            scheme = Some(Scheme::Ob71);
+            scheme = Some(Scheme::Tdr);
         }
 
         if count > 1 {
@@ -145,7 +145,7 @@ impl SchemeFlags {
         feature = "adsv",
         feature = "apsv",
         feature = "tdi",
-        feature = "ob71",
+        feature = "tdr",
         feature = "ob00"
     ))]
     fn is_set(&self) -> bool {
@@ -181,8 +181,8 @@ impl SchemeFlags {
         if self.tdi {
             return true;
         }
-        #[cfg(feature = "ob71")]
-        if self.ob71 {
+        #[cfg(feature = "tdr")]
+        if self.tdr {
             return true;
         }
         return false;
@@ -823,7 +823,7 @@ mod tests {
             feature = "adsv",
             feature = "apsv",
             feature = "tdi",
-            feature = "ob71",
+            feature = "tdr",
             feature = "ob00"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
@@ -844,8 +844,8 @@ mod tests {
             apsv: false,
             #[cfg(feature = "tdi")]
             tdi: true,
-            #[cfg(feature = "ob71")]
-            ob71: false,
+            #[cfg(feature = "tdr")]
+            tdr: false,
         };
         assert_eq!(flags.to_scheme().unwrap(), Some(Scheme::Tdi));
     }
@@ -862,7 +862,7 @@ mod tests {
             feature = "adsv",
             feature = "apsv",
             feature = "tdi",
-            feature = "ob71",
+            feature = "tdr",
             feature = "ob00"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
@@ -883,8 +883,8 @@ mod tests {
             apsv: true,
             #[cfg(feature = "tdi")]
             tdi: false,
-            #[cfg(feature = "ob71")]
-            ob71: false,
+            #[cfg(feature = "tdr")]
+            tdr: false,
         };
         assert!(flags.to_scheme().is_err());
     }
@@ -899,7 +899,7 @@ mod tests {
             feature = "adsv",
             feature = "apsv",
             feature = "tdi",
-            feature = "ob71",
+            feature = "tdr",
             feature = "ob00"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
@@ -920,8 +920,8 @@ mod tests {
             apsv: false,
             #[cfg(feature = "tdi")]
             tdi: false,
-            #[cfg(feature = "ob71")]
-            ob71: false,
+            #[cfg(feature = "tdr")]
+            tdr: false,
         };
         assert_eq!(flags.to_scheme().unwrap(), None);
     }
@@ -965,7 +965,7 @@ mod tests {
             feature = "adsv",
             feature = "apsv",
             feature = "tdi",
-            feature = "ob71",
+            feature = "tdr",
             feature = "ob00"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
@@ -986,8 +986,8 @@ mod tests {
             apsv: false,
             #[cfg(feature = "tdi")]
             tdi: false,
-            #[cfg(feature = "ob71")]
-            ob71: false,
+            #[cfg(feature = "tdr")]
+            tdr: false,
         };
         let encoding_flags = EncodingFlags {
             c32: false,
@@ -1019,7 +1019,7 @@ mod tests {
             feature = "adsv",
             feature = "apsv",
             feature = "tdi",
-            feature = "ob71",
+            feature = "tdr",
             feature = "ob00"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
@@ -1040,8 +1040,8 @@ mod tests {
             apsv: false,
             #[cfg(feature = "tdi")]
             tdi: true,
-            #[cfg(feature = "ob71")]
-            ob71: false,
+            #[cfg(feature = "tdr")]
+            tdr: false,
         };
         let encoding_flags = EncodingFlags {
             c32: false,
@@ -1074,7 +1074,7 @@ mod tests {
             feature = "adsv",
             feature = "apsv",
             feature = "tdi",
-            feature = "ob71",
+            feature = "tdr",
             feature = "ob00"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
@@ -1095,8 +1095,8 @@ mod tests {
             apsv: false,
             #[cfg(feature = "tdi")]
             tdi: false,
-            #[cfg(feature = "ob71")]
-            ob71: false,
+            #[cfg(feature = "tdr")]
+            tdr: false,
         };
         let encoding_flags = EncodingFlags {
             c32: false,
@@ -1124,7 +1124,7 @@ mod tests {
     fn test_format_spec_from_flags() {
         let config = Config {
             profile: "test".to_string(),
-            scheme: "ob71".to_string(),
+            scheme: "tdr".to_string(),
             encoding: "b32".to_string(),
         };
 
@@ -1136,7 +1136,7 @@ mod tests {
             feature = "adsv",
             feature = "apsv",
             feature = "tdi",
-            feature = "ob71",
+            feature = "tdr",
             feature = "ob00"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
@@ -1157,8 +1157,8 @@ mod tests {
             apsv: false,
             #[cfg(feature = "tdi")]
             tdi: true,
-            #[cfg(feature = "ob71")]
-            ob71: false,
+            #[cfg(feature = "tdr")]
+            tdr: false,
         };
         let encoding_flags = EncodingFlags {
             c32: false,
@@ -1191,7 +1191,7 @@ mod tests {
             feature = "adsv",
             feature = "apsv",
             feature = "tdi",
-            feature = "ob71",
+            feature = "tdr",
             feature = "ob00"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
@@ -1212,8 +1212,8 @@ mod tests {
             apsv: false,
             #[cfg(feature = "tdi")]
             tdi: false,
-            #[cfg(feature = "ob71")]
-            ob71: false,
+            #[cfg(feature = "tdr")]
+            tdr: false,
         };
         let encoding_flags = EncodingFlags {
             c32: false,

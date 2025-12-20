@@ -283,10 +283,10 @@ pub(crate) use obcrypt::{decrypt_upc, encrypt_upc};
 pub(crate) use obcrypt::{decrypt_zdc, encrypt_zdc};
 
 // Testing
-#[cfg(feature = "ob71")]
-pub(crate) use obcrypt::{decrypt_ob71, encrypt_ob71};
 #[cfg(feature = "tdi")]
 pub(crate) use obcrypt::{decrypt_tdi, encrypt_tdi};
+#[cfg(feature = "tdr")]
+pub(crate) use obcrypt::{decrypt_tdr, encrypt_tdr};
 
 pub use keygen::generate_key;
 #[cfg(feature = "bytes-keys")]
@@ -326,10 +326,10 @@ pub use constants::{UPC_B32, UPC_B64, UPC_C32, UPC_HEX};
 #[cfg(feature = "zdc")]
 pub use constants::{ZDC_B32, ZDC_B64, ZDC_C32, ZDC_HEX};
 // Testing
-#[cfg(feature = "ob71")]
-pub use constants::{OB71_B32, OB71_B64, OB71_C32, OB71_HEX};
 #[cfg(feature = "tdi")]
 pub use constants::{TDI_B32, TDI_B64, TDI_C32, TDI_HEX};
+#[cfg(feature = "tdr")]
+pub use constants::{TDR_B32, TDR_B64, TDR_C32, TDR_HEX};
 // Legacy
 #[cfg(feature = "ob00")]
 pub use constants::{OB00_B32, OB00_B64, OB00_C32, OB00_HEX};
@@ -348,10 +348,10 @@ pub use oboron::{UpcB32, UpcB64, UpcC32, UpcHex};
 #[cfg(feature = "zdc")]
 pub use oboron::{ZdcB32, ZdcB64, ZdcC32, ZdcHex};
 // Testing
-#[cfg(feature = "ob71")]
-pub use oboron::{Ob71Base32Crockford, Ob71Base32Rfc, Ob71Base64, Ob71Hex};
 #[cfg(feature = "tdi")]
 pub use oboron::{TdiB32, TdiB64, TdiC32, TdiHex};
+#[cfg(feature = "tdr")]
+pub use oboron::{TdrB32, TdrB64, TdrC32, TdrHex};
 // Legacy
 #[cfg(feature = "ob00")]
 pub use legacy::{Ob00Base32Crockford, Ob00Base32Rfc, Ob00Base64, Ob00Hex};
@@ -372,8 +372,8 @@ pub type Apsv = ApsvC32;
 // Testing
 #[cfg(feature = "tdi")]
 pub type Tdi = TdiC32;
-#[cfg(feature = "ob71")]
-pub type Ob71 = Ob71Base32Crockford;
+#[cfg(feature = "tdr")]
+pub type Tdr = TdrC32;
 // Legacy
 #[cfg(feature = "ob00")]
 pub type Ob00 = Ob00Base32Rfc;
