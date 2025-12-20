@@ -1,7 +1,7 @@
 """Format string constants for Oboron. 
 
 All constants follow the pattern:  {SCHEME}_{ENCODING}
-- Schemes: ZDC, OB21P, OB31, OB31P, OB32, OB32P, OB70, OB71, OB00 (legacy)
+- Schemes: ZDC, UPC, OB31, OB31P, OB32, OB32P, OB70, OB71, OB00 (legacy)
 - Encodings: C32 (Base32Crockford), B32 (Base32Rfc), B64 (Base64), HEX
 
 Example:
@@ -18,11 +18,11 @@ ZDC_B32: str = "zdc:b32"
 ZDC_B64: str = "zdc:b64"
 ZDC_HEX: str = "zdc:hex"
 
-# ob21p - AES-CBC (probabilistic, secure but not authenticated)
-OB21P_C32: str = "ob21p:c32"
-OB21P_B32: str = "ob21p:b32"
-OB21P_B64: str = "ob21p:b64"
-OB21P_HEX: str = "ob21p:hex"
+# upc - AES-CBC (probabilistic, secure but not authenticated)
+UPC_C32: str = "upc:c32"
+UPC_B32: str = "upc:b32"
+UPC_B64: str = "upc:b64"
+UPC_HEX: str = "upc:hex"
 
 # ob31 - AES-GCM-SIV (deterministic, secure and authenticated)
 OB31_C32: str = "ob31:c32"
@@ -68,8 +68,8 @@ OB00_HEX: str = "ob00:hex"
 __all__ = [
     # zdc
     "ZDC_C32", "ZDC_B32", "ZDC_B64", "ZDC_HEX",
-    # ob21p
-    "OB21P_C32", "OB21P_B32", "OB21P_B64", "OB21P_HEX",
+    # upc
+    "UPC_C32", "UPC_B32", "UPC_B64", "UPC_HEX",
     # ob31
     "OB31_C32", "OB31_B32", "OB31_B64", "OB31_HEX",
     # ob31p

@@ -38,12 +38,12 @@ but note that pre-1.0 releases may not adhere strictly to all guidelines.
     - "sv": AES-SIV
   - other tiers use a single letter for a 3 letters total
   - renamed schemes:
+    - ob01  -> zdc
+    - ob21p -> upc
     - ob31  -> adgs
     - ob31p -> apgs
     - ob32  -> adsv
     - ob32p -> apsv
-    - ob01  -> zdc
-    - ob21p -> upc
     - ob70  -> tdi
     - ob71  -> tdr
   - ob00 remains unchanged (legacy format)

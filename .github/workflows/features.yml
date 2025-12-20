@@ -17,7 +17,7 @@ jobs:
         feature:
           - ob00
           - zdc
-          - ob21p
+          - upc
           - ob31
           - ob31p
           - ob32
@@ -83,7 +83,7 @@ jobs:
           - name: "deterministic only"
             features: "zdc,ob31,ob32"
           - name: "probabilistic only"
-            features: "ob21p,ob31p,ob32p"
+            features: "upc,ob31p,ob32p"
           - name: "modern schemes"
             features: "ob31,ob32"
           - name: "ob32 only"

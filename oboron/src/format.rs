@@ -45,14 +45,14 @@ impl Format {
             #[cfg(feature = "zdc")]
             constants::ZDC_HEX => Format::new(Scheme::Zdc, Encoding::Hex),
 
-            #[cfg(feature = "ob21p")]
-            constants::OB21P_C32 => Format::new(Scheme::Ob21p, Encoding::Base32Crockford),
-            #[cfg(feature = "ob21p")]
-            constants::OB21P_B32 => Format::new(Scheme::Ob21p, Encoding::Base32Rfc),
-            #[cfg(feature = "ob21p")]
-            constants::OB21P_B64 => Format::new(Scheme::Ob21p, Encoding::Base64),
-            #[cfg(feature = "ob21p")]
-            constants::OB21P_HEX => Format::new(Scheme::Ob21p, Encoding::Hex),
+            #[cfg(feature = "upc")]
+            constants::UPC_C32 => Format::new(Scheme::Upc, Encoding::Base32Crockford),
+            #[cfg(feature = "upc")]
+            constants::UPC_B32 => Format::new(Scheme::Upc, Encoding::Base32Rfc),
+            #[cfg(feature = "upc")]
+            constants::UPC_B64 => Format::new(Scheme::Upc, Encoding::Base64),
+            #[cfg(feature = "upc")]
+            constants::UPC_HEX => Format::new(Scheme::Upc, Encoding::Hex),
 
             #[cfg(feature = "ob31")]
             constants::OB31_C32 => Format::new(Scheme::Ob31, Encoding::Base32Crockford),
@@ -158,8 +158,8 @@ mod tests {
         let schemes = vec![
             #[cfg(feature = "zdc")]
             Scheme::Zdc,
-            #[cfg(feature = "ob21p")]
-            Scheme::Ob21p,
+            #[cfg(feature = "upc")]
+            Scheme::Upc,
             #[cfg(feature = "ob31")]
             Scheme::Ob31,
             #[cfg(feature = "ob31p")]
@@ -250,12 +250,12 @@ mod tests {
             (Scheme::Zdc, Encoding::Hex, "zdc:hex"),
         ]);
 
-        #[cfg(feature = "ob21p")]
+        #[cfg(feature = "upc")]
         test_cases.extend(vec![
-            (Scheme::Ob21p, Encoding::Base32Crockford, "ob21p:c32"),
-            (Scheme::Ob21p, Encoding::Base32Rfc, "ob21p:b32"),
-            (Scheme::Ob21p, Encoding::Base64, "ob21p:b64"),
-            (Scheme::Ob21p, Encoding::Hex, "ob21p:hex"),
+            (Scheme::Upc, Encoding::Base32Crockford, "upc:c32"),
+            (Scheme::Upc, Encoding::Base32Rfc, "upc:b32"),
+            (Scheme::Upc, Encoding::Base64, "upc:b64"),
+            (Scheme::Upc, Encoding::Hex, "upc:hex"),
         ]);
 
         #[cfg(feature = "ob31")]
@@ -335,7 +335,7 @@ mod tests {
     fn test_all_schemes_support_both_base32_variants() {
         // All schemes should support both Base32Rfc (b32) and Base32Crockford (c32)
         let schemes = vec![
-            "zdc", "ob21p", "ob31", "ob31p", "ob32", "ob32p", "ob70", "ob71",
+            "zdc", "upc", "ob31", "ob31p", "ob32", "ob32p", "ob70", "ob71",
         ];
 
         for scheme_str in schemes {

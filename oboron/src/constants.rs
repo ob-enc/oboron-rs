@@ -23,9 +23,9 @@ pub const ZDC_BYTE: u8 = 0x02;
 
 // Tier ob2x - Secure, non-authenticated
 // -------------------------------------
-// ob21p: tier=2 (010), scheme=2 (0001), probabilistic=1 -> 01000011 = 0x23 (decimal: 35)
-#[cfg(feature = "ob21p")]
-pub const OB21P_BYTE: u8 = 0x23;
+// upc: tier=2 (010), scheme=2 (0001), probabilistic=1 -> 01000011 = 0x23 (decimal: 35)
+#[cfg(feature = "upc")]
+pub const UPC_BYTE: u8 = 0x23;
 
 // Tier ob3x - Secure, authenticated
 // ---------------------------------
@@ -58,13 +58,13 @@ pub const OB71_BYTE: u8 = 0xE2;
 
 // For efficient resolution in decode logic, list all scheme bytes of reversed schemes
 const fn get_reversed_schemes() -> &'static [u8] {
-    #[cfg(all(feature = "zdc", feature = "ob21p"))]
-    return &[ZDC_BYTE, OB21P_BYTE];
-    #[cfg(all(feature = "zdc", not(feature = "ob21p")))]
+    #[cfg(all(feature = "zdc", feature = "upc"))]
+    return &[ZDC_BYTE, UPC_BYTE];
+    #[cfg(all(feature = "zdc", not(feature = "upc")))]
     return &[ZDC_BYTE];
-    #[cfg(all(not(feature = "zdc"), feature = "ob21p"))]
-    return &[OB21P_BYTE];
-    #[cfg(all(not(feature = "zdc"), not(feature = "ob21p")))]
+    #[cfg(all(not(feature = "zdc"), feature = "upc"))]
+    return &[UPC_BYTE];
+    #[cfg(all(not(feature = "zdc"), not(feature = "upc")))]
     return &[];
 }
 pub const REVERSED_SCHEME_BYTES: &[u8] = get_reversed_schemes();
@@ -74,8 +74,8 @@ pub const REVERSED_SCHEME_BYTES: &[u8] = get_reversed_schemes();
 // c32 - Base32Crockford encoding
 #[cfg(feature = "zdc")]
 pub const ZDC_C32: &str = "zdc:c32";
-#[cfg(feature = "ob21p")]
-pub const OB21P_C32: &str = "ob21p:c32";
+#[cfg(feature = "upc")]
+pub const UPC_C32: &str = "upc:c32";
 #[cfg(feature = "ob31")]
 pub const OB31_C32: &str = "ob31:c32";
 #[cfg(feature = "ob31p")]
@@ -96,8 +96,8 @@ pub const OB00_C32: &str = "ob00:c32";
 // b32 - Base32Rfc encoding
 #[cfg(feature = "zdc")]
 pub const ZDC_B32: &str = "zdc:b32";
-#[cfg(feature = "ob21p")]
-pub const OB21P_B32: &str = "ob21p:b32";
+#[cfg(feature = "upc")]
+pub const UPC_B32: &str = "upc:b32";
 #[cfg(feature = "ob31")]
 pub const OB31_B32: &str = "ob31:b32";
 #[cfg(feature = "ob31p")]
@@ -118,8 +118,8 @@ pub const OB00_B32: &str = "ob00:b32";
 // b64 - Base64 encoding
 #[cfg(feature = "zdc")]
 pub const ZDC_B64: &str = "zdc:b64";
-#[cfg(feature = "ob21p")]
-pub const OB21P_B64: &str = "ob21p:b64";
+#[cfg(feature = "upc")]
+pub const UPC_B64: &str = "upc:b64";
 #[cfg(feature = "ob31")]
 pub const OB31_B64: &str = "ob31:b64";
 #[cfg(feature = "ob31p")]
@@ -140,8 +140,8 @@ pub const OB00_B64: &str = "ob00:b64";
 // hex - Hex encoding
 #[cfg(feature = "zdc")]
 pub const ZDC_HEX: &str = "zdc:hex";
-#[cfg(feature = "ob21p")]
-pub const OB21P_HEX: &str = "ob21p:hex";
+#[cfg(feature = "upc")]
+pub const UPC_HEX: &str = "upc:hex";
 #[cfg(feature = "ob31")]
 pub const OB31_HEX: &str = "ob31:hex";
 #[cfg(feature = "ob31p")]

@@ -130,7 +130,7 @@ macro_rules! impl_cipher_class {
     };
 }
 
-// ZdcC32 variants
+// Zdc variants
 // -------------
 #[cfg(feature = "zdc")]
 impl_cipher_class!(
@@ -157,37 +157,31 @@ impl_cipher_class!(
     "Zdc cipher with Hex encoding (AES-CBC, deterministic)"
 );
 
-// Ob21p variants
+// Upc variants
 // --------------
-#[cfg(feature = "ob21p")]
+#[cfg(feature = "upc")]
 impl_cipher_class!(
-    Ob21pBase32Crockford,
-    ::oboron::Ob21pBase32Crockford,
-    "Ob21p cipher with Base32Crockford encoding (Probabilistic AES-CBC)"
+    UpcC32,
+    ::oboron::UpcC32,
+    "Upc cipher with Base32Crockford encoding (Probabilistic AES-CBC)"
 );
-#[cfg(feature = "ob21p")]
+#[cfg(feature = "upc")]
 impl_cipher_class!(
-    Ob21pBase32Rfc,
-    ::oboron::Ob21pBase32Rfc,
-    "Ob21p cipher with Base32Rfc encoding (Probabilistic AES-CBC)"
+    UpcB32,
+    ::oboron::UpcB32,
+    "Upc cipher with Base32Rfc encoding (Probabilistic AES-CBC)"
 );
-#[cfg(feature = "ob21p")]
+#[cfg(feature = "upc")]
 impl_cipher_class!(
-    Ob21p,
-    ::oboron::Ob21p,
-    "Ob21p cipher with default Base32Crockford encoding (Probabilistic AES-CBC)"
+    UpcB64,
+    ::oboron::UpcB64,
+    "Upc cipher with Base64 encoding (Probabilistic AES-CBC)"
 );
-#[cfg(feature = "ob21p")]
+#[cfg(feature = "upc")]
 impl_cipher_class!(
-    Ob21pBase64,
-    ::oboron::Ob21pBase64,
-    "Ob21p cipher with Base64 encoding (Probabilistic AES-CBC)"
-);
-#[cfg(feature = "ob21p")]
-impl_cipher_class!(
-    Ob21pHex,
-    ::oboron::Ob21pHex,
-    "Ob21p cipher with Hex encoding (Probabilistic AES-CBC)"
+    UpcHex,
+    ::oboron::UpcHex,
+    "Upc cipher with Hex encoding (Probabilistic AES-CBC)"
 );
 
 // Ob31 variants
@@ -203,12 +197,6 @@ impl_cipher_class!(
     Ob31Base32Rfc,
     ::oboron::Ob31Base32Rfc,
     "Ob31 cipher with Base32Rfc encoding (AES-GCM-SIV, deterministic)"
-);
-#[cfg(feature = "ob31")]
-impl_cipher_class!(
-    Ob31,
-    ::oboron::Ob31,
-    "Ob31 cipher with default Base32Crockford encoding (AES-GCM-SIV, deterministic)"
 );
 #[cfg(feature = "ob31")]
 impl_cipher_class!(
@@ -239,12 +227,6 @@ impl_cipher_class!(
 );
 #[cfg(feature = "ob31p")]
 impl_cipher_class!(
-    Ob31p,
-    ::oboron::Ob31p,
-    "Ob31p cipher with default Base32Crockford encoding (Probabilistic AES-GCM-SIV)"
-);
-#[cfg(feature = "ob31p")]
-impl_cipher_class!(
     Ob31pBase64,
     ::oboron::Ob31pBase64,
     "Ob31p cipher with Base64 encoding (Probabilistic AES-GCM-SIV)"
@@ -269,12 +251,6 @@ impl_cipher_class!(
     Ob32Base32Rfc,
     ::oboron::Ob32Base32Rfc,
     "Ob32 cipher with Base32Rfc encoding (AES-SIV, deterministic, nonce-misuse resistant)"
-);
-#[cfg(feature = "ob32")]
-impl_cipher_class!(
-    Ob32,
-    ::oboron::Ob32,
-    "Ob32 cipher with default Base32Crockford encoding (AES-SIV, deterministic, nonce-misuse resistant)"
 );
 #[cfg(feature = "ob32")]
 impl_cipher_class!(
@@ -305,12 +281,6 @@ impl_cipher_class!(
 );
 #[cfg(feature = "ob32p")]
 impl_cipher_class!(
-    Ob32p,
-    ::oboron::Ob32p,
-    "Ob32p cipher with default Base32Crockford encoding (Probabilistic AES-SIV)"
-);
-#[cfg(feature = "ob32p")]
-impl_cipher_class!(
     Ob32pBase64,
     ::oboron::Ob32pBase64,
     "Ob32p cipher with Base64 encoding (Probabilistic AES-SIV)"
@@ -337,11 +307,6 @@ impl_cipher_class!(
     "Ob70 cipher with Base32Rfc encoding (Identity scheme, for testing)"
 );
 impl_cipher_class!(
-    Ob70,
-    ::oboron::Ob70,
-    "Ob70 cipher with default Base32Crockford encoding (Identity scheme, for testing)"
-);
-impl_cipher_class!(
     Ob70Base64,
     ::oboron::Ob70Base64,
     "Ob70 cipher with Base64 encoding (Identity scheme, for testing)"
@@ -363,11 +328,6 @@ impl_cipher_class!(
     Ob71Base32Rfc,
     ::oboron::Ob71Base32Rfc,
     "Ob71 cipher with Base32Rfc encoding (Reverse scheme, for testing)"
-);
-impl_cipher_class!(
-    Ob71,
-    ::oboron::Ob71,
-    "Ob71 cipher with default Base32Crockford encoding (Reverse scheme, for testing)"
 );
 impl_cipher_class!(
     Ob71Base64,
@@ -857,13 +817,13 @@ fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m.add_class::<ZdcHex>()?;
     }
 
-    // Ob21p variants
-    #[cfg(feature = "ob21p")]
+    // Upc variants
+    #[cfg(feature = "upc")]
     {
-        m.add_class::<Ob21pBase32Crockford>()?;
-        m.add_class::<Ob21pBase32Rfc>()?;
-        m.add_class::<Ob21pBase64>()?;
-        m.add_class::<Ob21pHex>()?;
+        m.add_class::<UpcC32>()?;
+        m.add_class::<UpcB32>()?;
+        m.add_class::<UpcB64>()?;
+        m.add_class::<UpcHex>()?;
     }
 
     // Ob31 variants

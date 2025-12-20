@@ -1,7 +1,7 @@
-#[cfg(feature = "ob21p")]
-use oboron::Ob21p;
 #[cfg(feature = "ob31")]
 use oboron::Ob31;
+#[cfg(feature = "upc")]
+use oboron::UpcC32;
 #[cfg(feature = "zdc")]
 use oboron::ZdcC32;
 use oboron::{ObMulti, Oboron};
@@ -67,15 +67,15 @@ fn test_ob31_deterministic() {
 }
 
 #[test]
-#[cfg(feature = "ob21p")]
-fn test_ob21p_probabilistic() {
+#[cfg(feature = "upc")]
+fn test_upc_probabilistic() {
     let original = "probabilistic test";
-    let ob = Ob21p::new_keyless().unwrap();
+    let ob = UpcC32::new_keyless().unwrap();
 
     let ot1 = ob.enc(original).unwrap();
     let ot2 = ob.enc(original).unwrap();
 
-    // ob21p is probabilistic - same input produces different output
+    // upc is probabilistic - same input produces different output
     assert_ne!(ot1, ot2);
 
     let pt21 = ob.dec_strict(&ot1).unwrap();
@@ -95,11 +95,11 @@ fn test_autodetect_all_formats() {
         let pt2 = ob.autodec(&ot).unwrap();
         assert_eq!(original, pt2, "Failed for format zdc");
     }
-    #[cfg(feature = "ob21p")]
+    #[cfg(feature = "upc")]
     {
-        let ot = ob.enc(original, "ob21p:c32").unwrap();
+        let ot = ob.enc(original, "upc:c32").unwrap();
         let pt2 = ob.autodec(&ot).unwrap();
-        assert_eq!(original, pt2, "Failed for format ob21p");
+        assert_eq!(original, pt2, "Failed for format upc");
     }
     #[cfg(feature = "ob31")]
     {

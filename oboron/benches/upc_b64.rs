@@ -1,5 +1,5 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use oboron::{Ob21pBase32Rfc, Oboron};
+use oboron::{Oboron, UpcB64};
 use serde::Deserialize;
 use std::fs;
 use std::path::PathBuf;
@@ -28,39 +28,39 @@ struct PrecomputeSpec {
 
 fn load_benchmark_specs() -> Vec<BenchmarkSpec> {
     let possible_paths = vec![
-        PathBuf::from("benches/benchmarks_ob21p_b32.jsonl"),
-        PathBuf::from("oboron/benches/benchmarks_ob21p_b32.jsonl"),
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("benches/benchmarks_ob21p_b32.jsonl"),
+        PathBuf::from("benches/benchmarks_upc_b64.jsonl"),
+        PathBuf::from("oboron/benches/benchmarks_upc_b64.jsonl"),
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("benches/benchmarks_upc_b64.jsonl"),
     ];
 
     for path in &possible_paths {
         if path.exists() {
-            eprintln!("Found ob21p:b32 benchmarks at: {:?}", path);
+            eprintln!("Found upc_b64 benchmarks at: {:?}", path);
             let data = fs::read_to_string(path).expect("Failed to read benchmarks");
             let specs: Vec<BenchmarkSpec> = data
                 .lines()
                 .filter(|line| !line.trim().is_empty())
                 .map(|line| serde_json::from_str(line).expect("Failed to parse"))
                 .collect();
-            eprintln!("Loaded {} ob21p:b32 benchmark specifications", specs.len());
+            eprintln!("Loaded {} upc_b64 benchmark specifications", specs.len());
             return specs;
         }
     }
 
-    eprintln!("Warning: benchmarks_ob21p_b32.jsonl not found");
+    eprintln!("Warning: benchmarks_upc_b64.jsonl not found");
     vec![]
 }
 
-fn run_ob21p_b32_benchmarks(c: &mut Criterion) {
+fn run_upc_b64_benchmarks(c: &mut Criterion) {
     let specs = load_benchmark_specs();
 
     if specs.is_empty() {
-        eprintln!("No ob21p:b32 specs loaded");
+        eprintln!("No upc_b64 specs loaded");
         return;
     }
 
     // Create ob once, OUTSIDE the timed loop
-    let ob = Ob21pBase32Rfc::new_keyless().unwrap();
+    let ob = UpcB64::new_keyless().unwrap();
 
     let mut bench_count = 0;
     for spec in specs {
@@ -103,8 +103,8 @@ fn run_ob21p_b32_benchmarks(c: &mut Criterion) {
             }
         }
     }
-    eprintln!("Registered {} ob21p:b32 benchmarks", bench_count);
+    eprintln!("Registered {} upc_b64 benchmarks", bench_count);
 }
 
-criterion_group!(benches, run_ob21p_b32_benchmarks);
+criterion_group!(benches, run_upc_b64_benchmarks);
 criterion_main!(benches);

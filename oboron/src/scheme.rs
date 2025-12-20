@@ -7,8 +7,8 @@ use crate::{constants, error::Error};
 pub enum Scheme {
     #[cfg(feature = "zdc")]
     Zdc,
-    #[cfg(feature = "ob21p")]
-    Ob21p,
+    #[cfg(feature = "upc")]
+    Upc,
     #[cfg(feature = "ob31")]
     Ob31,
     #[cfg(feature = "ob31p")]
@@ -33,8 +33,8 @@ impl Scheme {
         match self {
             #[cfg(feature = "zdc")]
             Scheme::Zdc => "zdc",
-            #[cfg(feature = "ob21p")]
-            Scheme::Ob21p => "ob21p",
+            #[cfg(feature = "upc")]
+            Scheme::Upc => "upc",
             #[cfg(feature = "ob31")]
             Scheme::Ob31 => "ob31",
             #[cfg(feature = "ob31p")]
@@ -64,8 +64,8 @@ impl Scheme {
         match self {
             #[cfg(feature = "zdc")]
             Scheme::Zdc => true,
-            #[cfg(feature = "ob21p")]
-            Scheme::Ob21p => false,
+            #[cfg(feature = "upc")]
+            Scheme::Upc => false,
             #[cfg(feature = "ob31")]
             Scheme::Ob31 => true,
             #[cfg(feature = "ob31p")]
@@ -100,8 +100,8 @@ impl Scheme {
         match self {
             #[cfg(feature = "zdc")]
             Scheme::Zdc => constants::ZDC_BYTE,
-            #[cfg(feature = "ob21p")]
-            Scheme::Ob21p => constants::OB21P_BYTE,
+            #[cfg(feature = "upc")]
+            Scheme::Upc => constants::UPC_BYTE,
             #[cfg(feature = "ob31")]
             Scheme::Ob31 => constants::OB31_BYTE,
             #[cfg(feature = "ob31p")]
@@ -129,8 +129,8 @@ impl std::str::FromStr for Scheme {
         match s.to_lowercase().as_str() {
             #[cfg(feature = "zdc")]
             "zdc" => Ok(Scheme::Zdc),
-            #[cfg(feature = "ob21p")]
-            "ob21p" => Ok(Scheme::Ob21p),
+            #[cfg(feature = "upc")]
+            "upc" => Ok(Scheme::Upc),
             #[cfg(feature = "ob31")]
             "ob31" => Ok(Scheme::Ob31),
             #[cfg(feature = "ob31p")]

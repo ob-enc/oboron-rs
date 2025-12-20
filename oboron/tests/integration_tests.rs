@@ -16,9 +16,9 @@ fn test_available_schemes() {
         assert_eq!(ob.dec(&enc).unwrap(), "test");
     }
 
-    #[cfg(feature = "ob21p")]
+    #[cfg(feature = "upc")]
     {
-        let ob = oboron::Ob21p::new(&key).unwrap();
+        let ob = oboron::UpcC32::new(&key).unwrap();
         let enc = ob.enc("test").unwrap();
         assert_eq!(ob.dec(&enc).unwrap(), "test");
     }

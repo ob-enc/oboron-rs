@@ -1,6 +1,6 @@
 [package]
 name = "oboron-py"
-version = "0.3.0"
+version = "0.4.0"
 edition = "2021"
 
 [lib]
@@ -14,12 +14,12 @@ ob00 = ["oboron/ob00"]
 zdc = ["oboron/zdc"]
 ob31 = ["oboron/ob31"]
 ob32 = ["oboron/ob32"]
-ob21p = ["oboron/ob21p"]
+upc = ["oboron/upc"]
 ob31p = ["oboron/ob31p"]
 ob32p = ["oboron/ob32p"]
 ob70 = ["oboron/ob70"]
 ob71 = ["oboron/ob71"]
-all-schemes = ["zdc", "ob21p", "ob31", "ob31p", "ob32", "ob32p"]
+all-schemes = ["zdc", "upc", "ob31", "ob31p", "ob32", "ob32p"]
 
 keyless = ["oboron/keyless"]
 
@@ -28,7 +28,7 @@ legacy = ["ob00"]  # For compatibility/testing
 experimental = []  # Experimental algorithms
 
 [dependencies]
-oboron = { version = "0.3", path = "../oboron", default-features = false, features=["full"] }
+oboron = { version = "0.4", path = "../oboron", default-features = false, features=["full"] }
 pyo3 = { version = "0.22", features = ["extension-module"] }
 hex = "0.4"
 

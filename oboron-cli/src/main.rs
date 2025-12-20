@@ -30,10 +30,10 @@ struct SchemeFlags {
     #[arg(short = '1', long, alias = "01")]
     zdc: bool,
 
-    /// Use ob21p scheme (probabilistic AES-CBC with PKCS#7)
-    #[cfg(feature = "ob21p")]
+    /// Use upc scheme (probabilistic AES-CBC with PKCS#7)
+    #[cfg(feature = "upc")]
     #[arg(short = '2', long, alias = "21p")]
-    ob21p: bool,
+    upc: bool,
 
     /// Use ob31 scheme (deterministic AES-GCM-SIV)
     #[cfg(feature = "ob31")]
@@ -70,7 +70,7 @@ impl SchemeFlags {
     /// Convert flags to Option<Scheme>, returning error if multiple are set
     #[cfg(any(
         feature = "zdc",
-        feature = "ob21p",
+        feature = "upc",
         feature = "ob31",
         feature = "ob31p",
         feature = "ob32",
@@ -93,10 +93,10 @@ impl SchemeFlags {
             count += 1;
             scheme = Some(Scheme::Zdc);
         }
-        #[cfg(feature = "ob21p")]
-        if self.ob21p {
+        #[cfg(feature = "upc")]
+        if self.upc {
             count += 1;
-            scheme = Some(Scheme::Ob21p);
+            scheme = Some(Scheme::Upc);
         }
         #[cfg(feature = "ob31")]
         if self.ob31 {
@@ -139,7 +139,7 @@ impl SchemeFlags {
     /// Check if any scheme flag is set
     #[cfg(any(
         feature = "zdc",
-        feature = "ob21p",
+        feature = "upc",
         feature = "ob31",
         feature = "ob31p",
         feature = "ob32",
@@ -165,8 +165,8 @@ impl SchemeFlags {
         if self.ob32 {
             return true;
         }
-        #[cfg(feature = "ob21p")]
-        if self.ob21p {
+        #[cfg(feature = "upc")]
+        if self.upc {
             return true;
         }
         #[cfg(feature = "ob31p")]
@@ -817,7 +817,7 @@ mod tests {
     fn test_scheme_flags_to_scheme_single() {
         #[cfg(not(any(
             feature = "zdc",
-            feature = "ob21p",
+            feature = "upc",
             feature = "ob31",
             feature = "ob31p",
             feature = "ob32",
@@ -832,8 +832,8 @@ mod tests {
             ob00: false,
             #[cfg(feature = "zdc")]
             zdc: false,
-            #[cfg(feature = "ob21p")]
-            ob21p: false,
+            #[cfg(feature = "upc")]
+            upc: false,
             #[cfg(feature = "ob31")]
             ob31: false,
             #[cfg(feature = "ob31p")]
@@ -856,7 +856,7 @@ mod tests {
     fn test_scheme_flags_to_scheme_multiple_errors() {
         #[cfg(not(any(
             feature = "zdc",
-            feature = "ob21p",
+            feature = "upc",
             feature = "ob31",
             feature = "ob31p",
             feature = "ob32",
@@ -871,8 +871,8 @@ mod tests {
             ob00: false,
             #[cfg(feature = "zdc")]
             zdc: false,
-            #[cfg(feature = "ob21p")]
-            ob21p: false,
+            #[cfg(feature = "upc")]
+            upc: false,
             #[cfg(feature = "ob31")]
             ob31: false,
             #[cfg(feature = "ob31p")]
@@ -893,7 +893,7 @@ mod tests {
     fn test_scheme_flags_to_scheme_none() {
         #[cfg(not(any(
             feature = "zdc",
-            feature = "ob21p",
+            feature = "upc",
             feature = "ob31",
             feature = "ob31p",
             feature = "ob32",
@@ -908,8 +908,8 @@ mod tests {
             ob00: false,
             #[cfg(feature = "zdc")]
             zdc: false,
-            #[cfg(feature = "ob21p")]
-            ob21p: false,
+            #[cfg(feature = "upc")]
+            upc: false,
             #[cfg(feature = "ob31")]
             ob31: false,
             #[cfg(feature = "ob31p")]
@@ -959,7 +959,7 @@ mod tests {
 
         #[cfg(not(any(
             feature = "zdc",
-            feature = "ob21p",
+            feature = "upc",
             feature = "ob31",
             feature = "ob31p",
             feature = "ob32",
@@ -974,8 +974,8 @@ mod tests {
             ob00: false,
             #[cfg(feature = "zdc")]
             zdc: false,
-            #[cfg(feature = "ob21p")]
-            ob21p: false,
+            #[cfg(feature = "upc")]
+            upc: false,
             #[cfg(feature = "ob31")]
             ob31: false,
             #[cfg(feature = "ob31p")]
@@ -1013,7 +1013,7 @@ mod tests {
     fn test_format_spec_conflicts_with_scheme_flag() {
         #[cfg(not(any(
             feature = "zdc",
-            feature = "ob21p",
+            feature = "upc",
             feature = "ob31",
             feature = "ob31p",
             feature = "ob32",
@@ -1028,8 +1028,8 @@ mod tests {
             ob00: false,
             #[cfg(feature = "zdc")]
             zdc: false,
-            #[cfg(feature = "ob21p")]
-            ob21p: false,
+            #[cfg(feature = "upc")]
+            upc: false,
             #[cfg(feature = "ob31")]
             ob31: false,
             #[cfg(feature = "ob31p")]
@@ -1068,7 +1068,7 @@ mod tests {
     fn test_format_spec_conflicts_with_encoding_flag() {
         #[cfg(not(any(
             feature = "zdc",
-            feature = "ob21p",
+            feature = "upc",
             feature = "ob31",
             feature = "ob31p",
             feature = "ob32",
@@ -1083,8 +1083,8 @@ mod tests {
             ob00: false,
             #[cfg(feature = "zdc")]
             zdc: false,
-            #[cfg(feature = "ob21p")]
-            ob21p: false,
+            #[cfg(feature = "upc")]
+            upc: false,
             #[cfg(feature = "ob31")]
             ob31: false,
             #[cfg(feature = "ob31p")]
@@ -1130,7 +1130,7 @@ mod tests {
 
         #[cfg(not(any(
             feature = "zdc",
-            feature = "ob21p",
+            feature = "upc",
             feature = "ob31",
             feature = "ob31p",
             feature = "ob32",
@@ -1145,8 +1145,8 @@ mod tests {
             ob00: false,
             #[cfg(feature = "zdc")]
             zdc: false,
-            #[cfg(feature = "ob21p")]
-            ob21p: false,
+            #[cfg(feature = "upc")]
+            upc: false,
             #[cfg(feature = "ob31")]
             ob31: false,
             #[cfg(feature = "ob31p")]
@@ -1185,7 +1185,7 @@ mod tests {
 
         #[cfg(not(any(
             feature = "zdc",
-            feature = "ob21p",
+            feature = "upc",
             feature = "ob31",
             feature = "ob31p",
             feature = "ob32",
@@ -1200,8 +1200,8 @@ mod tests {
             ob00: false,
             #[cfg(feature = "zdc")]
             zdc: false,
-            #[cfg(feature = "ob21p")]
-            ob21p: false,
+            #[cfg(feature = "upc")]
+            upc: false,
             #[cfg(feature = "ob31")]
             ob31: false,
             #[cfg(feature = "ob31p")]

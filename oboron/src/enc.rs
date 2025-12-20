@@ -6,8 +6,6 @@ use crate::{
 use data_encoding::{BASE64URL_NOPAD, HEXLOWER};
 
 // Conditionally import encrypt functions based on features
-#[cfg(feature = "ob21p")]
-use crate::encrypt_ob21p;
 #[cfg(feature = "ob31")]
 use crate::encrypt_ob31;
 #[cfg(feature = "ob31p")]
@@ -16,6 +14,8 @@ use crate::encrypt_ob31p;
 use crate::encrypt_ob32;
 #[cfg(feature = "ob32p")]
 use crate::encrypt_ob32p;
+#[cfg(feature = "upc")]
+use crate::encrypt_upc;
 #[cfg(feature = "zdc")]
 use crate::encrypt_zdc;
 // Testing
@@ -44,8 +44,8 @@ pub(crate) fn enc_to_format(
     let ciphertext = match format.scheme() {
         #[cfg(feature = "zdc")]
         Scheme::Zdc => encrypt_zdc(keychain, plaintext.as_bytes())?,
-        #[cfg(feature = "ob21p")]
-        Scheme::Ob21p => encrypt_ob21p(keychain, plaintext.as_bytes())?,
+        #[cfg(feature = "upc")]
+        Scheme::Upc => encrypt_upc(keychain, plaintext.as_bytes())?,
         #[cfg(feature = "ob31")]
         Scheme::Ob31 => encrypt_ob31(keychain, plaintext.as_bytes())?,
         #[cfg(feature = "ob31p")]

@@ -1,7 +1,7 @@
-#[cfg(feature = "ob21p")]
-use oboron::Ob21pBase64;
 #[cfg(feature = "ob31")]
 use oboron::Ob31Base64;
+#[cfg(feature = "upc")]
+use oboron::UpcB64;
 #[cfg(feature = "zdc")]
 use oboron::ZdcB64;
 use oboron::{Encoding, ObFlex, Oboron, Scheme};
@@ -169,7 +169,7 @@ fn test_ob32p_all_encodings() {
 
 #[test]
 #[cfg(feature = "zdc")]
-#[cfg(feature = "ob21p")]
+#[cfg(feature = "upc")]
 #[cfg(feature = "ob31")]
 #[cfg(feature = "ob31p")]
 #[cfg(feature = "ob32")]
@@ -183,7 +183,7 @@ fn test_obflex_basic() {
     // Test with different schemes
     for scheme in &[
         Scheme::Zdc,
-        Scheme::Ob21p,
+        Scheme::Upc,
         Scheme::Ob31,
         Scheme::Ob31p,
         Scheme::Ob32,
@@ -207,7 +207,7 @@ fn test_obflex_basic() {
 
 #[test]
 #[cfg(feature = "zdc")]
-#[cfg(feature = "ob21p")]
+#[cfg(feature = "upc")]
 #[cfg(feature = "ob31")]
 #[cfg(feature = "ob31p")]
 #[cfg(feature = "ob32")]
@@ -222,9 +222,9 @@ fn test_obflex_all_formats() {
         "zdc:c32",
         "zdc:b64",
         "zdc:hex",
-        "ob21p:c32",
-        "ob21p:b64",
-        "ob21p:hex",
+        "upc:c32",
+        "upc:b64",
+        "upc:hex",
         "ob31:c32",
         "ob31:b64",
         "ob31:hex",
@@ -417,7 +417,7 @@ fn test_cross_scheme_decoding_should_fail() {
 }
 
 #[test]
-#[cfg(feature = "ob21p")]
+#[cfg(feature = "upc")]
 #[cfg(feature = "ob31p")]
 #[cfg(feature = "ob32p")]
 fn test_probabilistic_schemes_uniqueness() {
@@ -425,17 +425,17 @@ fn test_probabilistic_schemes_uniqueness() {
     let plaintext = "Testing probabilistic uniqueness";
     let iterations = 100;
 
-    // Test Ob21p
-    let ob21p = Ob21pBase64::from_bytes(&key).expect("Failed to create ob21p");
+    // Test Upc
+    let upc = UpcB64::from_bytes(&key).expect("Failed to create upc");
     let mut encodings = std::collections::HashSet::new();
     for _ in 0..iterations {
-        let encd = ob21p.enc(plaintext).expect("Failed to enc with ob21p");
+        let encd = upc.enc(plaintext).expect("Failed to enc with upc");
         encodings.insert(encd);
     }
     assert_eq!(
         encodings.len(),
         iterations,
-        "Ob21p should produce {} unique ciphertexts",
+        "UpcB64 should produce {} unique obtexts",
         iterations
     );
 

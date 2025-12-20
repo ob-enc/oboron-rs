@@ -203,7 +203,7 @@
 //! - `Zdc`: AES-CBC (deterministic)
 //! - `Ob31`: AES-GCM-SIV (deterministic)
 //! - `Ob32`: AES-SIV (deterministic, nonce-misuse resistant)
-//! - `Ob21p`, `Ob31p`, `Ob32p`: Probabilistic variants (different output each time)
+//! - `Upc`, `Ob31p`, `Ob32p`: Probabilistic variants (different output each time)
 //!
 //! Testing/Demo only schemes using no encryption (`non-crypto` feature group):
 //! - `Ob70`: Identity
@@ -269,8 +269,6 @@ pub use error::Error;
 // Re-export from obcrypt
 pub(crate) use obcrypt::Keychain;
 
-#[cfg(feature = "ob21p")]
-pub(crate) use obcrypt::{decrypt_ob21p, encrypt_ob21p};
 #[cfg(feature = "ob31")]
 pub(crate) use obcrypt::{decrypt_ob31, encrypt_ob31};
 #[cfg(feature = "ob31p")]
@@ -279,6 +277,8 @@ pub(crate) use obcrypt::{decrypt_ob31p, encrypt_ob31p};
 pub(crate) use obcrypt::{decrypt_ob32, encrypt_ob32};
 #[cfg(feature = "ob32p")]
 pub(crate) use obcrypt::{decrypt_ob32p, encrypt_ob32p};
+#[cfg(feature = "upc")]
+pub(crate) use obcrypt::{decrypt_upc, encrypt_upc};
 #[cfg(feature = "zdc")]
 pub(crate) use obcrypt::{decrypt_zdc, encrypt_zdc};
 
@@ -313,8 +313,6 @@ pub use oboron::{new, new_with_format, ObAny, Oboron};
 pub use oboron::{new_keyless, new_keyless_with_format};
 
 // Conditionally export format string constants (scheme+encoding combinations)
-#[cfg(feature = "ob21p")]
-pub use constants::{OB21P_B32, OB21P_B64, OB21P_C32, OB21P_HEX};
 #[cfg(feature = "ob31p")]
 pub use constants::{OB31P_B32, OB31P_B64, OB31P_C32, OB31P_HEX};
 #[cfg(feature = "ob31")]
@@ -323,6 +321,8 @@ pub use constants::{OB31_B32, OB31_B64, OB31_C32, OB31_HEX};
 pub use constants::{OB32P_B32, OB32P_B64, OB32P_C32, OB32P_HEX};
 #[cfg(feature = "ob32")]
 pub use constants::{OB32_B32, OB32_B64, OB32_C32, OB32_HEX};
+#[cfg(feature = "upc")]
+pub use constants::{UPC_B32, UPC_B64, UPC_C32, UPC_HEX};
 #[cfg(feature = "zdc")]
 pub use constants::{ZDC_B32, ZDC_B64, ZDC_C32, ZDC_HEX};
 // Testing
@@ -335,8 +335,6 @@ pub use constants::{OB71_B32, OB71_B64, OB71_C32, OB71_HEX};
 pub use constants::{OB00_B32, OB00_B64, OB00_C32, OB00_HEX};
 
 // Conditionally export format-specific structs (scheme+encoding combinations)
-#[cfg(feature = "ob21p")]
-pub use oboron::{Ob21pBase32Crockford, Ob21pBase32Rfc, Ob21pBase64, Ob21pHex};
 #[cfg(feature = "ob31")]
 pub use oboron::{Ob31Base32Crockford, Ob31Base32Rfc, Ob31Base64, Ob31Hex};
 #[cfg(feature = "ob31p")]
@@ -345,6 +343,8 @@ pub use oboron::{Ob31pBase32Crockford, Ob31pBase32Rfc, Ob31pBase64, Ob31pHex};
 pub use oboron::{Ob32Base32Crockford, Ob32Base32Rfc, Ob32Base64, Ob32Hex};
 #[cfg(feature = "ob32p")]
 pub use oboron::{Ob32pBase32Crockford, Ob32pBase32Rfc, Ob32pBase64, Ob32pHex};
+#[cfg(feature = "upc")]
+pub use oboron::{UpcB32, UpcB64, UpcC32, UpcHex};
 #[cfg(feature = "zdc")]
 pub use oboron::{ZdcB32, ZdcB64, ZdcC32, ZdcHex};
 // Testing
@@ -359,8 +359,8 @@ pub use legacy::{Ob00Base32Crockford, Ob00Base32Rfc, Ob00Base64, Ob00Hex};
 // Aliases for default encoding:
 #[cfg(feature = "zdc")]
 pub type Zdc = ZdcC32;
-#[cfg(feature = "ob21p")]
-pub type Ob21p = Ob21pBase32Crockford;
+#[cfg(feature = "upc")]
+pub type Upc = UpcC32;
 #[cfg(feature = "ob31")]
 pub type Ob31 = Ob31Base32Crockford;
 #[cfg(feature = "ob31p")]

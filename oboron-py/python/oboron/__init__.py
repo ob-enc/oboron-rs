@@ -81,50 +81,43 @@ OboronBase.register(_oboron.ZdcB32)
 OboronBase.register(_oboron.ZdcB64)
 OboronBase.register(_oboron.ZdcHex)
 
-# Ob21p variants
-OboronBase.register(_oboron.Ob21p)
-OboronBase.register(_oboron.Ob21pBase32Crockford)
-OboronBase.register(_oboron.Ob21pBase32Rfc)
-OboronBase.register(_oboron.Ob21pBase64)
-OboronBase.register(_oboron.Ob21pHex)
+# Upc variants
+OboronBase.register(_oboron.UpcC32)
+OboronBase.register(_oboron.UpcB32)
+OboronBase.register(_oboron.UpcB64)
+OboronBase.register(_oboron.UpcHex)
 
 # Ob31 variants
-OboronBase.register(_oboron.Ob31)
 OboronBase.register(_oboron.Ob31Base32Crockford)
 OboronBase.register(_oboron.Ob31Base32Rfc)
 OboronBase.register(_oboron.Ob31Base64)
 OboronBase.register(_oboron.Ob31Hex)
 
 # Ob31p variants
-OboronBase.register(_oboron.Ob31p)
 OboronBase.register(_oboron.Ob31pBase32Crockford)
 OboronBase.register(_oboron.Ob31pBase32Rfc)
 OboronBase.register(_oboron.Ob31pBase64)
 OboronBase.register(_oboron.Ob31pHex)
 
 # Ob32 variants
-OboronBase.register(_oboron.Ob32)
 OboronBase.register(_oboron.Ob32Base32Crockford)
 OboronBase.register(_oboron.Ob32Base32Rfc)
 OboronBase.register(_oboron.Ob32Base64)
 OboronBase.register(_oboron.Ob32Hex)
 
 # Ob32p variants
-OboronBase.register(_oboron.Ob32p)
 OboronBase.register(_oboron.Ob32pBase32Crockford)
 OboronBase.register(_oboron.Ob32pBase32Rfc)
 OboronBase.register(_oboron.Ob32pBase64)
 OboronBase.register(_oboron.Ob32pHex)
 
 # Ob71 variants (testing)
-OboronBase.register(_oboron.Ob71)
 OboronBase.register(_oboron.Ob71Base32Crockford)
 OboronBase.register(_oboron.Ob71Base32Rfc)
 OboronBase.register(_oboron.Ob71Base64)
 OboronBase.register(_oboron.Ob71Hex)
 
 # Ob70 variants (testing)
-OboronBase.register(_oboron.Ob70)
 OboronBase.register(_oboron.Ob70Base32Crockford)
 OboronBase.register(_oboron.Ob70Base32Rfc)
 OboronBase.register(_oboron.Ob70Base64)
@@ -152,11 +145,11 @@ ZdcB32 = _oboron.ZdcB32
 ZdcB64 = _oboron.ZdcB64
 ZdcHex = _oboron.ZdcHex
 
-# Ob21p variants
-Ob21pBase32Crockford = _oboron.Ob21pBase32Crockford
-Ob21pBase32Rfc = _oboron.Ob21pBase32Rfc
-Ob21pBase64 = _oboron.Ob21pBase64
-Ob21pHex = _oboron.Ob21pHex
+# Upc variants
+UpcC32 = _oboron.UpcC32
+UpcB32 = _oboron.UpcB32
+UpcB64 = _oboron.UpcB64
+UpcHex = _oboron.UpcHex
 
 # Ob31 variants
 Ob31Base32Crockford = _oboron.Ob31Base32Crockford
@@ -230,11 +223,11 @@ __all__ = [
     'ZdcB64',
     'ZdcHex',
 
-    # Ob21p
-    'Ob21pBase32Crockford',
-    'Ob21pBase32Rfc',
-    'Ob21pBase64',
-    'Ob21pHex',
+    # Upc
+    'UpcC32',
+    'UpcB32',
+    'UpcB64',
+    'UpcHex',
 
     # Ob31
     'Ob31Base32Crockford',

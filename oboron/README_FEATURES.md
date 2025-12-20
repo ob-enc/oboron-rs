@@ -11,7 +11,7 @@ By default, **all secure production-ready schemes are enabled**:
 oboron = "1.0"
 ```
 
-This includes: `ob21p`, `ob31`, `ob31p`, `ob32`, `ob32p`.
+This includes: `upc`, `ob31`, `ob31p`, `ob32`, `ob32p`.
 
 All encodings (`:c32`-Crockford base32, `:b32`-standard base32, `:b64`-URL-safe base64, and `:hex`-hex) are always included.
 
@@ -41,7 +41,7 @@ hex/bytes key interfaces and the keyless testing feature.
 ### Individual Schemes
 
 - `zdc` - AES-CBC (deterministic)
-- `ob21p` - AES-CBC (probabilistic)
+- `upc` - AES-CBC (probabilistic)
 - `ob31` - AES-GCM-SIV (deterministic)
 - `ob31p` - AES-GCM-SIV (probabilistic)
 - `ob32` - AES-SIV (deterministic)
@@ -76,13 +76,13 @@ versioning guarantees and may change or be removed in patch releases.
 ### Scheme Groups
 
 By algorithm
-- `all-cbc-schemes` - Includes `zdc`, `ob21p`
+- `all-cbc-schemes` - Includes `zdc`, `upc`
 - `all-gcm-schemes` - Includes `ob31`, `ob31p`
 - `all-siv-schemes` - Includes `ob32`, `ob32p`
 
 By properties:
 - `deterministic-schemes` - Includes `zdc`, `ob31`, `ob32`
-- `probabilistic-schemes` - Includes `ob21p`, `ob31p`, `ob32p`
+- `probabilistic-schemes` - Includes `upc`, `ob31p`, `ob32p`
 - `authenticated-schemes` - Includes `ob31`, `ob31p`, `ob32`, `ob32p`
 - `secure-schemes` - Includes all but `zdc`
 - `insecure-schemes` - Includes `zdc` only
@@ -90,7 +90,7 @@ By properties:
 By tier:
 - `ob0x` - Includes `zdc` only
 - `ob1x` - No current members
-- `ob2x` - Includes `ob21p` only
+- `ob2x` - Includes `upc` only
 - `ob3x` - Includes all authenticated schemes (= `authenticated-schemes`)
 
 Testing:
