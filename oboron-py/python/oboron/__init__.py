@@ -69,11 +69,11 @@ class OboronBase(ABC):
 # Register all Rust classes as virtual subclasses
 # ============================================================================
 
-# Ob00 variants (LEGACY)
-OboronBase.register(_oboron.Ob00Base32Crockford)
-OboronBase.register(_oboron.Ob00Base32Rfc)
-OboronBase.register(_oboron.Ob00Base64)
-OboronBase.register(_oboron.Ob00Hex)
+# Legacy variants (LEGACY)
+OboronBase.register(_oboron.LegacyC32)
+OboronBase.register(_oboron.LegacyB32)
+OboronBase.register(_oboron.LegacyB64)
+OboronBase.register(_oboron.LegacyHex)
 
 # Zdc variants
 OboronBase.register(_oboron.ZdcC32)
@@ -133,11 +133,11 @@ OboronBase.register(_oboron.Ob)
 # Main flexible interface
 Ob = _oboron.Ob
 
-# Ob00 variants (LEGACY)
-Ob00Base32Crockford = _oboron.Ob00Base32Crockford
-Ob00Base32Rfc = _oboron.Ob00Base32Rfc
-Ob00Base64 = _oboron.Ob00Base64
-Ob00Hex = _oboron.Ob00Hex
+# Legacy variants (LEGACY)
+LegacyC32 = _oboron.LegacyC32
+LegacyB32 = _oboron.LegacyB32
+LegacyB64 = _oboron.LegacyB64
+LegacyHex = _oboron.LegacyHex
 
 # Zdc variants
 ZdcC32 = _oboron.ZdcC32
@@ -210,12 +210,11 @@ __all__ = [
     # Main interfaces
     'Ob',
 
-    # Ob00 (LEGACY)
-    'Ob00',
-    'Ob00Base32Crockford',
-    'Ob00Base32Rfc',
-    'Ob00Base64',
-    'Ob00Hex',
+    # Legacy
+    'LegacyC32',
+    'LegacyB32',
+    'LegacyB64',
+    'LegacyHex',
 
     # Zdc
     'ZdcC32',

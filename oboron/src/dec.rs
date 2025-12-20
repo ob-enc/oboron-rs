@@ -20,12 +20,12 @@ use crate::decrypt_upc;
 #[cfg(feature = "zdc")]
 use crate::decrypt_zdc;
 // Testing
-#[cfg(feature = "mock1")]
+#[cfg(feature = "mock")]
 use crate::decrypt_mock1;
-#[cfg(feature = "mock2")]
+#[cfg(feature = "mock")]
 use crate::decrypt_mock2;
 
-/// Generic decoding pipeline for all schemes (except ob00).
+/// Generic decoding pipeline for all schemes (except legacy).
 ///
 /// Steps:
 /// 1. Decode obtext using format's encoding
@@ -76,13 +76,13 @@ pub(crate) fn dec_from_format(
         #[cfg(feature = "apsv")]
         Scheme::Apsv => decrypt_apsv(keychain, &buffer)?,
         // Testing
-        #[cfg(feature = "mock1")]
+        #[cfg(feature = "mock")]
         Scheme::Mock1 => decrypt_mock1(keychain, &buffer)?,
-        #[cfg(feature = "mock2")]
+        #[cfg(feature = "mock")]
         Scheme::Mock2 => decrypt_mock2(keychain, &buffer)?,
-        // Legacy - ob00 does not use this call path
-        #[cfg(feature = "ob00")]
-        Scheme::Ob00 => unreachable!("called generic dec function for ob00"),
+        // Legacy - legacy does not use this call path
+        #[cfg(feature = "legacy")]
+        Scheme::Legacy => unreachable!("called generic dec function for legacy"),
     };
 
     // Step 5: Convert to string

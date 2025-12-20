@@ -1,7 +1,7 @@
 """Format string constants for Oboron. 
 
 All constants follow the pattern:  {SCHEME}_{ENCODING}
-- Schemes: ZDC, UPC, ADGS, APGS, ADSV, APSV, MOCK1, MOCK2, OB00 (legacy)
+- Schemes: ZDC, UPC, ADGS, APGS, ADSV, APSV, MOCK1, MOCK2, LEGACY (legacy)
 - Encodings: C32 (Base32Crockford), B32 (Base32Rfc), B64 (Base64), HEX
 
 Example:
@@ -59,11 +59,11 @@ MOCK2_B32: str = "mock2:b32"
 MOCK2_B64: str = "mock2:b64"
 MOCK2_HEX: str = "mock2:hex"
 
-# Legacy (ob00 - deprecated, use zdc instead)
-OB00_C32: str = "ob00:c32"
-OB00_B32: str = "ob00:b32"
-OB00_B64: str = "ob00:b64"
-OB00_HEX: str = "ob00:hex"
+# Legacy (legacy - deprecated, use zdc instead)
+LEGACY_C32: str = "legacy:c32"
+LEGACY_B32: str = "legacy:b32"
+LEGACY_B64: str = "legacy:b64"
+LEGACY_HEX: str = "legacy:hex"
 
 __all__ = [
     # zdc
@@ -82,5 +82,5 @@ __all__ = [
     "MOCK1_C32", "MOCK1_B32", "MOCK1_B64", "MOCK1_HEX",
     "MOCK2_C32", "MOCK2_B32", "MOCK2_B64", "MOCK2_HEX",
     # Legacy
-    "OB00_C32", "OB00_B32", "OB00_B64", "OB00_HEX",
+    "LEGACY_C32", "LEGACY_B32", "LEGACY_B64", "LEGACY_HEX",
 ]

@@ -1,4 +1,4 @@
-#![cfg(feature = "mock1")]
+#![cfg(feature = "mock")]
 //! mock1 - Identity scheme (no encryption, testing only)
 //!
 //! This scheme performs no encryption and is available by default.

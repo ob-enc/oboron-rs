@@ -1,4 +1,4 @@
-#![cfg(feature = "ob00")]
+#![cfg(feature = "legacy")]
 use super::{constants::AES_BLOCK_SIZE, keychain::Keychain};
 use crate::Error;
 use aes::Aes128;
@@ -8,9 +8,9 @@ use cipher::{BlockDecryptMut, BlockEncryptMut, KeyIvInit};
 type Aes128CbcEnc = Encryptor<Aes128>;
 type Aes128CbcDec = Decryptor<Aes128>;
 
-const OB00_PADDING_BYTE: u8 = b'='; // legacy - ob00 only
+const LEGACY_PADDING_BYTE: u8 = b'='; // legacy - legacy only
 
-/// Encrypt plaintext bytes using legacy AES-CBC (ob00 scheme).
+/// Encrypt plaintext bytes using legacy AES-CBC (legacy scheme).
 /// Returns raw ciphertext bytes with custom padding.
 pub fn encrypt(keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
     if plaintext_bytes.is_empty() {
@@ -25,7 +25,7 @@ pub fn encrypt(keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, E
     // Allocate once with the correct size
     let mut buffer = Vec::with_capacity(total_len);
     buffer.extend_from_slice(plaintext_bytes);
-    buffer.resize(total_len, OB00_PADDING_BYTE);
+    buffer.resize(total_len, LEGACY_PADDING_BYTE);
 
     // Encrypt in-place
     let cipher = Aes128CbcEnc::new(keychain.cbc().into(), keychain.cbc_iv().into());
@@ -36,7 +36,7 @@ pub fn encrypt(keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, E
     Ok(buffer)
 }
 
-/// Decrypt ciphertext using legacy AES-CBC (ob00 scheme).
+/// Decrypt ciphertext using legacy AES-CBC (legacy scheme).
 /// Returns plaintext bytes with custom padding removed.
 pub fn decrypt(keychain: &Keychain, data: &[u8]) -> Result<Vec<u8>, Error> {
     // Decrypt with AES-128-CBC
@@ -54,7 +54,7 @@ pub fn decrypt(keychain: &Keychain, data: &[u8]) -> Result<Vec<u8>, Error> {
     // Remove '=' padding by finding the end and truncating
     let end = buffer
         .iter()
-        .rposition(|&b| b != OB00_PADDING_BYTE)
+        .rposition(|&b| b != LEGACY_PADDING_BYTE)
         .map_or(0, |i| i + 1);
     buffer.truncate(end);
 

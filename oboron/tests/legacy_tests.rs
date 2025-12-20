@@ -1,29 +1,29 @@
-//! Tests for legacy schemes (ob00)
+//! Tests for legacy schemes (legacy)
 //!
 //! These tests are isolated from main tests to ensure legacy functionality works independently.
 //!
 //! **Note**: ObMulti and convenience functions (enc_keyless, dec_keyless) will NOT work
-//! with ob00 scheme. Use the Ob00 struct directly instead:
+//! with legacy scheme. Use the Legacy struct directly instead:
 //!
 //! ```ignore
-//! use oboron::{Oboron, Ob00};
+//! use oboron::{Oboron, Legacy};
 //!
-//! let ob = Ob00::new_keyless()?;
+//! let ob = Legacy::new_keyless()?;
 //! let ot = ob.enc("test")?;
 //! let pt2 = ob.dec(&ot)?;
 //! ```
 
-#![cfg(feature = "ob00")]
+#![cfg(feature = "legacy")]
 
-use oboron::{Ob00, Ob00Base64, Ob00Hex, Oboron};
+use oboron::{Legacy, LegacyBase64, LegacyHex, Oboron};
 
 // 128 hex characters = 64 bytes
 const HEX_KEY: &str = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
 
 #[test]
-fn test_ob00_basic() {
+fn test_legacy_basic() {
     let pt = "hello world";
-    let ob = Ob00::new_keyless().unwrap();
+    let ob = Legacy::new_keyless().unwrap();
     let ot = ob.enc(pt).unwrap();
     let pt2 = ob.dec_strict(&ot).unwrap();
 
@@ -32,9 +32,9 @@ fn test_ob00_basic() {
 }
 
 #[test]
-fn test_ob00_autodetect() {
+fn test_legacy_autodetect() {
     let pt = "autodetect test";
-    let ob = Ob00::new_keyless().unwrap();
+    let ob = Legacy::new_keyless().unwrap();
     let ot = ob.enc(pt).unwrap();
     let pt2 = ob.dec(&ot).unwrap();
 
@@ -42,22 +42,22 @@ fn test_ob00_autodetect() {
 }
 
 #[test]
-fn test_ob00_with_equals_padding() {
+fn test_legacy_with_equals_padding() {
     let pt = "test==";
-    let ob = Ob00::new_keyless().unwrap();
+    let ob = Legacy::new_keyless().unwrap();
     let ot = ob.enc(pt).unwrap();
     let pt2 = ob.dec_strict(&ot).unwrap();
 
-    // ob00 strips trailing '='
+    // legacy strips trailing '='
     assert_eq!("test", pt2);
 }
 
 #[test]
-fn test_ob00_custom_keys() {
+fn test_legacy_custom_keys() {
     let key = [1u8; 64];
     let pt = "custom keys test";
 
-    let ob = Ob00::from_bytes(&key).unwrap();
+    let ob = Legacy::from_bytes(&key).unwrap();
     let ot = ob.enc(pt).unwrap();
     let pt2 = ob.dec_strict(&ot).unwrap();
 
@@ -65,13 +65,13 @@ fn test_ob00_custom_keys() {
 }
 
 #[test]
-fn test_ob00_different_key_fails() {
+fn test_legacy_different_key_fails() {
     let key1 = [1u8; 64];
     let key2 = [2u8; 64];
     let pt = "different keys";
 
-    let ob1 = Ob00::from_bytes(&key1).unwrap();
-    let ob2 = Ob00::from_bytes(&key2).unwrap();
+    let ob1 = Legacy::from_bytes(&key1).unwrap();
+    let ob2 = Legacy::from_bytes(&key2).unwrap();
 
     let ot = ob1.enc(pt).unwrap();
     let pt2 = ob2.dec_strict(&ot);
@@ -81,13 +81,13 @@ fn test_ob00_different_key_fails() {
 }
 
 #[test]
-fn test_ob00_all_encodings() {
+fn test_legacy_all_encodings() {
     let pt = "encoding test";
     let key = [42u8; 64];
 
-    let ob_b32 = Ob00::from_bytes(&key).unwrap();
-    let ob_b64 = Ob00Base64::from_bytes(&key).unwrap();
-    let ob_hex = Ob00Hex::from_bytes(&key).unwrap();
+    let ob_b32 = Legacy::from_bytes(&key).unwrap();
+    let ob_b64 = LegacyBase64::from_bytes(&key).unwrap();
+    let ob_hex = LegacyHex::from_bytes(&key).unwrap();
 
     let enc_b32 = ob_b32.enc(pt).unwrap();
     let enc_b64 = ob_b64.enc(pt).unwrap();
@@ -104,15 +104,15 @@ fn test_ob00_all_encodings() {
     assert_ne!(enc_b64, enc_hex);
 
     // Cross-scheme getter tests
-    assert_eq!(ob_b32.scheme(), oboron::Scheme::Ob00);
+    assert_eq!(ob_b32.scheme(), oboron::Scheme::Legacy);
     assert_eq!(ob_b64.encoding(), oboron::Encoding::Base64);
     assert_eq!(ob_hex.encoding(), oboron::Encoding::Hex);
 }
 
 #[test]
-fn test_ob00_long_string() {
+fn test_legacy_long_string() {
     let pt = "a".repeat(1000);
-    let ob = Ob00::new_keyless().unwrap();
+    let ob = Legacy::new_keyless().unwrap();
     let ot = ob.enc(&pt).unwrap();
     let pt2 = ob.dec_strict(&ot).unwrap();
 
@@ -120,9 +120,9 @@ fn test_ob00_long_string() {
 }
 
 #[test]
-fn test_ob00_special_characters() {
+fn test_legacy_special_characters() {
     let pt = "hello\nworld\t!  @#$%^&*()";
-    let ob = Ob00::new_keyless().unwrap();
+    let ob = Legacy::new_keyless().unwrap();
     let ot = ob.enc(pt).unwrap();
     let pt2 = ob.dec_strict(&ot).unwrap();
 
@@ -130,9 +130,9 @@ fn test_ob00_special_characters() {
 }
 
 #[test]
-fn test_ob00_unicode() {
+fn test_legacy_unicode() {
     let pt = "Hello 世界 🌍";
-    let ob = Ob00::new_keyless().unwrap();
+    let ob = Legacy::new_keyless().unwrap();
     let ot = ob.enc(pt).unwrap();
     let pt2 = ob.dec_strict(&ot).unwrap();
 
@@ -140,17 +140,17 @@ fn test_ob00_unicode() {
 }
 
 #[test]
-fn test_ob00_empty_string_fails() {
-    let ob = Ob00::new_keyless().unwrap();
+fn test_legacy_empty_string_fails() {
+    let ob = Legacy::new_keyless().unwrap();
     assert!(ob.enc("").is_err());
 }
 
 #[test]
-fn test_ob00_hex_key() {
+fn test_legacy_hex_key() {
     let hex_key = "00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff";
     let pt = "hex key test";
 
-    let ob = Ob00::from_hex_key(hex_key).unwrap();
+    let ob = Legacy::from_hex_key(hex_key).unwrap();
     let ot = ob.enc(pt).unwrap();
     let pt2 = ob.dec_strict(&ot).unwrap();
 
@@ -158,20 +158,20 @@ fn test_ob00_hex_key() {
 }
 
 #[test]
-fn test_ob00_invalid_hex_key() {
+fn test_legacy_invalid_hex_key() {
     let invalid_hex = "not a hex string";
-    assert!(Ob00::new(invalid_hex).is_err());
+    assert!(Legacy::new(invalid_hex).is_err());
 }
 
 #[test]
-fn test_ob00_short_hex_key() {
+fn test_legacy_short_hex_key() {
     let short_hex = "00112233"; // Too short
-    assert!(Ob00::from_hex_key(short_hex).is_err());
+    assert!(Legacy::from_hex_key(short_hex).is_err());
 }
 
 #[test]
-fn test_ob00_vector_test() {
-    let ob = Ob00::from_hex_key(HEX_KEY).unwrap();
+fn test_legacy_vector_test() {
+    let ob = Legacy::from_hex_key(HEX_KEY).unwrap();
     let plaintext = "test";
 
     // First enc to see what we actually get
@@ -184,12 +184,12 @@ fn test_ob00_vector_test() {
 }
 
 #[test]
-fn test_ob00_backward_compatibility() {
-    // Test that we can still dec legacy ob00 strings
+fn test_legacy_backward_compatibility() {
+    // Test that we can still dec legacy strings
     // Note: These test vectors need to be generated with the actual implementation
     // For now, we'll do a roundtrip test to ensure encoding/decoding works
 
-    let ob = Ob00::from_hex_key(HEX_KEY).unwrap();
+    let ob = Legacy::from_hex_key(HEX_KEY).unwrap();
 
     let test_plaintexts = vec!["test", "hello", "world"];
 
@@ -201,8 +201,8 @@ fn test_ob00_backward_compatibility() {
 }
 
 #[test]
-fn test_ob00_roundtrip_vectors() {
-    let ob = Ob00::from_hex_key(HEX_KEY).unwrap();
+fn test_legacy_roundtrip_vectors() {
+    let ob = Legacy::from_hex_key(HEX_KEY).unwrap();
 
     let test_cases = vec![
         "test",
@@ -222,9 +222,9 @@ fn test_ob00_roundtrip_vectors() {
 }
 
 #[test]
-fn test_ob00_keyless_encoding() {
+fn test_legacy_keyless_encoding() {
     // Generate test vectors using hardcoded key for documentation
-    let ob = Ob00::new_keyless().unwrap();
+    let ob = Legacy::new_keyless().unwrap();
 
     let test_cases = vec!["test", "hello world", "123"];
 
@@ -241,7 +241,7 @@ fn test_ob00_keyless_encoding() {
 #[test]
 #[ignore] // Remove this when you have actual legacy vectors
 fn test_specific_legacy_vectors() {
-    // let ob = Ob00::new_keyless().unwrap();
+    // let ob = Legacy::new_keyless().unwrap();
 
     // Example format (uncomment and add real vectors when available):
     // let vectors = vec![

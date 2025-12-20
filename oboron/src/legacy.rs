@@ -1,4 +1,4 @@
-//! Legacy AES-CBC scheme (ob00)
+//! Legacy AES-CBC scheme (legacy)
 //!
 //! **Deprecated**: This scheme exists only for compatibility with
 //! existing deployments. New code should use `zdc` instead.
@@ -9,30 +9,30 @@
 //! - Less optimal prefix entropy distribution
 //!
 //! This module contains fully the isolated implementation of the
-//! deprecated `ob00` scheme.
+//! deprecated `legacy` scheme.
 //! This is maintained for backward compatibility but should not be used
 //! for new code.
 //!
 //! **Architecture**: This module is intentionally self-contained, duplicating some
 //! encoding/decoding logic to keep legacy code isolated from the main codebase.
 
-#![cfg(feature = "ob00")]
+#![cfg(feature = "legacy")]
 
 use crate::{
     base32::BASE32_CROCKFORD,
     constants::HARDCODED_KEY_BYTES,
     error::Error,
-    obcrypt::{decrypt_ob00, encrypt_ob00},
+    obcrypt::{decrypt_legacy, encrypt_legacy},
     oboron::Oboron,
     Encoding, Format, Keychain, Scheme,
 };
 use data_encoding::{BASE32, BASE64URL_NOPAD, HEXLOWER};
 
 // ============================================================================
-// Internal Helper Functions (ob00-specific encoding/decoding)
+// Internal Helper Functions (legacy-specific encoding/decoding)
 // ============================================================================
 
-/// Encode raw ciphertext bytes to oboron ob00 string format.
+/// Encode raw ciphertext bytes to oboron legacy string format.
 fn encode_ciphertext_to_obtext(encoding: Encoding, ciphertext: &[u8]) -> String {
     let enc = match encoding {
         Encoding::Base32Crockford => {
@@ -63,7 +63,7 @@ fn encode_ciphertext_to_obtext(encoding: Encoding, ciphertext: &[u8]) -> String 
     unsafe { String::from_utf8_unchecked(result) }
 }
 
-/// Decode oboron ob00 string to raw ciphertext bytes.
+/// Decode oboron legacy string to raw ciphertext bytes.
 fn decode_obtext_to_ciphertext(encoding: Encoding, obtext: &str) -> Result<Vec<u8>, Error> {
     match encoding {
         Encoding::Base32Crockford => {
@@ -107,24 +107,28 @@ fn decode_obtext_to_ciphertext(encoding: Encoding, obtext: &str) -> Result<Vec<u
     }
 }
 
-/// Decode ob00 format to plaintext (used by autodetection in dec_auto.rs).
-pub(crate) fn dec_ob00(obtext: &str, format: Format, keychain: &Keychain) -> Result<String, Error> {
-    assert_eq!(format.scheme(), Scheme::Ob00);
+/// Decode legacy format to plaintext (used by autodetection in dec_auto.rs).
+pub(crate) fn dec_legacy(
+    obtext: &str,
+    format: Format,
+    keychain: &Keychain,
+) -> Result<String, Error> {
+    assert_eq!(format.scheme(), Scheme::Legacy);
     let ciphertext = decode_obtext_to_ciphertext(format.encoding(), obtext)?;
     // SAFETY: Plaintext was originally valid UTF-8, and encryption preserves byte sequences
-    Ok(unsafe { String::from_utf8_unchecked(decrypt_ob00(keychain, &ciphertext)?) })
+    Ok(unsafe { String::from_utf8_unchecked(decrypt_legacy(keychain, &ciphertext)?) })
 }
 
 // ============================================================================
-// Public Oboron Implementations (Ob00Base32Crockford, Ob00Base32Rfc, Ob00Base64, Ob00Hex)
+// Public Oboron Implementations (LegacyBase32Crockford, LegacyBase32Rfc, LegacyBase64, LegacyHex)
 // ============================================================================
 
-/// Macro to implement ob00 Oboron variants with different encodings.
-macro_rules! impl_ob00_oboron {
+/// Macro to implement legacy Oboron variants with different encodings.
+macro_rules! impl_legacy_oboron {
     ($name:ident, $encoding:expr, $format_str:expr) => {
-        #[doc = concat!("Legacy Ob00 Oboron implementation for ", $format_str, " format.\n\n")]
+        #[doc = concat!("Legacy Legacy Oboron implementation for ", $format_str, " format.\n\n")]
         #[doc = "**LEGACY**: This scheme is maintained for backward compatibility only.\n"]
-        #[doc = "The ob00 scheme uses legacy AES-CBC encryption with custom padding.\n"]
+        #[doc = "The legacy scheme uses legacy AES-CBC encryption with custom padding.\n"]
         #[doc = "For new projects, consider using zdc or more secure schemes like adgs/adsv.\n"]
         #[doc = concat!("\nCorresponds to format string: `\"", $format_str, "\"`")]
         #[allow(non_camel_case_types)]
@@ -135,7 +139,7 @@ macro_rules! impl_ob00_oboron {
 
         impl Oboron for $name {
             fn enc(&self, plaintext: &str) -> Result<String, Error> {
-                let ciphertext = encrypt_ob00(&self.keychain, plaintext.as_bytes())?;
+                let ciphertext = encrypt_legacy(&self.keychain, plaintext.as_bytes())?;
                 Ok(encode_ciphertext_to_obtext(
                     self.format.encoding(),
                     &ciphertext,
@@ -148,11 +152,11 @@ macro_rules! impl_ob00_oboron {
             }
 
             fn dec_strict(&self, obtext: &str) -> Result<String, Error> {
-                // Only decode ob00 format, no autodetection
+                // Only decode legacy format, no autodetection
                 let ciphertext = decode_obtext_to_ciphertext(self.format.encoding(), obtext)?;
                 Ok(unsafe {
                     // SAFETY: Plaintext was originally valid UTF-8, and encryption preserves byte sequences
-                    String::from_utf8_unchecked(decrypt_ob00(&self.keychain, &ciphertext)?)
+                    String::from_utf8_unchecked(decrypt_legacy(&self.keychain, &ciphertext)?)
                 })
             }
 
@@ -193,16 +197,16 @@ macro_rules! impl_ob00_oboron {
             /// # Examples
             ///
             /// ```
-            /// # use oboron::{Oboron, Ob00Base32Rfc};
+            /// # use oboron::{Oboron, LegacyBase32Rfc};
             /// let key = oboron::generate_key();
-            /// let ob = Ob00Base32Rfc::new(&key)? ;
+            /// let ob = LegacyBase32Rfc::new(&key)? ;
             /// # Ok::<(), oboron::Error>(())
             /// ```
             pub fn new(key: &str) -> Result<Self, Error> {
                 let keychain = Keychain::from_base64(key)?;
                 Ok(Self {
                     keychain,
-                    format: Format::new(Scheme::Ob00, $encoding),
+                    format: Format::new(Scheme::Legacy, $encoding),
                 })
             }
 
@@ -215,10 +219,10 @@ macro_rules! impl_ob00_oboron {
             /// # Examples
             ///
             /// ```
-            /// use oboron::{Oboron, Ob00Base32Rfc};
+            /// use oboron::{Oboron, LegacyBase32Rfc};
             ///
             /// let key_hex = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-            /// let ob = Ob00Base32Rfc::from_hex_key(key_hex)? ;
+            /// let ob = LegacyBase32Rfc::from_hex_key(key_hex)? ;
             /// # Ok::<(), oboron::Error>(())
             /// ```
             #[cfg(feature = "hex-keys")]
@@ -226,7 +230,7 @@ macro_rules! impl_ob00_oboron {
                 let keychain = Keychain::from_hex(key_hex)?;
                 Ok(Self {
                     keychain,
-                    format: Format::new(Scheme::Ob00, $encoding),
+                    format: Format::new(Scheme::Legacy, $encoding),
                 })
             }
 
@@ -239,10 +243,10 @@ macro_rules! impl_ob00_oboron {
             /// # Examples
             ///
             /// ```
-            /// use oboron::{Oboron, Ob00Base32Rfc};
+            /// use oboron::{Oboron, LegacyBase32Rfc};
             ///
             /// let key = [0u8; 64];
-            /// let ob = Ob00Base32Rfc::from_bytes(&key)?;
+            /// let ob = LegacyBase32Rfc::from_bytes(&key)?;
             /// # Ok::<(), oboron::Error>(())
             /// ```
             #[inline]
@@ -255,7 +259,7 @@ macro_rules! impl_ob00_oboron {
                 let keychain = Keychain::from_bytes(key)?;
                 Ok(Self {
                     keychain,
-                    format: Format::new(Scheme::Ob00, $encoding),
+                    format: Format::new(Scheme::Legacy, $encoding),
                 })
             }
 
@@ -267,9 +271,9 @@ macro_rules! impl_ob00_oboron {
             /// # Examples
             ///
             /// ```
-            /// use oboron::{Oboron, Ob00Base32Rfc};
+            /// use oboron::{Oboron, LegacyBase32Rfc};
             ///
-            /// let ob = Ob00Base32Rfc::new_keyless()?;
+            /// let ob = LegacyBase32Rfc::new_keyless()?;
             /// let ot = ob.enc("test")?;
             /// # Ok::<(), oboron::Error>(())
             /// ```
@@ -281,11 +285,15 @@ macro_rules! impl_ob00_oboron {
     };
 }
 
-// Generate all ob00 encoding variants
-impl_ob00_oboron!(Ob00Base32Crockford, Encoding::Base32Crockford, "ob00:c32");
-impl_ob00_oboron!(Ob00Base32Rfc, Encoding::Base32Rfc, "ob00:b32");
-impl_ob00_oboron!(Ob00Base64, Encoding::Base64, "ob00:b64");
-impl_ob00_oboron!(Ob00Hex, Encoding::Hex, "ob00:hex");
+// Generate all legacy encoding variants
+impl_legacy_oboron!(
+    LegacyBase32Crockford,
+    Encoding::Base32Crockford,
+    "legacy:c32"
+);
+impl_legacy_oboron!(LegacyBase32Rfc, Encoding::Base32Rfc, "legacy:b32");
+impl_legacy_oboron!(LegacyBase64, Encoding::Base64, "legacy:b64");
+impl_legacy_oboron!(LegacyHex, Encoding::Hex, "legacy:hex");
 
 #[cfg(test)]
 mod tests {
@@ -294,8 +302,8 @@ mod tests {
 
     #[test]
     #[cfg(feature = "keyless")]
-    fn test_ob00_roundtrip() {
-        let ob = Ob00Base32Rfc::new_keyless().unwrap();
+    fn test_legacy_roundtrip() {
+        let ob = LegacyBase32Rfc::new_keyless().unwrap();
         let pt = "hello world";
         let ot = ob.enc(pt).unwrap();
         let pt2 = ob.dec_strict(&ot).unwrap();
@@ -303,14 +311,14 @@ mod tests {
     }
 
     #[test]
-    fn test_ob00_encoding_variants() {
+    fn test_legacy_encoding_variants() {
         let pt = "test123";
         let key = [42u8; 64];
 
-        let ob_c32 = Ob00Base32Crockford::from_bytes(&key).unwrap();
-        let ob_b32 = Ob00Base32Rfc::from_bytes(&key).unwrap();
-        let ob_b64 = Ob00Base64::from_bytes(&key).unwrap();
-        let ob_hex = Ob00Hex::from_bytes(&key).unwrap();
+        let ob_c32 = LegacyBase32Crockford::from_bytes(&key).unwrap();
+        let ob_b32 = LegacyBase32Rfc::from_bytes(&key).unwrap();
+        let ob_b64 = LegacyBase64::from_bytes(&key).unwrap();
+        let ob_hex = LegacyHex::from_bytes(&key).unwrap();
 
         let ot_c32 = ob_c32.enc(pt).unwrap();
         let ot_b32 = ob_b32.enc(pt).unwrap();
@@ -334,8 +342,8 @@ mod tests {
 
     #[test]
     #[cfg(feature = "keyless")]
-    fn test_ob00_dec_with_autodetect() {
-        let ob = Ob00Base32Rfc::new_keyless().unwrap();
+    fn test_legacy_dec_with_autodetect() {
+        let ob = LegacyBase32Rfc::new_keyless().unwrap();
         let pt = "autodetect test";
         let ot = ob.enc(pt).unwrap();
 

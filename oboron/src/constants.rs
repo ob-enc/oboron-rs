@@ -49,11 +49,11 @@ pub const APSV_BYTE: u8 = 0x65;
 // -------------------
 // Identity scheme (no encryption)
 // mock1: tier=7 (111), scheme=0 (0000), probabilistic=0 -> 11100000 = 0xE0 (decimal: 224)
-#[cfg(feature = "mock1")]
+#[cfg(feature = "mock")]
 pub const MOCK1_BYTE: u8 = 0xE0;
 // String-reversal (no encryption)
 // mock2: tier=7 (111), scheme=1 (0001), probabilistic=0 -> 11100010 = 0xE2 (decimal: 226)
-#[cfg(feature = "mock2")]
+#[cfg(feature = "mock")]
 pub const MOCK2_BYTE: u8 = 0xE2;
 
 // For efficient resolution in decode logic, list all scheme bytes of reversed schemes
@@ -85,13 +85,13 @@ pub const ADSV_C32: &str = "adsv:c32";
 #[cfg(feature = "apsv")]
 pub const APSV_C32: &str = "apsv:c32";
 // Tier ob7x - Testing
-#[cfg(feature = "mock1")]
+#[cfg(feature = "mock")]
 pub const MOCK1_C32: &str = "mock1:c32";
-#[cfg(feature = "mock2")]
+#[cfg(feature = "mock")]
 pub const MOCK2_C32: &str = "mock2:c32";
 // Legacy
-#[cfg(feature = "ob00")]
-pub const OB00_C32: &str = "ob00:c32";
+#[cfg(feature = "legacy")]
+pub const LEGACY_C32: &str = "legacy:c32";
 
 // b32 - Base32Rfc encoding
 #[cfg(feature = "zdc")]
@@ -107,13 +107,13 @@ pub const ADSV_B32: &str = "adsv:b32";
 #[cfg(feature = "apsv")]
 pub const APSV_B32: &str = "apsv:b32";
 // Tier ob7x - Testing
-#[cfg(feature = "mock1")]
+#[cfg(feature = "mock")]
 pub const MOCK1_B32: &str = "mock1:b32";
-#[cfg(feature = "mock2")]
+#[cfg(feature = "mock")]
 pub const MOCK2_B32: &str = "mock2:b32";
 // Legacy
-#[cfg(feature = "ob00")]
-pub const OB00_B32: &str = "ob00:b32";
+#[cfg(feature = "legacy")]
+pub const LEGACY_B32: &str = "legacy:b32";
 
 // b64 - Base64 encoding
 #[cfg(feature = "zdc")]
@@ -129,13 +129,13 @@ pub const ADSV_B64: &str = "adsv:b64";
 #[cfg(feature = "apsv")]
 pub const APSV_B64: &str = "apsv:b64";
 // Tier ob7x - Testing
-#[cfg(feature = "mock1")]
+#[cfg(feature = "mock")]
 pub const MOCK1_B64: &str = "mock1:b64";
-#[cfg(feature = "mock2")]
+#[cfg(feature = "mock")]
 pub const MOCK2_B64: &str = "mock2:b64";
 // Legacy
-#[cfg(feature = "ob00")]
-pub const OB00_B64: &str = "ob00:b64";
+#[cfg(feature = "legacy")]
+pub const LEGACY_B64: &str = "legacy:b64";
 
 // hex - Hex encoding
 #[cfg(feature = "zdc")]
@@ -151,13 +151,13 @@ pub const ADSV_HEX: &str = "adsv:hex";
 #[cfg(feature = "apsv")]
 pub const APSV_HEX: &str = "apsv:hex";
 // Tier ob7x - Testing
-#[cfg(feature = "mock1")]
+#[cfg(feature = "mock")]
 pub const MOCK1_HEX: &str = "mock1:hex";
-#[cfg(feature = "mock2")]
+#[cfg(feature = "mock")]
 pub const MOCK2_HEX: &str = "mock2:hex";
 // Legacy
-#[cfg(feature = "ob00")]
-pub const OB00_HEX: &str = "ob00:hex";
+#[cfg(feature = "legacy")]
+pub const LEGACY_HEX: &str = "legacy:hex";
 
 #[cfg(test)]
 mod tests {

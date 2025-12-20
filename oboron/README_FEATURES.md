@@ -49,7 +49,7 @@ hex/bytes key interfaces and the keyless testing feature.
 
 Testing schemes (non-cryptographic):
 - `mock1` - identity transformation (ciphertext = plaintext bytes)
-- `mock2` - uses reversed `mock1` ciphertext
+- `mock2` - reversed plaintext
 
 ### Unsafe Performance Enhancement
 
@@ -62,10 +62,10 @@ Testing schemes (non-cryptographic):
 
 Feature groups:
 - `experimental` - Group for experimental schemes
-- `legacy` - Includes `ob00` scheme for compatibility with existing
+- `legacy` - Includes `legacy` scheme for compatibility with existing
   deployments
 
-**Note:** `ob00` is a legacy scheme used internally by early adopters.
+**Note:** `legacy` is a legacy scheme used internally by early adopters.
 New users should use `zdc` instead, which provides improved prefix
 entropy and better padding. This feature is only for maintaining
 compatibility with existing encrypted data.
@@ -94,7 +94,7 @@ By tier:
 - `ob3x` - Includes all authenticated schemes (= `authenticated-schemes`)
 
 Testing:
-- `non-crypto` - Includes `mock1` and `mock2`
+- `mock` - Includes `mock1` and `mock2`
 
 Comprehensive group
 - `all-schemes` - Includes all schemes (same as default)

@@ -1,5 +1,5 @@
 use crate::{error::Error, Encoding, Keychain};
-#[cfg(feature = "ob00")]
+#[cfg(feature = "legacy")]
 use crate::{Format, Scheme};
 
 // Always available
@@ -18,12 +18,12 @@ use crate::{constants::UPC_BYTE, decrypt_upc};
 #[cfg(feature = "zdc")]
 use crate::{constants::ZDC_BYTE, decrypt_zdc};
 // Testing
-#[cfg(feature = "mock1")]
+#[cfg(feature = "mock")]
 use crate::{constants::MOCK1_BYTE, decrypt_mock1};
-#[cfg(feature = "mock2")]
+#[cfg(feature = "mock")]
 use crate::{constants::MOCK2_BYTE, decrypt_mock2};
 // Legacy
-#[cfg(feature = "ob00")]
+#[cfg(feature = "legacy")]
 use crate::legacy;
 
 /// Decode the given encoding, then decrypt autodetecting the scheme
@@ -36,13 +36,13 @@ pub fn dec_any_scheme(
     let mut buffer = match crate::dec::decode_obtext_to_payload(obtext, encoding) {
         Ok(ct) => ct,
         Err(decode_err) => {
-            // Decoding failed - try ob00 (legacy format with reversal applied to final encoding rather than bytes as in zdc)
-            #[cfg(feature = "ob00")]
+            // Decoding failed - try legacy (legacy format with reversal applied to final encoding rather than bytes as in zdc)
+            #[cfg(feature = "legacy")]
             {
-                let format = Format::new(Scheme::Ob00, encoding);
-                return legacy::dec_ob00(obtext, format, keychain).or(Err(decode_err));
+                let format = Format::new(Scheme::Legacy, encoding);
+                return legacy::dec_legacy(obtext, format, keychain).or(Err(decode_err));
             }
-            #[cfg(not(feature = "ob00"))]
+            #[cfg(not(feature = "legacy"))]
             return Err(decode_err);
         }
     };
@@ -80,21 +80,21 @@ pub fn dec_any_scheme(
         #[cfg(feature = "apsv")]
         APSV_BYTE => decrypt_apsv(keychain, &buffer)?,
         // Testing
-        #[cfg(feature = "mock1")]
+        #[cfg(feature = "mock")]
         MOCK1_BYTE => decrypt_mock1(keychain, &buffer)?,
-        #[cfg(feature = "mock2")]
+        #[cfg(feature = "mock")]
         MOCK2_BYTE => decrypt_mock2(keychain, &buffer)?,
         _ => {
-            // Unknown scheme byte - try ob00 as fallback
-            #[cfg(feature = "ob00")]
+            // Unknown scheme byte - try legacy as fallback
+            #[cfg(feature = "legacy")]
             {
-                let format = Format::new(Scheme::Ob00, encoding);
-                let ob00_result = legacy::dec_ob00(obtext, format, keychain)?;
-                // Only validate ob00 fallback results to avoid false positives
-                validate_ob00_output(&ob00_result)?;
-                return Ok(ob00_result);
+                let format = Format::new(Scheme::Legacy, encoding);
+                let legacy_result = legacy::dec_legacy(obtext, format, keychain)?;
+                // Only validate legacy fallback results to avoid false positives
+                validate_legacy_output(&legacy_result)?;
+                return Ok(legacy_result);
             }
-            #[cfg(not(feature = "ob00"))]
+            #[cfg(not(feature = "legacy"))]
             return Err(Error::UnknownScheme);
         }
     };
@@ -113,9 +113,9 @@ pub fn dec_any_scheme(
     }
 }
 
-/// Validate ob00 output to prevent false positives from encoding mismatches
-#[cfg(feature = "ob00")]
-fn validate_ob00_output(plaintext: &str) -> Result<(), Error> {
+/// Validate legacy output to prevent false positives from encoding mismatches
+#[cfg(feature = "legacy")]
+fn validate_legacy_output(plaintext: &str) -> Result<(), Error> {
     let total_chars = plaintext.chars().count();
     if total_chars == 0 {
         return Ok(()); // Empty string is fine
@@ -132,7 +132,7 @@ fn validate_ob00_output(plaintext: &str) -> Result<(), Error> {
 
     // Require at least 70% of characters to be reasonable (lowered threshold)
     if reasonable_count * 10 < total_chars * 7 {
-        return Err(Error::InvalidOb00Output);
+        return Err(Error::InvalidLegacyOutput);
     }
 
     Ok(())

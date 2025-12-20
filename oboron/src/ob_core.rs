@@ -155,7 +155,7 @@ mod tests {
     use super::*;
 
     #[test]
-    #[cfg(feature = "mock1")]
+    #[cfg(feature = "mock")]
     fn test_obcore_basic() {
         // 86-character base64 key
         let key = crate::generate_key();
@@ -167,7 +167,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "mock1")]
+    #[cfg(feature = "mock")]
     #[cfg(feature = "keyless")]
     fn test_obcore_keyless() {
         let core = ObCore::new_keyless("mock1:c32").unwrap();

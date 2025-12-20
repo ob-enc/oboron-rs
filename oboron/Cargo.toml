@@ -19,7 +19,7 @@ default = ["std"]
 # ===================
 std = ["secure-schemes"]
 secure-min = ["adsv"]  # Minimum secure setup
-full = ["all-schemes", "all-alt-keys", "keyless", "legacy", "non-crypto", "convenience"]
+full = ["all-schemes", "all-alt-keys", "keyless", "legacy", "mock", "convenience"]
 
 dev = ["full"]  # Development setup
 
@@ -46,10 +46,9 @@ apgs = ["aes-gcm-siv"]
 adsv = ["aes-siv"]
 apsv = ["aes-siv"]
 # Testing only
-mock1 = []  # identity, non-crypto
-mock2 = []  # string reversal, non-crypto
+mock = []
 # Legacy
-ob00 = ["aes", "cipher", "cbc"]  # backward compatibility
+legacy = ["aes", "cipher", "cbc"]  # backward compatibility
 
 # Misc features
 # =============
@@ -63,18 +62,13 @@ ob0x = ["zdc"] # insecure, not authenticated
 ob1x = []  # insecure, authenticated
 ob2x = ["upc"]  # secure, not authenticated
 ob3x = ["adgs", "apgs", "adsv", "apsv"]  # secure, authenticated
-ob7x = ["mock1", "mock2"]  # testing
+ob7x = ["mock"]  # testing
 insecure-schemes = ["ob0x", "ob1x"]
 secure-schemes = ["ob2x", "ob3x"]
 authenticated-schemes = ["ob3x"]
 deterministic-schemes = ["zdc", "adgs", "adsv"]
 probabilistic-schemes = ["upc", "apgs", "apsv"]
 all-schemes = ["ob0x", "ob1x", "ob2x", "ob3x"]
-
-# Special purpose groups
-# ======================
-non-crypto = ["mock1", "mock2"]
-legacy = ["ob00"]  # For backward compatibility only -> use zdc instead
 
 [dependencies]
 # Always needed
@@ -241,19 +235,19 @@ name = "apsv_hex"
 harness = false
 
 [[bench]]
-name = "ob00_c32"
+name = "legacy_c32"
 harness = false
 
 [[bench]]
-name = "ob00_b32"
+name = "legacy_b32"
 harness = false
 
 [[bench]]
-name = "ob00_b64"
+name = "legacy_b64"
 harness = false
 
 [[bench]]
-name = "ob00_hex"
+name = "legacy_hex"
 harness = false
 
 [[bench]]

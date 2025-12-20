@@ -8,24 +8,19 @@ name = "_oboron"
 crate-type = ["cdylib"]
 
 [features]
-default = ["all-schemes", "legacy", "experimental", "keyless", "legacy", "mock1"]
+default = ["all-schemes", "legacy", "keyless", "legacy", "mock"]
 
-ob00 = ["oboron/ob00"]
+legacy = ["oboron/legacy"]
 zdc = ["oboron/zdc"]
 adgs = ["oboron/adgs"]
 adsv = ["oboron/adsv"]
 upc = ["oboron/upc"]
 apgs = ["oboron/apgs"]
 apsv = ["oboron/apsv"]
-mock1 = ["oboron/mock1"]
-mock2 = ["oboron/mock2"]
+mock = ["oboron/mock"]
 all-schemes = ["zdc", "upc", "adgs", "apgs", "adsv", "apsv"]
 
 keyless = ["oboron/keyless"]
-
-# Feature groups
-legacy = ["ob00"]  # For compatibility/testing
-experimental = []  # Experimental algorithms
 
 [dependencies]
 oboron = { version = "0.4", path = "../oboron", default-features = false, features=["full"] }

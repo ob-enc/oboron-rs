@@ -58,9 +58,9 @@ pub enum Error {
     #[error("decoding failed: scheme byte mismatch")]
     SchemeByteMismatch,
 
-    #[cfg(feature = "ob00")]
-    #[error("ob00 fallback produced invalid output (likely encoding mismatch)")]
-    InvalidOb00Output,
+    #[cfg(feature = "legacy")]
+    #[error("legacy fallback produced invalid output (likely encoding mismatch)")]
+    InvalidLegacyOutput,
 }
 
 impl From<hex::FromHexError> for Error {

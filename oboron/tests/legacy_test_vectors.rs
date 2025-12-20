@@ -1,6 +1,6 @@
-#![cfg(feature = "ob00")]
+#![cfg(feature = "legacy")]
 
-use oboron::{Ob00, Ob00Base32Rfc, Ob00Base64, Ob00Hex, Oboron};
+use oboron::{Legacy, LegacyBase32Rfc, LegacyBase64, LegacyHex, Oboron};
 use serde::Deserialize;
 use std::fs;
 use std::path::PathBuf;
@@ -24,7 +24,7 @@ fn load_test_vectors() -> Vec<TestVector> {
 
     for path in &possible_paths {
         if path.exists() {
-            println!("Found ob00 test vectors at: {:?}", path);
+            println!("Found legacy test vectors at: {:?}", path);
             let data = fs::read_to_string(path).expect("Failed to read legacy-test-vectors.jsonl");
             return data
                 .lines()
@@ -34,21 +34,21 @@ fn load_test_vectors() -> Vec<TestVector> {
         }
     }
 
-    panic!("test-vectors_ob00.jsonl not found");
+    panic!("legacy-test-vectors.jsonl not found");
 }
 
 fn get_ob_for_format(format: &str) -> Box<dyn Oboron> {
     match format {
-        "ob00:base32crockford" | "ob00:c32" => Box::new(Ob00::new_keyless().unwrap()),
-        "ob00:base32rfc" | "ob00:b32" => Box::new(Ob00Base32Rfc::new_keyless().unwrap()),
-        "ob00:base64" | "ob00:b64" => Box::new(Ob00Base64::new_keyless().unwrap()),
-        "ob00:hex" => Box::new(Ob00Hex::new_keyless().unwrap()),
-        _ => panic!("Unsupported ob00 format: {}", format),
+        "legacy:base32crockford" | "legacy:c32" => Box::new(Legacy::new_keyless().unwrap()),
+        "legacy:base32rfc" | "legacy:b32" => Box::new(LegacyBase32Rfc::new_keyless().unwrap()),
+        "legacy:base64" | "legacy:b64" => Box::new(LegacyBase64::new_keyless().unwrap()),
+        "legacy:hex" => Box::new(LegacyHex::new_keyless().unwrap()),
+        _ => panic!("Unsupported legacy format: {}", format),
     }
 }
 #[test]
-fn test_ob00_vectors() {
-    println!("Starting test_ob00_vectors");
+fn test_legacy_vectors() {
+    println!("Starting test_legacy_vectors");
 
     let vectors = match std::panic::catch_unwind(|| load_test_vectors()) {
         Ok(v) => {

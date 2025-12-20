@@ -19,12 +19,12 @@ use crate::encrypt_upc;
 #[cfg(feature = "zdc")]
 use crate::encrypt_zdc;
 // Testing
-#[cfg(feature = "mock1")]
+#[cfg(feature = "mock")]
 use crate::encrypt_mock1;
-#[cfg(feature = "mock2")]
+#[cfg(feature = "mock")]
 use crate::encrypt_mock2;
 
-/// Generic encoding pipeline for all schemes (except ob00).
+/// Generic encoding pipeline for all schemes (except legacy).
 ///
 /// Steps:
 /// 1. Call scheme-specific encrypt function
@@ -55,13 +55,13 @@ pub(crate) fn enc_to_format(
         #[cfg(feature = "apsv")]
         Scheme::Apsv => encrypt_apsv(keychain, plaintext.as_bytes())?,
         // Testing
-        #[cfg(feature = "mock1")]
+        #[cfg(feature = "mock")]
         Scheme::Mock1 => encrypt_mock1(keychain, plaintext.as_bytes())?,
-        #[cfg(feature = "mock2")]
+        #[cfg(feature = "mock")]
         Scheme::Mock2 => encrypt_mock2(keychain, plaintext.as_bytes())?,
-        // Legacy - ob00 does not use this call path
-        #[cfg(feature = "ob00")]
-        Scheme::Ob00 => unreachable!("called generic dec function for ob00"),
+        // Legacy - legacy does not use this call path
+        #[cfg(feature = "legacy")]
+        Scheme::Legacy => unreachable!("called generic dec function for legacy"),
     };
 
     // Step 2+3: Build payload with scheme byte and conditionally reverse

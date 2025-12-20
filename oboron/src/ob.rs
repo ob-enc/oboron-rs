@@ -31,7 +31,7 @@ use crate::{ob_core::ObCore, Encoding, Error, Format, Oboron, Scheme};
 ///
 /// ```rust
 /// # fn main() -> Result<(), oboron::Error> {
-/// # #[cfg(all(feature = "adsv", feature = "non-crypto"))]
+/// # #[cfg(all(feature = "adsv", feature = "mock"))]
 /// # {
 /// # use oboron::{Ob, AdsvB64, ObFlex, Oboron};
 /// # let key = oboron::generate_key();

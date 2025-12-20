@@ -1,4 +1,4 @@
-#![cfg(feature = "mock2")]
+#![cfg(feature = "mock")]
 //! mock2 - Reverse scheme (reverses plaintext, no encryption)
 //!  
 //! This scheme is always available and requires no crypto dependencies.

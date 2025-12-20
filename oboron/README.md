@@ -905,7 +905,7 @@ Available constants:
 - `ADSV_C32`, `ADSV_B32`, `ADSV_B64`, `ADSV_HEX`
 - `APSV_C32`, `APSV_B32`, `APSV_B64`, `APSV_HEX`
 - Testing:  `MOCK1_*`, `MOCK2_*`
-- Legacy: `OB00_*`
+- Legacy: `LEGACY_*`
 
 ### Advanced: `Format` Objects
 
@@ -1009,7 +1009,7 @@ is equal to the plaintext bytes (identity transformation). It is
 included in the tables below as baseline.
 
 (Note: the `mock1` scheme is feature gated: use it by enabling the `mock1`
-feature, or the `ob7x` testing feature group, or the `non-crypto` feature
+feature, or the `ob7x` testing feature group, or the `mock` feature
 group.)
 
 ## Base32 encoding (b32/c32)

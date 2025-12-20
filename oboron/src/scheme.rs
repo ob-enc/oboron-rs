@@ -18,13 +18,13 @@ pub enum Scheme {
     #[cfg(feature = "apsv")]
     Apsv,
     // Testing
-    #[cfg(feature = "mock1")]
+    #[cfg(feature = "mock")]
     Mock1,
-    #[cfg(feature = "mock2")]
+    #[cfg(feature = "mock")]
     Mock2,
     // Legacy
-    #[cfg(feature = "ob00")]
-    Ob00,
+    #[cfg(feature = "legacy")]
+    Legacy,
 }
 
 impl Scheme {
@@ -44,13 +44,13 @@ impl Scheme {
             #[cfg(feature = "apsv")]
             Scheme::Apsv => "apsv",
             // Testing
-            #[cfg(feature = "mock1")]
+            #[cfg(feature = "mock")]
             Scheme::Mock1 => "mock1",
-            #[cfg(feature = "mock2")]
+            #[cfg(feature = "mock")]
             Scheme::Mock2 => "mock2",
             // Legacy
-            #[cfg(feature = "ob00")]
-            Scheme::Ob00 => "ob00",
+            #[cfg(feature = "legacy")]
+            Scheme::Legacy => "legacy",
         }
     }
 
@@ -75,13 +75,13 @@ impl Scheme {
             #[cfg(feature = "apsv")]
             Scheme::Apsv => false,
             // Testing
-            #[cfg(feature = "mock1")]
+            #[cfg(feature = "mock")]
             Scheme::Mock1 => true,
-            #[cfg(feature = "mock2")]
+            #[cfg(feature = "mock")]
             Scheme::Mock2 => true,
             // Legacy
-            #[cfg(feature = "ob00")]
-            Scheme::Ob00 => true,
+            #[cfg(feature = "legacy")]
+            Scheme::Legacy => true,
         }
     }
 
@@ -111,13 +111,13 @@ impl Scheme {
             #[cfg(feature = "apsv")]
             Scheme::Apsv => constants::APSV_BYTE,
             // Testing
-            #[cfg(feature = "mock1")]
+            #[cfg(feature = "mock")]
             Scheme::Mock1 => constants::MOCK1_BYTE,
-            #[cfg(feature = "mock2")]
+            #[cfg(feature = "mock")]
             Scheme::Mock2 => constants::MOCK2_BYTE,
             // Legacy
-            #[cfg(feature = "ob00")]
-            Scheme::Ob00 => unreachable!("ob00 does not use a scheme byte"),
+            #[cfg(feature = "legacy")]
+            Scheme::Legacy => unreachable!("legacy does not use a scheme byte"),
         }
     }
 }
@@ -140,13 +140,13 @@ impl std::str::FromStr for Scheme {
             #[cfg(feature = "apsv")]
             "apsv" => Ok(Scheme::Apsv),
             // Testing
-            #[cfg(feature = "mock1")]
+            #[cfg(feature = "mock")]
             "mock1" => Ok(Scheme::Mock1),
-            #[cfg(feature = "mock2")]
+            #[cfg(feature = "mock")]
             "mock2" => Ok(Scheme::Mock2),
             // Legacy
-            #[cfg(feature = "ob00")]
-            "ob00" => Ok(Scheme::Ob00),
+            #[cfg(feature = "legacy")]
+            "legacy" => Ok(Scheme::Legacy),
             _ => Err(Error::UnknownScheme),
         }
     }

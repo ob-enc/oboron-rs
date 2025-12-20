@@ -20,10 +20,10 @@ struct Cli {
 /// Scheme selection flags (mutually exclusive)
 #[derive(Args, Debug)]
 struct SchemeFlags {
-    /// Use ob00 scheme (legacy AES-CBC)
-    #[cfg(feature = "ob00")]
+    /// Use legacy scheme (legacy AES-CBC)
+    #[cfg(feature = "legacy")]
     #[arg(short = '0', long, alias = "00")]
-    ob00: bool,
+    legacy: bool,
 
     /// Use zdc scheme (optimized AES-CBC)
     #[cfg(feature = "zdc")]
@@ -56,12 +56,12 @@ struct SchemeFlags {
     apsv: bool,
 
     /// Use mock1 scheme (testing, identity)
-    #[cfg(feature = "mock1")]
+    #[cfg(feature = "mock")]
     #[arg(long, alias = "70", hide = true)]
     mock1: bool,
 
     /// Use mock2 scheme (testing, string reversal)
-    #[cfg(feature = "mock2")]
+    #[cfg(feature = "mock")]
     #[arg(long, alias = "71", hide = true)]
     mock2: bool,
 }
@@ -75,18 +75,18 @@ impl SchemeFlags {
         feature = "apgs",
         feature = "adsv",
         feature = "apsv",
-        feature = "mock1",
-        feature = "mock2",
-        feature = "ob00"
+        feature = "mock",
+        feature = "mock",
+        feature = "legacy"
     ))]
     fn to_scheme(&self) -> Result<Option<Scheme>> {
         let mut count = 0;
         let mut scheme = None;
 
-        #[cfg(feature = "ob00")]
-        if self.ob00 {
+        #[cfg(feature = "legacy")]
+        if self.legacy {
             count += 1;
-            scheme = Some(Scheme::Ob00);
+            scheme = Some(Scheme::Legacy);
         }
         #[cfg(feature = "zdc")]
         if self.zdc {
@@ -118,12 +118,12 @@ impl SchemeFlags {
             count += 1;
             scheme = Some(Scheme::Apsv);
         }
-        #[cfg(feature = "mock1")]
+        #[cfg(feature = "mock")]
         if self.mock1 {
             count += 1;
             scheme = Some(Scheme::Mock1);
         }
-        #[cfg(feature = "mock2")]
+        #[cfg(feature = "mock")]
         if self.mock2 {
             count += 1;
             scheme = Some(Scheme::Mock2);
@@ -144,13 +144,13 @@ impl SchemeFlags {
         feature = "apgs",
         feature = "adsv",
         feature = "apsv",
-        feature = "mock1",
-        feature = "mock2",
-        feature = "ob00"
+        feature = "mock",
+        feature = "mock",
+        feature = "legacy"
     ))]
     fn is_set(&self) -> bool {
-        #[cfg(feature = "ob00")]
-        if self.ob00 {
+        #[cfg(feature = "legacy")]
+        if self.legacy {
             return true;
         }
         #[cfg(feature = "zdc")]
@@ -177,11 +177,11 @@ impl SchemeFlags {
         if self.apsv {
             return true;
         }
-        #[cfg(feature = "mock1")]
+        #[cfg(feature = "mock")]
         if self.mock1 {
             return true;
         }
-        #[cfg(feature = "mock2")]
+        #[cfg(feature = "mock")]
         if self.mock2 {
             return true;
         }
@@ -263,7 +263,7 @@ impl FormatSpec {
     ) -> Result<Self> {
         // Check for conflicts between --format and individual flags
         if format_str.is_some() && scheme_flags.is_set() {
-            anyhow::bail!("Cannot use --format together with scheme flags (--ob00, --zdc, etc.)");
+            anyhow::bail!("Cannot use --format together with scheme flags (--legacy, --zdc, etc.)");
         }
         if format_str.is_some() && encoding_flags.is_set() {
             anyhow::bail!(
@@ -813,7 +813,7 @@ mod tests {
     use super::*;
 
     #[test]
-    #[cfg(feature = "mock1")]
+    #[cfg(feature = "mock")]
     fn test_scheme_flags_to_scheme_single() {
         #[cfg(not(any(
             feature = "zdc",
@@ -822,14 +822,14 @@ mod tests {
             feature = "apgs",
             feature = "adsv",
             feature = "apsv",
-            feature = "mock1",
-            feature = "mock2",
-            feature = "ob00"
+            feature = "mock",
+            feature = "mock",
+            feature = "legacy"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
         let flags = SchemeFlags {
-            #[cfg(feature = "ob00")]
-            ob00: false,
+            #[cfg(feature = "legacy")]
+            legacy: false,
             #[cfg(feature = "zdc")]
             zdc: false,
             #[cfg(feature = "upc")]
@@ -842,9 +842,9 @@ mod tests {
             adsv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
-            #[cfg(feature = "mock1")]
+            #[cfg(feature = "mock")]
             mock1: true,
-            #[cfg(feature = "mock2")]
+            #[cfg(feature = "mock")]
             mock2: false,
         };
         assert_eq!(flags.to_scheme().unwrap(), Some(Scheme::Mock1));
@@ -861,14 +861,14 @@ mod tests {
             feature = "apgs",
             feature = "adsv",
             feature = "apsv",
-            feature = "mock1",
-            feature = "mock2",
-            feature = "ob00"
+            feature = "mock",
+            feature = "mock",
+            feature = "legacy"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
         let flags = SchemeFlags {
-            #[cfg(feature = "ob00")]
-            ob00: false,
+            #[cfg(feature = "legacy")]
+            legacy: false,
             #[cfg(feature = "zdc")]
             zdc: false,
             #[cfg(feature = "upc")]
@@ -881,9 +881,9 @@ mod tests {
             adsv: true,
             #[cfg(feature = "apsv")]
             apsv: true,
-            #[cfg(feature = "mock1")]
+            #[cfg(feature = "mock")]
             mock1: false,
-            #[cfg(feature = "mock2")]
+            #[cfg(feature = "mock")]
             mock2: false,
         };
         assert!(flags.to_scheme().is_err());
@@ -898,14 +898,14 @@ mod tests {
             feature = "apgs",
             feature = "adsv",
             feature = "apsv",
-            feature = "mock1",
-            feature = "mock2",
-            feature = "ob00"
+            feature = "mock",
+            feature = "mock",
+            feature = "legacy"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
         let flags = SchemeFlags {
-            #[cfg(feature = "ob00")]
-            ob00: false,
+            #[cfg(feature = "legacy")]
+            legacy: false,
             #[cfg(feature = "zdc")]
             zdc: false,
             #[cfg(feature = "upc")]
@@ -918,9 +918,9 @@ mod tests {
             adsv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
-            #[cfg(feature = "mock1")]
+            #[cfg(feature = "mock")]
             mock1: false,
-            #[cfg(feature = "mock2")]
+            #[cfg(feature = "mock")]
             mock2: false,
         };
         assert_eq!(flags.to_scheme().unwrap(), None);
@@ -949,7 +949,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "mock1")]
+    #[cfg(feature = "mock")]
     fn test_format_spec_from_format_string() {
         let config = Config {
             profile: "test".to_string(),
@@ -964,14 +964,14 @@ mod tests {
             feature = "apgs",
             feature = "adsv",
             feature = "apsv",
-            feature = "mock1",
-            feature = "mock2",
-            feature = "ob00"
+            feature = "mock",
+            feature = "mock",
+            feature = "legacy"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
         let scheme_flags = SchemeFlags {
-            #[cfg(feature = "ob00")]
-            ob00: false,
+            #[cfg(feature = "legacy")]
+            legacy: false,
             #[cfg(feature = "zdc")]
             zdc: false,
             #[cfg(feature = "upc")]
@@ -984,9 +984,9 @@ mod tests {
             adsv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
-            #[cfg(feature = "mock1")]
+            #[cfg(feature = "mock")]
             mock1: false,
-            #[cfg(feature = "mock2")]
+            #[cfg(feature = "mock")]
             mock2: false,
         };
         let encoding_flags = EncodingFlags {
@@ -1009,7 +1009,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "mock1")]
+    #[cfg(feature = "mock")]
     fn test_format_spec_conflicts_with_scheme_flag() {
         #[cfg(not(any(
             feature = "zdc",
@@ -1018,14 +1018,14 @@ mod tests {
             feature = "apgs",
             feature = "adsv",
             feature = "apsv",
-            feature = "mock1",
-            feature = "mock2",
-            feature = "ob00"
+            feature = "mock",
+            feature = "mock",
+            feature = "legacy"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
         let scheme_flags = SchemeFlags {
-            #[cfg(feature = "ob00")]
-            ob00: false,
+            #[cfg(feature = "legacy")]
+            legacy: false,
             #[cfg(feature = "zdc")]
             zdc: false,
             #[cfg(feature = "upc")]
@@ -1038,9 +1038,9 @@ mod tests {
             adsv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
-            #[cfg(feature = "mock1")]
+            #[cfg(feature = "mock")]
             mock1: true,
-            #[cfg(feature = "mock2")]
+            #[cfg(feature = "mock")]
             mock2: false,
         };
         let encoding_flags = EncodingFlags {
@@ -1073,14 +1073,14 @@ mod tests {
             feature = "apgs",
             feature = "adsv",
             feature = "apsv",
-            feature = "mock1",
-            feature = "mock2",
-            feature = "ob00"
+            feature = "mock",
+            feature = "mock",
+            feature = "legacy"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
         let scheme_flags = SchemeFlags {
-            #[cfg(feature = "ob00")]
-            ob00: false,
+            #[cfg(feature = "legacy")]
+            legacy: false,
             #[cfg(feature = "zdc")]
             zdc: false,
             #[cfg(feature = "upc")]
@@ -1093,9 +1093,9 @@ mod tests {
             adsv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
-            #[cfg(feature = "mock1")]
+            #[cfg(feature = "mock")]
             mock1: false,
-            #[cfg(feature = "mock2")]
+            #[cfg(feature = "mock")]
             mock2: false,
         };
         let encoding_flags = EncodingFlags {
@@ -1120,7 +1120,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "mock1")]
+    #[cfg(feature = "mock")]
     fn test_format_spec_from_flags() {
         let config = Config {
             profile: "test".to_string(),
@@ -1135,14 +1135,14 @@ mod tests {
             feature = "apgs",
             feature = "adsv",
             feature = "apsv",
-            feature = "mock1",
-            feature = "mock2",
-            feature = "ob00"
+            feature = "mock",
+            feature = "mock",
+            feature = "legacy"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
         let scheme_flags = SchemeFlags {
-            #[cfg(feature = "ob00")]
-            ob00: false,
+            #[cfg(feature = "legacy")]
+            legacy: false,
             #[cfg(feature = "zdc")]
             zdc: false,
             #[cfg(feature = "upc")]
@@ -1155,9 +1155,9 @@ mod tests {
             adsv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
-            #[cfg(feature = "mock1")]
+            #[cfg(feature = "mock")]
             mock1: true,
-            #[cfg(feature = "mock2")]
+            #[cfg(feature = "mock")]
             mock2: false,
         };
         let encoding_flags = EncodingFlags {
@@ -1175,7 +1175,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "mock1")]
+    #[cfg(feature = "mock")]
     fn test_format_spec_from_config() {
         let config = Config {
             profile: "test".to_string(),
@@ -1190,14 +1190,14 @@ mod tests {
             feature = "apgs",
             feature = "adsv",
             feature = "apsv",
-            feature = "mock1",
-            feature = "mock2",
-            feature = "ob00"
+            feature = "mock",
+            feature = "mock",
+            feature = "legacy"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
         let scheme_flags = SchemeFlags {
-            #[cfg(feature = "ob00")]
-            ob00: false,
+            #[cfg(feature = "legacy")]
+            legacy: false,
             #[cfg(feature = "zdc")]
             zdc: false,
             #[cfg(feature = "upc")]
@@ -1210,9 +1210,9 @@ mod tests {
             adsv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
-            #[cfg(feature = "mock1")]
+            #[cfg(feature = "mock")]
             mock1: false,
-            #[cfg(feature = "mock2")]
+            #[cfg(feature = "mock")]
             mock2: false,
         };
         let encoding_flags = EncodingFlags {
@@ -1230,14 +1230,14 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "mock1")]
+    #[cfg(feature = "mock")]
     fn test_get_scheme_from_override() {
         let result = get_scheme(Some(Scheme::Mock1), None);
         assert_eq!(result.unwrap(), Scheme::Mock1);
     }
 
     #[test]
-    #[cfg(feature = "mock1")]
+    #[cfg(feature = "mock")]
     fn test_get_scheme_from_config() {
         let config = Config {
             profile: "test".to_string(),

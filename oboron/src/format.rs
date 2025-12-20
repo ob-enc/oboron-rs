@@ -93,36 +93,36 @@ impl Format {
             // Testing
 
             // mock1 variants
-            #[cfg(feature = "mock1")]
+            #[cfg(feature = "mock")]
             constants::MOCK1_C32 => Format::new(Scheme::Mock1, Encoding::Base32Crockford),
-            #[cfg(feature = "mock1")]
+            #[cfg(feature = "mock")]
             constants::MOCK1_B32 => Format::new(Scheme::Mock1, Encoding::Base32Rfc),
-            #[cfg(feature = "mock1")]
+            #[cfg(feature = "mock")]
             constants::MOCK1_B64 => Format::new(Scheme::Mock1, Encoding::Base64),
-            #[cfg(feature = "mock1")]
+            #[cfg(feature = "mock")]
             constants::MOCK1_HEX => Format::new(Scheme::Mock1, Encoding::Hex),
 
             // mock2 variants
-            #[cfg(feature = "mock2")]
+            #[cfg(feature = "mock")]
             constants::MOCK2_C32 => Format::new(Scheme::Mock2, Encoding::Base32Crockford),
-            #[cfg(feature = "mock2")]
+            #[cfg(feature = "mock")]
             constants::MOCK2_B32 => Format::new(Scheme::Mock2, Encoding::Base32Rfc),
-            #[cfg(feature = "mock2")]
+            #[cfg(feature = "mock")]
             constants::MOCK2_B64 => Format::new(Scheme::Mock2, Encoding::Base64),
-            #[cfg(feature = "mock2")]
+            #[cfg(feature = "mock")]
             constants::MOCK2_HEX => Format::new(Scheme::Mock2, Encoding::Hex),
 
             // Legacy
 
-            // ob00 variants
-            #[cfg(feature = "ob00")]
-            constants::OB00_C32 => Format::new(Scheme::Ob00, Encoding::Base32Crockford),
-            #[cfg(feature = "ob00")]
-            constants::OB00_B32 => Format::new(Scheme::Ob00, Encoding::Base32Rfc),
-            #[cfg(feature = "ob00")]
-            constants::OB00_B64 => Format::new(Scheme::Ob00, Encoding::Base64),
-            #[cfg(feature = "ob00")]
-            constants::OB00_HEX => Format::new(Scheme::Ob00, Encoding::Hex),
+            // legacy variants
+            #[cfg(feature = "legacy")]
+            constants::LEGACY_C32 => Format::new(Scheme::Legacy, Encoding::Base32Crockford),
+            #[cfg(feature = "legacy")]
+            constants::LEGACY_B32 => Format::new(Scheme::Legacy, Encoding::Base32Rfc),
+            #[cfg(feature = "legacy")]
+            constants::LEGACY_B64 => Format::new(Scheme::Legacy, Encoding::Base64),
+            #[cfg(feature = "legacy")]
+            constants::LEGACY_HEX => Format::new(Scheme::Legacy, Encoding::Hex),
 
             _ => return Err(Error::InvalidFormat),
         })
@@ -169,13 +169,13 @@ mod tests {
             #[cfg(feature = "apsv")]
             Scheme::Apsv,
             // Testing
-            #[cfg(feature = "mock1")]
+            #[cfg(feature = "mock")]
             Scheme::Mock1,
-            #[cfg(feature = "mock2")]
+            #[cfg(feature = "mock")]
             Scheme::Mock2,
             // Legacy
-            #[cfg(feature = "ob00")]
-            Scheme::Ob00,
+            #[cfg(feature = "legacy")]
+            Scheme::Legacy,
         ];
 
         // Define all encodings
@@ -222,7 +222,7 @@ mod tests {
     #[test]
     fn test_format_to_string_roundtrip() {
         // Define test cases: (scheme, encoding, expected_string)
-        #[cfg(feature = "non-crypto")]
+        #[cfg(feature = "mock")]
         let mut test_cases = vec![
             (Scheme::Mock2, Encoding::Base32Crockford, "mock2:c32"),
             (Scheme::Mock2, Encoding::Base32Rfc, "mock2:b32"),
@@ -234,12 +234,12 @@ mod tests {
             (Scheme::Mock1, Encoding::Hex, "mock1:hex"),
         ];
 
-        #[cfg(feature = "ob00")]
+        #[cfg(feature = "legacy")]
         test_cases.extend(vec![
-            (Scheme::Ob00, Encoding::Base32Crockford, "ob00:c32"),
-            (Scheme::Ob00, Encoding::Base32Rfc, "ob00:b32"),
-            (Scheme::Ob00, Encoding::Base64, "ob00:b64"),
-            (Scheme::Ob00, Encoding::Hex, "ob00:hex"),
+            (Scheme::Legacy, Encoding::Base32Crockford, "legacy:c32"),
+            (Scheme::Legacy, Encoding::Base32Rfc, "legacy:b32"),
+            (Scheme::Legacy, Encoding::Base64, "legacy:b64"),
+            (Scheme::Legacy, Encoding::Hex, "legacy:hex"),
         ]);
 
         #[cfg(feature = "zdc")]
@@ -318,20 +318,20 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "ob00")]
-    fn test_ob00_supports_both_base32_variants() {
-        // ob00 should support both Base32Rfc and Base32Crockford
-        let format_rfc = Format::from_str("ob00:b32").unwrap();
-        assert_eq!(format_rfc.scheme(), Scheme::Ob00);
+    #[cfg(feature = "legacy")]
+    fn test_legacy_supports_both_base32_variants() {
+        // legacy should support both Base32Rfc and Base32Crockford
+        let format_rfc = Format::from_str("legacy:b32").unwrap();
+        assert_eq!(format_rfc.scheme(), Scheme::Legacy);
         assert_eq!(format_rfc.encoding(), Encoding::Base32Rfc);
 
-        let format_crock = Format::from_str("ob00:c32").unwrap();
-        assert_eq!(format_crock.scheme(), Scheme::Ob00);
+        let format_crock = Format::from_str("legacy:c32").unwrap();
+        assert_eq!(format_crock.scheme(), Scheme::Legacy);
         assert_eq!(format_crock.encoding(), Encoding::Base32Crockford);
     }
 
     #[test]
-    #[cfg(all(feature = "all-schemes", feature = "non-crypto"))]
+    #[cfg(all(feature = "all-schemes", feature = "mock"))]
     fn test_all_schemes_support_both_base32_variants() {
         // All schemes should support both Base32Rfc (b32) and Base32Crockford (c32)
         let schemes = vec![

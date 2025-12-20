@@ -46,7 +46,7 @@ but note that pre-1.0 releases may not adhere strictly to all guidelines.
     - ob32p -> apsv
     - ob70  -> mock1
     - ob71  -> mock2
-  - ob00 remains unchanged (legacy format)
+    - ob00  -> legacy
   - new format uses "." as separator instead of colon
   - renamed formats:
     - ob01:c32  -> zdc.c32

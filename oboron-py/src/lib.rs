@@ -340,37 +340,37 @@ impl_cipher_class!(
     "Mock2 cipher with Hex encoding (Reverse scheme, for testing)"
 );
 
-// Ob00 - LEGACY variants
+// Legacy - LEGACY variants
 // ----------------------
-#[cfg(feature = "ob00")]
+#[cfg(feature = "legacy")]
 impl_cipher_class!(
-    Ob00Base32Crockford,
-    ::oboron::Ob00Base32Crockford,
-    "Ob00 cipher with Base32Crockford encoding (LEGACY AES-CBC with custom padding)\n\n\
+    LegacyC32,
+    ::oboron::LegacyC32,
+    "Legacy cipher with Base32Crockford encoding (LEGACY AES-CBC with custom padding)\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
      For new projects, use Zdc or more secure schemes like Adgs/Adsv."
 );
-#[cfg(feature = "ob00")]
+#[cfg(feature = "legacy")]
 impl_cipher_class!(
-    Ob00Base32Rfc,
-    ::oboron::Ob00Base32Rfc,
-    "Ob00 cipher with Base32Rfc encoding (LEGACY AES-CBC with custom padding)\n\n\
+    LegacyB32,
+    ::oboron::LegacyB32,
+    "Legacy cipher with Base32Rfc encoding (LEGACY AES-CBC with custom padding)\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
      For new projects, use Zdc or more secure schemes like Adgs/Adsv."
 );
-#[cfg(feature = "ob00")]
+#[cfg(feature = "legacy")]
 impl_cipher_class!(
-    Ob00Base64,
-    ::oboron::Ob00Base64,
-    "Ob00 cipher with Base64 encoding (LEGACY AES-CBC with custom padding)\n\n\
+    LegacyB64,
+    ::oboron::LegacyB64,
+    "Legacy cipher with Base64 encoding (LEGACY AES-CBC with custom padding)\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
      For new projects, use Zdc or more secure schemes like Adgs/Adsv."
 );
-#[cfg(feature = "ob00")]
+#[cfg(feature = "legacy")]
 impl_cipher_class!(
-    Ob00Hex,
-    ::oboron::Ob00Hex,
-    "Ob00 cipher with Hex encoding (LEGACY AES-CBC with custom padding)\n\n\
+    LegacyHex,
+    ::oboron::LegacyHex,
+    "Legacy cipher with Hex encoding (LEGACY AES-CBC with custom padding)\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
      For new projects, use Zdc or more secure schemes like Adgs/Adsv."
 );
@@ -799,13 +799,13 @@ fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
     // Multi-format interface
     m.add_class::<ObMulti>()?;
 
-    // Ob00 variants (LEGACY)
-    #[cfg(feature = "ob00")]
+    // Legacy variants (LEGACY)
+    #[cfg(feature = "legacy")]
     {
-        m.add_class::<Ob00Base32Crockford>()?;
-        m.add_class::<Ob00Base32Rfc>()?;
-        m.add_class::<Ob00Base64>()?;
-        m.add_class::<Ob00Hex>()?;
+        m.add_class::<LegacyC32>()?;
+        m.add_class::<LegacyB32>()?;
+        m.add_class::<LegacyB64>()?;
+        m.add_class::<LegacyHex>()?;
     }
 
     // Zdc variants

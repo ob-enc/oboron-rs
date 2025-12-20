@@ -51,17 +51,17 @@ impl Keychain {
     // Key derivation ==================================================
 
     // AES-128 key for AES-CBC (first 16 bytes)
-    // Used in ob00, zdc, upc schemes
+    // Used in legacy, zdc, upc schemes
     #[inline]
-    #[cfg(any(feature = "ob00", feature = "zdc", feature = "upc"))]
+    #[cfg(any(feature = "legacy", feature = "zdc", feature = "upc"))]
     pub(crate) fn cbc(&self) -> &[u8; 16] {
         self.key[..16].try_into().unwrap()
     }
 
     // Constant IV for deterministic AES-CBC (second 16 bytes)
-    // Used in ob00 and zdc schemes
+    // Used in legacy and zdc schemes
     #[inline]
-    #[cfg(any(feature = "ob00", feature = "zdc"))]
+    #[cfg(any(feature = "legacy", feature = "zdc"))]
     pub(crate) fn cbc_iv(&self) -> &[u8; 16] {
         self.key[16..32].try_into().unwrap()
     }

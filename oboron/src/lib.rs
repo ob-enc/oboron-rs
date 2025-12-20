@@ -108,7 +108,7 @@
 //!
 //! ```rust
 //! # fn main() -> Result<(), oboron::Error> {
-//! # #[cfg(all(feature = "adsv", feature = "non-crypto"))]
+//! # #[cfg(all(feature = "adsv", feature = "mock"))]
 //! # {
 //! # use oboron::{ObFlex, Oboron, Scheme, Encoding};
 //! # let key = oboron::generate_key();
@@ -164,7 +164,7 @@
 //!
 //! ```rust
 //! # fn main() -> Result<(), oboron::Error> {
-//! # #[cfg(all(feature = "adsv", feature = "non-crypto"))]
+//! # #[cfg(all(feature = "adsv", feature = "mock"))]
 //! # {
 //! # use oboron::Oboron;
 //! # use oboron;
@@ -205,7 +205,7 @@
 //! - `Adsv`: AES-SIV (deterministic, nonce-misuse resistant)
 //! - `Upc`, `Apgs`, `Apsv`: Probabilistic variants (different output each time)
 //!
-//! Testing/Demo only schemes using no encryption (`non-crypto` feature group):
+//! Testing/Demo only schemes using no encryption (`mock` feature group):
 //! - `Mock1`: Identity
 //! - `Mock2`: Reverse plaintext
 //!
@@ -252,7 +252,7 @@ mod encoding;
 mod error;
 mod format;
 mod keygen;
-#[cfg(feature = "ob00")]
+#[cfg(feature = "legacy")]
 mod legacy;
 mod ob;
 mod ob_core;
@@ -283,9 +283,9 @@ pub(crate) use obcrypt::{decrypt_upc, encrypt_upc};
 pub(crate) use obcrypt::{decrypt_zdc, encrypt_zdc};
 
 // Testing
-#[cfg(feature = "mock1")]
+#[cfg(feature = "mock")]
 pub(crate) use obcrypt::{decrypt_mock1, encrypt_mock1};
-#[cfg(feature = "mock2")]
+#[cfg(feature = "mock")]
 pub(crate) use obcrypt::{decrypt_mock2, encrypt_mock2};
 
 pub use keygen::generate_key;
@@ -326,13 +326,13 @@ pub use constants::{UPC_B32, UPC_B64, UPC_C32, UPC_HEX};
 #[cfg(feature = "zdc")]
 pub use constants::{ZDC_B32, ZDC_B64, ZDC_C32, ZDC_HEX};
 // Testing
-#[cfg(feature = "mock1")]
+#[cfg(feature = "mock")]
 pub use constants::{MOCK1_B32, MOCK1_B64, MOCK1_C32, MOCK1_HEX};
-#[cfg(feature = "mock2")]
+#[cfg(feature = "mock")]
 pub use constants::{MOCK2_B32, MOCK2_B64, MOCK2_C32, MOCK2_HEX};
 // Legacy
-#[cfg(feature = "ob00")]
-pub use constants::{OB00_B32, OB00_B64, OB00_C32, OB00_HEX};
+#[cfg(feature = "legacy")]
+pub use constants::{LEGACY_B32, LEGACY_B64, LEGACY_C32, LEGACY_HEX};
 
 // Conditionally export format-specific structs (scheme+encoding combinations)
 #[cfg(feature = "adgs")]
@@ -348,13 +348,13 @@ pub use oboron::{UpcB32, UpcB64, UpcC32, UpcHex};
 #[cfg(feature = "zdc")]
 pub use oboron::{ZdcB32, ZdcB64, ZdcC32, ZdcHex};
 // Testing
-#[cfg(feature = "mock1")]
+#[cfg(feature = "mock")]
 pub use oboron::{Mock1B32, Mock1B64, Mock1C32, Mock1Hex};
-#[cfg(feature = "mock2")]
+#[cfg(feature = "mock")]
 pub use oboron::{Mock2B32, Mock2B64, Mock2C32, Mock2Hex};
 // Legacy
-#[cfg(feature = "ob00")]
-pub use legacy::{Ob00Base32Crockford, Ob00Base32Rfc, Ob00Base64, Ob00Hex};
+#[cfg(feature = "legacy")]
+pub use legacy::{LegacyBase32Crockford, LegacyBase32Rfc, LegacyBase64, LegacyHex};
 
 // Aliases for default encoding:
 #[cfg(feature = "zdc")]
@@ -370,13 +370,13 @@ pub type Adsv = AdsvC32;
 #[cfg(feature = "apsv")]
 pub type Apsv = ApsvC32;
 // Testing
-#[cfg(feature = "mock1")]
+#[cfg(feature = "mock")]
 pub type Mock1 = Mock1C32;
-#[cfg(feature = "mock2")]
+#[cfg(feature = "mock")]
 pub type Mock2 = Mock2C32;
 // Legacy
-#[cfg(feature = "ob00")]
-pub type Ob00 = Ob00Base32Rfc;
+#[cfg(feature = "legacy")]
+pub type Legacy = LegacyBase32Rfc;
 
 // Re-export multi-format Oboron implementation
 pub use ob_multi::ObMulti;

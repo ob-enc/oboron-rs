@@ -994,7 +994,7 @@ Available constants:
 - `ADSV_C32`, `ADSV_B32`, `ADSV_B64`, `ADSV_HEX`
 - `APSV_C32`, `APSV_B32`, `APSV_B64`, `APSV_HEX`
 - Testing:  `MOCK1_*`, `MOCK2_*`
-- Legacy: `OB00_*`
+- Legacy: `LEGACY_*`
 
 ### Typical Production Use
 

@@ -13,7 +13,7 @@ use crate::{ob_core::ObCore, Encoding, Error, Format, Oboron, Scheme};
 ///
 /// ```rust
 /// # fn main() -> Result<(), oboron::Error> {
-/// # #[cfg(all(feature = "adsv", feature = "non-crypto"))]
+/// # #[cfg(all(feature = "adsv", feature = "mock"))]
 /// # {
 /// # use oboron::{Oboron, ObFlex, Scheme, Encoding, Format, ADSV_HEX};
 /// # let key = oboron::generate_key();
@@ -129,7 +129,7 @@ impl ObFlex {
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(all(feature = "adsv", feature = "non-crypto"))]
+    /// # #[cfg(all(feature = "adsv", feature = "mock"))]
     /// # {
     /// # use oboron::{ObFlex, Format, Scheme, Encoding};
     /// # let key = oboron::generate_key();
@@ -151,7 +151,7 @@ impl ObFlex {
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(all(feature = "adsv", feature = "non-crypto"))]
+    /// # #[cfg(all(feature = "adsv", feature = "mock"))]
     /// # {
     /// # use oboron::{ObFlex, Scheme};
     /// # let key = oboron::generate_key();

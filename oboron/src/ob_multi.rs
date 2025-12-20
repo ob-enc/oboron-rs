@@ -16,7 +16,7 @@ use crate::{Error, Format, Keychain};
 ///
 /// ```rust
 /// # fn main() -> Result<(), oboron::Error> {
-/// # #[cfg(all(feature = "adsv", feature="non-crypto"))]
+/// # #[cfg(all(feature = "adsv", feature="mock"))]
 /// # {
 /// # use oboron::{ObMulti, MOCK1_B64};
 /// # let key = oboron::generate_key();
@@ -60,7 +60,7 @@ impl ObMulti {
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(all(feature = "adsv", feature="non-crypto"))]
+    /// # #[cfg(all(feature = "adsv", feature="mock"))]
     /// # {
     /// # use oboron::ObMulti;
     /// let key = oboron::generate_key();
