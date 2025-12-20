@@ -42,7 +42,7 @@ pub trait Oboron {
 }
 
 #[cfg(feature = "legacy")]
-use crate::legacy::{LegacyBase32Crockford, LegacyBase32Rfc, LegacyBase64, LegacyHex};
+use crate::legacy::{LegacyB32, LegacyB64, LegacyC32, LegacyHex};
 
 /// Macro to implement optimized Oboron types with compile-time specialization.
 ///
@@ -330,11 +330,11 @@ pub enum ObAny {
     Mock2B64(Mock2B64),
     // Legacy
     #[cfg(feature = "legacy")]
-    LegacyBase32Crockford(LegacyBase32Crockford),
+    LegacyC32(LegacyC32),
     #[cfg(feature = "legacy")]
-    LegacyBase32Rfc(LegacyBase32Rfc),
+    LegacyB32(LegacyB32),
     #[cfg(feature = "legacy")]
-    LegacyBase64(LegacyBase64),
+    LegacyB64(LegacyB64),
     #[cfg(feature = "legacy")]
     LegacyHex(LegacyHex),
 }
@@ -411,11 +411,11 @@ macro_rules! delegate_to_inner {
                 ObAny::Mock2Hex(ob) => ob.$method($($arg),*),
                 // Legacy
                 #[cfg(feature = "legacy")]
-                ObAny::LegacyBase32Crockford(ob) => ob.$method($($arg),*),
+                ObAny::LegacyC32(ob) => ob.$method($($arg),*),
                 #[cfg(feature = "legacy")]
-                ObAny::LegacyBase32Rfc(ob) => ob.$method($($arg),*),
+                ObAny::LegacyB32(ob) => ob.$method($($arg),*),
                 #[cfg(feature = "legacy")]
-                ObAny::LegacyBase64(ob) => ob.$method($($arg),*),
+                ObAny::LegacyB64(ob) => ob.$method($($arg),*),
                 #[cfg(feature = "legacy")]
                 ObAny::LegacyHex(ob) => ob.$method($($arg),*),
             }
@@ -486,9 +486,7 @@ impl ObAny {
             feature = "adsv",
             feature = "apsv"
         )))]
-        return Ok(ObAny::LegacyBase32Crockford(LegacyBase32Crockford::new(
-            key,
-        )?));
+        return Ok(ObAny::LegacyC32(LegacyC32::new(key)?));
         #[cfg(not(any(
             feature = "mock",
             feature = "zdc",
@@ -565,7 +563,7 @@ impl ObAny {
             feature = "adsv",
             feature = "apsv"
         )))]
-        return Ok(ObAny::LegacyBase32Crockford(LegacyBase32Crockford {
+        return Ok(ObAny::LegacyC32(LegacyC32 {
             keychain: Keychain::from_bytes(key_bytes)?,
         }));
         #[cfg(not(any(
@@ -626,9 +624,7 @@ impl ObAny {
             feature = "adsv",
             feature = "apsv"
         )))]
-        return Ok(ObAny::LegacyBase32Crockford(
-            LegacyBase32Crockford::from_hex_key(key_hex)?,
-        ));
+        return Ok(ObAny::LegacyC32(LegacyC32::from_hex_key(key_hex)?));
         #[cfg(not(any(
             feature = "mock",
             feature = "zdc",
@@ -704,7 +700,7 @@ impl ObAny {
             feature = "adsv",
             feature = "apsv"
         )))]
-        return Ok(ObAny::LegacyBase32Crockford(LegacyBase32Crockford {
+        return Ok(ObAny::LegacyC32(LegacyC32 {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
         }));
         #[cfg(not(any(
@@ -797,15 +793,11 @@ pub fn new_with_format(format: Format, key: &str) -> Result<ObAny, Error> {
         (Scheme::Mock2, Encoding::Hex) => Ok(ObAny::Mock2Hex(Mock2Hex::new(key)?)),
         // Legacy
         #[cfg(feature = "legacy")]
-        (Scheme::Legacy, Encoding::Base32Crockford) => Ok(ObAny::LegacyBase32Crockford(
-            LegacyBase32Crockford::new(key)?,
-        )),
+        (Scheme::Legacy, Encoding::Base32Crockford) => Ok(ObAny::LegacyC32(LegacyC32::new(key)?)),
         #[cfg(feature = "legacy")]
-        (Scheme::Legacy, Encoding::Base32Rfc) => {
-            Ok(ObAny::LegacyBase32Rfc(LegacyBase32Rfc::new(key)?))
-        }
+        (Scheme::Legacy, Encoding::Base32Rfc) => Ok(ObAny::LegacyB32(LegacyB32::new(key)?)),
         #[cfg(feature = "legacy")]
-        (Scheme::Legacy, Encoding::Base64) => Ok(ObAny::LegacyBase64(LegacyBase64::new(key)?)),
+        (Scheme::Legacy, Encoding::Base64) => Ok(ObAny::LegacyB64(LegacyB64::new(key)?)),
         #[cfg(feature = "legacy")]
         (Scheme::Legacy, Encoding::Hex) => Ok(ObAny::LegacyHex(LegacyHex::new(key)?)),
         #[allow(unreachable_patterns)]
@@ -943,17 +935,17 @@ fn from_bytes_with_format_internal(format: Format, key_bytes: &[u8; 64]) -> Resu
         }
         // Legacy
         #[cfg(feature = "legacy")]
-        (Scheme::Legacy, Encoding::Base32Crockford) => Ok(ObAny::LegacyBase32Crockford(
-            LegacyBase32Crockford::from_bytes_internal(key_bytes)?,
-        )),
+        (Scheme::Legacy, Encoding::Base32Crockford) => {
+            Ok(ObAny::LegacyC32(LegacyC32::from_bytes_internal(key_bytes)?))
+        }
         #[cfg(feature = "legacy")]
-        (Scheme::Legacy, Encoding::Base32Rfc) => Ok(ObAny::LegacyBase32Rfc(
-            LegacyBase32Rfc::from_bytes_internal(key_bytes)?,
-        )),
+        (Scheme::Legacy, Encoding::Base32Rfc) => {
+            Ok(ObAny::LegacyB32(LegacyB32::from_bytes_internal(key_bytes)?))
+        }
         #[cfg(feature = "legacy")]
-        (Scheme::Legacy, Encoding::Base64) => Ok(ObAny::LegacyBase64(
-            LegacyBase64::from_bytes_internal(key_bytes)?,
-        )),
+        (Scheme::Legacy, Encoding::Base64) => {
+            Ok(ObAny::LegacyB64(LegacyB64::from_bytes_internal(key_bytes)?))
+        }
         #[cfg(feature = "legacy")]
         (Scheme::Legacy, Encoding::Hex) => {
             Ok(ObAny::LegacyHex(LegacyHex::from_bytes_internal(key_bytes)?))

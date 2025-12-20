@@ -354,7 +354,7 @@ pub use oboron::{Mock1B32, Mock1B64, Mock1C32, Mock1Hex};
 pub use oboron::{Mock2B32, Mock2B64, Mock2C32, Mock2Hex};
 // Legacy
 #[cfg(feature = "legacy")]
-pub use legacy::{LegacyBase32Crockford, LegacyBase32Rfc, LegacyBase64, LegacyHex};
+pub use legacy::{LegacyB32, LegacyB64, LegacyC32, LegacyHex};
 
 // Aliases for default encoding:
 #[cfg(feature = "zdc")]
@@ -376,7 +376,7 @@ pub type Mock1 = Mock1C32;
 pub type Mock2 = Mock2C32;
 // Legacy
 #[cfg(feature = "legacy")]
-pub type Legacy = LegacyBase32Rfc;
+pub type Legacy = LegacyB32;
 
 // Re-export multi-format Oboron implementation
 pub use ob_multi::ObMulti;

@@ -120,7 +120,7 @@ pub(crate) fn dec_legacy(
 }
 
 // ============================================================================
-// Public Oboron Implementations (LegacyBase32Crockford, LegacyBase32Rfc, LegacyBase64, LegacyHex)
+// Public Oboron Implementations (LegacyC32, LegacyB32, LegacyB64, LegacyHex)
 // ============================================================================
 
 /// Macro to implement legacy Oboron variants with different encodings.
@@ -197,9 +197,9 @@ macro_rules! impl_legacy_oboron {
             /// # Examples
             ///
             /// ```
-            /// # use oboron::{Oboron, LegacyBase32Rfc};
+            /// # use oboron::{Oboron, LegacyB32};
             /// let key = oboron::generate_key();
-            /// let ob = LegacyBase32Rfc::new(&key)? ;
+            /// let ob = LegacyB32::new(&key)? ;
             /// # Ok::<(), oboron::Error>(())
             /// ```
             pub fn new(key: &str) -> Result<Self, Error> {
@@ -219,10 +219,10 @@ macro_rules! impl_legacy_oboron {
             /// # Examples
             ///
             /// ```
-            /// use oboron::{Oboron, LegacyBase32Rfc};
+            /// use oboron::{Oboron, LegacyB32};
             ///
             /// let key_hex = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-            /// let ob = LegacyBase32Rfc::from_hex_key(key_hex)? ;
+            /// let ob = LegacyB32::from_hex_key(key_hex)? ;
             /// # Ok::<(), oboron::Error>(())
             /// ```
             #[cfg(feature = "hex-keys")]
@@ -243,10 +243,10 @@ macro_rules! impl_legacy_oboron {
             /// # Examples
             ///
             /// ```
-            /// use oboron::{Oboron, LegacyBase32Rfc};
+            /// use oboron::{Oboron, LegacyB32};
             ///
             /// let key = [0u8; 64];
-            /// let ob = LegacyBase32Rfc::from_bytes(&key)?;
+            /// let ob = LegacyB32::from_bytes(&key)?;
             /// # Ok::<(), oboron::Error>(())
             /// ```
             #[inline]
@@ -271,9 +271,9 @@ macro_rules! impl_legacy_oboron {
             /// # Examples
             ///
             /// ```
-            /// use oboron::{Oboron, LegacyBase32Rfc};
+            /// use oboron::{Oboron, LegacyB32};
             ///
-            /// let ob = LegacyBase32Rfc::new_keyless()?;
+            /// let ob = LegacyB32::new_keyless()?;
             /// let ot = ob.enc("test")?;
             /// # Ok::<(), oboron::Error>(())
             /// ```
@@ -286,13 +286,9 @@ macro_rules! impl_legacy_oboron {
 }
 
 // Generate all legacy encoding variants
-impl_legacy_oboron!(
-    LegacyBase32Crockford,
-    Encoding::Base32Crockford,
-    "legacy:c32"
-);
-impl_legacy_oboron!(LegacyBase32Rfc, Encoding::Base32Rfc, "legacy:b32");
-impl_legacy_oboron!(LegacyBase64, Encoding::Base64, "legacy:b64");
+impl_legacy_oboron!(LegacyC32, Encoding::Base32Crockford, "legacy:c32");
+impl_legacy_oboron!(LegacyB32, Encoding::Base32Rfc, "legacy:b32");
+impl_legacy_oboron!(LegacyB64, Encoding::Base64, "legacy:b64");
 impl_legacy_oboron!(LegacyHex, Encoding::Hex, "legacy:hex");
 
 #[cfg(test)]
@@ -303,7 +299,7 @@ mod tests {
     #[test]
     #[cfg(feature = "keyless")]
     fn test_legacy_roundtrip() {
-        let ob = LegacyBase32Rfc::new_keyless().unwrap();
+        let ob = LegacyB32::new_keyless().unwrap();
         let pt = "hello world";
         let ot = ob.enc(pt).unwrap();
         let pt2 = ob.dec_strict(&ot).unwrap();
@@ -315,9 +311,9 @@ mod tests {
         let pt = "test123";
         let key = [42u8; 64];
 
-        let ob_c32 = LegacyBase32Crockford::from_bytes(&key).unwrap();
-        let ob_b32 = LegacyBase32Rfc::from_bytes(&key).unwrap();
-        let ob_b64 = LegacyBase64::from_bytes(&key).unwrap();
+        let ob_c32 = LegacyC32::from_bytes(&key).unwrap();
+        let ob_b32 = LegacyB32::from_bytes(&key).unwrap();
+        let ob_b64 = LegacyB64::from_bytes(&key).unwrap();
         let ob_hex = LegacyHex::from_bytes(&key).unwrap();
 
         let ot_c32 = ob_c32.enc(pt).unwrap();
@@ -343,7 +339,7 @@ mod tests {
     #[test]
     #[cfg(feature = "keyless")]
     fn test_legacy_dec_with_autodetect() {
-        let ob = LegacyBase32Rfc::new_keyless().unwrap();
+        let ob = LegacyB32::new_keyless().unwrap();
         let pt = "autodetect test";
         let ot = ob.enc(pt).unwrap();
 
