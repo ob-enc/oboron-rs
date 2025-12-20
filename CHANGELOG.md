@@ -14,6 +14,26 @@ but note that pre-1.0 releases may not adhere strictly to all guidelines.
 
 - Batch and iter versions of all `enc*()`/`dec*()` methods and functions.
 
+### Changed
+
+
+[0.4.0] - 2025-12-19
+--------------------
+
+### Changed
+
+- Feature-gated convenience functions ("convenience" feature)
+- Python crate README.md - rewrite parallel to oboron crate, adapted
+- Moved `generate_key()` from obcrypt module to top level lib level
+
+
+### Fixed
+
+- Fixed Python API in oboron-py crate:
+  - ObMulti no longer inherits from OboronBase (different interface)
+  - Static classes (e.g., `Ob01`) properties fixed: `scheme`, `encoding`,
+    `format` now consistent
+  - `Ob.format` was a function, now property
 
 [0.3.0] - 2025-12-18
 --------------------
