@@ -25,7 +25,7 @@ struct SchemeFlags {
     #[arg(short = '0', long, alias = "00")]
     ob00: bool,
 
-    /// Use zdc scheme (optimized AES-CBC, recommended)
+    /// Use zdc scheme (optimized AES-CBC)
     #[cfg(feature = "zdc")]
     #[arg(short = '1', long, alias = "01")]
     zdc: bool,
