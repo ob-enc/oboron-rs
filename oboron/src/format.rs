@@ -92,15 +92,15 @@ impl Format {
 
             // Testing
 
-            // ob70 variants
-            #[cfg(feature = "ob70")]
-            constants::OB70_C32 => Format::new(Scheme::Ob70, Encoding::Base32Crockford),
-            #[cfg(feature = "ob70")]
-            constants::OB70_B32 => Format::new(Scheme::Ob70, Encoding::Base32Rfc),
-            #[cfg(feature = "ob70")]
-            constants::OB70_B64 => Format::new(Scheme::Ob70, Encoding::Base64),
-            #[cfg(feature = "ob70")]
-            constants::OB70_HEX => Format::new(Scheme::Ob70, Encoding::Hex),
+            // tdi variants
+            #[cfg(feature = "tdi")]
+            constants::TDI_C32 => Format::new(Scheme::Tdi, Encoding::Base32Crockford),
+            #[cfg(feature = "tdi")]
+            constants::TDI_B32 => Format::new(Scheme::Tdi, Encoding::Base32Rfc),
+            #[cfg(feature = "tdi")]
+            constants::TDI_B64 => Format::new(Scheme::Tdi, Encoding::Base64),
+            #[cfg(feature = "tdi")]
+            constants::TDI_HEX => Format::new(Scheme::Tdi, Encoding::Hex),
 
             // ob71 variants
             #[cfg(feature = "ob71")]
@@ -169,8 +169,8 @@ mod tests {
             #[cfg(feature = "apsv")]
             Scheme::Apsv,
             // Testing
-            #[cfg(feature = "ob70")]
-            Scheme::Ob70,
+            #[cfg(feature = "tdi")]
+            Scheme::Tdi,
             #[cfg(feature = "ob71")]
             Scheme::Ob71,
             // Legacy
@@ -216,7 +216,7 @@ mod tests {
         assert!(Format::from_str("zdc").is_err());
         assert!(Format::from_str("zdc:").is_err());
         assert!(Format::from_str(":b64").is_err());
-        assert!(Format::from_str("ob70:invalid").is_err());
+        assert!(Format::from_str("tdi:invalid").is_err());
     }
 
     #[test]
@@ -228,10 +228,10 @@ mod tests {
             (Scheme::Ob71, Encoding::Base32Rfc, "ob71:b32"),
             (Scheme::Ob71, Encoding::Base64, "ob71:b64"),
             (Scheme::Ob71, Encoding::Hex, "ob71:hex"),
-            (Scheme::Ob70, Encoding::Base32Crockford, "ob70:c32"),
-            (Scheme::Ob70, Encoding::Base32Rfc, "ob70:b32"),
-            (Scheme::Ob70, Encoding::Base64, "ob70:b64"),
-            (Scheme::Ob70, Encoding::Hex, "ob70:hex"),
+            (Scheme::Tdi, Encoding::Base32Crockford, "tdi:c32"),
+            (Scheme::Tdi, Encoding::Base32Rfc, "tdi:b32"),
+            (Scheme::Tdi, Encoding::Base64, "tdi:b64"),
+            (Scheme::Tdi, Encoding::Hex, "tdi:hex"),
         ];
 
         #[cfg(feature = "ob00")]
@@ -334,7 +334,7 @@ mod tests {
     #[cfg(all(feature = "all-schemes", feature = "non-crypto"))]
     fn test_all_schemes_support_both_base32_variants() {
         // All schemes should support both Base32Rfc (b32) and Base32Crockford (c32)
-        let schemes = vec!["zdc", "upc", "adgs", "apgs", "adsv", "apsv", "ob70", "ob71"];
+        let schemes = vec!["zdc", "upc", "adgs", "apgs", "adsv", "apsv", "tdi", "ob71"];
 
         for scheme_str in schemes {
             // Test Base32Crockford (c32)

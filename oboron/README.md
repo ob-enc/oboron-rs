@@ -904,7 +904,7 @@ Available constants:
 - `APGS_C32`, `APGS_B32`, `APGS_B64`, `APGS_HEX`
 - `ADSV_C32`, `ADSV_B32`, `ADSV_B64`, `ADSV_HEX`
 - `APSV_C32`, `APSV_B32`, `APSV_B64`, `APSV_HEX`
-- Testing:  `OB70_*`, `OB71_*`
+- Testing:  `TDI_*`, `OB71_*`
 - Legacy: `OB00_*`
 
 ### Advanced: `Format` Objects
@@ -1004,11 +1004,11 @@ Licensed under the MIT license ([LICENSE](LICENSE)).
 
 ## Appendix: Obtext Lengths
 
-`ob70` is a non-cryptographic scheme used for testing, whose ciphertext
+`tdi` is a non-cryptographic scheme used for testing, whose ciphertext
 is equal to the plaintext bytes (identity transformation). It is
 included in the tables below as baseline.
 
-(Note: the `ob70` scheme is feature gated: use it by enabling the `ob70`
+(Note: the `tdi` scheme is feature gated: use it by enabling the `tdi`
 feature, or the `ob7x` testing feature group, or the `non-crypto` feature
 group.)
 
@@ -1016,7 +1016,7 @@ group.)
 
 | Scheme | Encoding | 4B  | 8B  | 12B | 16B | 24B | 32B | 64B  | 128B |
 |--------|----------|----:|----:|----:|----:|----:|----:|-----:|-----:|
-| ob70   | b32/c32  | 8   | 15  | 21  | 28  | 40  | 53  | 104  | 207  |
+| tdi   | b32/c32  | 8   | 15  | 21  | 28  | 40  | 53  | 104  | 207  |
 | zdc   | b32/c32  | 28  | 28  | 28  | 28  | 53  | 53  | 104  | 207  |
 | adgs   | b32/c32  | 34  | 40  | 47  | 53  | 66  | 79  | 130  | 232  |
 | adsv   | b32/c32  | 34  | 40  | 47  | 53  | 66  | 79  | 130  | 232  |
@@ -1028,7 +1028,7 @@ group.)
 
 | Scheme | Encoding | 4B  | 8B  | 12B | 16B | 24B | 32B | 64B  | 128B |
 |--------|----------|----:|----:|----:|----:|----:|----:|-----:|-----:|
-| ob70   | b64      | 7   | 12  | 18  | 23  | 34  | 44  | 87   | 172  |
+| tdi   | b64      | 7   | 12  | 18  | 23  | 34  | 44  | 87   | 172  |
 | zdc   | b64      | 23  | 23  | 23  | 23  | 44  | 44  | 87   | 172  |
 | adgs   | b64      | 28  | 34  | 39  | 44  | 55  | 66  | 108  | 194  |
 | adsv   | b64      | 28  | 34  | 39  | 44  | 55  | 66  | 108  | 194  |
@@ -1040,7 +1040,7 @@ group.)
 
 | Scheme | Encoding | 4B  | 8B  | 12B | 16B | 24B | 32B | 64B  | 128B |
 |--------|---------:|----:|----:|----:|----:|----:|----:|-----:|-----:|
-| ob70   | hex      | 10  | 18  | 26  | 34  | 50  | 66  | 130  | 258  |
+| tdi   | hex      | 10  | 18  | 26  | 34  | 50  | 66  | 130  | 258  |
 | zdc   | hex      | 34  | 34  | 34  | 34  | 66  | 66  | 130  | 258  |
 | adgs   | hex      | 42  | 50  | 58  | 66  | 82  | 98  | 162  | 290  |
 | adsv   | hex      | 42  | 50  | 58  | 66  | 82  | 98  | 162  | 290  |

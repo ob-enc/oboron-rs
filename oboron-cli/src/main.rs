@@ -55,10 +55,10 @@ struct SchemeFlags {
     #[arg(short = 'S', long, alias = "32p")]
     apsv: bool,
 
-    /// Use ob70 scheme (testing, identity)
-    #[cfg(feature = "ob70")]
+    /// Use tdi scheme (testing, identity)
+    #[cfg(feature = "tdi")]
     #[arg(long, alias = "70", hide = true)]
-    ob70: bool,
+    tdi: bool,
 
     /// Use ob71 scheme (testing, string reversal)
     #[cfg(feature = "ob71")]
@@ -75,7 +75,7 @@ impl SchemeFlags {
         feature = "apgs",
         feature = "adsv",
         feature = "apsv",
-        feature = "ob70",
+        feature = "tdi",
         feature = "ob71",
         feature = "ob00"
     ))]
@@ -118,10 +118,10 @@ impl SchemeFlags {
             count += 1;
             scheme = Some(Scheme::Apsv);
         }
-        #[cfg(feature = "ob70")]
-        if self.ob70 {
+        #[cfg(feature = "tdi")]
+        if self.tdi {
             count += 1;
-            scheme = Some(Scheme::Ob70);
+            scheme = Some(Scheme::Tdi);
         }
         #[cfg(feature = "ob71")]
         if self.ob71 {
@@ -144,7 +144,7 @@ impl SchemeFlags {
         feature = "apgs",
         feature = "adsv",
         feature = "apsv",
-        feature = "ob70",
+        feature = "tdi",
         feature = "ob71",
         feature = "ob00"
     ))]
@@ -177,8 +177,8 @@ impl SchemeFlags {
         if self.apsv {
             return true;
         }
-        #[cfg(feature = "ob70")]
-        if self.ob70 {
+        #[cfg(feature = "tdi")]
+        if self.tdi {
             return true;
         }
         #[cfg(feature = "ob71")]
@@ -642,7 +642,7 @@ fn config_set_command(
 ) -> Result<()> {
     let mut config = config::load_config().unwrap_or(Config {
         profile: "default".to_string(),
-        scheme: "ob70".to_string(),
+        scheme: "tdi".to_string(),
         encoding: "c32".to_string(),
     });
 
@@ -813,7 +813,7 @@ mod tests {
     use super::*;
 
     #[test]
-    #[cfg(feature = "ob70")]
+    #[cfg(feature = "tdi")]
     fn test_scheme_flags_to_scheme_single() {
         #[cfg(not(any(
             feature = "zdc",
@@ -822,7 +822,7 @@ mod tests {
             feature = "apgs",
             feature = "adsv",
             feature = "apsv",
-            feature = "ob70",
+            feature = "tdi",
             feature = "ob71",
             feature = "ob00"
         )))]
@@ -842,12 +842,12 @@ mod tests {
             adsv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
-            #[cfg(feature = "ob70")]
-            ob70: true,
+            #[cfg(feature = "tdi")]
+            tdi: true,
             #[cfg(feature = "ob71")]
             ob71: false,
         };
-        assert_eq!(flags.to_scheme().unwrap(), Some(Scheme::Ob70));
+        assert_eq!(flags.to_scheme().unwrap(), Some(Scheme::Tdi));
     }
 
     #[test]
@@ -861,7 +861,7 @@ mod tests {
             feature = "apgs",
             feature = "adsv",
             feature = "apsv",
-            feature = "ob70",
+            feature = "tdi",
             feature = "ob71",
             feature = "ob00"
         )))]
@@ -881,8 +881,8 @@ mod tests {
             adsv: true,
             #[cfg(feature = "apsv")]
             apsv: true,
-            #[cfg(feature = "ob70")]
-            ob70: false,
+            #[cfg(feature = "tdi")]
+            tdi: false,
             #[cfg(feature = "ob71")]
             ob71: false,
         };
@@ -898,7 +898,7 @@ mod tests {
             feature = "apgs",
             feature = "adsv",
             feature = "apsv",
-            feature = "ob70",
+            feature = "tdi",
             feature = "ob71",
             feature = "ob00"
         )))]
@@ -918,8 +918,8 @@ mod tests {
             adsv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
-            #[cfg(feature = "ob70")]
-            ob70: false,
+            #[cfg(feature = "tdi")]
+            tdi: false,
             #[cfg(feature = "ob71")]
             ob71: false,
         };
@@ -949,11 +949,11 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "ob70")]
+    #[cfg(feature = "tdi")]
     fn test_format_spec_from_format_string() {
         let config = Config {
             profile: "test".to_string(),
-            scheme: "ob70".to_string(),
+            scheme: "tdi".to_string(),
             encoding: "b32".to_string(),
         };
 
@@ -964,7 +964,7 @@ mod tests {
             feature = "apgs",
             feature = "adsv",
             feature = "apsv",
-            feature = "ob70",
+            feature = "tdi",
             feature = "ob71",
             feature = "ob00"
         )))]
@@ -984,8 +984,8 @@ mod tests {
             adsv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
-            #[cfg(feature = "ob70")]
-            ob70: false,
+            #[cfg(feature = "tdi")]
+            tdi: false,
             #[cfg(feature = "ob71")]
             ob71: false,
         };
@@ -997,19 +997,19 @@ mod tests {
         };
 
         let result = FormatSpec::parse(
-            Some("ob70:b64".to_string()),
+            Some("tdi:b64".to_string()),
             &scheme_flags,
             &encoding_flags,
             Some(&config),
         )
         .unwrap();
 
-        assert_eq!(result.scheme, Scheme::Ob70);
+        assert_eq!(result.scheme, Scheme::Tdi);
         assert_eq!(result.encoding, Encoding::Base64);
     }
 
     #[test]
-    #[cfg(feature = "ob70")]
+    #[cfg(feature = "tdi")]
     fn test_format_spec_conflicts_with_scheme_flag() {
         #[cfg(not(any(
             feature = "zdc",
@@ -1018,7 +1018,7 @@ mod tests {
             feature = "apgs",
             feature = "adsv",
             feature = "apsv",
-            feature = "ob70",
+            feature = "tdi",
             feature = "ob71",
             feature = "ob00"
         )))]
@@ -1038,8 +1038,8 @@ mod tests {
             adsv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
-            #[cfg(feature = "ob70")]
-            ob70: true,
+            #[cfg(feature = "tdi")]
+            tdi: true,
             #[cfg(feature = "ob71")]
             ob71: false,
         };
@@ -1051,7 +1051,7 @@ mod tests {
         };
 
         let result = FormatSpec::parse(
-            Some("ob70:b64".to_string()),
+            Some("tdi:b64".to_string()),
             &scheme_flags,
             &encoding_flags,
             None,
@@ -1073,7 +1073,7 @@ mod tests {
             feature = "apgs",
             feature = "adsv",
             feature = "apsv",
-            feature = "ob70",
+            feature = "tdi",
             feature = "ob71",
             feature = "ob00"
         )))]
@@ -1093,8 +1093,8 @@ mod tests {
             adsv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
-            #[cfg(feature = "ob70")]
-            ob70: false,
+            #[cfg(feature = "tdi")]
+            tdi: false,
             #[cfg(feature = "ob71")]
             ob71: false,
         };
@@ -1106,7 +1106,7 @@ mod tests {
         };
 
         let result = FormatSpec::parse(
-            Some("ob70:b64".to_string()),
+            Some("tdi:b64".to_string()),
             &scheme_flags,
             &encoding_flags,
             None,
@@ -1120,7 +1120,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "ob70")]
+    #[cfg(feature = "tdi")]
     fn test_format_spec_from_flags() {
         let config = Config {
             profile: "test".to_string(),
@@ -1135,7 +1135,7 @@ mod tests {
             feature = "apgs",
             feature = "adsv",
             feature = "apsv",
-            feature = "ob70",
+            feature = "tdi",
             feature = "ob71",
             feature = "ob00"
         )))]
@@ -1155,8 +1155,8 @@ mod tests {
             adsv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
-            #[cfg(feature = "ob70")]
-            ob70: true,
+            #[cfg(feature = "tdi")]
+            tdi: true,
             #[cfg(feature = "ob71")]
             ob71: false,
         };
@@ -1170,16 +1170,16 @@ mod tests {
         let result =
             FormatSpec::parse(None, &scheme_flags, &encoding_flags, Some(&config)).unwrap();
 
-        assert_eq!(result.scheme, Scheme::Ob70);
+        assert_eq!(result.scheme, Scheme::Tdi);
         assert_eq!(result.encoding, Encoding::Base64);
     }
 
     #[test]
-    #[cfg(feature = "ob70")]
+    #[cfg(feature = "tdi")]
     fn test_format_spec_from_config() {
         let config = Config {
             profile: "test".to_string(),
-            scheme: "ob70".to_string(),
+            scheme: "tdi".to_string(),
             encoding: "hex".to_string(),
         };
 
@@ -1190,7 +1190,7 @@ mod tests {
             feature = "apgs",
             feature = "adsv",
             feature = "apsv",
-            feature = "ob70",
+            feature = "tdi",
             feature = "ob71",
             feature = "ob00"
         )))]
@@ -1210,8 +1210,8 @@ mod tests {
             adsv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
-            #[cfg(feature = "ob70")]
-            ob70: false,
+            #[cfg(feature = "tdi")]
+            tdi: false,
             #[cfg(feature = "ob71")]
             ob71: false,
         };
@@ -1225,27 +1225,27 @@ mod tests {
         let result =
             FormatSpec::parse(None, &scheme_flags, &encoding_flags, Some(&config)).unwrap();
 
-        assert_eq!(result.scheme, Scheme::Ob70);
+        assert_eq!(result.scheme, Scheme::Tdi);
         assert_eq!(result.encoding, Encoding::Hex);
     }
 
     #[test]
-    #[cfg(feature = "ob70")]
+    #[cfg(feature = "tdi")]
     fn test_get_scheme_from_override() {
-        let result = get_scheme(Some(Scheme::Ob70), None);
-        assert_eq!(result.unwrap(), Scheme::Ob70);
+        let result = get_scheme(Some(Scheme::Tdi), None);
+        assert_eq!(result.unwrap(), Scheme::Tdi);
     }
 
     #[test]
-    #[cfg(feature = "ob70")]
+    #[cfg(feature = "tdi")]
     fn test_get_scheme_from_config() {
         let config = Config {
             profile: "test".to_string(),
-            scheme: "ob70".to_string(),
+            scheme: "tdi".to_string(),
             encoding: "b32".to_string(),
         };
         let result = get_scheme(None, Some(&config));
-        assert_eq!(result.unwrap(), Scheme::Ob70);
+        assert_eq!(result.unwrap(), Scheme::Tdi);
     }
 
     #[test]

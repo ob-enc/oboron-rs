@@ -21,7 +21,7 @@ adsv = ["oboron/adsv"]
 upc = ["oboron/upc"]
 apgs = ["oboron/apgs"]
 apsv = ["oboron/apsv"]
-ob70 = ["oboron/ob70"]
+tdi = ["oboron/tdi"]
 ob71 = ["oboron/ob71"]
 
 # Scheme categories
@@ -30,7 +30,7 @@ ob0x = ["zdc"] # insecure, not authenticated
 ob1x = []  # insecure, authenticated
 ob2x = ["upc"]  # secure, not authenticated
 ob3x = ["adgs", "apgs", "adsv", "apsv"]  # secure, authenticated
-ob7x = ["ob70", "ob71"]  # testing
+ob7x = ["tdi", "ob71"]  # testing
 insecure-schemes = ["ob0x", "ob1x"]
 secure-schemes = ["ob2x", "ob3x"]
 authenticated-schemes = ["ob3x"]
@@ -40,7 +40,7 @@ all-schemes = ["ob0x", "ob1x", "ob2x", "ob3x"]
 
 # Special purpose groups
 # ======================
-non-crypto = ["ob70", "ob71"]
+non-crypto = ["tdi", "ob71"]
 legacy = ["ob00"]  # For backward compatibility only -> use zdc instead
 experimental = []  # Experimental algorithms
 

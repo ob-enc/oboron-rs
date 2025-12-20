@@ -20,9 +20,9 @@ use crate::{ob_core::ObCore, Encoding, Error, Format, Oboron, Scheme};
 /// let mut ob = ObFlex::new("adsv:c32", &key)?;
 /// let obtext = ob.enc("hello")?; // adsv:c32 format
 ///
-/// // Switch to ob70 scheme (format remains c32)
-/// ob.set_scheme(Scheme::Ob70)?;
-/// let obtext = ob.enc("hello")?; // ob70:c32 format
+/// // Switch to tdi scheme (format remains c32)
+/// ob.set_scheme(Scheme::Tdi)?;
+/// let obtext = ob.enc("hello")?; // tdi:c32 format
 ///
 /// // Switch to ob71:b64 using Format instance
 /// ob.set_format(Format::new(Scheme::Ob71, Encoding::Base64))?;
@@ -134,7 +134,7 @@ impl ObFlex {
     /// # use oboron::{ObFlex, Format, Scheme, Encoding};
     /// # let key = oboron::generate_key();
     /// let mut ob = ObFlex::new("adsv:c32", &key)?;
-    /// ob.set_format("ob70:b64")?; // switch using string
+    /// ob.set_format("tdi:b64")?; // switch using string
     /// ob.set_format(Format::new(Scheme::Ob71, Encoding::Hex))?; // switch using Format
     /// # }
     /// # Ok(())
@@ -156,7 +156,7 @@ impl ObFlex {
     /// # use oboron::{ObFlex, Scheme};
     /// # let key = oboron::generate_key();
     /// let mut ob = ObFlex::new("adsv:c32", &key)? ;
-    /// ob.set_scheme(Scheme::Ob70)?; // switch to ob70, keeping c32 encoding
+    /// ob.set_scheme(Scheme::Tdi)?; // switch to tdi, keeping c32 encoding
     /// # }
     /// # Ok(())
     /// # }

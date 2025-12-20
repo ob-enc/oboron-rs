@@ -294,27 +294,27 @@ impl_cipher_class!(
 
 // --- TESTING CLASSES ---
 
-// Ob70 variants
+// Tdi variants
 // -------------
 impl_cipher_class!(
-    Ob70Base32Crockford,
-    ::oboron::Ob70Base32Crockford,
-    "Ob70 cipher with Base32Crockford encoding (Identity scheme, for testing)"
+    TdiC32,
+    ::oboron::TdiC32,
+    "Tdi cipher with Base32Crockford encoding (Identity scheme, for testing)"
 );
 impl_cipher_class!(
-    Ob70Base32Rfc,
-    ::oboron::Ob70Base32Rfc,
-    "Ob70 cipher with Base32Rfc encoding (Identity scheme, for testing)"
+    TdiB32,
+    ::oboron::TdiB32,
+    "Tdi cipher with Base32Rfc encoding (Identity scheme, for testing)"
 );
 impl_cipher_class!(
-    Ob70Base64,
-    ::oboron::Ob70Base64,
-    "Ob70 cipher with Base64 encoding (Identity scheme, for testing)"
+    TdiB64,
+    ::oboron::TdiB64,
+    "Tdi cipher with Base64 encoding (Identity scheme, for testing)"
 );
 impl_cipher_class!(
-    Ob70Hex,
-    ::oboron::Ob70Hex,
-    "Ob70 cipher with Hex encoding (Identity scheme, for testing)"
+    TdiHex,
+    ::oboron::TdiHex,
+    "Tdi cipher with Hex encoding (Identity scheme, for testing)"
 );
 
 // Ob71 variants
@@ -868,11 +868,11 @@ fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<Ob71Base64>()?;
     m.add_class::<Ob71Hex>()?;
 
-    // Ob70 variants
-    m.add_class::<Ob70Base32Crockford>()?;
-    m.add_class::<Ob70Base32Rfc>()?;
-    m.add_class::<Ob70Base64>()?;
-    m.add_class::<Ob70Hex>()?;
+    // Tdi variants
+    m.add_class::<TdiC32>()?;
+    m.add_class::<TdiB32>()?;
+    m.add_class::<TdiB64>()?;
+    m.add_class::<TdiHex>()?;
 
     // Utility functions
     m.add_function(wrap_pyfunction!(generate_key, m)?)?;

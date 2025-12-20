@@ -155,11 +155,11 @@ mod tests {
     use super::*;
 
     #[test]
-    #[cfg(feature = "ob70")]
+    #[cfg(feature = "tdi")]
     fn test_obcore_basic() {
         // 86-character base64 key
         let key = crate::generate_key();
-        let core = ObCore::new("ob70:c32", &key).unwrap();
+        let core = ObCore::new("tdi:c32", &key).unwrap();
 
         let ot = core.enc("hello").unwrap();
         let pt2 = core.dec(&ot).unwrap();
@@ -167,10 +167,10 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "ob70")]
+    #[cfg(feature = "tdi")]
     #[cfg(feature = "keyless")]
     fn test_obcore_keyless() {
-        let core = ObCore::new_keyless("ob70:c32").unwrap();
+        let core = ObCore::new_keyless("tdi:c32").unwrap();
 
         let ot = core.enc("test").unwrap();
         let pt2 = core.dec(&ot).unwrap();

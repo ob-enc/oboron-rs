@@ -116,10 +116,10 @@
 //! let ot1 = flex.enc("hello")?;    // adsv:b64 format
 //!
 //! // Change format at runtime
-//! flex.set_scheme(Scheme::Ob70)?;  // set_scheme() only with ObFlex
-//! let ot2 = flex.enc("hello")? ;   // ob70:b64 format output
+//! flex.set_scheme(Scheme::Tdi)?;  // set_scheme() only with ObFlex
+//! let ot2 = flex.enc("hello")? ;   // tdi:b64 format output
 //! // Also available:
-//! flex.set_encoding(Encoding::Hex)?; // now set as ob70:hex
+//! flex.set_encoding(Encoding::Hex)?; // now set as tdi:hex
 //! flex.set_format("adsv:b32")?;      // now adsv:b32
 //! # }
 //! # Ok(())
@@ -171,22 +171,22 @@
 //! # let key = oboron::generate_key();
 //! // Fixed format types (best performance for multiple operations with same format)
 //! let adsv = oboron::AdsvC32::new(&key)?;  // "adsv:c32" format Oboron instance
-//! let ob70 = oboron::Ob70::new(&key)?;  // "ob70:c32" format Oboron instance
+//! let tdi = oboron::TdiC32::new(&key)?;  // "tdi:c32" format Oboron instance
 //!
 //! let ot_adsv = adsv.enc("data1")?;
-//! let ot_ob70 = ob70.enc("data2")?;
+//! let ot_tdi = tdi.enc("data2")?;
 //!
 //! // Decoding uses scheme autodetection by default
 //! let pt1 = adsv.dec(&ot_adsv)?;  // Decodes successfully
-//! let pt2 = adsv.dec(&ot_ob70)?;  // Also works (autodetects ob70)
+//! let pt2 = adsv.dec(&ot_tdi)?;  // Also works (autodetects tdi)
 //! assert_eq!(pt1, "data1");
 //! assert_eq!(pt2, "data2");
 //! // Note: The above autodetection works only with shared encodings
-//! // adsv:c32 and ob70:c32 are both base32crockford-encoded
+//! // adsv:c32 and tdi:c32 are both base32crockford-encoded
 //!
 //! // Use dec_strict to enforce scheme matching
 //! let pt3 = adsv.dec_strict(&ot_adsv)?;         // OK: Matches scheme
-//! assert!(adsv.dec_strict(&ot_ob70).is_err());  // Error: Wrong scheme (adsv != ob70)
+//! assert!(adsv.dec_strict(&ot_tdi).is_err());  // Error: Wrong scheme (adsv != tdi)
 //!
 //! // Note: For fixed oborons, string encoding (c32/b32/b64/hex) must match the instance encoding
 //! let adsv_b64 = oboron::AdsvB64::new(&key)?;  // "adsv:b64" format Oboron
@@ -206,8 +206,8 @@
 //! - `Upc`, `Apgs`, `Apsv`: Probabilistic variants (different output each time)
 //!
 //! Testing/Demo only schemes using no encryption (`non-crypto` feature group):
-//! - `Ob70`: Identity
-//! - `Ob71`: Reverse plaintext
+//! - `Tdi`: Identity
+//! - `Tdr`: Reverse plaintext
 //!
 //! Each scheme supports four string encodings:
 //! - Base32Crockford,
@@ -283,10 +283,10 @@ pub(crate) use obcrypt::{decrypt_upc, encrypt_upc};
 pub(crate) use obcrypt::{decrypt_zdc, encrypt_zdc};
 
 // Testing
-#[cfg(feature = "ob70")]
-pub(crate) use obcrypt::{decrypt_ob70, encrypt_ob70};
 #[cfg(feature = "ob71")]
 pub(crate) use obcrypt::{decrypt_ob71, encrypt_ob71};
+#[cfg(feature = "tdi")]
+pub(crate) use obcrypt::{decrypt_tdi, encrypt_tdi};
 
 pub use keygen::generate_key;
 #[cfg(feature = "bytes-keys")]
@@ -326,10 +326,10 @@ pub use constants::{UPC_B32, UPC_B64, UPC_C32, UPC_HEX};
 #[cfg(feature = "zdc")]
 pub use constants::{ZDC_B32, ZDC_B64, ZDC_C32, ZDC_HEX};
 // Testing
-#[cfg(feature = "ob70")]
-pub use constants::{OB70_B32, OB70_B64, OB70_C32, OB70_HEX};
 #[cfg(feature = "ob71")]
 pub use constants::{OB71_B32, OB71_B64, OB71_C32, OB71_HEX};
+#[cfg(feature = "tdi")]
+pub use constants::{TDI_B32, TDI_B64, TDI_C32, TDI_HEX};
 // Legacy
 #[cfg(feature = "ob00")]
 pub use constants::{OB00_B32, OB00_B64, OB00_C32, OB00_HEX};
@@ -348,10 +348,10 @@ pub use oboron::{UpcB32, UpcB64, UpcC32, UpcHex};
 #[cfg(feature = "zdc")]
 pub use oboron::{ZdcB32, ZdcB64, ZdcC32, ZdcHex};
 // Testing
-#[cfg(feature = "ob70")]
-pub use oboron::{Ob70Base32Crockford, Ob70Base32Rfc, Ob70Base64, Ob70Hex};
 #[cfg(feature = "ob71")]
 pub use oboron::{Ob71Base32Crockford, Ob71Base32Rfc, Ob71Base64, Ob71Hex};
+#[cfg(feature = "tdi")]
+pub use oboron::{TdiB32, TdiB64, TdiC32, TdiHex};
 // Legacy
 #[cfg(feature = "ob00")]
 pub use legacy::{Ob00Base32Crockford, Ob00Base32Rfc, Ob00Base64, Ob00Hex};
@@ -370,8 +370,8 @@ pub type Adsv = AdsvC32;
 #[cfg(feature = "apsv")]
 pub type Apsv = ApsvC32;
 // Testing
-#[cfg(feature = "ob70")]
-pub type Ob70 = Ob70Base32Crockford;
+#[cfg(feature = "tdi")]
+pub type Tdi = TdiC32;
 #[cfg(feature = "ob71")]
 pub type Ob71 = Ob71Base32Crockford;
 // Legacy
@@ -551,7 +551,7 @@ pub fn autodec(obtext: &str, key: &str) -> Result<String, Error> {
 /// # #[cfg(feature = "adsv")]
 /// # {
 /// # use oboron;
-/// # let ot = oboron::enc_keyless("test", "ob70:b64")?;
+/// # let ot = oboron::enc_keyless("test", "tdi:b64")?;
 /// let pt2 = oboron::autodec_keyless(&ot)?; // Autodetect format; use hardcoded key
 /// # assert_eq!(pt2, "test");
 /// # }

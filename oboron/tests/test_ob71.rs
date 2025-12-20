@@ -25,12 +25,12 @@ fn test_ob71_reverses_plaintext() {
     // The underlying ciphertext should contain reversed text
     // We can't easily test this directly, but we can verify behavior
     let ob71_direct = oboron::Ob71::new(&key).unwrap();
-    let ob70_direct = oboron::Ob70::new(&key).unwrap();
+    let tdi_direct = oboron::TdiC32::new(&key).unwrap();
 
     let ot71 = ob71_direct.enc(plaintext).unwrap();
-    let ot70 = ob70_direct.enc(plaintext).unwrap();
+    let ot70 = tdi_direct.enc(plaintext).unwrap();
 
-    // ob71 and ob70 should produce different outputs
+    // ob71 and tdi should produce different outputs
     assert_ne!(ot71, ot70);
 }
 
@@ -68,22 +68,22 @@ fn test_ob71_deterministic() {
 }
 
 #[test]
-fn test_ob71_cross_scheme_with_ob70() {
+fn test_ob71_cross_scheme_with_tdi() {
     let key = oboron::generate_key();
     let ob71 = oboron::Ob71::new(&key).unwrap();
-    let ob70 = oboron::Ob70::new(&key).unwrap();
+    let tdi = oboron::TdiC32::new(&key).unwrap();
 
     let plaintext = "cross-scheme test";
     let ot71 = ob71.enc(plaintext).unwrap();
-    let ot70 = ob70.enc(plaintext).unwrap();
+    let ot70 = tdi.enc(plaintext).unwrap();
 
     // Strict dec should fail across schemes
     assert!(ob71.dec_strict(&ot70).is_err());
-    assert!(ob70.dec_strict(&ot71).is_err());
+    assert!(tdi.dec_strict(&ot71).is_err());
 
     // But auto-detect dec should work
     assert_eq!(ob71.dec(&ot70).unwrap(), plaintext);
-    assert_eq!(ob70.dec(&ot71).unwrap(), plaintext);
+    assert_eq!(tdi.dec(&ot71).unwrap(), plaintext);
 }
 
 #[test]

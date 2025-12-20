@@ -19,10 +19,10 @@ use crate::encrypt_upc;
 #[cfg(feature = "zdc")]
 use crate::encrypt_zdc;
 // Testing
-#[cfg(feature = "ob70")]
-use crate::encrypt_ob70;
 #[cfg(feature = "ob71")]
 use crate::encrypt_ob71;
+#[cfg(feature = "tdi")]
+use crate::encrypt_tdi;
 
 /// Generic encoding pipeline for all schemes (except ob00).
 ///
@@ -55,8 +55,8 @@ pub(crate) fn enc_to_format(
         #[cfg(feature = "apsv")]
         Scheme::Apsv => encrypt_apsv(keychain, plaintext.as_bytes())?,
         // Testing
-        #[cfg(feature = "ob70")]
-        Scheme::Ob70 => encrypt_ob70(keychain, plaintext.as_bytes())?,
+        #[cfg(feature = "tdi")]
+        Scheme::Tdi => encrypt_tdi(keychain, plaintext.as_bytes())?,
         #[cfg(feature = "ob71")]
         Scheme::Ob71 => encrypt_ob71(keychain, plaintext.as_bytes())?,
         // Legacy - ob00 does not use this call path
@@ -95,8 +95,8 @@ mod tests {
     use crate::{Keychain, Scheme};
 
     #[test]
-    fn test_enc_pipeline_ob70() {
-        let format = Format::new(Scheme::Ob70, Encoding::Base32Crockford);
+    fn test_enc_pipeline_tdi() {
+        let format = Format::new(Scheme::Tdi, Encoding::Base32Crockford);
 
         // Create a real keychain for testing
         let key = [0u8; 64];

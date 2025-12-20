@@ -48,8 +48,8 @@ hex/bytes key interfaces and the keyless testing feature.
 - `apsv` - AES-SIV (probabilistic)
 
 Testing schemes (non-cryptographic):
-- `ob70` - identity transformation (ciphertext = plaintext bytes)
-- `ob71` - uses reversed `ob70` ciphertext
+- `tdi` - identity transformation (ciphertext = plaintext bytes)
+- `ob71` - uses reversed `tdi` ciphertext
 
 ### Unsafe Performance Enhancement
 
@@ -94,7 +94,7 @@ By tier:
 - `ob3x` - Includes all authenticated schemes (= `authenticated-schemes`)
 
 Testing:
-- `non-crypto` - Includes `ob70` and `ob71`
+- `non-crypto` - Includes `tdi` and `ob71`
 
 Comprehensive group
 - `all-schemes` - Includes all schemes (same as default)

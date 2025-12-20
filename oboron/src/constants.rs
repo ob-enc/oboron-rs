@@ -48,9 +48,9 @@ pub const APSV_BYTE: u8 = 0x65;
 // Tier ob7x - Testing
 // -------------------
 // Identity scheme (no encryption)
-// ob70: tier=7 (111), scheme=0 (0000), probabilistic=0 -> 11100000 = 0xE0 (decimal: 224)
-#[cfg(feature = "ob70")]
-pub const OB70_BYTE: u8 = 0xE0;
+// tdi: tier=7 (111), scheme=0 (0000), probabilistic=0 -> 11100000 = 0xE0 (decimal: 224)
+#[cfg(feature = "tdi")]
+pub const TDI_BYTE: u8 = 0xE0;
 // String-reversal (no encryption)
 // ob71: tier=7 (111), scheme=1 (0001), probabilistic=0 -> 11100010 = 0xE2 (decimal: 226)
 #[cfg(feature = "ob71")]
@@ -85,8 +85,8 @@ pub const ADSV_C32: &str = "adsv:c32";
 #[cfg(feature = "apsv")]
 pub const APSV_C32: &str = "apsv:c32";
 // Tier ob7x - Testing
-#[cfg(feature = "ob70")]
-pub const OB70_C32: &str = "ob70:c32";
+#[cfg(feature = "tdi")]
+pub const TDI_C32: &str = "tdi:c32";
 #[cfg(feature = "ob71")]
 pub const OB71_C32: &str = "ob71:c32";
 // Legacy
@@ -107,8 +107,8 @@ pub const ADSV_B32: &str = "adsv:b32";
 #[cfg(feature = "apsv")]
 pub const APSV_B32: &str = "apsv:b32";
 // Tier ob7x - Testing
-#[cfg(feature = "ob70")]
-pub const OB70_B32: &str = "ob70:b32";
+#[cfg(feature = "tdi")]
+pub const TDI_B32: &str = "tdi:b32";
 #[cfg(feature = "ob71")]
 pub const OB71_B32: &str = "ob71:b32";
 // Legacy
@@ -129,8 +129,8 @@ pub const ADSV_B64: &str = "adsv:b64";
 #[cfg(feature = "apsv")]
 pub const APSV_B64: &str = "apsv:b64";
 // Tier ob7x - Testing
-#[cfg(feature = "ob70")]
-pub const OB70_B64: &str = "ob70:b64";
+#[cfg(feature = "tdi")]
+pub const TDI_B64: &str = "tdi:b64";
 #[cfg(feature = "ob71")]
 pub const OB71_B64: &str = "ob71:b64";
 // Legacy
@@ -151,8 +151,8 @@ pub const ADSV_HEX: &str = "adsv:hex";
 #[cfg(feature = "apsv")]
 pub const APSV_HEX: &str = "apsv:hex";
 // Tier ob7x - Testing
-#[cfg(feature = "ob70")]
-pub const OB70_HEX: &str = "ob70:hex";
+#[cfg(feature = "tdi")]
+pub const TDI_HEX: &str = "tdi:hex";
 #[cfg(feature = "ob71")]
 pub const OB71_HEX: &str = "ob71:hex";
 // Legacy

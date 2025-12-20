@@ -18,8 +18,8 @@ pub enum Scheme {
     #[cfg(feature = "apsv")]
     Apsv,
     // Testing
-    #[cfg(feature = "ob70")]
-    Ob70,
+    #[cfg(feature = "tdi")]
+    Tdi,
     #[cfg(feature = "ob71")]
     Ob71,
     // Legacy
@@ -44,8 +44,8 @@ impl Scheme {
             #[cfg(feature = "apsv")]
             Scheme::Apsv => "apsv",
             // Testing
-            #[cfg(feature = "ob70")]
-            Scheme::Ob70 => "ob70",
+            #[cfg(feature = "tdi")]
+            Scheme::Tdi => "tdi",
             #[cfg(feature = "ob71")]
             Scheme::Ob71 => "ob71",
             // Legacy
@@ -75,8 +75,8 @@ impl Scheme {
             #[cfg(feature = "apsv")]
             Scheme::Apsv => false,
             // Testing
-            #[cfg(feature = "ob70")]
-            Scheme::Ob70 => true,
+            #[cfg(feature = "tdi")]
+            Scheme::Tdi => true,
             #[cfg(feature = "ob71")]
             Scheme::Ob71 => true,
             // Legacy
@@ -111,8 +111,8 @@ impl Scheme {
             #[cfg(feature = "apsv")]
             Scheme::Apsv => constants::APSV_BYTE,
             // Testing
-            #[cfg(feature = "ob70")]
-            Scheme::Ob70 => constants::OB70_BYTE,
+            #[cfg(feature = "tdi")]
+            Scheme::Tdi => constants::TDI_BYTE,
             #[cfg(feature = "ob71")]
             Scheme::Ob71 => constants::OB71_BYTE,
             // Legacy
@@ -140,8 +140,8 @@ impl std::str::FromStr for Scheme {
             #[cfg(feature = "apsv")]
             "apsv" => Ok(Scheme::Apsv),
             // Testing
-            #[cfg(feature = "ob70")]
-            "ob70" => Ok(Scheme::Ob70),
+            #[cfg(feature = "tdi")]
+            "tdi" => Ok(Scheme::Tdi),
             #[cfg(feature = "ob71")]
             "ob71" => Ok(Scheme::Ob71),
             // Legacy

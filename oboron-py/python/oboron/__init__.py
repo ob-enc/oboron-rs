@@ -117,11 +117,11 @@ OboronBase.register(_oboron.Ob71Base32Rfc)
 OboronBase.register(_oboron.Ob71Base64)
 OboronBase.register(_oboron.Ob71Hex)
 
-# Ob70 variants (testing)
-OboronBase.register(_oboron.Ob70Base32Crockford)
-OboronBase.register(_oboron.Ob70Base32Rfc)
-OboronBase.register(_oboron.Ob70Base64)
-OboronBase.register(_oboron.Ob70Hex)
+# Tdi variants (testing)
+OboronBase.register(_oboron.TdiC32)
+OboronBase.register(_oboron.TdiB32)
+OboronBase.register(_oboron.TdiB64)
+OboronBase.register(_oboron.TdiHex)
 
 # Flexible interface
 OboronBase.register(_oboron.Ob)
@@ -175,11 +175,11 @@ ApsvB32 = _oboron.ApsvB32
 ApsvB64 = _oboron.ApsvB64
 ApsvHex = _oboron.ApsvHex
 
-# Ob70 variants (testing)
-Ob70Base32Crockford = _oboron.Ob70Base32Crockford
-Ob70Base32Rfc = _oboron.Ob70Base32Rfc
-Ob70Base64 = _oboron.Ob70Base64
-Ob70Hex = _oboron.Ob70Hex
+# Tdi variants (testing)
+TdiC32 = _oboron.TdiC32
+TdiB32 = _oboron.TdiB32
+TdiB64 = _oboron.TdiB64
+TdiHex = _oboron.TdiHex
 
 # Ob71 variants (testing)
 Ob71Base32Crockford = _oboron.Ob71Base32Crockford
@@ -253,11 +253,11 @@ __all__ = [
     'ApsvB64',
     'ApsvHex',
 
-    # Ob70 (testing)
-    'Ob70Base32Crockford',
-    'Ob70Base32Rfc',
-    'Ob70Base64',
-    'Ob70Hex',
+    # Tdi (testing)
+    'TdiC32',
+    'TdiB32',
+    'TdiB64',
+    'TdiHex',
 
     # Ob71 (testing)
     'Ob71Base32Crockford',
