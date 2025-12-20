@@ -45,10 +45,10 @@ struct SchemeFlags {
     #[arg(short = 'G', long, alias = "31p")]
     apgs: bool,
 
-    /// Use ob32 scheme (deterministic AES-SIV)
-    #[cfg(feature = "ob32")]
+    /// Use adsv scheme (deterministic AES-SIV)
+    #[cfg(feature = "adsv")]
     #[arg(short = 's', long, alias = "32")]
-    ob32: bool,
+    adsv: bool,
 
     /// Use apsv scheme (probabilistic AES-SIV)
     #[cfg(feature = "apsv")]
@@ -73,7 +73,7 @@ impl SchemeFlags {
         feature = "upc",
         feature = "adgs",
         feature = "apgs",
-        feature = "ob32",
+        feature = "adsv",
         feature = "apsv",
         feature = "ob70",
         feature = "ob71",
@@ -108,10 +108,10 @@ impl SchemeFlags {
             count += 1;
             scheme = Some(Scheme::Apgs);
         }
-        #[cfg(feature = "ob32")]
-        if self.ob32 {
+        #[cfg(feature = "adsv")]
+        if self.adsv {
             count += 1;
-            scheme = Some(Scheme::Ob32);
+            scheme = Some(Scheme::Adsv);
         }
         #[cfg(feature = "apsv")]
         if self.apsv {
@@ -142,7 +142,7 @@ impl SchemeFlags {
         feature = "upc",
         feature = "adgs",
         feature = "apgs",
-        feature = "ob32",
+        feature = "adsv",
         feature = "apsv",
         feature = "ob70",
         feature = "ob71",
@@ -161,8 +161,8 @@ impl SchemeFlags {
         if self.adgs {
             return true;
         }
-        #[cfg(feature = "ob32")]
-        if self.ob32 {
+        #[cfg(feature = "adsv")]
+        if self.adsv {
             return true;
         }
         #[cfg(feature = "upc")]
@@ -732,7 +732,7 @@ fn get_scheme(scheme_override: Option<Scheme>, config: Option<&Config>) -> Resul
 
     // No override and no config - error
     Err(anyhow::anyhow!(
-        "scheme not specified: run 'ob init' or use a scheme flag (e.g., --ob32) or --format"
+        "scheme not specified: run 'ob init' or use a scheme flag (e.g., --adsv) or --format"
     ))
 }
 
@@ -820,7 +820,7 @@ mod tests {
             feature = "upc",
             feature = "adgs",
             feature = "apgs",
-            feature = "ob32",
+            feature = "adsv",
             feature = "apsv",
             feature = "ob70",
             feature = "ob71",
@@ -838,8 +838,8 @@ mod tests {
             adgs: false,
             #[cfg(feature = "apgs")]
             apgs: false,
-            #[cfg(feature = "ob32")]
-            ob32: false,
+            #[cfg(feature = "adsv")]
+            adsv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
             #[cfg(feature = "ob70")]
@@ -851,7 +851,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "ob32")]
+    #[cfg(feature = "adsv")]
     #[cfg(feature = "apsv")]
     fn test_scheme_flags_to_scheme_multiple_errors() {
         #[cfg(not(any(
@@ -859,7 +859,7 @@ mod tests {
             feature = "upc",
             feature = "adgs",
             feature = "apgs",
-            feature = "ob32",
+            feature = "adsv",
             feature = "apsv",
             feature = "ob70",
             feature = "ob71",
@@ -877,8 +877,8 @@ mod tests {
             adgs: false,
             #[cfg(feature = "apgs")]
             apgs: false,
-            #[cfg(feature = "ob32")]
-            ob32: true,
+            #[cfg(feature = "adsv")]
+            adsv: true,
             #[cfg(feature = "apsv")]
             apsv: true,
             #[cfg(feature = "ob70")]
@@ -896,7 +896,7 @@ mod tests {
             feature = "upc",
             feature = "adgs",
             feature = "apgs",
-            feature = "ob32",
+            feature = "adsv",
             feature = "apsv",
             feature = "ob70",
             feature = "ob71",
@@ -914,8 +914,8 @@ mod tests {
             adgs: false,
             #[cfg(feature = "apgs")]
             apgs: false,
-            #[cfg(feature = "ob32")]
-            ob32: false,
+            #[cfg(feature = "adsv")]
+            adsv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
             #[cfg(feature = "ob70")]
@@ -962,7 +962,7 @@ mod tests {
             feature = "upc",
             feature = "adgs",
             feature = "apgs",
-            feature = "ob32",
+            feature = "adsv",
             feature = "apsv",
             feature = "ob70",
             feature = "ob71",
@@ -980,8 +980,8 @@ mod tests {
             adgs: false,
             #[cfg(feature = "apgs")]
             apgs: false,
-            #[cfg(feature = "ob32")]
-            ob32: false,
+            #[cfg(feature = "adsv")]
+            adsv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
             #[cfg(feature = "ob70")]
@@ -1016,7 +1016,7 @@ mod tests {
             feature = "upc",
             feature = "adgs",
             feature = "apgs",
-            feature = "ob32",
+            feature = "adsv",
             feature = "apsv",
             feature = "ob70",
             feature = "ob71",
@@ -1034,8 +1034,8 @@ mod tests {
             adgs: false,
             #[cfg(feature = "apgs")]
             apgs: false,
-            #[cfg(feature = "ob32")]
-            ob32: false,
+            #[cfg(feature = "adsv")]
+            adsv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
             #[cfg(feature = "ob70")]
@@ -1071,7 +1071,7 @@ mod tests {
             feature = "upc",
             feature = "adgs",
             feature = "apgs",
-            feature = "ob32",
+            feature = "adsv",
             feature = "apsv",
             feature = "ob70",
             feature = "ob71",
@@ -1089,8 +1089,8 @@ mod tests {
             adgs: false,
             #[cfg(feature = "apgs")]
             apgs: false,
-            #[cfg(feature = "ob32")]
-            ob32: false,
+            #[cfg(feature = "adsv")]
+            adsv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
             #[cfg(feature = "ob70")]
@@ -1133,7 +1133,7 @@ mod tests {
             feature = "upc",
             feature = "adgs",
             feature = "apgs",
-            feature = "ob32",
+            feature = "adsv",
             feature = "apsv",
             feature = "ob70",
             feature = "ob71",
@@ -1151,8 +1151,8 @@ mod tests {
             adgs: false,
             #[cfg(feature = "apgs")]
             apgs: false,
-            #[cfg(feature = "ob32")]
-            ob32: false,
+            #[cfg(feature = "adsv")]
+            adsv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
             #[cfg(feature = "ob70")]
@@ -1188,7 +1188,7 @@ mod tests {
             feature = "upc",
             feature = "adgs",
             feature = "apgs",
-            feature = "ob32",
+            feature = "adsv",
             feature = "apsv",
             feature = "ob70",
             feature = "ob71",
@@ -1206,8 +1206,8 @@ mod tests {
             adgs: false,
             #[cfg(feature = "apgs")]
             apgs: false,
-            #[cfg(feature = "ob32")]
-            ob32: false,
+            #[cfg(feature = "adsv")]
+            adsv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
             #[cfg(feature = "ob70")]

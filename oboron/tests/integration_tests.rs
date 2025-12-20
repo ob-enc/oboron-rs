@@ -37,9 +37,9 @@ fn test_available_schemes() {
         assert_eq!(ob.dec(&enc).unwrap(), "test");
     }
 
-    #[cfg(feature = "ob32")]
+    #[cfg(feature = "adsv")]
     {
-        let ob = oboron::Ob32::new(&key).unwrap();
+        let ob = oboron::AdsvC32::new(&key).unwrap();
         let enc = ob.enc("test").unwrap();
         assert_eq!(ob.dec(&enc).unwrap(), "test");
     }
@@ -55,11 +55,11 @@ fn test_available_schemes() {
 #[test]
 fn test_format_string_parsing() {
     // Test parsing format strings for enabled schemes
-    #[cfg(feature = "ob32")]
+    #[cfg(feature = "adsv")]
     {
         use oboron::Format;
-        let format = Format::from_str("ob32:c32").unwrap();
-        assert_eq!(format.to_string(), "ob32:c32");
+        let format = Format::from_str("adsv:c32").unwrap();
+        assert_eq!(format.to_string(), "adsv:c32");
     }
 
     // Test that disabled schemes return error
@@ -80,21 +80,21 @@ fn test_ob_any_default() {
 }
 
 // Cross-scheme decoding test (only if multiple schemes enabled)
-#[cfg(all(feature = "adgs", feature = "ob32"))]
+#[cfg(all(feature = "adgs", feature = "adsv"))]
 #[test]
 fn test_cross_scheme_decoding() {
     let key = oboron::generate_key();
-    let adgs = oboron::Adgs::new(&key).unwrap();
-    let ob32 = oboron::Ob32::new(&key).unwrap();
+    let adgs = oboron::AdgsC32::new(&key).unwrap();
+    let adsv = oboron::AdsvC32::new(&key).unwrap();
 
     let enc31 = adgs.enc("hello").unwrap();
-    let enc32 = ob32.enc("world").unwrap();
+    let enc32 = adsv.enc("world").unwrap();
 
     // Auto-detection should work across schemes
     assert_eq!(adgs.dec(&enc32).unwrap(), "world");
-    assert_eq!(ob32.dec(&enc31).unwrap(), "hello");
+    assert_eq!(adsv.dec(&enc31).unwrap(), "hello");
 
     // Strict decoding should fail
     assert!(adgs.dec_strict(&enc32).is_err());
-    assert!(ob32.dec_strict(&enc31).is_err());
+    assert!(adsv.dec_strict(&enc31).is_err());
 }

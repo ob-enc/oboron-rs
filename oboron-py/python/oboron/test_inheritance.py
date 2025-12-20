@@ -7,14 +7,14 @@ def test_isinstance_checks():
     key = oboron.generate_key()
     
     # Test specific cipher classes
-    ob32 = oboron.Ob32(key=key)
-    assert isinstance(ob32, oboron.OboronBase)
+    adsv = oboron.AdsvC32(key=key)
+    assert isinstance(adsv, oboron.OboronBase)
     
     zdc = oboron.ZdcB64(key=key)
     assert isinstance(zdc, oboron.OboronBase)
     
     # Test flexible interfaces
-    ob = oboron.Ob("ob32:b64", key=key)
+    ob = oboron.Ob("adsv:b64", key=key)
     assert isinstance(ob, oboron.OboronBase)
     
     ob_multi = oboron.ObMulti(key=key)
@@ -27,8 +27,8 @@ def test_protocol_checks():
     """Test that Protocol duck typing works."""
     key = oboron.generate_key()
     
-    ob32 = oboron.Ob32(key=key)
-    assert isinstance(ob32, oboron. OboronBase)
+    adsv = oboron.AdsvC32(key=key)
+    assert isinstance(adsv, oboron. OboronBase)
     
     print("✓ Protocol checks passed!")
 
@@ -43,14 +43,14 @@ def test_polymorphic_function():
     plaintext = "Hello, World!"
     
     # Test with different cipher types
-    ob32 = oboron.Ob32(key=key)
-    zdc = oboron.Zdc(key=key)
+    adsv = oboron.AdsvC32(key=key)
+    zdc = oboron.ZdcC32(key=key)
     
-    enc1 = encrypt_with_cipher(ob32, plaintext)
-    enc2 = encrypt_with_cipher(zdc, plaintext)
+    ot1 = encrypt_with_cipher(adsv, plaintext)
+    ot2 = encrypt_with_cipher(zdc, plaintext)
     
-    assert ob32.dec(enc1) == plaintext
-    assert zdc.dec(enc2) == plaintext
+    assert adsv.dec(ot1) == plaintext
+    assert zdc.dec(ot2) == plaintext
     
     print("✓ Polymorphic function test passed!")
 

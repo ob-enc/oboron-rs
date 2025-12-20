@@ -1,14 +1,14 @@
 """Format string constants for Oboron. 
 
 All constants follow the pattern:  {SCHEME}_{ENCODING}
-- Schemes: ZDC, UPC, ADGS, APGS, OB32, APSV, OB70, OB71, OB00 (legacy)
+- Schemes: ZDC, UPC, ADGS, APGS, ADSV, APSV, OB70, OB71, OB00 (legacy)
 - Encodings: C32 (Base32Crockford), B32 (Base32Rfc), B64 (Base64), HEX
 
 Example:
     >>> from oboron import formats
     >>> from oboron import Ob
     >>> 
-    >>> ob = Ob(formats.OB32_B64, key)
+    >>> ob = Ob(formats.ADSV_B64, key)
     >>> ot = ob.enc("secret")
 """
 
@@ -36,11 +36,11 @@ APGS_B32: str = "apgs:b32"
 APGS_B64: str = "apgs:b64"
 APGS_HEX: str = "apgs:hex"
 
-# ob32 - AES-SIV (deterministic, secure and authenticated, nonce-misuse resistant)
-OB32_C32: str = "ob32:c32"
-OB32_B32: str = "ob32:b32"
-OB32_B64: str = "ob32:b64"
-OB32_HEX: str = "ob32:hex"
+# adsv - AES-SIV (deterministic, secure and authenticated, nonce-misuse resistant)
+ADSV_C32: str = "adsv:c32"
+ADSV_B32: str = "adsv:b32"
+ADSV_B64: str = "adsv:b64"
+ADSV_HEX: str = "adsv:hex"
 
 # apsv - AES-SIV (probabilistic, secure and authenticated)
 APSV_C32: str = "apsv:c32"
@@ -74,8 +74,8 @@ __all__ = [
     "ADGS_C32", "ADGS_B32", "ADGS_B64", "ADGS_HEX",
     # apgs
     "APGS_C32", "APGS_B32", "APGS_B64", "APGS_HEX",
-    # ob32
-    "OB32_C32", "OB32_B32", "OB32_B64", "OB32_HEX",
+    # adsv
+    "ADSV_C32", "ADSV_B32", "ADSV_B64", "ADSV_HEX",
     # apsv
     "APSV_C32", "APSV_B32", "APSV_B64", "APSV_HEX",
     # Testing

@@ -178,13 +178,8 @@ impl_oboron!(UpcC32, Scheme::Upc, Encoding::Base32Crockford, "upc:c32");
 impl_oboron!(AdgsC32, Scheme::Adgs, Encoding::Base32Crockford, "adgs:c32");
 #[cfg(feature = "apgs")]
 impl_oboron!(ApgsC32, Scheme::Apgs, Encoding::Base32Crockford, "apgs:c32");
-#[cfg(feature = "ob32")]
-impl_oboron!(
-    Ob32Base32Crockford,
-    Scheme::Ob32,
-    Encoding::Base32Crockford,
-    "ob32:c32"
-);
+#[cfg(feature = "adsv")]
+impl_oboron!(AdsvC32, Scheme::Adsv, Encoding::Base32Crockford, "adsv:c32");
 #[cfg(feature = "apsv")]
 impl_oboron!(ApsvC32, Scheme::Apsv, Encoding::Base32Crockford, "apsv:c32");
 
@@ -197,8 +192,8 @@ impl_oboron!(UpcB32, Scheme::Upc, Encoding::Base32Rfc, "upc:b32");
 impl_oboron!(AdgsB32, Scheme::Adgs, Encoding::Base32Rfc, "adgs:b32");
 #[cfg(feature = "apgs")]
 impl_oboron!(ApgsB32, Scheme::Apgs, Encoding::Base32Rfc, "apgs:b32");
-#[cfg(feature = "ob32")]
-impl_oboron!(Ob32Base32Rfc, Scheme::Ob32, Encoding::Base32Rfc, "ob32:b32");
+#[cfg(feature = "adsv")]
+impl_oboron!(AdsvB32, Scheme::Adsv, Encoding::Base32Rfc, "adsv:b32");
 #[cfg(feature = "apsv")]
 impl_oboron!(ApsvB32, Scheme::Apsv, Encoding::Base32Rfc, "apsv:b32");
 
@@ -211,8 +206,8 @@ impl_oboron!(UpcB64, Scheme::Upc, Encoding::Base64, "upc:b64");
 impl_oboron!(AdgsB64, Scheme::Adgs, Encoding::Base64, "adgs:b64");
 #[cfg(feature = "apgs")]
 impl_oboron!(ApgsB64, Scheme::Apgs, Encoding::Base64, "apgs:b64");
-#[cfg(feature = "ob32")]
-impl_oboron!(Ob32Base64, Scheme::Ob32, Encoding::Base64, "ob32:b64");
+#[cfg(feature = "adsv")]
+impl_oboron!(AdsvB64, Scheme::Adsv, Encoding::Base64, "adsv:b64");
 #[cfg(feature = "apsv")]
 impl_oboron!(ApsvB64, Scheme::Apsv, Encoding::Base64, "apsv:b64");
 
@@ -225,8 +220,8 @@ impl_oboron!(UpcHex, Scheme::Upc, Encoding::Hex, "upc:hex");
 impl_oboron!(AdgsHex, Scheme::Adgs, Encoding::Hex, "adgs:hex");
 #[cfg(feature = "apgs")]
 impl_oboron!(ApgsHex, Scheme::Apgs, Encoding::Hex, "apgs:hex");
-#[cfg(feature = "ob32")]
-impl_oboron!(Ob32Hex, Scheme::Ob32, Encoding::Hex, "ob32:hex");
+#[cfg(feature = "adsv")]
+impl_oboron!(AdsvHex, Scheme::Adsv, Encoding::Hex, "adsv:hex");
 #[cfg(feature = "apsv")]
 impl_oboron!(ApsvHex, Scheme::Apsv, Encoding::Hex, "apsv:hex");
 
@@ -300,14 +295,14 @@ pub enum ObAny {
     ApgsB64(ApgsB64),
     #[cfg(feature = "apgs")]
     ApgsHex(ApgsHex),
-    #[cfg(feature = "ob32")]
-    Ob32Base32Crockford(Ob32Base32Crockford),
-    #[cfg(feature = "ob32")]
-    Ob32Base32Rfc(Ob32Base32Rfc),
-    #[cfg(feature = "ob32")]
-    Ob32Base64(Ob32Base64),
-    #[cfg(feature = "ob32")]
-    Ob32Hex(Ob32Hex),
+    #[cfg(feature = "adsv")]
+    AdsvC32(AdsvC32),
+    #[cfg(feature = "adsv")]
+    AdsvB32(AdsvB32),
+    #[cfg(feature = "adsv")]
+    AdsvB64(AdsvB64),
+    #[cfg(feature = "adsv")]
+    AdsvHex(AdsvHex),
     #[cfg(feature = "apsv")]
     ApsvC32(ApsvC32),
     #[cfg(feature = "apsv")]
@@ -381,14 +376,14 @@ macro_rules! delegate_to_inner {
                 ObAny::ApgsB64(ob) => ob.$method($($arg),*),
                 #[cfg(feature = "apgs")]
                 ObAny::ApgsHex(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "ob32")]
-                ObAny::Ob32Base32Crockford(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "ob32")]
-                ObAny::Ob32Base32Rfc(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "ob32")]
-                ObAny::Ob32Base64(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "ob32")]
-                ObAny::Ob32Hex(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "adsv")]
+                ObAny::AdsvC32(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "adsv")]
+                ObAny::AdsvB32(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "adsv")]
+                ObAny::AdsvB64(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "adsv")]
+                ObAny::AdsvHex(ob) => ob.$method($($arg),*),
                 #[cfg(feature = "apsv")]
                 ObAny::ApsvC32(ob) => ob.$method($($arg),*),
                 #[cfg(feature = "apsv")]
@@ -471,7 +466,7 @@ impl ObAny {
             feature = "adgs"
         )))]
         return Ok(ObAny::ApgsC32(ApgsC32::new(key)?));
-        #[cfg(feature = "ob32")]
+        #[cfg(feature = "adsv")]
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
@@ -480,7 +475,7 @@ impl ObAny {
             feature = "adgs",
             feature = "apgs"
         )))]
-        return Ok(ObAny::Ob32Base32Crockford(Ob32Base32Crockford::new(key)?));
+        return Ok(ObAny::AdsvC32(AdsvC32::new(key)?));
         #[cfg(feature = "apsv")]
         #[cfg(not(any(
             feature = "ob70",
@@ -489,7 +484,7 @@ impl ObAny {
             feature = "upc",
             feature = "adgs",
             feature = "apgs",
-            feature = "ob32"
+            feature = "adsv"
         )))]
         return Ok(ObAny::ApsvC32(ApsvC32::new(key)?));
         #[cfg(feature = "ob00")]
@@ -500,7 +495,7 @@ impl ObAny {
             feature = "upc",
             feature = "adgs",
             feature = "apgs",
-            feature = "ob32",
+            feature = "adsv",
             feature = "apsv"
         )))]
         return Ok(ObAny::Ob00Base32Crockford(Ob00Base32Crockford::new(key)?));
@@ -511,7 +506,7 @@ impl ObAny {
             feature = "upc",
             feature = "adgs",
             feature = "apgs",
-            feature = "ob32",
+            feature = "adsv",
             feature = "apsv",
             feature = "ob00"
         )))]
@@ -559,7 +554,7 @@ impl ObAny {
         return Ok(ObAny::ApgsC32(ApgsC32 {
             keychain: Keychain::from_bytes(key_bytes)?,
         }));
-        #[cfg(feature = "ob32")]
+        #[cfg(feature = "adsv")]
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
@@ -568,7 +563,7 @@ impl ObAny {
             feature = "adgs",
             feature = "apgs"
         )))]
-        return Ok(ObAny::Ob32Base32Crockford(Ob32Base32Crockford {
+        return Ok(ObAny::AdsvC32(AdsvC32 {
             keychain: Keychain::from_bytes(key_bytes)?,
         }));
         #[cfg(feature = "apsv")]
@@ -579,7 +574,7 @@ impl ObAny {
             feature = "upc",
             feature = "adgs",
             feature = "apgs",
-            feature = "ob32"
+            feature = "adsv"
         )))]
         return Ok(ObAny::ApsvC32(ApsvC32 {
             keychain: Keychain::from_bytes(key_bytes)?,
@@ -592,7 +587,7 @@ impl ObAny {
             feature = "upc",
             feature = "adgs",
             feature = "apgs",
-            feature = "ob32",
+            feature = "adsv",
             feature = "apsv"
         )))]
         return Ok(ObAny::Ob00Base32Crockford(Ob00Base32Crockford {
@@ -605,7 +600,7 @@ impl ObAny {
             feature = "upc",
             feature = "adgs",
             feature = "apgs",
-            feature = "ob32",
+            feature = "adsv",
             feature = "apsv",
             feature = "ob00"
         )))]
@@ -641,7 +636,7 @@ impl ObAny {
             feature = "adgs"
         )))]
         return Ok(ObAny::ApgsC32(ApgsC32::from_hex_key(key_hex)?));
-        #[cfg(feature = "ob32")]
+        #[cfg(feature = "adsv")]
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
@@ -650,9 +645,7 @@ impl ObAny {
             feature = "adgs",
             feature = "apgs"
         )))]
-        return Ok(ObAny::Ob32Base32Crockford(
-            Ob32Base32Crockford::from_hex_key(key_hex)?,
-        ));
+        return Ok(ObAny::AdsvC32(AdsvC32::from_hex_key(key_hex)?));
         #[cfg(feature = "apsv")]
         #[cfg(not(any(
             feature = "ob70",
@@ -661,7 +654,7 @@ impl ObAny {
             feature = "upc",
             feature = "adgs",
             feature = "apgs",
-            feature = "ob32"
+            feature = "adsv"
         )))]
         return Ok(ObAny::ApsvC32(ApsvC32::from_hex_key(key_hex)?));
         #[cfg(feature = "ob00")]
@@ -672,7 +665,7 @@ impl ObAny {
             feature = "upc",
             feature = "adgs",
             feature = "apgs",
-            feature = "ob32",
+            feature = "adsv",
             feature = "apsv"
         )))]
         return Ok(ObAny::Ob00Base32Crockford(
@@ -685,7 +678,7 @@ impl ObAny {
             feature = "upc",
             feature = "adgs",
             feature = "apgs",
-            feature = "ob32",
+            feature = "adsv",
             feature = "apsv",
             feature = "ob00"
         )))]
@@ -732,7 +725,7 @@ impl ObAny {
         return Ok(ObAny::ApgsC32(ApgsC32 {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
         }));
-        #[cfg(feature = "ob32")]
+        #[cfg(feature = "adsv")]
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
@@ -741,7 +734,7 @@ impl ObAny {
             feature = "adgs",
             feature = "apgs"
         )))]
-        return Ok(ObAny::Ob32Base32Crockford(Ob32Base32Crockford {
+        return Ok(ObAny::AdsvC32(AdsvC32 {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
         }));
         #[cfg(feature = "apsv")]
@@ -752,7 +745,7 @@ impl ObAny {
             feature = "upc",
             feature = "adgs",
             feature = "apgs",
-            feature = "ob32"
+            feature = "adsv"
         )))]
         return Ok(ObAny::ApsvC32(ApsvC32 {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
@@ -765,7 +758,7 @@ impl ObAny {
             feature = "upc",
             feature = "adgs",
             feature = "apgs",
-            feature = "ob32",
+            feature = "adsv",
             feature = "apsv"
         )))]
         return Ok(ObAny::Ob00Base32Crockford(Ob00Base32Crockford {
@@ -778,7 +771,7 @@ impl ObAny {
             feature = "upc",
             feature = "adgs",
             feature = "apgs",
-            feature = "ob32",
+            feature = "adsv",
             feature = "apsv",
             feature = "ob00"
         )))]
@@ -827,16 +820,14 @@ pub fn new_with_format(format: Format, key: &str) -> Result<ObAny, Error> {
         (Scheme::Apgs, Encoding::Base64) => Ok(ObAny::ApgsB64(ApgsB64::new(key)?)),
         #[cfg(feature = "apgs")]
         (Scheme::Apgs, Encoding::Hex) => Ok(ObAny::ApgsHex(ApgsHex::new(key)?)),
-        #[cfg(feature = "ob32")]
-        (Scheme::Ob32, Encoding::Base32Crockford) => {
-            Ok(ObAny::Ob32Base32Crockford(Ob32Base32Crockford::new(key)?))
-        }
-        #[cfg(feature = "ob32")]
-        (Scheme::Ob32, Encoding::Base32Rfc) => Ok(ObAny::Ob32Base32Rfc(Ob32Base32Rfc::new(key)?)),
-        #[cfg(feature = "ob32")]
-        (Scheme::Ob32, Encoding::Base64) => Ok(ObAny::Ob32Base64(Ob32Base64::new(key)?)),
-        #[cfg(feature = "ob32")]
-        (Scheme::Ob32, Encoding::Hex) => Ok(ObAny::Ob32Hex(Ob32Hex::new(key)?)),
+        #[cfg(feature = "adsv")]
+        (Scheme::Adsv, Encoding::Base32Crockford) => Ok(ObAny::AdsvC32(AdsvC32::new(key)?)),
+        #[cfg(feature = "adsv")]
+        (Scheme::Adsv, Encoding::Base32Rfc) => Ok(ObAny::AdsvB32(AdsvB32::new(key)?)),
+        #[cfg(feature = "adsv")]
+        (Scheme::Adsv, Encoding::Base64) => Ok(ObAny::AdsvB64(AdsvB64::new(key)?)),
+        #[cfg(feature = "adsv")]
+        (Scheme::Adsv, Encoding::Hex) => Ok(ObAny::AdsvHex(AdsvHex::new(key)?)),
         #[cfg(feature = "apsv")]
         (Scheme::Apsv, Encoding::Base32Crockford) => Ok(ObAny::ApsvC32(ApsvC32::new(key)?)),
         #[cfg(feature = "apsv")]
@@ -945,21 +936,21 @@ fn from_bytes_with_format_internal(format: Format, key_bytes: &[u8; 64]) -> Resu
         (Scheme::Apgs, Encoding::Hex) => {
             Ok(ObAny::ApgsHex(ApgsHex::from_bytes_internal(key_bytes)?))
         }
-        #[cfg(feature = "ob32")]
-        (Scheme::Ob32, Encoding::Base32Crockford) => Ok(ObAny::Ob32Base32Crockford(
-            Ob32Base32Crockford::from_bytes_internal(key_bytes)?,
-        )),
-        #[cfg(feature = "ob32")]
-        (Scheme::Ob32, Encoding::Base32Rfc) => Ok(ObAny::Ob32Base32Rfc(
-            Ob32Base32Rfc::from_bytes_internal(key_bytes)?,
-        )),
-        #[cfg(feature = "ob32")]
-        (Scheme::Ob32, Encoding::Base64) => Ok(ObAny::Ob32Base64(Ob32Base64::from_bytes_internal(
-            key_bytes,
-        )?)),
-        #[cfg(feature = "ob32")]
-        (Scheme::Ob32, Encoding::Hex) => {
-            Ok(ObAny::Ob32Hex(Ob32Hex::from_bytes_internal(key_bytes)?))
+        #[cfg(feature = "adsv")]
+        (Scheme::Adsv, Encoding::Base32Crockford) => {
+            Ok(ObAny::AdsvC32(AdsvC32::from_bytes_internal(key_bytes)?))
+        }
+        #[cfg(feature = "adsv")]
+        (Scheme::Adsv, Encoding::Base32Rfc) => {
+            Ok(ObAny::AdsvB32(AdsvB32::from_bytes_internal(key_bytes)?))
+        }
+        #[cfg(feature = "adsv")]
+        (Scheme::Adsv, Encoding::Base64) => {
+            Ok(ObAny::AdsvB64(AdsvB64::from_bytes_internal(key_bytes)?))
+        }
+        #[cfg(feature = "adsv")]
+        (Scheme::Adsv, Encoding::Hex) => {
+            Ok(ObAny::AdsvHex(AdsvHex::from_bytes_internal(key_bytes)?))
         }
         #[cfg(feature = "apsv")]
         (Scheme::Apsv, Encoding::Base32Crockford) => {
@@ -1097,8 +1088,8 @@ mod tests {
             Scheme::Adgs,
             #[cfg(feature = "apgs")]
             Scheme::Apgs,
-            #[cfg(feature = "ob32")]
-            Scheme::Ob32,
+            #[cfg(feature = "adsv")]
+            Scheme::Adsv,
             #[cfg(feature = "apsv")]
             Scheme::Apsv,
             // Testing
@@ -1168,8 +1159,8 @@ mod tests {
             Scheme::Adgs,
             #[cfg(feature = "apgs")]
             Scheme::Apgs,
-            #[cfg(feature = "ob32")]
-            Scheme::Ob32,
+            #[cfg(feature = "adsv")]
+            Scheme::Adsv,
             #[cfg(feature = "apsv")]
             Scheme::Apsv,
         ];
@@ -1223,8 +1214,8 @@ mod tests {
             Scheme::Zdc,
             #[cfg(feature = "adgs")]
             Scheme::Adgs,
-            #[cfg(feature = "ob32")]
-            Scheme::Ob32,
+            #[cfg(feature = "adsv")]
+            Scheme::Adsv,
         ];
 
         // Define all encodings

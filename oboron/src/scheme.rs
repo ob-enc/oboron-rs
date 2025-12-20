@@ -13,8 +13,8 @@ pub enum Scheme {
     Adgs,
     #[cfg(feature = "apgs")]
     Apgs,
-    #[cfg(feature = "ob32")]
-    Ob32,
+    #[cfg(feature = "adsv")]
+    Adsv,
     #[cfg(feature = "apsv")]
     Apsv,
     // Testing
@@ -39,8 +39,8 @@ impl Scheme {
             Scheme::Adgs => "adgs",
             #[cfg(feature = "apgs")]
             Scheme::Apgs => "apgs",
-            #[cfg(feature = "ob32")]
-            Scheme::Ob32 => "ob32",
+            #[cfg(feature = "adsv")]
+            Scheme::Adsv => "adsv",
             #[cfg(feature = "apsv")]
             Scheme::Apsv => "apsv",
             // Testing
@@ -70,8 +70,8 @@ impl Scheme {
             Scheme::Adgs => true,
             #[cfg(feature = "apgs")]
             Scheme::Apgs => false,
-            #[cfg(feature = "ob32")]
-            Scheme::Ob32 => true,
+            #[cfg(feature = "adsv")]
+            Scheme::Adsv => true,
             #[cfg(feature = "apsv")]
             Scheme::Apsv => false,
             // Testing
@@ -106,8 +106,8 @@ impl Scheme {
             Scheme::Adgs => constants::ADGS_BYTE,
             #[cfg(feature = "apgs")]
             Scheme::Apgs => constants::APGS_BYTE,
-            #[cfg(feature = "ob32")]
-            Scheme::Ob32 => constants::OB32_BYTE,
+            #[cfg(feature = "adsv")]
+            Scheme::Adsv => constants::ADSV_BYTE,
             #[cfg(feature = "apsv")]
             Scheme::Apsv => constants::APSV_BYTE,
             // Testing
@@ -135,8 +135,8 @@ impl std::str::FromStr for Scheme {
             "adgs" => Ok(Scheme::Adgs),
             #[cfg(feature = "apgs")]
             "apgs" => Ok(Scheme::Apgs),
-            #[cfg(feature = "ob32")]
-            "ob32" => Ok(Scheme::Ob32),
+            #[cfg(feature = "adsv")]
+            "adsv" => Ok(Scheme::Adsv),
             #[cfg(feature = "apsv")]
             "apsv" => Ok(Scheme::Apsv),
             // Testing

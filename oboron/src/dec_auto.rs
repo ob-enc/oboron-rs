@@ -7,12 +7,12 @@ use crate::constants::REVERSED_SCHEME_BYTES;
 
 #[cfg(feature = "adgs")]
 use crate::{constants::ADGS_BYTE, decrypt_adgs};
+#[cfg(feature = "adsv")]
+use crate::{constants::ADSV_BYTE, decrypt_adsv};
 #[cfg(feature = "apgs")]
 use crate::{constants::APGS_BYTE, decrypt_apgs};
 #[cfg(feature = "apsv")]
 use crate::{constants::APSV_BYTE, decrypt_apsv};
-#[cfg(feature = "ob32")]
-use crate::{constants::OB32_BYTE, decrypt_ob32};
 #[cfg(feature = "upc")]
 use crate::{constants::UPC_BYTE, decrypt_upc};
 #[cfg(feature = "zdc")]
@@ -75,8 +75,8 @@ pub fn dec_any_scheme(
         ADGS_BYTE => decrypt_adgs(keychain, &buffer)?,
         #[cfg(feature = "apgs")]
         APGS_BYTE => decrypt_apgs(keychain, &buffer)?,
-        #[cfg(feature = "ob32")]
-        OB32_BYTE => decrypt_ob32(keychain, &buffer)?,
+        #[cfg(feature = "adsv")]
+        ADSV_BYTE => decrypt_adsv(keychain, &buffer)?,
         #[cfg(feature = "apsv")]
         APSV_BYTE => decrypt_apsv(keychain, &buffer)?,
         // Testing

@@ -52,7 +52,7 @@ Add to your `Cargo.toml`:
 [dependencies]
 oboron = "1.0" # default features
 # or with minimal features:
-# oboron = { version = "1.0", features = ["ob32", "apsv"] }
+# oboron = { version = "1.0", features = ["adsv", "apsv"] }
 ```
 
 Generate your 512-bit key (86 base64 characters) using the keygen script
@@ -66,14 +66,14 @@ let key = oboron::generate_key();
 ```
 then save the key as an environment variable.
 
-Use Ob32 (a secure scheme, 256-bit encrypted with AES-SIV, encoded using
+Use AdsvC32 (a secure scheme, 256-bit encrypted with AES-SIV, encoded using
 Crockford's base32 variant) for enc/dec:
 ```rust
-use oboron::{Ob32, Oboron};
+use oboron::{AdsvC32, Oboron};
 
 let key = env::var("OBORON_KEY")?; // get the key
 
-let ob = Ob32::new(&key)?; // create Oboron instance
+let ob = AdsvC32::new(&key)?; // create Oboron instance
 
 let ot = ob.enc("hello, world")?; // encrypt+encode
 let pt2 = ob.dec(&ot)?; // decode+decrypt
@@ -162,7 +162,7 @@ odd = authenticated.
 | `upc` | AES-CBC     | No             | No             |       |
 | `adgs`  | AES-GCM-SIV | Yes            | Yes            |       |
 | `apgs` | AES-GCM-SIV | No             | Yes            |       |
-| `ob32`  | AES-SIV     | Yes            | Yes            |       |
+| `adsv`  | AES-SIV     | Yes            | Yes            |       |
 | `apsv` | AES-SIV     | No             | Yes            |       |
 
 **Key Concepts:**
@@ -191,7 +191,7 @@ the following:
   **Use `zdc` only for** maximum compactness and strong prefix entropy
   in non-security-critical contexts (e.g., development or obfuscation).
   For sensitive data, **always use authenticated schemes** (ob3x tier:
-  adgs or ob32).
+  adgs or adsv).
 
 We reiterate that the first digit in the scheme is a critically important
 one (see [Scheme Tiers](#scheme-tiers) above):
@@ -342,7 +342,7 @@ increase per-operation latency by several multiples and dominate runtime
 for the intended workloads.
 
 Subkeys are fixed, non-adaptive slices of the master key. With the
-exception of `ob32` / `apsv` (AES-SIV schemes), which intentionally use
+exception of `adsv` / `apsv` (AES-SIV schemes), which intentionally use
 the full 512-bit key, subkeys do not overlap.
 
 This implies related-key structure by construction. Oboron does not claim
@@ -359,7 +359,7 @@ following way:
 - `zdc`, `upc`: use the first 16 bytes (128 bits) for AES key
 - `zdc`: uses the second 16 bytes for IV
 - `adgs`, `apgs`: use the last 32 bytes (256 bits) for AES-GCM-SIV key
-- `ob32`, `apsv`: use the full 64 bytes (512 bits) for AES-SIV key
+- `adsv`, `apsv`: use the full 64 bytes (512 bits) for AES-SIV key
 
 The master key never leaves your application. Algorithm-specific keys
 are extracted on-the-fly and never cached or stored.
@@ -463,7 +463,7 @@ both SHA256 and JWT performance while providing reversible encryption.
 | Scheme | 8B Encode | 8B Decode | Security      | Use Case                        |
 |--------|----------:|-----------|---------------|---------------------------------|
 | zdc   | 132 ns    | 126 ns    | Insecure      | Maximum speed + compactness     |
-| ob32   | 334 ns    | 364 ns    | Secure + Auth | Balanced performance + security |
+| adsv   | 334 ns    | 364 ns    | Secure + Auth | Balanced performance + security |
 | JWT    | 550 ns    | 846 ns    | Auth only`*`  | Signature without encryption    |
 | SHA256 | 191 ns    | N/A       | One-way       | Hashing only                    |
 
@@ -490,7 +490,7 @@ performed on the same machine is available here:
 | Method        | Small string output length |
 |---------------|----------------------------|
 | Oboron zdc:  | 28 characters              |
-| Oboron ob32:  | 34-47 characters           |
+| Oboron adsv:  | 34-47 characters           |
 | Oboron apsv: | 60-72 characters           |
 | SHA256:       | 64 characters              |
 | JWT:          | 150+ characters            |
@@ -502,7 +502,7 @@ A more complete output length comparison is given in the
 
 - **zdc**: Non-security-critical applications prioritizing speed and
   compactness
-- **ob32**: General-purpose secure encryption with deterministic output
+- **adsv**: General-purpose secure encryption with deterministic output
   and compact size
 - **apsv**: Maximum privacy protection with probabilistic output
   (larger size due to nonce)
@@ -511,7 +511,7 @@ A more complete output length comparison is given in the
 - Performance and compactness are primary requirements (~28 chars)
 - Security requirements are minimal (obfuscation contexts)
 
-**Choose ob32 when:**  
+**Choose adsv when:**  
 - Cryptographic security with compact output is needed (~34-47 chars)
 - Deterministic behavior is beneficial (lookup keys, caching)
 
@@ -534,8 +534,8 @@ guidance, see [README_FEATURES.md](README_FEATURES.md).
 
 Quick examples:
 ```toml
-# Minimal: only ob32 (deterministic AES-SIV)
-oboron = { version = "1.0", default-features = false, features = ["ob32"] }
+# Minimal: only adsv (deterministic AES-SIV)
+oboron = { version = "1.0", default-features = false, features = ["adsv"] }
 
 # All authenticated schemes (ob3x tier)
 oboron = { version = "1.0", default-features = false, features = ["authenticated-schemes"] }
@@ -574,7 +574,7 @@ prefix entropy and compactness—enables specialized applications:
 | Use Case            | Traditional Solution | Oboron Approach |
 |---------------------|----------------------|------------------|
 | Short unique IDs    | UUIDv4 (36 chars)    | zdc:c32 (28 chars, reversible) |
-| URL parameters      | JWT (150+ chars)     | ob32:b64 (4.5x smaller, 4x faster) |
+| URL parameters      | JWT (150+ chars)     | adsv:b64 (4.5x smaller, 4x faster) |
 | Database ID masking | Hashids (not secure) | Proper encryption |
 | Simple encryption   | Libsodium (complex)  | String in, string out API |
 
@@ -596,7 +596,7 @@ let encoded = base64::encode(ciphertext);
 
 **After (Oboron - simplified, string-oriented):**
 ```rust
-let ob = Ob32::new(&env::var("OBORON_KEY")?);
+let ob = AdsvC32::new(&env::var("OBORON_KEY")?);
 let ot = ob.enc("Hello World")?; // "uf2glao2xd7fnbq5z53cb63ukc"
 ```
 
@@ -631,7 +631,7 @@ let obfuscated = hashids.encode(&[123]); // "k2d3e4"
 
 **After (Oboron - encrypted, reversible, secure):**
 ```rust
-let ob = Ob32::new(&env::var("OBORON_KEY")?);
+let ob = AdsvC32::new(&env::var("OBORON_KEY")?);
 let ot = ob.enc("user:123")?; // "uf2glao2xd7f"
 // Can include namespace prefixes to prevent type confusion
 ```
@@ -699,7 +699,7 @@ let full_id = ob.enc("user:alice")?;
   - Strong obfuscation where attackers have no context of Oboron use
 
 Possible security tightening if reversibility is needed:
-- Use `adgs` or `ob32` for strong 256-bit tamper-proof encryption.
+- Use `adgs` or `adsv` for strong 256-bit tamper-proof encryption.
   (Trade-off: longer output: 44 chars; 2-3x slower than `zdc` but still
   comparable performance to SHA256)
 - Keep the payload securely encrypted by having a shared secret:
@@ -797,13 +797,13 @@ assert_eq!(pt2, "hello");
 ```
 
 Available types include all combinations of scheme variants (e.g.,
-`Zdc`, `Upc`, `Adgs`, `Apgs`, `Ob32`, `Apsv`) with encoding
+`Zdc`, `Upc`, `Adgs`, `Apgs`, `Adsv`, `Apsv`) with encoding
 specifications (`Base64`, `Hex`, `Base32Rfc`, or `Base32Crockford`),
 and concatenates the two in struct names, for example:
 - `ZdcB32` - encoder for `zdc:b32` format
 - `UpcHex` - encoder for `upc:hex` format
 - `AdgsB64` - encoder for `adgs:b64` format
-- `Ob32Base32Crockford = Ob32` - encoder for `ob32:c32` format.
+- `AdsvC32` - encoder for `adsv:c32` format.
 
 Note that the `zdc` scheme is not included by default as
 cryptographically insecure.  In order to use the associated structs
@@ -819,7 +819,7 @@ unnecessary, use `Ob`:
 use oboron::{Ob, Oboron};
 
 let key = env::var("OBORON_KEY")?;
-let ob = Ob::new("ob32:b64", &key)?;
+let ob = Ob::new("adsv:b64", &key)?;
 
 let ot = ob.enc("hello")?;
 let pt2 = ob.dec(&ot)?;
@@ -874,7 +874,7 @@ let pt2 = obm.autodec(&ot);
 Note performance implications: autodetection uses trial-and-error across
 encodings, with worst-case performance ~3x slower than known-format
 dec operations. Meanwhile, scheme autodetection in other interfaces (e.g.,
-`Ob.dec()`, `ObFlex.dec()`, `Ob32Base64.dec()`) has zero overhead, as the
+`Ob.dec()`, `ObFlex.dec()`, `AdsvB64.dec()`) has zero overhead, as the
 scheme is detected based on the scheme byte in the payload, and the logic
 follows a direct path with no retries.
 
@@ -884,17 +884,17 @@ For type safety and discoverability, use the provided format constants
 instead of string literals:
 
 ```rust
-use oboron::{Ob, ObMulti, Oboron, OB32_B64, OB32_HEX};
+use oboron::{Ob, ObMulti, Oboron, ADSV_B64, ADSV_HEX};
 
 let key = oboron::generate_key();
 
 // With Ob (runtime format selection)
-let ob = Ob::new(OB32_B64, &key)?;
+let ob = Ob::new(ADSV_B64, &key)?;
 
 // With ObMulti (multi-format operations)
 let obm = ObMulti::new(&key)?;
-let ot_b64 = obm.enc("data", OB32_B64)?;
-let ot_hex = obm.enc("data", OB32_HEX)?;
+let ot_b64 = obm.enc("data", ADSV_B64)?;
+let ot_hex = obm.enc("data", ADSV_HEX)?;
 ```
 
 Available constants:
@@ -902,7 +902,7 @@ Available constants:
 - `UPC_C32`, `UPC_B32`, `UPC_B64`, `UPC_HEX`
 - `ADGS_C32`, `ADGS_B32`, `ADGS_B64`, `ADGS_HEX`
 - `APGS_C32`, `APGS_B32`, `APGS_B64`, `APGS_HEX`
-- `OB32_C32`, `OB32_B32`, `OB32_B64`, `OB32_HEX`
+- `ADSV_C32`, `ADSV_B32`, `ADSV_B64`, `ADSV_HEX`
 - `APSV_C32`, `APSV_B32`, `APSV_B64`, `APSV_HEX`
 - Testing:  `OB70_*`, `OB71_*`
 - Legacy: `OB00_*`
@@ -915,7 +915,7 @@ string constants:
 ```rust
 use oboron::{Ob, Format, Scheme, Encoding};
 
-let format = Format::new(Scheme::Ob32, Encoding::Base64);
+let format = Format::new(Scheme::Adsv, Encoding::Base64);
 let ob = Ob::new_with_format(format, &key)?;
 ```
 
@@ -925,8 +925,8 @@ For compile-time known schemes and encodings, however, static types
 provide optimal performance, concise syntax, and strongest type
 guarantees:
 ```rust
-use oboron::{Ob32Base64, Oboron};
-let ob = Ob32Base64::new(&key)?;
+use oboron::{AdsvB64, Oboron};
+let ob = AdsvB64::new(&key)?;
 let ot = ob.enc("secret")?;
 ```
 The format is built into the struct, no format strings, constants,
@@ -975,7 +975,7 @@ the hardcoded key.
 - **Key errors**: Ensure keys are exactly 86 base64 characters characters
   properly encoded from 512 bits (see note about
   [valid base64 keys](#valid-base64-keys))
-- **Format strings**: Must match exactly, e.g., "ob32:b64" not "ob32-b64"
+- **Format strings**: Must match exactly, e.g., "adsv:b64" not "adsv-b64"
 - **Decoding errors**: Use `autodec()` when format is unknown
 
 ### Minimum Supported Rust Version (MSRV)
@@ -1019,7 +1019,7 @@ group.)
 | ob70   | b32/c32  | 8   | 15  | 21  | 28  | 40  | 53  | 104  | 207  |
 | zdc   | b32/c32  | 28  | 28  | 28  | 28  | 53  | 53  | 104  | 207  |
 | adgs   | b32/c32  | 34  | 40  | 47  | 53  | 66  | 79  | 130  | 232  |
-| ob32   | b32/c32  | 34  | 40  | 47  | 53  | 66  | 79  | 130  | 232  |
+| adsv   | b32/c32  | 34  | 40  | 47  | 53  | 66  | 79  | 130  | 232  |
 | upc  | b32/c32  | 53  | 53  | 53  | 53  | 79  | 79  | 130  | 232  |
 | apgs  | b32/c32  | 53  | 60  | 66  | 72  | 85  | 98  | 149  | 252  |
 | apsv  | b32/c32  | 60  | 66  | 72  | 79  | 92  | 104 | 156  | 258  |
@@ -1031,7 +1031,7 @@ group.)
 | ob70   | b64      | 7   | 12  | 18  | 23  | 34  | 44  | 87   | 172  |
 | zdc   | b64      | 23  | 23  | 23  | 23  | 44  | 44  | 87   | 172  |
 | adgs   | b64      | 28  | 34  | 39  | 44  | 55  | 66  | 108  | 194  |
-| ob32   | b64      | 28  | 34  | 39  | 44  | 55  | 66  | 108  | 194  |
+| adsv   | b64      | 28  | 34  | 39  | 44  | 55  | 66  | 108  | 194  |
 | upc  | b64      | 44  | 44  | 44  | 44  | 66  | 66  | 108  | 215  |
 | apgs  | b64      | 40  | 50  | 55  | 60  | 71  | 82  | 124  | 210  |
 | apsv  | b64      | 46  | 55  | 60  | 66  | 76  | 87  | 130  | 215  |
@@ -1043,7 +1043,7 @@ group.)
 | ob70   | hex      | 10  | 18  | 26  | 34  | 50  | 66  | 130  | 258  |
 | zdc   | hex      | 34  | 34  | 34  | 34  | 66  | 66  | 130  | 258  |
 | adgs   | hex      | 42  | 50  | 58  | 66  | 82  | 98  | 162  | 290  |
-| ob32   | hex      | 42  | 50  | 58  | 66  | 82  | 98  | 162  | 290  |
+| adsv   | hex      | 42  | 50  | 58  | 66  | 82  | 98  | 162  | 290  |
 | upc  | hex      | 66  | 66  | 66  | 66  | 98  | 98  | 162  | 290  |
 | apgs  | hex      | 66  | 74  | 82  | 90  | 106 | 122 | 186  | 314  |
 | apsv  | hex      | 74  | 82  | 90  | 98  | 114 | 130 | 194  | 322  |

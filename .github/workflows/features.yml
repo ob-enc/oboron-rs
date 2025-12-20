@@ -20,7 +20,7 @@ jobs:
           - upc
           - adgs
           - apgs
-          - ob32
+          - adsv
           - apsv
     steps:
       - uses: actions/checkout@v4
@@ -81,13 +81,13 @@ jobs:
       matrix:
         include:
           - name: "deterministic only"
-            features: "zdc,adgs,ob32"
+            features: "zdc,adgs,adsv"
           - name: "probabilistic only"
             features: "upc,apgs,apsv"
           - name: "modern schemes"
-            features: "adgs,ob32"
-          - name: "ob32 only"
-            features: "ob32,keyless"
+            features: "adgs,adsv"
+          - name: "adsv only"
+            features: "adsv,keyless"
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -98,7 +98,7 @@ jobs:
 
   # Test WASM target with minimal features
   test-wasm-minimal:
-    name: Test WASM build (ob32 only)
+    name: Test WASM build (adsv only)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -108,7 +108,7 @@ jobs:
       - name: Build for WASM with minimal features
         run: |
           cd oboron
-          cargo build --target wasm32-unknown-unknown --release --no-default-features --features ob32 --lib
+          cargo build --target wasm32-unknown-unknown --release --no-default-features --features adsv --lib
       - name: Check binary size
         run: |
           ls -lh target/wasm32-unknown-unknown/release/

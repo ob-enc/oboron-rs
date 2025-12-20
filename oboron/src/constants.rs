@@ -37,9 +37,9 @@ pub const ADGS_BYTE: u8 = 0x62;
 #[cfg(feature = "apgs")]
 pub const APGS_BYTE: u8 = 0x63;
 
-// ob32: tier=3 (011), scheme=2 (0010), probabilistic=0 -> 01100100 = 0x64 (decimal: 100)
-#[cfg(feature = "ob32")]
-pub const OB32_BYTE: u8 = 0x64;
+// adsv: tier=3 (011), scheme=2 (0010), probabilistic=0 -> 01100100 = 0x64 (decimal: 100)
+#[cfg(feature = "adsv")]
+pub const ADSV_BYTE: u8 = 0x64;
 
 // apsv: tier=3 (011), scheme=2 (0010), probabilistic=1 -> 01100101 = 0x65 (decimal: 101)
 #[cfg(feature = "apsv")]
@@ -80,8 +80,8 @@ pub const UPC_C32: &str = "upc:c32";
 pub const ADGS_C32: &str = "adgs:c32";
 #[cfg(feature = "apgs")]
 pub const APGS_C32: &str = "apgs:c32";
-#[cfg(feature = "ob32")]
-pub const OB32_C32: &str = "ob32:c32";
+#[cfg(feature = "adsv")]
+pub const ADSV_C32: &str = "adsv:c32";
 #[cfg(feature = "apsv")]
 pub const APSV_C32: &str = "apsv:c32";
 // Tier ob7x - Testing
@@ -102,8 +102,8 @@ pub const UPC_B32: &str = "upc:b32";
 pub const ADGS_B32: &str = "adgs:b32";
 #[cfg(feature = "apgs")]
 pub const APGS_B32: &str = "apgs:b32";
-#[cfg(feature = "ob32")]
-pub const OB32_B32: &str = "ob32:b32";
+#[cfg(feature = "adsv")]
+pub const ADSV_B32: &str = "adsv:b32";
 #[cfg(feature = "apsv")]
 pub const APSV_B32: &str = "apsv:b32";
 // Tier ob7x - Testing
@@ -124,8 +124,8 @@ pub const UPC_B64: &str = "upc:b64";
 pub const ADGS_B64: &str = "adgs:b64";
 #[cfg(feature = "apgs")]
 pub const APGS_B64: &str = "apgs:b64";
-#[cfg(feature = "ob32")]
-pub const OB32_B64: &str = "ob32:b64";
+#[cfg(feature = "adsv")]
+pub const ADSV_B64: &str = "adsv:b64";
 #[cfg(feature = "apsv")]
 pub const APSV_B64: &str = "apsv:b64";
 // Tier ob7x - Testing
@@ -146,8 +146,8 @@ pub const UPC_HEX: &str = "upc:hex";
 pub const ADGS_HEX: &str = "adgs:hex";
 #[cfg(feature = "apgs")]
 pub const APGS_HEX: &str = "apgs:hex";
-#[cfg(feature = "ob32")]
-pub const OB32_HEX: &str = "ob32:hex";
+#[cfg(feature = "adsv")]
+pub const ADSV_HEX: &str = "adsv:hex";
 #[cfg(feature = "apsv")]
 pub const APSV_HEX: &str = "apsv:hex";
 // Tier ob7x - Testing

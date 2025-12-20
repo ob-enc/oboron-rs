@@ -8,12 +8,12 @@ use data_encoding::{BASE64URL_NOPAD, HEXLOWER};
 // Conditionally import encrypt functions based on features
 #[cfg(feature = "adgs")]
 use crate::encrypt_adgs;
+#[cfg(feature = "adsv")]
+use crate::encrypt_adsv;
 #[cfg(feature = "apgs")]
 use crate::encrypt_apgs;
 #[cfg(feature = "apsv")]
 use crate::encrypt_apsv;
-#[cfg(feature = "ob32")]
-use crate::encrypt_ob32;
 #[cfg(feature = "upc")]
 use crate::encrypt_upc;
 #[cfg(feature = "zdc")]
@@ -50,8 +50,8 @@ pub(crate) fn enc_to_format(
         Scheme::Adgs => encrypt_adgs(keychain, plaintext.as_bytes())?,
         #[cfg(feature = "apgs")]
         Scheme::Apgs => encrypt_apgs(keychain, plaintext.as_bytes())?,
-        #[cfg(feature = "ob32")]
-        Scheme::Ob32 => encrypt_ob32(keychain, plaintext.as_bytes())?,
+        #[cfg(feature = "adsv")]
+        Scheme::Adsv => encrypt_adsv(keychain, plaintext.as_bytes())?,
         #[cfg(feature = "apsv")]
         Scheme::Apsv => encrypt_apsv(keychain, plaintext.as_bytes())?,
         // Testing

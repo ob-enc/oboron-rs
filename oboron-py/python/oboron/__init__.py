@@ -18,11 +18,11 @@ class OboronBase(ABC):
     """
     Abstract base class for all Oboron cipher implementations.
 
-    All cipher classes (Ob32, Zdc, etc.) are registered as virtual
+    All cipher classes (AdsvB32, ZdcB64, etc.) are registered as virtual
     subclasses, enabling isinstance() and issubclass() checks.
 
     Example:
-        >>> cipher = Ob32(hex_key=key)
+        >>> cipher = AdsvC32(hex_key=key)
         >>> isinstance(cipher, OboronBase)
         True
 
@@ -43,7 +43,7 @@ class OboronBase(ABC):
     @property
     @abstractmethod
     def scheme(self) -> str:
-        """Get the scheme identifier (e.g., 'Ob32')."""
+        """Get the scheme identifier (e.g., 'AdsvC32')."""
         ...
 
     @property
@@ -99,11 +99,11 @@ OboronBase.register(_oboron.ApgsB32)
 OboronBase.register(_oboron.ApgsB64)
 OboronBase.register(_oboron.ApgsHex)
 
-# Ob32 variants
-OboronBase.register(_oboron.Ob32Base32Crockford)
-OboronBase.register(_oboron.Ob32Base32Rfc)
-OboronBase.register(_oboron.Ob32Base64)
-OboronBase.register(_oboron.Ob32Hex)
+# Adsv variants
+OboronBase.register(_oboron.AdsvC32)
+OboronBase.register(_oboron.AdsvB32)
+OboronBase.register(_oboron.AdsvB64)
+OboronBase.register(_oboron.AdsvHex)
 
 # Apsv variants
 OboronBase.register(_oboron.ApsvC32)
@@ -163,11 +163,11 @@ ApgsB32 = _oboron.ApgsB32
 ApgsB64 = _oboron.ApgsB64
 ApgsHex = _oboron.ApgsHex
 
-# Ob32 variants
-Ob32Base32Crockford = _oboron.Ob32Base32Crockford
-Ob32Base32Rfc = _oboron.Ob32Base32Rfc
-Ob32Base64 = _oboron.Ob32Base64
-Ob32Hex = _oboron.Ob32Hex
+# Adsv variants
+AdsvC32 = _oboron.AdsvC32
+AdsvB32 = _oboron.AdsvB32
+AdsvB64 = _oboron.AdsvB64
+AdsvHex = _oboron.AdsvHex
 
 # Apsv variants
 ApsvC32 = _oboron.ApsvC32
@@ -241,11 +241,11 @@ __all__ = [
     'ApgsB64',
     'ApgsHex',
 
-    # Ob32
-    'Ob32Base32Crockford',
-    'Ob32Base32Rfc',
-    'Ob32Base64',
-    'Ob32Hex',
+    # Adsv
+    'AdsvC32',
+    'AdsvB32',
+    'AdsvB64',
+    'AdsvHex',
 
     # Apsv
     'ApsvC32',

@@ -11,7 +11,7 @@ By default, **all secure production-ready schemes are enabled**:
 oboron = "1.0"
 ```
 
-This includes: `upc`, `adgs`, `apgs`, `ob32`, `apsv`.
+This includes: `upc`, `adgs`, `apgs`, `adsv`, `apsv`.
 
 All encodings (`:c32`-Crockford base32, `:b32`-standard base32, `:b64`-URL-safe base64, and `:hex`-hex) are always included.
 
@@ -31,7 +31,7 @@ To use only what you need:
 
 ```toml
 [dependencies]
-oboron = { version = "1.0", default-features = false, features = ["ob32"] }
+oboron = { version = "1.0", default-features = false, features = ["adsv"] }
 ```
 This minimal configuration includes only base64 key support and excludes
 hex/bytes key interfaces and the keyless testing feature.
@@ -44,7 +44,7 @@ hex/bytes key interfaces and the keyless testing feature.
 - `upc` - AES-CBC (probabilistic)
 - `adgs` - AES-GCM-SIV (deterministic)
 - `apgs` - AES-GCM-SIV (probabilistic)
-- `ob32` - AES-SIV (deterministic)
+- `adsv` - AES-SIV (deterministic)
 - `apsv` - AES-SIV (probabilistic)
 
 Testing schemes (non-cryptographic):
@@ -78,12 +78,12 @@ versioning guarantees and may change or be removed in patch releases.
 By algorithm
 - `all-cbc-schemes` - Includes `zdc`, `upc`
 - `all-gcm-schemes` - Includes `adgs`, `apgs`
-- `all-siv-schemes` - Includes `ob32`, `apsv`
+- `all-siv-schemes` - Includes `adsv`, `apsv`
 
 By properties:
-- `deterministic-schemes` - Includes `zdc`, `adgs`, `ob32`
+- `deterministic-schemes` - Includes `zdc`, `adgs`, `adsv`
 - `probabilistic-schemes` - Includes `upc`, `apgs`, `apsv`
-- `authenticated-schemes` - Includes `adgs`, `apgs`, `ob32`, `apsv`
+- `authenticated-schemes` - Includes `adgs`, `apgs`, `adsv`, `apsv`
 - `secure-schemes` - Includes all but `zdc`
 - `insecure-schemes` - Includes `zdc` only
 
@@ -121,7 +121,7 @@ All disabled by default:
 
 ### Quick Selection Guide
 
-- **General purpose**: `ob32` (deterministic) or `apsv` (probabilistic)
+- **General purpose**: `adsv` (deterministic) or `apsv` (probabilistic)
 - **Maximum speed, most compact output**: `zdc` (insecure, deterministic
   only)
 - **Testing/obfuscation**: `zdc` with `keyless` feature
@@ -130,7 +130,7 @@ All disabled by default:
 
 For WebAssembly builds, the biggest size savings come from excluding
 entire algorithm families. For example, if you only need AES-SIV, use
-features = ["all-siv-schemes"] instead of individual ob32/apsv features.
+features = ["all-siv-schemes"] instead of individual adsv/apsv features.
 
 ## Examples
 

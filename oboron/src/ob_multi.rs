@@ -16,14 +16,14 @@ use crate::{Error, Format, Keychain};
 ///
 /// ```rust
 /// # fn main() -> Result<(), oboron::Error> {
-/// # #[cfg(all(feature = "ob32", feature="non-crypto"))]
+/// # #[cfg(all(feature = "adsv", feature="non-crypto"))]
 /// # {
 /// # use oboron::{ObMulti, OB70_B64};
 /// # let key = oboron::generate_key();
 /// let obm = ObMulti::new(&key)?;
 ///
 /// // Encode with explicit format
-/// let ot1 = obm.enc("hello", "ob32:c32")?; // using explicit string
+/// let ot1 = obm.enc("hello", "adsv:c32")?; // using explicit string
 /// let ot2 = obm.enc("world", OB70_B64)?; // using string constant
 ///
 /// // autodec detects both scheme and encoding
@@ -60,13 +60,13 @@ impl ObMulti {
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(all(feature = "ob32", feature="non-crypto"))]
+    /// # #[cfg(all(feature = "adsv", feature="non-crypto"))]
     /// # {
     /// # use oboron::ObMulti;
     /// let key = oboron::generate_key();
     /// let obm = ObMulti::new(&key)?;
     ///
-    /// let ot = obm.enc("hello", "ob32:c32")?;
+    /// let ot = obm.enc("hello", "adsv:c32")?;
     /// let ot2 = obm.enc("world", "ob70:b64")?;
     /// # }
     /// # Ok(())
@@ -85,12 +85,12 @@ impl ObMulti {
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(feature = "ob32")]
+    /// # #[cfg(feature = "adsv")]
     /// # {
     /// # use oboron::{ObMulti, Format, Scheme, Encoding};
     /// # let key = oboron::generate_key();
     /// # let obm = ObMulti::new(&key)?;
-    /// let format = Format::new(Scheme::Ob32, Encoding::Base32Crockford);
+    /// let format = Format::new(Scheme::Adsv, Encoding::Base32Crockford);
     ///
     /// // Reuse format across multiple calls
     /// let ot1 = obm.enc_with_format("hello", format)? ;
@@ -112,13 +112,13 @@ impl ObMulti {
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(feature = "ob32")]
+    /// # #[cfg(feature = "adsv")]
     /// # {
     /// # use oboron::ObMulti;
     /// # let key = oboron::generate_key();
     /// # let obm = ObMulti::new(&key)?;
-    /// let ot = obm.enc("hello", "ob32:b64")?;
-    /// let pt2 = obm.dec(&ot, "ob32:b64")? ;
+    /// let ot = obm.enc("hello", "adsv:b64")?;
+    /// let pt2 = obm.dec(&ot, "adsv:b64")? ;
     /// assert_eq!(pt2, "hello");
     /// # }
     /// # Ok(())
@@ -138,12 +138,12 @@ impl ObMulti {
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(feature = "ob32")]
+    /// # #[cfg(feature = "adsv")]
     /// # {
     /// # use oboron::{ObMulti, Format, Scheme, Encoding};
     /// # let key = oboron::generate_key();
     /// # let obm = ObMulti::new(&key)?;
-    /// let format = Format::new(Scheme::Ob32, Encoding::Base64);
+    /// let format = Format::new(Scheme::Adsv, Encoding::Base64);
     ///
     /// let ot = obm.enc_with_format("hello", format)?;
     /// let pt2 = obm.dec_with_format(&ot, format)?;
@@ -162,13 +162,13 @@ impl ObMulti {
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(feature = "ob32")]
+    /// # #[cfg(feature = "adsv")]
     /// # {
     /// # use oboron::ObMulti;
     /// # let key = oboron::generate_key();
     /// # let obm = ObMulti::new(&key)?;
-    /// let ot = obm.enc("hello", "ob32:b64")?;
-    /// let pt2 = obm.autodec(&ot)?;  // Autodetects ob32:b64
+    /// let ot = obm.enc("hello", "adsv:b64")?;
+    /// let pt2 = obm.autodec(&ot)?;  // Autodetects adsv:b64
     /// assert_eq!(pt2, "hello");
     /// # }
     /// # Ok(())

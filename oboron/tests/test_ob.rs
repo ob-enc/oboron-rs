@@ -13,16 +13,16 @@ fn test_ob_basic_roundtrip() {
 }
 
 #[test]
-#[cfg(feature = "ob32")]
+#[cfg(feature = "adsv")]
 fn test_ob_deterministic() {
     let key = [0u8; 64];
-    let ob = Ob::from_bytes("ob32:b64", &key).expect("Failed to create Ob with ob32");
+    let ob = Ob::from_bytes("adsv:b64", &key).expect("Failed to create Ob with adsv");
 
     let plaintext = "Deterministic test";
     let encd1 = ob.enc(plaintext).expect("Failed to enc");
     let encd2 = ob.enc(plaintext).expect("Failed to enc");
 
-    // Ob32 is deterministic
+    // Adsv is deterministic
     assert_eq!(encd1, encd2);
 }
 
@@ -112,16 +112,16 @@ fn test_ob_immutable_format() {
 }
 
 #[test]
-#[cfg(feature = "ob32")]
+#[cfg(feature = "adsv")]
 fn test_ob_scheme_autodetection() {
     let key = [0u8; 64];
 
-    // Encode with ob32
-    let ob32 = Ob::from_bytes("ob32:b64", &key).expect("Failed to create Ob32");
-    let encd = ob32.enc("test").expect("Failed to enc");
+    // Encode with adsv
+    let adsv = Ob::from_bytes("adsv:b64", &key).expect("Failed to create Ob with adsv:b64 format");
+    let encd = adsv.enc("test").expect("Failed to enc");
 
     // Decode with ob70 (different scheme, same encoding)
-    let ob70 = Ob::from_bytes("ob70:b64", &key).expect("Failed to create Ob70");
+    let ob70 = Ob::from_bytes("ob70:b64", &key).expect("Failed to create Ob with ob70:b64 format");
     let decd = ob70.dec(&encd).expect("Failed to dec with autodetection");
     assert_eq!(decd, "test");
 

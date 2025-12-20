@@ -238,31 +238,31 @@ impl_cipher_class!(
     "Apgs cipher with Hex encoding (Probabilistic AES-GCM-SIV)"
 );
 
-// Ob32 variants
+// Adsv variants
 // -------------
-#[cfg(feature = "ob32")]
+#[cfg(feature = "adsv")]
 impl_cipher_class!(
-    Ob32Base32Crockford,
-    ::oboron::Ob32Base32Crockford,
-    "Ob32 cipher with Base32Crockford encoding (AES-SIV, deterministic, nonce-misuse resistant)"
+    AdsvC32,
+    ::oboron::AdsvC32,
+    "Adsv cipher with Base32Crockford encoding (AES-SIV, deterministic, nonce-misuse resistant)"
 );
-#[cfg(feature = "ob32")]
+#[cfg(feature = "adsv")]
 impl_cipher_class!(
-    Ob32Base32Rfc,
-    ::oboron::Ob32Base32Rfc,
-    "Ob32 cipher with Base32Rfc encoding (AES-SIV, deterministic, nonce-misuse resistant)"
+    AdsvB32,
+    ::oboron::AdsvB32,
+    "Adsv cipher with Base32Rfc encoding (AES-SIV, deterministic, nonce-misuse resistant)"
 );
-#[cfg(feature = "ob32")]
+#[cfg(feature = "adsv")]
 impl_cipher_class!(
-    Ob32Base64,
-    ::oboron::Ob32Base64,
-    "Ob32 cipher with Base64 encoding (AES-SIV, deterministic, nonce-misuse resistant)"
+    AdsvB64,
+    ::oboron::AdsvB64,
+    "Adsv cipher with Base64 encoding (AES-SIV, deterministic, nonce-misuse resistant)"
 );
-#[cfg(feature = "ob32")]
+#[cfg(feature = "adsv")]
 impl_cipher_class!(
-    Ob32Hex,
-    ::oboron::Ob32Hex,
-    "Ob32 cipher with Hex encoding (AES-SIV, deterministic, nonce-misuse resistant)"
+    AdsvHex,
+    ::oboron::AdsvHex,
+    "Adsv cipher with Hex encoding (AES-SIV, deterministic, nonce-misuse resistant)"
 );
 
 // Apsv variants
@@ -348,7 +348,7 @@ impl_cipher_class!(
     ::oboron::Ob00Base32Crockford,
     "Ob00 cipher with Base32Crockford encoding (LEGACY AES-CBC with custom padding)\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
-     For new projects, use Zdc or more secure schemes like Adgs/Ob32."
+     For new projects, use Zdc or more secure schemes like Adgs/Adsv."
 );
 #[cfg(feature = "ob00")]
 impl_cipher_class!(
@@ -356,7 +356,7 @@ impl_cipher_class!(
     ::oboron::Ob00Base32Rfc,
     "Ob00 cipher with Base32Rfc encoding (LEGACY AES-CBC with custom padding)\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
-     For new projects, use Zdc or more secure schemes like Adgs/Ob32."
+     For new projects, use Zdc or more secure schemes like Adgs/Adsv."
 );
 #[cfg(feature = "ob00")]
 impl_cipher_class!(
@@ -364,7 +364,7 @@ impl_cipher_class!(
     ::oboron::Ob00Base64,
     "Ob00 cipher with Base64 encoding (LEGACY AES-CBC with custom padding)\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
-     For new projects, use Zdc or more secure schemes like Adgs/Ob32."
+     For new projects, use Zdc or more secure schemes like Adgs/Adsv."
 );
 #[cfg(feature = "ob00")]
 impl_cipher_class!(
@@ -372,7 +372,7 @@ impl_cipher_class!(
     ::oboron::Ob00Hex,
     "Ob00 cipher with Hex encoding (LEGACY AES-CBC with custom padding)\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
-     For new projects, use Zdc or more secure schemes like Adgs/Ob32."
+     For new projects, use Zdc or more secure schemes like Adgs/Adsv."
 );
 
 /// Ob - Flexible cipher with runtime format selection.   
@@ -844,13 +844,13 @@ fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m.add_class::<ApgsHex>()?;
     }
 
-    // Ob32 variants
-    #[cfg(feature = "ob32")]
+    // Adsv variants
+    #[cfg(feature = "adsv")]
     {
-        m.add_class::<Ob32Base32Crockford>()?;
-        m.add_class::<Ob32Base32Rfc>()?;
-        m.add_class::<Ob32Base64>()?;
-        m.add_class::<Ob32Hex>()?;
+        m.add_class::<AdsvC32>()?;
+        m.add_class::<AdsvB32>()?;
+        m.add_class::<AdsvB64>()?;
+        m.add_class::<AdsvHex>()?;
     }
 
     // Apsv variants

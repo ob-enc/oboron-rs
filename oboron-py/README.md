@@ -62,14 +62,14 @@ key = oboron.generate_key()
 ```
 then save the key as an environment variable.
 
-Use Ob32 (a secure scheme, 256-bit encrypted with AES-SIV, encoded using
+Use AdsvC32 (a secure scheme, 256-bit encrypted with AES-SIV, encoded using
 Crockford's base32 variant) for enc/dec:
 ```python
 import os
-from oboron import Ob32
+from oboron import AdsvC32
 
 key = os.getenv("OBORON_KEY")  # get the key
-ob = Ob32(key)                 # instantiate Oboron (cipher+encoder)
+ob = AdsvC32(key)                 # instantiate Oboron (cipher+encoder)
 ot = ob.enc("hello, world")    # get obtext (encrypted+encoded)
 pt2 = ob.dec(ot)               # get plaintext back (decode+decrypt obtext)
 
@@ -157,7 +157,7 @@ odd = authenticated.
 | `upc` | AES-CBC     | No             | No             |       |
 | `adgs`  | AES-GCM-SIV | Yes            | Yes            |       |
 | `apgs` | AES-GCM-SIV | No             | Yes            |       |
-| `ob32`  | AES-SIV     | Yes            | Yes            |       |
+| `adsv`  | AES-SIV     | Yes            | Yes            |       |
 | `apsv` | AES-SIV     | No             | Yes            |       |
 
 **Key Concepts:**
@@ -186,7 +186,7 @@ the following:
   **Use `zdc` only for** maximum compactness and strong prefix entropy
   in non-security-critical contexts (e.g., development or obfuscation).
   For sensitive data, **always use authenticated schemes** (ob3x tier:
-  adgs or ob32).
+  adgs or adsv).
 
 We reiterate that the first digit in the scheme is a critically important
 one (see [Scheme Tiers](#scheme-tiers) above):
@@ -337,7 +337,7 @@ increase per-operation latency by several multiples and dominate runtime
 for the intended workloads.
 
 Subkeys are fixed, non-adaptive slices of the master key. With the
-exception of `ob32` / `apsv` (AES-SIV schemes), which intentionally use
+exception of `adsv` / `apsv` (AES-SIV schemes), which intentionally use
 the full 512-bit key, subkeys do not overlap.
 
 This implies related-key structure by construction. Oboron does not claim
@@ -354,7 +354,7 @@ following way:
 - `zdc`, `upc`: use the first 16 bytes (128 bits) for AES key
 - `zdc`: uses the second 16 bytes for IV
 - `adgs`, `apgs`: use the last 32 bytes (256 bits) for AES-GCM-SIV key
-- `ob32`, `apsv`: use the full 64 bytes (512 bits) for AES-SIV key
+- `adsv`, `apsv`: use the full 64 bytes (512 bits) for AES-SIV key
 
 The master key never leaves your application. Algorithm-specific keys
 are extracted on-the-fly and never cached or stored.
@@ -462,7 +462,7 @@ both SHA256 and JWT performance while providing reversible encryption.
 | Scheme | 8B Encode | 8B Decode | Security      | Use Case                        |
 |--------|----------:|-----------|---------------|---------------------------------|
 | zdc   | 132 ns    | 126 ns    | Insecure      | Maximum speed + compactness     |
-| ob32   | 334 ns    | 364 ns    | Secure + Auth | Balanced performance + security |
+| adsv   | 334 ns    | 364 ns    | Secure + Auth | Balanced performance + security |
 | JWT    | 550 ns    | 846 ns    | Auth only`*`  | Signature without encryption    |
 | SHA256 | 191 ns    | N/A       | One-way       | Hashing only                    |
 
@@ -489,7 +489,7 @@ performed on the same machine is available here:
 | Method        | Small string output length |
 |---------------|----------------------------|
 | Oboron zdc:  | 28 characters              |
-| Oboron ob32:  | 34-47 characters           |
+| Oboron adsv:  | 34-47 characters           |
 | Oboron apsv: | 60-72 characters           |
 | SHA256:       | 64 characters              |
 | JWT:          | 150+ characters            |
@@ -501,7 +501,7 @@ A more complete output length comparison is given in the
 
 - **zdc**: Non-security-critical applications prioritizing speed and
   compactness
-- **ob32**: General-purpose secure encryption with deterministic output
+- **adsv**: General-purpose secure encryption with deterministic output
   and compact size
 - **apsv**: Maximum privacy protection with probabilistic output
   (larger size due to nonce)
@@ -510,7 +510,7 @@ A more complete output length comparison is given in the
 - Performance and compactness are primary requirements (~28 chars)
 - Security requirements are minimal (obfuscation contexts)
 
-**Choose ob32 when:**  
+**Choose adsv when:**  
 - Cryptographic security with compact output is needed (~34-47 chars)
 - Deterministic behavior is beneficial (lookup keys, caching)
 
@@ -547,7 +547,7 @@ prefix entropy and compactness—enables specialized applications:
 | Use Case            | Traditional Solution | Oboron Approach                    |
 |---------------------|----------------------|------------------------------------|
 | Short unique IDs    | UUIDv4 (36 chars)    | zdc:c32 (28 chars, reversible)    |
-| URL parameters      | JWT (150+ chars)     | ob32:b64 (4.5x smaller, 4x faster) |
+| URL parameters      | JWT (150+ chars)     | adsv:b64 (4.5x smaller, 4x faster) |
 | Database ID masking | Hashids (not secure) | Proper encryption                  |
 | Simple encryption   | Libsodium (complex)  | String in, string out API          |
 
@@ -599,13 +599,13 @@ print(f"Decrypted: {decrypted_str}")
 
 **After (Oboron - simplified, string-oriented):**
 ```python
-from oboron import Ob32, generate_key
+from oboron import AdsvC32, generate_key
 
 # --- KEY ---
 
 # Generate key in base64 (ready for storing as environment variable)
 key = generate_key()
-ob = Ob32(key)
+ob = AdsvC32(key)
 
 # --- ENCRYPT+ENCODE ---
 # Direct string in, string out
@@ -662,10 +662,10 @@ Problems:
 **After (Oboron - encrypted, reversible, secure):**
 ```python
 import os
-from oboron import Ob32
+from oboron import AdsvC32
 
 key = os.environ.get("OBORON_KEY")
-ob = Ob32(key)
+ob = AdsvC32(key)
 
 obtext = ob.enc("123")  # "waz7vh42v1jqwtavafwnxqy2anhn12w6"
 
@@ -807,7 +807,7 @@ full_id = ob.enc(f"user:alice")
   - Strong obfuscation where attackers have no context of Oboron use
 
 Possible security tightening if reversibility is needed:
-- Use `adgs` or `ob32` for strong 256-bit tamper-proof encryption.
+- Use `adgs` or `adsv` for strong 256-bit tamper-proof encryption.
   (Trade-off: longer output: 44 chars; 2-3x slower than `zdc` but still
   comparable performance to SHA256)
 - Keep the payload securely encrypted by having a shared secret:
@@ -891,7 +891,7 @@ clarity.
 ### 1. Fixed Format Selection (Recommended for Production)
 
 When your encryption format is fixed, instantiate the specific scheme class
-(like `Ob32`) directly for optimal performance and type safety:
+(like `AdsvC32`) directly for optimal performance and type safety:
 
 ```python
 from oboron import ApgsB64
@@ -902,13 +902,13 @@ assert pt2 == "hello"
 ```
 
 Available types include all combinations of scheme variants (e.g.,
-`Zdc`, `Upc`, `Adgs`, `Apgs`, `Ob32`, `Apsv`) with encoding
+`Zdc`, `Upc`, `Adgs`, `Apgs`, `Adsv`, `Apsv`) with encoding
 specifications (`Base64`, `Hex`, `Base32Rfc`, or `Base32Crockford`),
 and concatenates the two in class names, for example:
 - `ZdcB32` - encoder for `zdc:b32` format
 - `UpcHex` - encoder for `upc:hex` format
 - `AdgsB64` - encoder for `adgs:b64` format
-- `Ob32Base32Crockford = Ob32` - encoder for `ob32:c32` format.
+- `AdsvC32` - encoder for `adsv:c32` format.
 
 ### 2. Runtime Format Selection (`Ob`)
 
@@ -916,13 +916,13 @@ When format specification at runtime is required, use `Ob`:
 
 ```python
 from oboron import Ob
-ob = Ob("ob32:b64", key)
-ot = ob.enc("hello")  # ob32:b64 format obtext
+ob = Ob("adsv:b64", key)
+ot = ob.enc("hello")  # adsv:b64 format obtext
 pt2 = ob.dec(ot)
 assert pt2 == "hello"
 
-ob.set_encoding("c32")  # switch format to ob32:c32
-ob.enc("hello")  # now ob32:c32-encoded obtext
+ob.set_encoding("c32")  # switch format to adsv:c32
+ob.enc("hello")  # now adsv:c32-encoded obtext
 
 ob.set_scheme("adgs")  # switch wormat to adgs:c32
 ob.enc("hello")  # now adgs:c32-encoded obtext
@@ -965,7 +965,7 @@ encodings, with worst-case performance ~3x slower than known-format
 dec operations. (However, the heuristic encoding detection makes the average
 performace much closer to that of normal `dec()` operations than the worst case.)
 Meanwhile, scheme autodetection in other interfaces (e.g., `Ob.dec()`,
-`Ob32Base64.dec()`) has zero overhead, as the scheme is detected based
+`AdsvB64.dec()`) has zero overhead, as the scheme is detected based
 on the scheme byte in the payload, and the logic follows a direct path
 with no retries.
 
@@ -978,12 +978,12 @@ instead of string literals:
 from oboron import Ob, ObMulti, formats
 
 # With Ob (runtime format selection)
-ob = Ob(formats.OB32_B64, key)
+ob = Ob(formats.ADSV_B64, key)
 
 # With ObMulti (multi-format operations)
 obm = ObMulti(key)
-ot_b64 = obm.enc("data", formats.OB32_B64)
-ot_hex = obm.enc("data", formats.OB32_HEX)
+ot_b64 = obm.enc("data", formats.ADSV_B64)
+ot_hex = obm.enc("data", formats.ADSV_HEX)
 ```
 
 Available constants:
@@ -991,7 +991,7 @@ Available constants:
 - `UPC_C32`, `UPC_B32`, `UPC_B64`, `UPC_HEX`
 - `ADGS_C32`, `ADGS_B32`, `ADGS_B64`, `ADGS_HEX`
 - `APGS_C32`, `APGS_B32`, `APGS_B64`, `APGS_HEX`
-- `OB32_C32`, `OB32_B32`, `OB32_B64`, `OB32_HEX`
+- `ADSV_C32`, `ADSV_B32`, `ADSV_B64`, `ADSV_HEX`
 - `APSV_C32`, `APSV_B32`, `APSV_B64`, `APSV_HEX`
 - Testing:  `OB70_*`, `OB71_*`
 - Legacy: `OB00_*`
@@ -1002,8 +1002,8 @@ For compile-time known schemes and encodings, however, static types
 provide optimal performance, concise syntax, and strongest type
 guarantees:
 ```python
-from oboron import Ob32Base64
-ob = Ob32Base64(key)
+from oboron import AdsvB64
+ob = AdsvB64(key)
 ot = ob.enc("secret")
 ```
 The format is built into the class, no format strings or constants, are
@@ -1046,7 +1046,7 @@ ob = AdgsB64(keyless=True)  # hardcoded key
 - **Key errors**: Ensure keys are exactly 86 base64 characters characters
   properly encoded from 512 bits (see note about
   [valid base64 keys](#valid-base64-keys))
-- **Format strings**: Must match exactly, e.g., "ob32:b64" not "ob32-b64"
+- **Format strings**: Must match exactly, e.g., "adsv:b64" not "adsv-b64"
 - **Decoding errors**: Use `autodec()` when format is unknown
 
 ## Compatibility
@@ -1086,7 +1086,7 @@ group.)
 | ob70   | b32/c32  | 8   | 15  | 21  | 28  | 40  | 53  | 104  | 207  |
 | zdc   | b32/c32  | 28  | 28  | 28  | 28  | 53  | 53  | 104  | 207  |
 | adgs   | b32/c32  | 34  | 40  | 47  | 53  | 66  | 79  | 130  | 232  |
-| ob32   | b32/c32  | 34  | 40  | 47  | 53  | 66  | 79  | 130  | 232  |
+| adsv   | b32/c32  | 34  | 40  | 47  | 53  | 66  | 79  | 130  | 232  |
 | upc  | b32/c32  | 53  | 53  | 53  | 53  | 79  | 79  | 130  | 232  |
 | apgs  | b32/c32  | 53  | 60  | 66  | 72  | 85  | 98  | 149  | 252  |
 | apsv  | b32/c32  | 60  | 66  | 72  | 79  | 92  | 104 | 156  | 258  |
@@ -1098,7 +1098,7 @@ group.)
 | ob70   | b64      | 7   | 12  | 18  | 23  | 34  | 44  | 87   | 172  |
 | zdc   | b64      | 23  | 23  | 23  | 23  | 44  | 44  | 87   | 172  |
 | adgs   | b64      | 28  | 34  | 39  | 44  | 55  | 66  | 108  | 194  |
-| ob32   | b64      | 28  | 34  | 39  | 44  | 55  | 66  | 108  | 194  |
+| adsv   | b64      | 28  | 34  | 39  | 44  | 55  | 66  | 108  | 194  |
 | upc  | b64      | 44  | 44  | 44  | 44  | 66  | 66  | 108  | 215  |
 | apgs  | b64      | 40  | 50  | 55  | 60  | 71  | 82  | 124  | 210  |
 | apsv  | b64      | 46  | 55  | 60  | 66  | 76  | 87  | 130  | 215  |
@@ -1110,7 +1110,7 @@ group.)
 | ob70   | hex      | 10  | 18  | 26  | 34  | 50  | 66  | 130  | 258  |
 | zdc   | hex      | 34  | 34  | 34  | 34  | 66  | 66  | 130  | 258  |
 | adgs   | hex      | 42  | 50  | 58  | 66  | 82  | 98  | 162  | 290  |
-| ob32   | hex      | 42  | 50  | 58  | 66  | 82  | 98  | 162  | 290  |
+| adsv   | hex      | 42  | 50  | 58  | 66  | 82  | 98  | 162  | 290  |
 | upc  | hex      | 66  | 66  | 66  | 66  | 98  | 98  | 162  | 290  |
 | apgs  | hex      | 66  | 74  | 82  | 90  | 106 | 122 | 186  | 314  |
 | apsv  | hex      | 74  | 82  | 90  | 98  | 114 | 130 | 194  | 322  |

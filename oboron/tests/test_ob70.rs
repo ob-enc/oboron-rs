@@ -118,20 +118,20 @@ fn test_ob70_dec_strict() {
 }
 
 #[test]
-#[cfg(feature = "ob32")]
+#[cfg(feature = "adsv")]
 fn test_ob70_cannot_dec_other_schemes_strict() {
     let key = oboron::generate_key();
     let ob70 = oboron::Ob70::new(&key).unwrap();
-    let ob32 = oboron::Ob32::new(&key).unwrap();
+    let adsv = oboron::AdsvC32::new(&key).unwrap();
 
     let plaintext = "cross-scheme test";
-    let encd_ob32 = ob32.enc(plaintext).unwrap();
+    let encd_adsv = adsv.enc(plaintext).unwrap();
 
     // Strict dec should fail when scheme doesn't match
-    assert!(ob70.dec_strict(&encd_ob32).is_err());
+    assert!(ob70.dec_strict(&encd_adsv).is_err());
 
     // But regular dec (with autodetection) should work
-    assert_eq!(ob70.dec(&encd_ob32).unwrap(), plaintext);
+    assert_eq!(ob70.dec(&encd_adsv).unwrap(), plaintext);
 }
 
 #[test]

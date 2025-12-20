@@ -5,11 +5,11 @@
 //!
 //! ```rust
 //! # fn main() -> Result<(), oboron::Error> {
-//! # #[cfg(feature = "ob32")]
+//! # #[cfg(feature = "adsv")]
 //! # {
-//! use oboron::{Ob32, Oboron};
+//! use oboron::{AdsvC32, Oboron};
 //! let key = oboron::generate_key();   // get key
-//! let ob = Ob32::new(&key)?;          // instantiate Oboron (cipher+encoder)
+//! let ob = AdsvC32::new(&key)?;          // instantiate Oboron (cipher+encoder)
 //! let ot = ob.enc("secret data")?;    // get obtext (encoded ciphertext)
 //! # }
 //! # Ok(())
@@ -29,22 +29,22 @@
 //! Examples:
 //! ```rust
 //! # fn main() -> Result<(), oboron::Error> {
-//! # #[cfg(feature = "ob32")]
+//! # #[cfg(feature = "adsv")]
 //! # {
 //! # use oboron;
 //! # let key = oboron::generate_key();
 //! # let obm = oboron::ObMulti::new(&key)?;
 //! // Operations: data, format
-//! let ot = obm.enc("plaintext", "ob32:b64")?;
-//! obm.dec(&ot, "ob32:b64")?;
+//! let ot = obm.enc("plaintext", "adsv:b64")?;
+//! obm.dec(&ot, "adsv:b64")?;
 //!
 //! // Constructors: format, key
-//! oboron::Ob::new("ob32:b64", &key)?;
-//! oboron::ObFlex::new("ob32:b64", &key)?;
+//! oboron::Ob::new("adsv:b64", &key)?;
+//! oboron::ObFlex::new("adsv:b64", &key)?;
 //!
 //! // Convenience functions: data, format, key
-//! let ot = oboron::enc("plaintext", "ob32:b64", &key)?;
-//! oboron::dec(&ot, "ob32:b64", &key)?;
+//! let ot = oboron::enc("plaintext", "adsv:b64", &key)?;
+//! oboron::dec(&ot, "adsv:b64", &key)?;
 //! # }
 //! # Ok(())
 //! # }
@@ -60,15 +60,15 @@
 //!
 //! ```rust
 //! # fn main() -> Result<(), oboron::Error> {
-//! # #[cfg(feature = "ob32")]
+//! # #[cfg(feature = "adsv")]
 //! # {
-//! # use oboron::{Ob32, Ob32Base64, Oboron};
+//! # use oboron::{AdsvC32, AdsvB64, Oboron};
 //! # let key = oboron::generate_key();
-//! let ob32 = Ob32::new(&key)?;            // ob32:c32 format (Base32Crockford)
-//! let ob32_b64 = Ob32Base64::new(&key)?;  // ob32:b64 format (Base64)
+//! let adsv = AdsvC32::new(&key)?;            // adsv:c32 format (Base32Crockford)
+//! let adsv_b64 = AdsvB64::new(&key)?;  // adsv:b64 format (Base64)
 //!
-//! let ot = ob32.enc("hello")?;
-//! let pt2 = ob32.dec(&ot)?;
+//! let ot = adsv.enc("hello")?;
+//! let pt2 = adsv.dec(&ot)?;
 //! # }
 //! # Ok(())
 //! # }
@@ -84,12 +84,12 @@
 //!
 //! ```rust
 //! # fn main() -> Result<(), oboron::Error> {
-//! # #[cfg(feature = "ob32")]
+//! # #[cfg(feature = "adsv")]
 //! # {
 //! # use oboron::{Ob, Oboron};
 //! # let key = oboron::generate_key();
 //! // Format chosen at runtime, immutable instance
-//! let ob = Ob::new("ob32:b64", &key)?;
+//! let ob = Ob::new("adsv:b64", &key)?;
 //!
 //! let ot = ob.enc("hello")?;
 //! let pt2 = ob.dec(&ot)?;
@@ -108,19 +108,19 @@
 //!
 //! ```rust
 //! # fn main() -> Result<(), oboron::Error> {
-//! # #[cfg(all(feature = "ob32", feature = "non-crypto"))]
+//! # #[cfg(all(feature = "adsv", feature = "non-crypto"))]
 //! # {
 //! # use oboron::{ObFlex, Oboron, Scheme, Encoding};
 //! # let key = oboron::generate_key();
-//! let mut flex = ObFlex::new("ob32:b64", &key)?;
-//! let ot1 = flex.enc("hello")?;    // ob32:b64 format
+//! let mut flex = ObFlex::new("adsv:b64", &key)?;
+//! let ot1 = flex.enc("hello")?;    // adsv:b64 format
 //!
 //! // Change format at runtime
 //! flex.set_scheme(Scheme::Ob70)?;  // set_scheme() only with ObFlex
 //! let ot2 = flex.enc("hello")? ;   // ob70:b64 format output
 //! // Also available:
 //! flex.set_encoding(Encoding::Hex)?; // now set as ob70:hex
-//! flex.set_format("ob32:b32")?;      // now ob32:b32
+//! flex.set_format("adsv:b32")?;      // now adsv:b32
 //! # }
 //! # Ok(())
 //! # }
@@ -136,16 +136,16 @@
 //!
 //! ```rust
 //! # fn main() -> Result<(), oboron::Error> {
-//! # #[cfg(feature = "ob32")]
+//! # #[cfg(feature = "adsv")]
 //! # {
 //! # use oboron::ObMulti;
 //! # let key = oboron::generate_key();
 //! let obm = ObMulti::new(&key)?;
 //!
 //! // Encode to different formats
-//! let ot_b32 = obm.enc("data", "ob32:c32")?;
-//! let ot_b64 = obm.enc("data", "ob32:b64")?;
-//! let ot_hex = obm.enc("data", "ob32:hex")?;
+//! let ot_b32 = obm.enc("data", "adsv:c32")?;
+//! let ot_b64 = obm.enc("data", "adsv:b64")?;
+//! let ot_hex = obm.enc("data", "adsv:hex")?;
 //!
 //! // Decode with automatic format detection
 //! let pt2 = obm.autodec(&ot_b64)?;
@@ -164,34 +164,34 @@
 //!
 //! ```rust
 //! # fn main() -> Result<(), oboron::Error> {
-//! # #[cfg(all(feature = "ob32", feature = "non-crypto"))]
+//! # #[cfg(all(feature = "adsv", feature = "non-crypto"))]
 //! # {
 //! # use oboron::Oboron;
 //! # use oboron;
 //! # let key = oboron::generate_key();
 //! // Fixed format types (best performance for multiple operations with same format)
-//! let ob32 = oboron::Ob32::new(&key)?;  // "ob32:c32" format Oboron instance
+//! let adsv = oboron::AdsvC32::new(&key)?;  // "adsv:c32" format Oboron instance
 //! let ob70 = oboron::Ob70::new(&key)?;  // "ob70:c32" format Oboron instance
 //!
-//! let ot_ob32 = ob32.enc("data1")?;
+//! let ot_adsv = adsv.enc("data1")?;
 //! let ot_ob70 = ob70.enc("data2")?;
 //!
 //! // Decoding uses scheme autodetection by default
-//! let pt1 = ob32.dec(&ot_ob32)?;  // Decodes successfully
-//! let pt2 = ob32.dec(&ot_ob70)?;  // Also works (autodetects ob70)
+//! let pt1 = adsv.dec(&ot_adsv)?;  // Decodes successfully
+//! let pt2 = adsv.dec(&ot_ob70)?;  // Also works (autodetects ob70)
 //! assert_eq!(pt1, "data1");
 //! assert_eq!(pt2, "data2");
 //! // Note: The above autodetection works only with shared encodings
-//! // ob32:c32 and ob70:c32 are both base32crockford-encoded
+//! // adsv:c32 and ob70:c32 are both base32crockford-encoded
 //!
 //! // Use dec_strict to enforce scheme matching
-//! let pt3 = ob32.dec_strict(&ot_ob32)?;         // OK: Matches scheme
-//! assert!(ob32.dec_strict(&ot_ob70).is_err());  // Error: Wrong scheme (ob32 != ob70)
+//! let pt3 = adsv.dec_strict(&ot_adsv)?;         // OK: Matches scheme
+//! assert!(adsv.dec_strict(&ot_ob70).is_err());  // Error: Wrong scheme (adsv != ob70)
 //!
 //! // Note: For fixed oborons, string encoding (c32/b32/b64/hex) must match the instance encoding
-//! let ob32_b64 = oboron::Ob32Base64::new(&key)?;  // "ob32:b64" format Oboron
-//! let ot_b64 = ob32_b64.enc("data3")?;
-//! assert!(ob32.dec(&ot_b64).is_err());  // Error: Encoding mismatch (c32 != b64)
+//! let adsv_b64 = oboron::AdsvB64::new(&key)?;  // "adsv:b64" format Oboron
+//! let ot_b64 = adsv_b64.enc("data3")?;
+//! assert!(adsv.dec(&ot_b64).is_err());  // Error: Encoding mismatch (c32 != b64)
 //! // For mixed encodings, use ObMulti instead (see above)
 //! # }
 //! # Ok(())
@@ -202,7 +202,7 @@
 //!
 //! - `Zdc`: AES-CBC (deterministic)
 //! - `Adgs`: AES-GCM-SIV (deterministic)
-//! - `Ob32`: AES-SIV (deterministic, nonce-misuse resistant)
+//! - `Adsv`: AES-SIV (deterministic, nonce-misuse resistant)
 //! - `Upc`, `Apgs`, `Apsv`: Probabilistic variants (different output each time)
 //!
 //! Testing/Demo only schemes using no encryption (`non-crypto` feature group):
@@ -217,24 +217,24 @@
 //!
 //! # The `Oboron` Trait
 //!
-//! All types (`Ob32`, `Ob`, `ObFlex`, etc.) except `ObMulti` implement the `Oboron` trait,
+//! All types (`AdsvC32`, `Ob`, `ObFlex`, etc.) except `ObMulti` implement the `Oboron` trait,
 //! providing a consistent interface:
 //!
 //! ```rust
 //! # fn main() -> Result<(), oboron::Error> {
-//! # #[cfg(feature = "ob32")]
+//! # #[cfg(feature = "adsv")]
 //! # {
-//! # use oboron::{Oboron, Ob32, Ob};
+//! # use oboron::{Oboron, AdsvC32, Ob};
 //! # let key = oboron::generate_key();
 //! fn process<O: Oboron>(ob: &O, data: &str) -> Result<String, oboron::Error> {
 //!     let ot = ob.enc(data)?;
 //!     ob.dec(&ot)
 //! }
 //!
-//! let ob32 = Ob32::new(&key)?;
-//! let ob = Ob::new("ob32:c32", &key)?;
+//! let adsv = AdsvC32::new(&key)?;
+//! let ob = Ob::new("adsv:c32", &key)?;
 //!
-//! process(&ob32, "hello")?;
+//! process(&adsv, "hello")?;
 //! process(&ob, "hello")?;
 //! # }
 //! # Ok(())
@@ -271,12 +271,12 @@ pub(crate) use obcrypt::Keychain;
 
 #[cfg(feature = "adgs")]
 pub(crate) use obcrypt::{decrypt_adgs, encrypt_adgs};
+#[cfg(feature = "adsv")]
+pub(crate) use obcrypt::{decrypt_adsv, encrypt_adsv};
 #[cfg(feature = "apgs")]
 pub(crate) use obcrypt::{decrypt_apgs, encrypt_apgs};
 #[cfg(feature = "apsv")]
 pub(crate) use obcrypt::{decrypt_apsv, encrypt_apsv};
-#[cfg(feature = "ob32")]
-pub(crate) use obcrypt::{decrypt_ob32, encrypt_ob32};
 #[cfg(feature = "upc")]
 pub(crate) use obcrypt::{decrypt_upc, encrypt_upc};
 #[cfg(feature = "zdc")]
@@ -315,12 +315,12 @@ pub use oboron::{new_keyless, new_keyless_with_format};
 // Conditionally export format string constants (scheme+encoding combinations)
 #[cfg(feature = "adgs")]
 pub use constants::{ADGS_B32, ADGS_B64, ADGS_C32, ADGS_HEX};
+#[cfg(feature = "adsv")]
+pub use constants::{ADSV_B32, ADSV_B64, ADSV_C32, ADSV_HEX};
 #[cfg(feature = "apgs")]
 pub use constants::{APGS_B32, APGS_B64, APGS_C32, APGS_HEX};
 #[cfg(feature = "apsv")]
 pub use constants::{APSV_B32, APSV_B64, APSV_C32, APSV_HEX};
-#[cfg(feature = "ob32")]
-pub use constants::{OB32_B32, OB32_B64, OB32_C32, OB32_HEX};
 #[cfg(feature = "upc")]
 pub use constants::{UPC_B32, UPC_B64, UPC_C32, UPC_HEX};
 #[cfg(feature = "zdc")]
@@ -337,12 +337,12 @@ pub use constants::{OB00_B32, OB00_B64, OB00_C32, OB00_HEX};
 // Conditionally export format-specific structs (scheme+encoding combinations)
 #[cfg(feature = "adgs")]
 pub use oboron::{AdgsB32, AdgsB64, AdgsC32, AdgsHex};
+#[cfg(feature = "adsv")]
+pub use oboron::{AdsvB32, AdsvB64, AdsvC32, AdsvHex};
 #[cfg(feature = "apgs")]
 pub use oboron::{ApgsB32, ApgsB64, ApgsC32, ApgsHex};
 #[cfg(feature = "apsv")]
 pub use oboron::{ApsvB32, ApsvB64, ApsvC32, ApsvHex};
-#[cfg(feature = "ob32")]
-pub use oboron::{Ob32Base32Crockford, Ob32Base32Rfc, Ob32Base64, Ob32Hex};
 #[cfg(feature = "upc")]
 pub use oboron::{UpcB32, UpcB64, UpcC32, UpcHex};
 #[cfg(feature = "zdc")]
@@ -365,8 +365,8 @@ pub type Upc = UpcC32;
 pub type Adgs = AdgsC32;
 #[cfg(feature = "apgs")]
 pub type Apgs = ApgsC32;
-#[cfg(feature = "ob32")]
-pub type Ob32 = Ob32Base32Crockford;
+#[cfg(feature = "adsv")]
+pub type Adsv = AdsvC32;
 #[cfg(feature = "apsv")]
 pub type Apsv = ApsvC32;
 // Testing
@@ -388,10 +388,10 @@ pub use ob_multi::ObMulti;
 /// use oboron::prelude::*;
 /// ```
 pub mod prelude {
+    #[cfg(feature = "adsv")]
+    pub use crate::AdsvC32;
     #[cfg(feature = "apsv")]
-    pub use crate::Apsv;
-    #[cfg(feature = "ob32")]
-    pub use crate::Ob32;
+    pub use crate::ApsvC32;
     pub use crate::{Encoding, Error, Format, Oboron, Scheme};
     pub use crate::{Ob, ObFlex, ObMulti};
 }
@@ -421,11 +421,11 @@ pub mod prelude {
 ///
 /// ```rust
 /// # fn main() -> Result<(), oboron::Error> {
-/// # #[cfg(feature = "ob32")]
+/// # #[cfg(feature = "adsv")]
 /// # {
 /// # use oboron;
 /// # let key = oboron::generate_key();
-/// let ot = oboron::enc("secret data", "ob32:b64", &key)?;
+/// let ot = oboron::enc("secret data", "adsv:b64", &key)?;
 /// # }
 /// # Ok(())
 /// # }
@@ -444,10 +444,10 @@ pub fn enc(plaintext: &str, format: &str, key: &str) -> Result<String, Error> {
 ///
 /// ```rust
 /// # fn main() -> Result<(), oboron::Error> {
-/// # #[cfg(feature = "ob32")]
+/// # #[cfg(feature = "adsv")]
 /// # {
 /// # use oboron;
-/// let ot = oboron::enc_keyless("test data", "ob32:b64")?;
+/// let ot = oboron::enc_keyless("test data", "adsv:b64")?;
 /// # }
 /// # Ok(())
 /// # }
@@ -470,12 +470,12 @@ pub fn enc_keyless(plaintext: &str, format: &str) -> Result<String, Error> {
 ///
 /// ```rust
 /// # fn main() -> Result<(), oboron::Error> {
-/// # #[cfg(feature = "ob32")]
+/// # #[cfg(feature = "adsv")]
 /// # use oboron;
 /// # {
 /// # let key = oboron::generate_key();
-/// # let ot = oboron::enc("test123", "ob32:b64", &key)?;
-/// let pt2 = oboron::dec(&ot, "ob32:b64", &key)?;
+/// # let ot = oboron::enc("test123", "adsv:b64", &key)?;
+/// let pt2 = oboron::dec(&ot, "adsv:b64", &key)?;
 /// # assert_eq!(pt2, "test123");
 /// # }
 /// # Ok(())
@@ -495,11 +495,11 @@ pub fn dec(obtext: &str, format: &str, key: &str) -> Result<String, Error> {
 ///
 /// ```rust
 /// # fn main() -> Result<(), oboron::Error> {
-/// # #[cfg(feature = "ob32")]
+/// # #[cfg(feature = "adsv")]
 /// # {
 /// # use oboron;
-/// # let ot = oboron::enc_keyless("test", "ob32:b64")?;
-/// let pt2 = oboron::dec_keyless(&ot, "ob32:b64")?;
+/// # let ot = oboron::enc_keyless("test", "adsv:b64")?;
+/// let pt2 = oboron::dec_keyless(&ot, "adsv:b64")?;
 /// # assert_eq!(pt2, "test");
 /// # }
 /// # Ok(())
@@ -523,11 +523,11 @@ pub fn dec_keyless(obtext: &str, format: &str) -> Result<String, Error> {
 ///
 /// ```rust
 /// # fn main() -> Result<(), oboron::Error> {
-/// # #[cfg(feature = "ob32")]
+/// # #[cfg(feature = "adsv")]
 /// # {
 /// # use oboron;
 /// # let key = oboron::generate_key();
-/// # let ot = oboron::enc("secret", "ob32:b64", &key)?;
+/// # let ot = oboron::enc("secret", "adsv:b64", &key)?;
 /// let pt2 = oboron::autodec(&ot, &key)?;  // Format autodetected, including encoding
 /// # assert_eq!(pt2, "secret");
 /// # }
@@ -548,7 +548,7 @@ pub fn autodec(obtext: &str, key: &str) -> Result<String, Error> {
 ///
 /// ```rust
 /// # fn main() -> Result<(), oboron::Error> {
-/// # #[cfg(feature = "ob32")]
+/// # #[cfg(feature = "adsv")]
 /// # {
 /// # use oboron;
 /// # let ot = oboron::enc_keyless("test", "ob70:b64")?;

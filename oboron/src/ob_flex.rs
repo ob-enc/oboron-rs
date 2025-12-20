@@ -13,12 +13,12 @@ use crate::{ob_core::ObCore, Encoding, Error, Format, Oboron, Scheme};
 ///
 /// ```rust
 /// # fn main() -> Result<(), oboron::Error> {
-/// # #[cfg(all(feature = "ob32", feature = "non-crypto"))]
+/// # #[cfg(all(feature = "adsv", feature = "non-crypto"))]
 /// # {
-/// # use oboron::{Oboron, ObFlex, Scheme, Encoding, Format, OB32_HEX};
+/// # use oboron::{Oboron, ObFlex, Scheme, Encoding, Format, ADSV_HEX};
 /// # let key = oboron::generate_key();
-/// let mut ob = ObFlex::new("ob32:c32", &key)?;
-/// let obtext = ob.enc("hello")?; // ob32:c32 format
+/// let mut ob = ObFlex::new("adsv:c32", &key)?;
+/// let obtext = ob.enc("hello")?; // adsv:c32 format
 ///
 /// // Switch to ob70 scheme (format remains c32)
 /// ob.set_scheme(Scheme::Ob70)?;
@@ -28,9 +28,9 @@ use crate::{ob_core::ObCore, Encoding, Error, Format, Oboron, Scheme};
 /// ob.set_format(Format::new(Scheme::Ob71, Encoding::Base64))?;
 /// let obtext = ob.enc("hello")?; // ob71:b64 format
 ///
-/// // Switch to ob32:hex using string constant
-/// ob.set_format(OB32_HEX)?;
-/// let obtext = ob.enc("hello")?; // ob32:hex format
+/// // Switch to adsv:hex using string constant
+/// ob.set_format(ADSV_HEX)?;
+/// let obtext = ob.enc("hello")?; // adsv:hex format
 /// # }
 /// # Ok(())
 /// # }
@@ -49,15 +49,15 @@ impl ObFlex {
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(feature = "ob32")]
+    /// # #[cfg(feature = "adsv")]
     /// # {
     /// # use oboron::{ObFlex, Format, Scheme, Encoding};
     /// # let key = oboron::generate_key();
     /// // Using format string
-    /// let ob1 = ObFlex::new("ob32:b64", &key)?;
+    /// let ob1 = ObFlex::new("adsv:b64", &key)?;
     ///
     /// // Same, using Format
-    /// let format = Format::new(Scheme::Ob32, Encoding::Base64);
+    /// let format = Format::new(Scheme::Adsv, Encoding::Base64);
     /// let ob2 = ObFlex::new(format, &key)?;
     /// # }
     /// # Ok(())
@@ -78,14 +78,14 @@ impl ObFlex {
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(all(feature = "ob32", feature="keyless"))]
+    /// # #[cfg(all(feature = "adsv", feature="keyless"))]
     /// # {
     /// # use oboron::{ObFlex, Format, Scheme, Encoding};
     /// // Using format string
-    /// let ob1 = ObFlex::new_keyless("ob32:c32")?;
+    /// let ob1 = ObFlex::new_keyless("adsv:c32")?;
     ///
     /// // Using Format instance
-    /// let format = Format::new(Scheme::Ob32, Encoding::Base32Crockford);
+    /// let format = Format::new(Scheme::Adsv, Encoding::Base32Crockford);
     /// let ob2 = ObFlex::new_keyless(format)?;
     /// # }
     /// # Ok(())
@@ -105,13 +105,13 @@ impl ObFlex {
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(feature = "ob32")]
+    /// # #[cfg(feature = "adsv")]
     /// # {
     /// # use oboron::{ObFlex, Scheme, Encoding};
     /// # let key = oboron::generate_key();
-    /// let ob = ObFlex::new("ob32:b64", &key)?;
+    /// let ob = ObFlex::new("adsv:b64", &key)?;
     /// let format = ob.format();
-    /// assert_eq!(format.scheme(), Scheme::Ob32);
+    /// assert_eq!(format.scheme(), Scheme::Adsv);
     /// assert_eq!(format.encoding(), Encoding::Base64);
     /// # }
     /// # Ok(())
@@ -129,11 +129,11 @@ impl ObFlex {
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(all(feature = "ob32", feature = "non-crypto"))]
+    /// # #[cfg(all(feature = "adsv", feature = "non-crypto"))]
     /// # {
     /// # use oboron::{ObFlex, Format, Scheme, Encoding};
     /// # let key = oboron::generate_key();
-    /// let mut ob = ObFlex::new("ob32:c32", &key)?;
+    /// let mut ob = ObFlex::new("adsv:c32", &key)?;
     /// ob.set_format("ob70:b64")?; // switch using string
     /// ob.set_format(Format::new(Scheme::Ob71, Encoding::Hex))?; // switch using Format
     /// # }
@@ -151,11 +151,11 @@ impl ObFlex {
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(all(feature = "ob32", feature = "non-crypto"))]
+    /// # #[cfg(all(feature = "adsv", feature = "non-crypto"))]
     /// # {
     /// # use oboron::{ObFlex, Scheme};
     /// # let key = oboron::generate_key();
-    /// let mut ob = ObFlex::new("ob32:c32", &key)? ;
+    /// let mut ob = ObFlex::new("adsv:c32", &key)? ;
     /// ob.set_scheme(Scheme::Ob70)?; // switch to ob70, keeping c32 encoding
     /// # }
     /// # Ok(())
@@ -172,12 +172,12 @@ impl ObFlex {
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(feature = "ob32")]
+    /// # #[cfg(feature = "adsv")]
     /// # {
     /// # use oboron::{ObFlex, Encoding};
     /// # let key = oboron::generate_key();
-    /// let mut ob = ObFlex::new("ob32:c32", &key)?;
-    /// ob.set_encoding(Encoding::Base64)?; // switch to b64, keeping ob32 scheme
+    /// let mut ob = ObFlex::new("adsv:c32", &key)?;
+    /// ob.set_encoding(Encoding::Base64)?; // switch to b64, keeping adsv scheme
     /// # }
     /// # Ok(())
     /// # }
@@ -197,15 +197,15 @@ impl ObFlex {
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(all(feature = "ob32", feature = "hex-keys"))]
+    /// # #[cfg(all(feature = "adsv", feature = "hex-keys"))]
     /// # {
     /// # use oboron::{ObFlex, Format, Scheme, Encoding};
     /// let key_hex = oboron::generate_key_hex();
     /// // Using format string
-    /// let ob1 = ObFlex::from_hex_key("ob32:b64", &key_hex)?;
+    /// let ob1 = ObFlex::from_hex_key("adsv:b64", &key_hex)?;
     ///
     /// // Using Format instance
-    /// let format = Format::new(Scheme::Ob32, Encoding::Base64);
+    /// let format = Format::new(Scheme::Adsv, Encoding::Base64);
     /// let ob2 = ObFlex::from_hex_key(format, &key_hex)?;
     /// # }
     /// # Ok(())
@@ -227,12 +227,12 @@ impl ObFlex {
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(all(feature = "ob32", feature = "bytes-keys"))]
+    /// # #[cfg(all(feature = "adsv", feature = "bytes-keys"))]
     /// # {
     /// # use oboron::{ObFlex, Format, Scheme, Encoding};
     /// let key_bytes = oboron::generate_key_bytes();
-    /// let ob1 = ObFlex::from_bytes("ob32:b64", &key_bytes)?; // using format string
-    /// let format = Format::new(Scheme::Ob32, Encoding::Base64); // using Format
+    /// let ob1 = ObFlex::from_bytes("adsv:b64", &key_bytes)?; // using format string
+    /// let format = Format::new(Scheme::Adsv, Encoding::Base64); // using Format
     /// let ob2 = ObFlex::from_bytes(format, &key_bytes)?;
     /// # }
     /// # Ok(())

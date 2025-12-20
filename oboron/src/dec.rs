@@ -9,12 +9,12 @@ use data_encoding::{BASE64URL_NOPAD, HEXLOWER};
 // Conditionally import decrypt functions based on features
 #[cfg(feature = "adgs")]
 use crate::decrypt_adgs;
+#[cfg(feature = "adsv")]
+use crate::decrypt_adsv;
 #[cfg(feature = "apgs")]
 use crate::decrypt_apgs;
 #[cfg(feature = "apsv")]
 use crate::decrypt_apsv;
-#[cfg(feature = "ob32")]
-use crate::decrypt_ob32;
 #[cfg(feature = "upc")]
 use crate::decrypt_upc;
 #[cfg(feature = "zdc")]
@@ -71,8 +71,8 @@ pub(crate) fn dec_from_format(
         Scheme::Adgs => decrypt_adgs(keychain, &buffer)?,
         #[cfg(feature = "apgs")]
         Scheme::Apgs => decrypt_apgs(keychain, &buffer)?,
-        #[cfg(feature = "ob32")]
-        Scheme::Ob32 => decrypt_ob32(keychain, &buffer)?,
+        #[cfg(feature = "adsv")]
+        Scheme::Adsv => decrypt_adsv(keychain, &buffer)?,
         #[cfg(feature = "apsv")]
         Scheme::Apsv => decrypt_apsv(keychain, &buffer)?,
         // Testing

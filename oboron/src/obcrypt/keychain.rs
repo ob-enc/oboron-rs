@@ -76,9 +76,9 @@ impl Keychain {
 
     // Double AES-256 key for AES-SIV (first 64 bytes)
     // (one 256-bit key for CMAC authentication, another for CTR encryption)
-    // Used in ob32 and apsv schemes
+    // Used in adsv and apsv schemes
     #[inline]
-    #[cfg(any(feature = "ob32", feature = "apsv"))]
+    #[cfg(any(feature = "adsv", feature = "apsv"))]
     pub(crate) fn siv(&self) -> &[u8; 64] {
         &self.key
     }

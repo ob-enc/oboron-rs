@@ -72,14 +72,14 @@ impl Format {
             #[cfg(feature = "apgs")]
             constants::APGS_HEX => Format::new(Scheme::Apgs, Encoding::Hex),
 
-            #[cfg(feature = "ob32")]
-            constants::OB32_C32 => Format::new(Scheme::Ob32, Encoding::Base32Crockford),
-            #[cfg(feature = "ob32")]
-            constants::OB32_B32 => Format::new(Scheme::Ob32, Encoding::Base32Rfc),
-            #[cfg(feature = "ob32")]
-            constants::OB32_B64 => Format::new(Scheme::Ob32, Encoding::Base64),
-            #[cfg(feature = "ob32")]
-            constants::OB32_HEX => Format::new(Scheme::Ob32, Encoding::Hex),
+            #[cfg(feature = "adsv")]
+            constants::ADSV_C32 => Format::new(Scheme::Adsv, Encoding::Base32Crockford),
+            #[cfg(feature = "adsv")]
+            constants::ADSV_B32 => Format::new(Scheme::Adsv, Encoding::Base32Rfc),
+            #[cfg(feature = "adsv")]
+            constants::ADSV_B64 => Format::new(Scheme::Adsv, Encoding::Base64),
+            #[cfg(feature = "adsv")]
+            constants::ADSV_HEX => Format::new(Scheme::Adsv, Encoding::Hex),
 
             #[cfg(feature = "apsv")]
             constants::APSV_C32 => Format::new(Scheme::Apsv, Encoding::Base32Crockford),
@@ -164,8 +164,8 @@ mod tests {
             Scheme::Adgs,
             #[cfg(feature = "apgs")]
             Scheme::Apgs,
-            #[cfg(feature = "ob32")]
-            Scheme::Ob32,
+            #[cfg(feature = "adsv")]
+            Scheme::Adsv,
             #[cfg(feature = "apsv")]
             Scheme::Apsv,
             // Testing
@@ -274,12 +274,12 @@ mod tests {
             (Scheme::Apgs, Encoding::Hex, "apgs:hex"),
         ]);
 
-        #[cfg(feature = "ob32")]
+        #[cfg(feature = "adsv")]
         test_cases.extend(vec![
-            (Scheme::Ob32, Encoding::Base32Crockford, "ob32:c32"),
-            (Scheme::Ob32, Encoding::Base32Rfc, "ob32:b32"),
-            (Scheme::Ob32, Encoding::Base64, "ob32:b64"),
-            (Scheme::Ob32, Encoding::Hex, "ob32:hex"),
+            (Scheme::Adsv, Encoding::Base32Crockford, "adsv:c32"),
+            (Scheme::Adsv, Encoding::Base32Rfc, "adsv:b32"),
+            (Scheme::Adsv, Encoding::Base64, "adsv:b64"),
+            (Scheme::Adsv, Encoding::Hex, "adsv:hex"),
         ]);
 
         #[cfg(feature = "apsv")]
@@ -334,7 +334,7 @@ mod tests {
     #[cfg(all(feature = "all-schemes", feature = "non-crypto"))]
     fn test_all_schemes_support_both_base32_variants() {
         // All schemes should support both Base32Rfc (b32) and Base32Crockford (c32)
-        let schemes = vec!["zdc", "upc", "adgs", "apgs", "ob32", "apsv", "ob70", "ob71"];
+        let schemes = vec!["zdc", "upc", "adgs", "apgs", "adsv", "apsv", "ob70", "ob71"];
 
         for scheme_str in schemes {
             // Test Base32Crockford (c32)

@@ -1,5 +1,7 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use oboron::{AdgsC32, ApgsC32, ApsvC32, Ob00, Ob32, Ob70, Ob71, ObMulti, Oboron, UpcC32, ZdcC32};
+use oboron::{
+    AdgsC32, AdsvC32, ApgsC32, ApsvC32, Ob00, Ob70, Ob71, ObMulti, Oboron, UpcC32, ZdcC32,
+};
 
 // Baseline benchmarks - no crypto, just encoding overhead
 fn benchmark_enc_tdr(c: &mut Criterion) {
@@ -55,7 +57,7 @@ fn benchmark_enc_adsv(c: &mut Criterion) {
 }
 
 fn benchmark_enc_adsv(c: &mut Criterion) {
-    let ob = Ob32::new_keyless().unwrap();
+    let ob = AdsvC32::new_keyless().unwrap();
     c.bench_function("enc_adsv", |b| {
         b.iter(|| ob.enc(black_box("test123")).unwrap());
     });
@@ -107,7 +109,7 @@ fn benchmark_dec_apgs(c: &mut Criterion) {
 }
 
 fn benchmark_dec_adsv(c: &mut Criterion) {
-    let ob = Ob32::new_keyless().unwrap();
+    let ob = AdsvC32::new_keyless().unwrap();
     let ot = ob.enc("test123").unwrap();
     c.bench_function("dec_adsv", |b| {
         b.iter(|| ob.dec(black_box(&ot)).unwrap());
@@ -138,17 +140,17 @@ fn benchmark_dec_apsv(c: &mut Criterion) {
     });
 }
 
-fn benchmark_auto_encode_ob32(c: &mut Criterion) {
+fn benchmark_auto_encode_adsv(c: &mut Criterion) {
     let ob = ObMulti::new_keyless().unwrap();
-    c.bench_function("auto_encode_ob32", |b| {
-        b.iter(|| ob.enc(black_box("test123"), "ob32:c32").unwrap());
+    c.bench_function("auto_encode_adsv", |b| {
+        b.iter(|| ob.enc(black_box("test123"), "adsv:c32").unwrap());
     });
 }
 
-fn benchmark_auto_decode_ob32(c: &mut Criterion) {
+fn benchmark_auto_decode_adsv(c: &mut Criterion) {
     let ob = ObMulti::new_keyless().unwrap();
-    let ot = ob.enc("test123", "ob32:c32").unwrap();
-    c.bench_function("auto_decode_ob32", |b| {
+    let ot = ob.enc("test123", "adsv:c32").unwrap();
+    c.bench_function("auto_decode_adsv", |b| {
         b.iter(|| ob.autodec(black_box(&ot)).unwrap());
     });
 }
@@ -176,7 +178,7 @@ criterion_group!(
     benchmark_dec_apgs,
     benchmark_dec_apsv,
     // ObMulti
-    benchmark_auto_encode_ob32,
-    benchmark_auto_decode_ob32
+    benchmark_auto_encode_adsv,
+    benchmark_auto_decode_adsv
 );
 criterion_main!(benches);

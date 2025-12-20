@@ -13,21 +13,21 @@ mod bytes_keys_enabled {
         let key = generate_key_bytes();
 
         // These should all compile with bytes-keys feature
-        #[cfg(feature = "ob32")]
+        #[cfg(feature = "adsv")]
         {
-            let _ = Ob32::from_bytes(&key);
-            let _ = Ob::from_bytes("ob32:c32", &key);
-            let _ = ObFlex::from_bytes("ob32:c32", &key);
+            let _ = AdsvC32::from_bytes(&key);
+            let _ = Ob::from_bytes("adsv:c32", &key);
+            let _ = ObFlex::from_bytes("adsv:c32", &key);
             let _ = ObMulti::from_bytes(&key);
         }
     }
 
     #[test]
     fn test_key_bytes_methods() {
-        #[cfg(feature = "ob32")]
+        #[cfg(feature = "adsv")]
         {
             let key = generate_key();
-            let ob = Ob32::new(&key).unwrap();
+            let ob = AdsvC32::new(&key).unwrap();
 
             // This should compile with bytes-keys feature
             let _key_bytes: &[u8; 64] = ob.key_bytes();
@@ -45,21 +45,21 @@ mod hex_keys_enabled {
         let key = generate_key_hex();
 
         // These should all compile with hex-keys feature
-        #[cfg(feature = "ob32")]
+        #[cfg(feature = "adsv")]
         {
-            let _ = Ob32::from_hex_key(&key);
-            let _ = Ob::from_hex_key("ob32:c32", &key);
-            let _ = ObFlex::from_hex_key("ob32:c32", &key);
+            let _ = AdsvC32::from_hex_key(&key);
+            let _ = Ob::from_hex_key("adsv:c32", &key);
+            let _ = ObFlex::from_hex_key("adsv:c32", &key);
             let _ = ObMulti::from_key_hex(&key);
         }
     }
 
     #[test]
     fn test_key_hex_methods() {
-        #[cfg(feature = "ob32")]
+        #[cfg(feature = "adsv")]
         {
             let key = generate_key();
-            let ob = Ob32::new(&key).unwrap();
+            let ob = AdsvC32::new(&key).unwrap();
 
             // This should compile with hex-keys feature
             let _key_hex = ob.key_hex();
@@ -75,31 +75,31 @@ mod keyless_enabled {
     #[test]
     fn test_keyless_constructors() {
         // These should all compile with keyless feature
-        #[cfg(feature = "ob32")]
+        #[cfg(feature = "adsv")]
         {
-            let _ = Ob32::new_keyless();
-            let _ = Ob::new_keyless("ob32:c32");
-            let _ = ObFlex::new_keyless("ob32:c32");
+            let _ = AdsvC32::new_keyless();
+            let _ = Ob::new_keyless("adsv:c32");
+            let _ = ObFlex::new_keyless("adsv:c32");
             let _ = ObMulti::new_keyless();
         }
     }
 
     #[test]
     fn test_keyless_convenience_functions() {
-        #[cfg(feature = "ob32")]
+        #[cfg(feature = "adsv")]
         {
             // These should compile with keyless feature
-            let ot = enc_keyless("test", "ob32:c32").unwrap();
-            let _pt = dec_keyless(&ot, "ob32:c32").unwrap();
+            let ot = enc_keyless("test", "adsv:c32").unwrap();
+            let _pt = dec_keyless(&ot, "adsv:c32").unwrap();
             let _pt2 = autodec_keyless(&ot).unwrap();
         }
     }
 
     #[test]
     fn test_keyless_roundtrip() {
-        #[cfg(feature = "ob32")]
+        #[cfg(feature = "adsv")]
         {
-            let ob = Ob32::new_keyless().unwrap();
+            let ob = AdsvC32::new_keyless().unwrap();
             let plaintext = "hello keyless";
             let obtext = ob.enc(plaintext).unwrap();
             let recovered = ob.dec(&obtext).unwrap();
@@ -146,16 +146,16 @@ mod combined_features {
 
     #[test]
     fn test_all_key_formats_work_together() {
-        #[cfg(feature = "ob32")]
+        #[cfg(feature = "adsv")]
         {
             let key_b64 = generate_key();
             let key_hex = generate_key_hex();
             let key_bytes = generate_key_bytes();
 
             // All constructors should work
-            let ob1 = Ob32::new(&key_b64).unwrap();
-            let ob2 = Ob32::from_hex_key(&key_hex).unwrap();
-            let ob3 = Ob32::from_bytes(&key_bytes).unwrap();
+            let ob1 = AdsvC32::new(&key_b64).unwrap();
+            let ob2 = AdsvC32::from_hex_key(&key_hex).unwrap();
+            let ob3 = AdsvC32::from_bytes(&key_bytes).unwrap();
 
             // All key getters should work
             let _ = ob1.key();

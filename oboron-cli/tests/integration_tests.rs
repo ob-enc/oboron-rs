@@ -32,7 +32,7 @@ fn test_enc_keyless() {
     cmd.env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("-z")
-        .arg("--ob32")
+        .arg("--adsv")
         .arg("--base32rfc")
         .arg("test123")
         .assert()
@@ -107,7 +107,7 @@ fn test_enc_with_explicit_key() {
         .arg("enc")
         .arg("--key")
         .arg(TEST_KEY_B64)
-        .arg("--ob32")
+        .arg("--adsv")
         .arg("--base32rfc")
         .arg("test_data")
         .assert()
@@ -148,7 +148,7 @@ fn test_enc_dec_with_explicit_key() {
         .arg("enc")
         .arg("--key")
         .arg(TEST_KEY_B64_ALT)
-        .arg("--ob32")
+        .arg("--adsv")
         .arg("--base32rfc")
         .arg("sensitive_data")
         .output()
@@ -167,7 +167,7 @@ fn test_enc_dec_with_explicit_key() {
         .arg("dec")
         .arg("--key")
         .arg(TEST_KEY_B64_ALT)
-        .arg("--ob32") // Use same scheme as enc
+        .arg("--adsv") // Use same scheme as enc
         .arg("--base32rfc")
         .arg(&encd)
         .assert()
@@ -220,14 +220,14 @@ fn test_enc_dec_with_explicit_key_adgs() {
 
 #[cfg(feature = "zdc")]
 #[cfg(feature = "adgs")]
-#[cfg(feature = "ob32")]
+#[cfg(feature = "adsv")]
 #[cfg(feature = "upc")]
 #[cfg(feature = "apgs")]
 #[cfg(feature = "apsv")]
 #[test]
 fn test_enc_different_schemes() {
     let test_home = test_home_dir();
-    let schemes = vec!["--zdc", "--adgs", "--ob32", "--upc", "--apgs", "--apsv"];
+    let schemes = vec!["--zdc", "--adgs", "--adsv", "--upc", "--apgs", "--apsv"];
 
     for scheme in schemes {
         let mut cmd = Command::cargo_bin("ob").unwrap();
@@ -267,11 +267,11 @@ fn test_enc_different_encodings() {
 
 #[cfg(feature = "zdc")]
 #[cfg(feature = "adgs")]
-#[cfg(feature = "ob32")]
+#[cfg(feature = "adsv")]
 #[test]
 fn test_enc_with_format_string() {
     let test_home = test_home_dir();
-    let formats = vec!["zdc:b32", "adgs:b64", "ob32:hex"];
+    let formats = vec!["zdc:b32", "adgs:b64", "adsv:hex"];
 
     for format in formats {
         let mut cmd = Command::cargo_bin("ob").unwrap();

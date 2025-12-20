@@ -18,7 +18,7 @@ default = ["std"]
 # Core configurations
 # ===================
 std = ["secure-schemes"]
-secure-min = ["ob32"]  # Minimum secure setup
+secure-min = ["adsv"]  # Minimum secure setup
 full = ["all-schemes", "all-alt-keys", "keyless", "legacy", "non-crypto", "convenience"]
 
 dev = ["full"]  # Development setup
@@ -35,7 +35,7 @@ keyless = []  # Hardcoded key methods (dev/testing only)
 # ==================================================
 all-cbc-schemes = ["zdc", "upc"]  # Shares AES+CBC deps
 all-gcm-schemes = ["adgs", "apgs"]  # Shares AES-GCM-SIV deps  
-all-siv-schemes = ["ob32", "apsv"]  # Shares AES-SIV deps
+all-siv-schemes = ["adsv", "apsv"]  # Shares AES-SIV deps
 
 # Individual schemes
 # ==================
@@ -43,7 +43,7 @@ zdc = ["aes", "cipher", "cbc"]
 upc = ["aes", "cipher", "cbc"]
 adgs = ["aes-gcm-siv"]
 apgs = ["aes-gcm-siv"]
-ob32 = ["aes-siv"]
+adsv = ["aes-siv"]
 apsv = ["aes-siv"]
 # Testing only
 ob70 = []  # identity, non-crypto
@@ -62,12 +62,12 @@ unchecked-utf8 = [] # Unsafe performance enhacement
 ob0x = ["zdc"] # insecure, not authenticated
 ob1x = []  # insecure, authenticated
 ob2x = ["upc"]  # secure, not authenticated
-ob3x = ["adgs", "apgs", "ob32", "apsv"]  # secure, authenticated
+ob3x = ["adgs", "apgs", "adsv", "apsv"]  # secure, authenticated
 ob7x = ["ob70", "ob71"]  # testing
 insecure-schemes = ["ob0x", "ob1x"]
 secure-schemes = ["ob2x", "ob3x"]
 authenticated-schemes = ["ob3x"]
-deterministic-schemes = ["zdc", "adgs", "ob32"]
+deterministic-schemes = ["zdc", "adgs", "adsv"]
 probabilistic-schemes = ["upc", "apgs", "apsv"]
 all-schemes = ["ob0x", "ob1x", "ob2x", "ob3x"]
 
@@ -209,19 +209,19 @@ name = "apgs_hex"
 harness = false
 
 [[bench]]
-name = "ob32"
+name = "adsv_c32"
 harness = false
 
 [[bench]]
-name = "ob32_b32"
+name = "adsv_b32"
 harness = false
 
 [[bench]]
-name = "ob32_b64"
+name = "adsv_b64"
 harness = false
 
 [[bench]]
-name = "ob32_hex"
+name = "adsv_hex"
 harness = false
 
 [[bench]]
@@ -241,7 +241,7 @@ name = "apsv_hex"
 harness = false
 
 [[bench]]
-name = "ob00"
+name = "ob00_c32"
 harness = false
 
 [[bench]]

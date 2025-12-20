@@ -77,9 +77,9 @@ pub fn load_config() -> Result<Config> {
     let mut config: Config =
         serde_json::from_str(&content).context("Failed to parse config file")?;
 
-    // Default to ob32 if not set
+    // Default to adsv if not set
     if config.scheme.is_empty() {
-        config.scheme = "ob32".to_string();
+        config.scheme = "adsv".to_string();
     }
 
     // Default to base32crockford if not set
@@ -195,7 +195,7 @@ pub fn init_command(name: &str) -> Result<()> {
 
     let config = Config {
         profile: name.to_string(),
-        scheme: "ob32".to_string(), // Default to ob32
+        scheme: "adsv".to_string(), // Default to adsv
         encoding: "base32crockford".to_string(),
     };
 
@@ -203,7 +203,7 @@ pub fn init_command(name: &str) -> Result<()> {
 
     println!("✓ Configuration saved to {}", config_path().display());
     println!("\nYour profile '{}':", name);
-    println!("  Default scheme: ob32");
+    println!("  Default scheme: adsv");
     println!("  Default encoding: base32crockford");
     println!("  Key: {}", key);
     println!("\n⚠️  Keep these keys secure! Anyone with these keys can decode your data.");
@@ -297,7 +297,7 @@ pub fn profile_activate_command(name: &str) -> Result<()> {
 
     let mut config = load_config().unwrap_or(Config {
         profile: "default".to_string(),
-        scheme: "ob32".to_string(),
+        scheme: "adsv".to_string(),
         encoding: "base32crockford".to_string(),
     });
 
@@ -492,7 +492,7 @@ mod tests {
 
         // Simulate load_config logic
         if config.scheme.is_empty() {
-            config.scheme = "ob32".to_string();
+            config.scheme = "adsv".to_string();
         }
         if config.encoding.is_empty() {
             config.encoding = "base32crockford".to_string();
@@ -502,7 +502,7 @@ mod tests {
         }
 
         assert_eq!(config.profile, "default");
-        assert_eq!(config.scheme, "ob32");
+        assert_eq!(config.scheme, "adsv");
         assert_eq!(config.encoding, "base32crockford");
     }
 
