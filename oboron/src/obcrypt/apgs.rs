@@ -1,4 +1,4 @@
-#![cfg(feature = "ob31p")]
+#![cfg(feature = "apgs")]
 use super::keychain::Keychain;
 use crate::Error;
 use aes_gcm_siv::{
@@ -10,7 +10,7 @@ use rand::RngCore;
 const NONCE_SIZE: usize = 12;
 const TAG_SIZE: usize = 16;
 
-/// Encrypt plaintext bytes using probabilistic AES-GCM-SIV (ob31p scheme).
+/// Encrypt plaintext bytes using probabilistic AES-GCM-SIV (apgs scheme).
 /// Returns raw ciphertext bytes with nonce prepended and authentication tag appended.
 /// Structure: [nonce][ciphertext+tag]
 pub fn encrypt(keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
@@ -39,7 +39,7 @@ pub fn encrypt(keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, E
     Ok(buffer)
 }
 
-/// Decrypt ciphertext using probabilistic AES-GCM-SIV (ob31p scheme).
+/// Decrypt ciphertext using probabilistic AES-GCM-SIV (apgs scheme).
 /// Expects data structure: [nonce][ciphertext+tag].  Returns plaintext bytes after authentication verification.
 pub fn decrypt(keychain: &Keychain, data: &[u8]) -> Result<Vec<u8>, Error> {
     // Minimum: 12 byte nonce + 1 byte plaintext + 16 byte tag = 29 bytes

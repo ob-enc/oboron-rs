@@ -1,5 +1,5 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use oboron::{Ob00, Ob31, Ob31p, Ob32, Ob32p, Ob70, Ob71, ObMulti, Oboron, UpcC32, ZdcC32};
+use oboron::{Apgs, Ob00, Ob31, Ob32, Ob32p, Ob70, Ob71, ObMulti, Oboron, UpcC32, ZdcC32};
 
 // Baseline benchmarks - no crypto, just encoding overhead
 fn benchmark_enc_tdr(c: &mut Criterion) {
@@ -98,10 +98,10 @@ fn benchmark_dec_zdc(c: &mut Criterion) {
     });
 }
 
-fn benchmark_dec_adgs(c: &mut Criterion) {
+fn benchmark_dec_apgs(c: &mut Criterion) {
     let ob = Ob31::new_keyless().unwrap();
     let ot = ob.enc("test123").unwrap();
-    c.bench_function("dec_adgs", |b| {
+    c.bench_function("dec_apgs", |b| {
         b.iter(|| ob.dec(black_box(&ot)).unwrap());
     });
 }
@@ -170,7 +170,7 @@ criterion_group!(
     benchmark_enc_apsv,
     benchmark_dec_ob00,
     benchmark_dec_zdc,
-    benchmark_dec_adgs,
+    benchmark_dec_apgs,
     benchmark_dec_adsv,
     benchmark_dec_upc,
     benchmark_dec_apgs,

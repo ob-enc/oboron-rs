@@ -19,7 +19,7 @@ zdc = ["oboron/zdc"]
 ob31 = ["oboron/ob31"]
 ob32 = ["oboron/ob32"]
 upc = ["oboron/upc"]
-ob31p = ["oboron/ob31p"]
+apgs = ["oboron/apgs"]
 ob32p = ["oboron/ob32p"]
 ob70 = ["oboron/ob70"]
 ob71 = ["oboron/ob71"]
@@ -29,13 +29,13 @@ ob71 = ["oboron/ob71"]
 ob0x = ["zdc"] # insecure, not authenticated
 ob1x = []  # insecure, authenticated
 ob2x = ["upc"]  # secure, not authenticated
-ob3x = ["ob31", "ob31p", "ob32", "ob32p"]  # secure, authenticated
+ob3x = ["ob31", "apgs", "ob32", "ob32p"]  # secure, authenticated
 ob7x = ["ob70", "ob71"]  # testing
 insecure-schemes = ["ob0x", "ob1x"]
 secure-schemes = ["ob2x", "ob3x"]
 authenticated-schemes = ["ob3x"]
 deterministic-schemes = ["zdc", "ob31", "ob32"]
-probabilistic-schemes = ["upc", "ob31p", "ob32p"]
+probabilistic-schemes = ["upc", "apgs", "ob32p"]
 all-schemes = ["ob0x", "ob1x", "ob2x", "ob3x"]
 
 # Special purpose groups

@@ -211,31 +211,31 @@ impl_cipher_class!(
     "Ob31 cipher with Hex encoding (AES-GCM-SIV, deterministic)"
 );
 
-// Ob31p variants
+// Apgs variants
 // --------------
-#[cfg(feature = "ob31p")]
+#[cfg(feature = "apgs")]
 impl_cipher_class!(
-    Ob31pBase32Crockford,
-    ::oboron::Ob31pBase32Crockford,
-    "Ob31p cipher with Base32Crockford encoding (Probabilistic AES-GCM-SIV)"
+    ApgsC32,
+    ::oboron::ApgsC32,
+    "Apgs cipher with Base32Crockford encoding (Probabilistic AES-GCM-SIV)"
 );
-#[cfg(feature = "ob31p")]
+#[cfg(feature = "apgs")]
 impl_cipher_class!(
-    Ob31pBase32Rfc,
-    ::oboron::Ob31pBase32Rfc,
-    "Ob31p cipher with Base32Rfc encoding (Probabilistic AES-GCM-SIV)"
+    ApgsB32,
+    ::oboron::ApgsB32,
+    "Apgs cipher with Base32Rfc encoding (Probabilistic AES-GCM-SIV)"
 );
-#[cfg(feature = "ob31p")]
+#[cfg(feature = "apgs")]
 impl_cipher_class!(
-    Ob31pBase64,
-    ::oboron::Ob31pBase64,
-    "Ob31p cipher with Base64 encoding (Probabilistic AES-GCM-SIV)"
+    ApgsB64,
+    ::oboron::ApgsB64,
+    "Apgs cipher with Base64 encoding (Probabilistic AES-GCM-SIV)"
 );
-#[cfg(feature = "ob31p")]
+#[cfg(feature = "apgs")]
 impl_cipher_class!(
-    Ob31pHex,
-    ::oboron::Ob31pHex,
-    "Ob31p cipher with Hex encoding (Probabilistic AES-GCM-SIV)"
+    ApgsHex,
+    ::oboron::ApgsHex,
+    "Apgs cipher with Hex encoding (Probabilistic AES-GCM-SIV)"
 );
 
 // Ob32 variants
@@ -835,13 +835,13 @@ fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m.add_class::<Ob31Hex>()?;
     }
 
-    // Ob31p variants
-    #[cfg(feature = "ob31p")]
+    // Apgs variants
+    #[cfg(feature = "apgs")]
     {
-        m.add_class::<Ob31pBase32Crockford>()?;
-        m.add_class::<Ob31pBase32Rfc>()?;
-        m.add_class::<Ob31pBase64>()?;
-        m.add_class::<Ob31pHex>()?;
+        m.add_class::<ApgsC32>()?;
+        m.add_class::<ApgsB32>()?;
+        m.add_class::<ApgsB64>()?;
+        m.add_class::<ApgsHex>()?;
     }
 
     // Ob32 variants

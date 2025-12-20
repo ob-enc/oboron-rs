@@ -63,14 +63,14 @@ impl Format {
             #[cfg(feature = "ob31")]
             constants::OB31_HEX => Format::new(Scheme::Ob31, Encoding::Hex),
 
-            #[cfg(feature = "ob31p")]
-            constants::OB31P_C32 => Format::new(Scheme::Ob31p, Encoding::Base32Crockford),
-            #[cfg(feature = "ob31p")]
-            constants::OB31P_B32 => Format::new(Scheme::Ob31p, Encoding::Base32Rfc),
-            #[cfg(feature = "ob31p")]
-            constants::OB31P_B64 => Format::new(Scheme::Ob31p, Encoding::Base64),
-            #[cfg(feature = "ob31p")]
-            constants::OB31P_HEX => Format::new(Scheme::Ob31p, Encoding::Hex),
+            #[cfg(feature = "apgs")]
+            constants::APGS_C32 => Format::new(Scheme::Apgs, Encoding::Base32Crockford),
+            #[cfg(feature = "apgs")]
+            constants::APGS_B32 => Format::new(Scheme::Apgs, Encoding::Base32Rfc),
+            #[cfg(feature = "apgs")]
+            constants::APGS_B64 => Format::new(Scheme::Apgs, Encoding::Base64),
+            #[cfg(feature = "apgs")]
+            constants::APGS_HEX => Format::new(Scheme::Apgs, Encoding::Hex),
 
             #[cfg(feature = "ob32")]
             constants::OB32_C32 => Format::new(Scheme::Ob32, Encoding::Base32Crockford),
@@ -162,8 +162,8 @@ mod tests {
             Scheme::Upc,
             #[cfg(feature = "ob31")]
             Scheme::Ob31,
-            #[cfg(feature = "ob31p")]
-            Scheme::Ob31p,
+            #[cfg(feature = "apgs")]
+            Scheme::Apgs,
             #[cfg(feature = "ob32")]
             Scheme::Ob32,
             #[cfg(feature = "ob32p")]
@@ -266,12 +266,12 @@ mod tests {
             (Scheme::Ob31, Encoding::Hex, "ob31:hex"),
         ]);
 
-        #[cfg(feature = "ob31p")]
+        #[cfg(feature = "apgs")]
         test_cases.extend(vec![
-            (Scheme::Ob31p, Encoding::Base32Crockford, "ob31p:c32"),
-            (Scheme::Ob31p, Encoding::Base32Rfc, "ob31p:b32"),
-            (Scheme::Ob31p, Encoding::Base64, "ob31p:b64"),
-            (Scheme::Ob31p, Encoding::Hex, "ob31p:hex"),
+            (Scheme::Apgs, Encoding::Base32Crockford, "apgs:c32"),
+            (Scheme::Apgs, Encoding::Base32Rfc, "apgs:b32"),
+            (Scheme::Apgs, Encoding::Base64, "apgs:b64"),
+            (Scheme::Apgs, Encoding::Hex, "apgs:hex"),
         ]);
 
         #[cfg(feature = "ob32")]
@@ -335,7 +335,7 @@ mod tests {
     fn test_all_schemes_support_both_base32_variants() {
         // All schemes should support both Base32Rfc (b32) and Base32Crockford (c32)
         let schemes = vec![
-            "zdc", "upc", "ob31", "ob31p", "ob32", "ob32p", "ob70", "ob71",
+            "zdc", "upc", "ob31", "apgs", "ob32", "ob32p", "ob70", "ob71",
         ];
 
         for scheme_str in schemes {

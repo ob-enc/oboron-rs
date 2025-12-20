@@ -30,9 +30,9 @@ fn test_available_schemes() {
         assert_eq!(ob.dec(&enc).unwrap(), "test");
     }
 
-    #[cfg(feature = "ob31p")]
+    #[cfg(feature = "apgs")]
     {
-        let ob = oboron::Ob31p::new(&key).unwrap();
+        let ob = oboron::Apgs::new(&key).unwrap();
         let enc = ob.enc("test").unwrap();
         assert_eq!(ob.dec(&enc).unwrap(), "test");
     }

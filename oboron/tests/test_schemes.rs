@@ -4,28 +4,28 @@ use oboron::Ob31Base64;
 use oboron::UpcB64;
 #[cfg(feature = "zdc")]
 use oboron::ZdcB64;
+#[cfg(feature = "apgs")]
+use oboron::{Apgs, ApgsB64, ApgsHex};
 use oboron::{Encoding, ObFlex, Oboron, Scheme};
-#[cfg(feature = "ob31p")]
-use oboron::{Ob31p, Ob31pBase64, Ob31pHex};
 #[cfg(feature = "ob32")]
 use oboron::{Ob32, Ob32Base64, Ob32Hex};
 #[cfg(feature = "ob32p")]
 use oboron::{Ob32p, Ob32pBase64, Ob32pHex};
 
 #[test]
-#[cfg(feature = "ob31p")]
-fn test_ob31p_basic() {
+#[cfg(feature = "apgs")]
+fn test_apgs_basic() {
     let key = [0u8; 64];
-    let ob = Ob31p::from_bytes(&key).expect("Failed to create Ob31p");
+    let ob = Apgs::from_bytes(&key).expect("Failed to create Apgs");
 
     let plaintext = "Hello, World!";
     let encd1 = ob.enc(plaintext).expect("Failed to enc");
     let encd2 = ob.enc(plaintext).expect("Failed to enc");
 
-    // Ob31p is probabilistic, so two encodings should be different
+    // Apgs is probabilistic, so two encodings should be different
     assert_ne!(
         encd1, encd2,
-        "Ob31p should produce different ciphertexts for the same plaintext"
+        "Apgs should produce different ciphertexts for the same plaintext"
     );
 
     // But both should dec to the same plaintext
@@ -35,34 +35,34 @@ fn test_ob31p_basic() {
     assert_eq!(decd1, plaintext);
     assert_eq!(decd2, plaintext);
 
-    eprintln!("✓ Ob31p basic test passed");
+    eprintln!("✓ Apgs basic test passed");
 }
 
 #[test]
-#[cfg(feature = "ob31p")]
-fn test_ob31p_all_encodings() {
+#[cfg(feature = "apgs")]
+fn test_apgs_all_encodings() {
     let key = [0u8; 64];
-    let plaintext = "Test ob31p with different encodings";
+    let plaintext = "Test apgs with different encodings";
 
     // Base32Crockford (default)
-    let ob_b32 = Ob31p::from_bytes(&key).expect("Failed to create Ob31p with base32");
+    let ob_b32 = Apgs::from_bytes(&key).expect("Failed to create Apgs with base32");
     let encd = ob_b32.enc(plaintext).expect("Failed to enc with base32");
     let decd = ob_b32.dec(&encd).expect("Failed to dec with base32");
     assert_eq!(decd, plaintext, "Decoding mismatch for base32");
 
     // Base64
-    let ob_b64 = Ob31pBase64::from_bytes(&key).expect("Failed to create Ob31p with base64");
+    let ob_b64 = ApgsB64::from_bytes(&key).expect("Failed to create Apgs with base64");
     let encd = ob_b64.enc(plaintext).expect("Failed to enc with base64");
     let decd = ob_b64.dec(&encd).expect("Failed to dec with base64");
     assert_eq!(decd, plaintext, "Decoding mismatch for base64");
 
     // Hex
-    let ob_hex = Ob31pHex::from_bytes(&key).expect("Failed to create Ob31p with hex");
+    let ob_hex = ApgsHex::from_bytes(&key).expect("Failed to create Apgs with hex");
     let encd = ob_hex.enc(plaintext).expect("Failed to enc with hex");
     let decd = ob_hex.dec(&encd).expect("Failed to dec with hex");
     assert_eq!(decd, plaintext, "Decoding mismatch for hex");
 
-    eprintln!("✓ Ob31p all encodings test passed");
+    eprintln!("✓ Apgs all encodings test passed");
 }
 
 #[test]
@@ -171,7 +171,7 @@ fn test_ob32p_all_encodings() {
 #[cfg(feature = "zdc")]
 #[cfg(feature = "upc")]
 #[cfg(feature = "ob31")]
-#[cfg(feature = "ob31p")]
+#[cfg(feature = "apgs")]
 #[cfg(feature = "ob32")]
 #[cfg(feature = "ob32p")]
 fn test_obflex_basic() {
@@ -185,7 +185,7 @@ fn test_obflex_basic() {
         Scheme::Zdc,
         Scheme::Upc,
         Scheme::Ob31,
-        Scheme::Ob31p,
+        Scheme::Apgs,
         Scheme::Ob32,
         Scheme::Ob32p,
     ] {
@@ -209,7 +209,7 @@ fn test_obflex_basic() {
 #[cfg(feature = "zdc")]
 #[cfg(feature = "upc")]
 #[cfg(feature = "ob31")]
-#[cfg(feature = "ob31p")]
+#[cfg(feature = "apgs")]
 #[cfg(feature = "ob32")]
 #[cfg(feature = "ob32p")]
 fn test_obflex_all_formats() {
@@ -228,9 +228,9 @@ fn test_obflex_all_formats() {
         "ob31:c32",
         "ob31:b64",
         "ob31:hex",
-        "ob31p:c32",
-        "ob31p:b64",
-        "ob31p:hex",
+        "apgs:c32",
+        "apgs:b64",
+        "apgs:hex",
         "ob32:c32",
         "ob32:b64",
         "ob32:hex",
@@ -286,20 +286,20 @@ fn test_obflex_encoding_changes() {
 }
 
 #[test]
-#[cfg(feature = "ob31p")]
+#[cfg(feature = "apgs")]
 #[cfg(feature = "ob32")]
 #[cfg(feature = "ob32p")]
 fn test_all_schemes_special_characters() {
     let key = [0u8; 64];
     let plaintext = "Special: !@#$%^&*(){}[]|\\:;\"'<>,.?/~`±§";
 
-    // Test Ob31p
-    let ob31p = Ob31pBase64::from_bytes(&key).expect("Failed to create Ob31p");
-    let encd = ob31p.enc(plaintext).expect("Failed to enc with ob31p");
-    let decd = ob31p.dec(&encd).expect("Failed to dec with ob31p");
+    // Test Apgs
+    let apgs = ApgsB64::from_bytes(&key).expect("Failed to create Apgs");
+    let encd = apgs.enc(plaintext).expect("Failed to enc with apgs");
+    let decd = apgs.dec(&encd).expect("Failed to dec with apgs");
     assert_eq!(
         decd, plaintext,
-        "Special characters decoding mismatch for ob31p"
+        "Special characters decoding mismatch for apgs"
     );
 
     // Test Ob32
@@ -324,7 +324,7 @@ fn test_all_schemes_special_characters() {
 }
 
 #[test]
-#[cfg(feature = "ob31p")]
+#[cfg(feature = "apgs")]
 #[cfg(feature = "ob32")]
 #[cfg(feature = "ob32p")]
 fn test_all_schemes_empty_string() {
@@ -334,10 +334,10 @@ fn test_all_schemes_empty_string() {
     // Empty strings cannot be encd - this is expected behavior
     // Test that all schemes correctly reject empty strings
 
-    // Test Ob31p
-    let ob31p = Ob31pBase64::from_bytes(&key).expect("Failed to create Ob31p");
-    let result = ob31p.enc(plaintext);
-    assert!(result.is_err(), "Ob31p should reject empty string");
+    // Test Apgs
+    let apgs = ApgsB64::from_bytes(&key).expect("Failed to create Apgs");
+    let result = apgs.enc(plaintext);
+    assert!(result.is_err(), "Apgs should reject empty string");
 
     // Test Ob32
     let ob32 = Ob32Base64::from_bytes(&key).expect("Failed to create Ob32");
@@ -353,22 +353,22 @@ fn test_all_schemes_empty_string() {
 }
 
 #[test]
-#[cfg(feature = "ob31p")]
+#[cfg(feature = "apgs")]
 #[cfg(feature = "ob32")]
 #[cfg(feature = "ob32p")]
 fn test_all_schemes_long_string() {
     let key = [0u8; 64];
     let plaintext = "a".repeat(10000);
 
-    // Test Ob31p
-    let ob31p = Ob31pBase64::from_bytes(&key).expect("Failed to create Ob31p");
-    let encd = ob31p
+    // Test Apgs
+    let apgs = ApgsB64::from_bytes(&key).expect("Failed to create Apgs");
+    let encd = apgs
         .enc(&plaintext)
-        .expect("Failed to enc long string with ob31p");
-    let decd = ob31p
+        .expect("Failed to enc long string with apgs");
+    let decd = apgs
         .dec(&encd)
-        .expect("Failed to dec long string with ob31p");
-    assert_eq!(decd, plaintext, "Long string decoding mismatch for ob31p");
+        .expect("Failed to dec long string with apgs");
+    assert_eq!(decd, plaintext, "Long string decoding mismatch for apgs");
 
     // Test Ob32
     let ob32 = Ob32Base64::from_bytes(&key).expect("Failed to create Ob32");
@@ -418,7 +418,7 @@ fn test_cross_scheme_decoding_should_fail() {
 
 #[test]
 #[cfg(feature = "upc")]
-#[cfg(feature = "ob31p")]
+#[cfg(feature = "apgs")]
 #[cfg(feature = "ob32p")]
 fn test_probabilistic_schemes_uniqueness() {
     let key = [0u8; 64];
@@ -439,17 +439,17 @@ fn test_probabilistic_schemes_uniqueness() {
         iterations
     );
 
-    // Test Ob31p
-    let ob31p = Ob31pBase64::from_bytes(&key).expect("Failed to create ob31p");
+    // Test Apgs
+    let apgs = ApgsB64::from_bytes(&key).expect("Failed to create apgs");
     encodings.clear();
     for _ in 0..iterations {
-        let encd = ob31p.enc(plaintext).expect("Failed to enc with ob31p");
+        let encd = apgs.enc(plaintext).expect("Failed to enc with apgs");
         encodings.insert(encd);
     }
     assert_eq!(
         encodings.len(),
         iterations,
-        "Ob31p should produce {} unique ciphertexts",
+        "Apgs should produce {} unique ciphertexts",
         iterations
     );
 

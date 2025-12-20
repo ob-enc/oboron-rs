@@ -33,9 +33,9 @@ pub const UPC_BYTE: u8 = 0x23;
 #[cfg(feature = "ob31")]
 pub const OB31_BYTE: u8 = 0x62;
 
-// ob31p: tier=3 (011), scheme=1 (0001), probabilistic=1 -> 01100011 = 0x63 (decimal: 99)
-#[cfg(feature = "ob31p")]
-pub const OB31P_BYTE: u8 = 0x63;
+// apgs: tier=3 (011), scheme=1 (0001), probabilistic=1 -> 01100011 = 0x63 (decimal: 99)
+#[cfg(feature = "apgs")]
+pub const APGS_BYTE: u8 = 0x63;
 
 // ob32: tier=3 (011), scheme=2 (0010), probabilistic=0 -> 01100100 = 0x64 (decimal: 100)
 #[cfg(feature = "ob32")]
@@ -78,8 +78,8 @@ pub const ZDC_C32: &str = "zdc:c32";
 pub const UPC_C32: &str = "upc:c32";
 #[cfg(feature = "ob31")]
 pub const OB31_C32: &str = "ob31:c32";
-#[cfg(feature = "ob31p")]
-pub const OB31P_C32: &str = "ob31p:c32";
+#[cfg(feature = "apgs")]
+pub const APGS_C32: &str = "apgs:c32";
 #[cfg(feature = "ob32")]
 pub const OB32_C32: &str = "ob32:c32";
 #[cfg(feature = "ob32p")]
@@ -100,8 +100,8 @@ pub const ZDC_B32: &str = "zdc:b32";
 pub const UPC_B32: &str = "upc:b32";
 #[cfg(feature = "ob31")]
 pub const OB31_B32: &str = "ob31:b32";
-#[cfg(feature = "ob31p")]
-pub const OB31P_B32: &str = "ob31p:b32";
+#[cfg(feature = "apgs")]
+pub const APGS_B32: &str = "apgs:b32";
 #[cfg(feature = "ob32")]
 pub const OB32_B32: &str = "ob32:b32";
 #[cfg(feature = "ob32p")]
@@ -122,8 +122,8 @@ pub const ZDC_B64: &str = "zdc:b64";
 pub const UPC_B64: &str = "upc:b64";
 #[cfg(feature = "ob31")]
 pub const OB31_B64: &str = "ob31:b64";
-#[cfg(feature = "ob31p")]
-pub const OB31P_B64: &str = "ob31p:b64";
+#[cfg(feature = "apgs")]
+pub const APGS_B64: &str = "apgs:b64";
 #[cfg(feature = "ob32")]
 pub const OB32_B64: &str = "ob32:b64";
 #[cfg(feature = "ob32p")]
@@ -144,8 +144,8 @@ pub const ZDC_HEX: &str = "zdc:hex";
 pub const UPC_HEX: &str = "upc:hex";
 #[cfg(feature = "ob31")]
 pub const OB31_HEX: &str = "ob31:hex";
-#[cfg(feature = "ob31p")]
-pub const OB31P_HEX: &str = "ob31p:hex";
+#[cfg(feature = "apgs")]
+pub const APGS_HEX: &str = "apgs:hex";
 #[cfg(feature = "ob32")]
 pub const OB32_HEX: &str = "ob32:hex";
 #[cfg(feature = "ob32p")]

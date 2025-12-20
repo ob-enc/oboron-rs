@@ -222,12 +222,12 @@ fn test_enc_dec_with_explicit_key_ob31() {
 #[cfg(feature = "ob31")]
 #[cfg(feature = "ob32")]
 #[cfg(feature = "upc")]
-#[cfg(feature = "ob31p")]
+#[cfg(feature = "apgs")]
 #[cfg(feature = "ob32p")]
 #[test]
 fn test_enc_different_schemes() {
     let test_home = test_home_dir();
-    let schemes = vec!["--zdc", "--ob31", "--ob32", "--upc", "--ob31p", "--ob32p"];
+    let schemes = vec!["--zdc", "--ob31", "--ob32", "--upc", "--apgs", "--ob32p"];
 
     for scheme in schemes {
         let mut cmd = Command::cargo_bin("ob").unwrap();

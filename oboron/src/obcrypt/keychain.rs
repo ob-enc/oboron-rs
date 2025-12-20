@@ -67,9 +67,9 @@ impl Keychain {
     }
 
     // AES-256 key for AES-GCM-SIV (second 32 bytes)
-    // Used in ob31 and ob31p schemes
+    // Used in ob31 and apgs schemes
     #[inline]
-    #[cfg(any(feature = "ob31", feature = "ob31p"))]
+    #[cfg(any(feature = "ob31", feature = "apgs"))]
     pub(crate) fn gcm_siv(&self) -> &[u8; 32] {
         self.key[32..64].try_into().unwrap()
     }

@@ -19,7 +19,7 @@ jobs:
           - zdc
           - upc
           - ob31
-          - ob31p
+          - apgs
           - ob32
           - ob32p
     steps:
@@ -83,7 +83,7 @@ jobs:
           - name: "deterministic only"
             features: "zdc,ob31,ob32"
           - name: "probabilistic only"
-            features: "upc,ob31p,ob32p"
+            features: "upc,apgs,ob32p"
           - name: "modern schemes"
             features: "ob31,ob32"
           - name: "ob32 only"

@@ -15,11 +15,11 @@ zdc = ["oboron/zdc"]
 ob31 = ["oboron/ob31"]
 ob32 = ["oboron/ob32"]
 upc = ["oboron/upc"]
-ob31p = ["oboron/ob31p"]
+apgs = ["oboron/apgs"]
 ob32p = ["oboron/ob32p"]
 ob70 = ["oboron/ob70"]
 ob71 = ["oboron/ob71"]
-all-schemes = ["zdc", "upc", "ob31", "ob31p", "ob32", "ob32p"]
+all-schemes = ["zdc", "upc", "ob31", "apgs", "ob32", "ob32p"]
 
 keyless = ["oboron/keyless"]
 

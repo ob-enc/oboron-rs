@@ -11,8 +11,8 @@ pub enum Scheme {
     Upc,
     #[cfg(feature = "ob31")]
     Ob31,
-    #[cfg(feature = "ob31p")]
-    Ob31p,
+    #[cfg(feature = "apgs")]
+    Apgs,
     #[cfg(feature = "ob32")]
     Ob32,
     #[cfg(feature = "ob32p")]
@@ -37,8 +37,8 @@ impl Scheme {
             Scheme::Upc => "upc",
             #[cfg(feature = "ob31")]
             Scheme::Ob31 => "ob31",
-            #[cfg(feature = "ob31p")]
-            Scheme::Ob31p => "ob31p",
+            #[cfg(feature = "apgs")]
+            Scheme::Apgs => "apgs",
             #[cfg(feature = "ob32")]
             Scheme::Ob32 => "ob32",
             #[cfg(feature = "ob32p")]
@@ -68,8 +68,8 @@ impl Scheme {
             Scheme::Upc => false,
             #[cfg(feature = "ob31")]
             Scheme::Ob31 => true,
-            #[cfg(feature = "ob31p")]
-            Scheme::Ob31p => false,
+            #[cfg(feature = "apgs")]
+            Scheme::Apgs => false,
             #[cfg(feature = "ob32")]
             Scheme::Ob32 => true,
             #[cfg(feature = "ob32p")]
@@ -104,8 +104,8 @@ impl Scheme {
             Scheme::Upc => constants::UPC_BYTE,
             #[cfg(feature = "ob31")]
             Scheme::Ob31 => constants::OB31_BYTE,
-            #[cfg(feature = "ob31p")]
-            Scheme::Ob31p => constants::OB31P_BYTE,
+            #[cfg(feature = "apgs")]
+            Scheme::Apgs => constants::APGS_BYTE,
             #[cfg(feature = "ob32")]
             Scheme::Ob32 => constants::OB32_BYTE,
             #[cfg(feature = "ob32p")]
@@ -133,8 +133,8 @@ impl std::str::FromStr for Scheme {
             "upc" => Ok(Scheme::Upc),
             #[cfg(feature = "ob31")]
             "ob31" => Ok(Scheme::Ob31),
-            #[cfg(feature = "ob31p")]
-            "ob31p" => Ok(Scheme::Ob31p),
+            #[cfg(feature = "apgs")]
+            "apgs" => Ok(Scheme::Apgs),
             #[cfg(feature = "ob32")]
             "ob32" => Ok(Scheme::Ob32),
             #[cfg(feature = "ob32p")]

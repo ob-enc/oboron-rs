@@ -156,7 +156,7 @@ odd = authenticated.
 | `zdc`  | AES-CBC     | Yes            | No             | Legacy; uses constant IV. Prioritizes determinism and performance over security. |
 | `upc` | AES-CBC     | No             | No             |       |
 | `ob31`  | AES-GCM-SIV | Yes            | Yes            |       |
-| `ob31p` | AES-GCM-SIV | No             | Yes            |       |
+| `apgs` | AES-GCM-SIV | No             | Yes            |       |
 | `ob32`  | AES-SIV     | Yes            | Yes            |       |
 | `ob32p` | AES-SIV     | No             | Yes            |       |
 
@@ -353,7 +353,7 @@ The master-key is partitioned into algorithm-specific keys in the
 following way:
 - `zdc`, `upc`: use the first 16 bytes (128 bits) for AES key
 - `zdc`: uses the second 16 bytes for IV
-- `ob31`, `ob31p`: use the last 32 bytes (256 bits) for AES-GCM-SIV key
+- `ob31`, `apgs`: use the last 32 bytes (256 bits) for AES-GCM-SIV key
 - `ob32`, `ob32p`: use the full 64 bytes (512 bits) for AES-SIV key
 
 The master key never leaves your application. Algorithm-specific keys
@@ -894,15 +894,15 @@ When your encryption format is fixed, instantiate the specific scheme class
 (like `Ob32`) directly for optimal performance and type safety:
 
 ```python
-from oboron import Ob31pBase64
-ob = Ob31pBase64(key)
+from oboron import ApgsB64
+ob = ApgsB64(key)
 ot = ob.enc("hello")
 pt2 = ob.dec(ot)
 assert pt2 == "hello"
 ```
 
 Available types include all combinations of scheme variants (e.g.,
-`Zdc`, `Upc`, `Ob31`, `Ob31p`, `Ob32`, `Ob32p`) with encoding
+`Zdc`, `Upc`, `Ob31`, `Apgs`, `Ob32`, `Ob32p`) with encoding
 specifications (`Base64`, `Hex`, `Base32Rfc`, or `Base32Crockford`),
 and concatenates the two in class names, for example:
 - `ZdcB32` - encoder for `zdc:b32` format
@@ -990,7 +990,7 @@ Available constants:
 - `ZDC_C32`, `ZDC_B32`, `ZDC_B64`, `ZDC_HEX`
 - `UPC_C32`, `UPC_B32`, `UPC_B64`, `UPC_HEX`
 - `OB31_C32`, `OB31_B32`, `OB31_B64`, `OB31_HEX`
-- `OB31P_C32`, `OB31P_B32`, `OB31P_B64`, `OB31P_HEX`
+- `APGS_C32`, `APGS_B32`, `APGS_B64`, `APGS_HEX`
 - `OB32_C32`, `OB32_B32`, `OB32_B64`, `OB32_HEX`
 - `OB32P_C32`, `OB32P_B32`, `OB32P_B64`, `OB32P_HEX`
 - Testing:  `OB70_*`, `OB71_*`
@@ -1088,7 +1088,7 @@ group.)
 | ob31   | b32/c32  | 34  | 40  | 47  | 53  | 66  | 79  | 130  | 232  |
 | ob32   | b32/c32  | 34  | 40  | 47  | 53  | 66  | 79  | 130  | 232  |
 | upc  | b32/c32  | 53  | 53  | 53  | 53  | 79  | 79  | 130  | 232  |
-| ob31p  | b32/c32  | 53  | 60  | 66  | 72  | 85  | 98  | 149  | 252  |
+| apgs  | b32/c32  | 53  | 60  | 66  | 72  | 85  | 98  | 149  | 252  |
 | ob32p  | b32/c32  | 60  | 66  | 72  | 79  | 92  | 104 | 156  | 258  |
 
 ## Base64 Encoding (b64)
@@ -1100,7 +1100,7 @@ group.)
 | ob31   | b64      | 28  | 34  | 39  | 44  | 55  | 66  | 108  | 194  |
 | ob32   | b64      | 28  | 34  | 39  | 44  | 55  | 66  | 108  | 194  |
 | upc  | b64      | 44  | 44  | 44  | 44  | 66  | 66  | 108  | 215  |
-| ob31p  | b64      | 40  | 50  | 55  | 60  | 71  | 82  | 124  | 210  |
+| apgs  | b64      | 40  | 50  | 55  | 60  | 71  | 82  | 124  | 210  |
 | ob32p  | b64      | 46  | 55  | 60  | 66  | 76  | 87  | 130  | 215  |
 
 ## Hex Encoding (hex)
@@ -1112,6 +1112,6 @@ group.)
 | ob31   | hex      | 42  | 50  | 58  | 66  | 82  | 98  | 162  | 290  |
 | ob32   | hex      | 42  | 50  | 58  | 66  | 82  | 98  | 162  | 290  |
 | upc  | hex      | 66  | 66  | 66  | 66  | 98  | 98  | 162  | 290  |
-| ob31p  | hex      | 66  | 74  | 82  | 90  | 106 | 122 | 186  | 314  |
+| apgs  | hex      | 66  | 74  | 82  | 90  | 106 | 122 | 186  | 314  |
 | ob32p  | hex      | 74  | 82  | 90  | 98  | 114 | 130 | 194  | 322  |
 
