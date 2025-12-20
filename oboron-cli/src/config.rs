@@ -461,7 +461,7 @@ mod tests {
     fn test_config_serialization() {
         let config = Config {
             profile: "test".to_string(),
-            scheme: "ob31".to_string(),
+            scheme: "adgs".to_string(),
             encoding: "base64".to_string(),
         };
 

@@ -87,11 +87,11 @@ OboronBase.register(_oboron.UpcB32)
 OboronBase.register(_oboron.UpcB64)
 OboronBase.register(_oboron.UpcHex)
 
-# Ob31 variants
-OboronBase.register(_oboron.Ob31Base32Crockford)
-OboronBase.register(_oboron.Ob31Base32Rfc)
-OboronBase.register(_oboron.Ob31Base64)
-OboronBase.register(_oboron.Ob31Hex)
+# Adgs variants
+OboronBase.register(_oboron.AdgsC32)
+OboronBase.register(_oboron.AdgsB32)
+OboronBase.register(_oboron.AdgsB64)
+OboronBase.register(_oboron.AdgsHex)
 
 # Apgs variants
 OboronBase.register(_oboron.ApgsC32)
@@ -151,11 +151,11 @@ UpcB32 = _oboron.UpcB32
 UpcB64 = _oboron.UpcB64
 UpcHex = _oboron.UpcHex
 
-# Ob31 variants
-Ob31Base32Crockford = _oboron.Ob31Base32Crockford
-Ob31Base32Rfc = _oboron.Ob31Base32Rfc
-Ob31Base64 = _oboron.Ob31Base64
-Ob31Hex = _oboron.Ob31Hex
+# Adgs variants
+AdgsC32 = _oboron.AdgsC32
+AdgsB32 = _oboron.AdgsB32
+AdgsB64 = _oboron.AdgsB64
+AdgsHex = _oboron.AdgsHex
 
 # Apgs variants
 ApgsC32 = _oboron.ApgsC32
@@ -229,11 +229,11 @@ __all__ = [
     'UpcB64',
     'UpcHex',
 
-    # Ob31
-    'Ob31Base32Crockford',
-    'Ob31Base32Rfc',
-    'Ob31Base64',
-    'Ob31Hex',
+    # Adgs
+    'AdgsC32',
+    'AdgsB32',
+    'AdgsB64',
+    'AdgsHex',
 
     # Apgs
     'ApgsC32',

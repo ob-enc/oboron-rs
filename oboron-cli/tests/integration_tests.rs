@@ -141,7 +141,7 @@ fn test_enc_with_explicit_key_ob32p() {
 fn test_enc_dec_with_explicit_key() {
     let test_home = test_home_dir();
 
-    // Encode with ob31
+    // Encode with adgs
     let mut enc_cmd = Command::cargo_bin("ob").unwrap();
     let enc_output = enc_cmd
         .env("HOME", test_home.as_os_str())
@@ -177,19 +177,19 @@ fn test_enc_dec_with_explicit_key() {
     cleanup_test_home(&test_home);
 }
 
-#[cfg(feature = "ob31")]
+#[cfg(feature = "adgs")]
 #[test]
-fn test_enc_dec_with_explicit_key_ob31() {
+fn test_enc_dec_with_explicit_key_adgs() {
     let test_home = test_home_dir();
 
-    // Encode with ob31
+    // Encode with adgs
     let mut enc_cmd = Command::cargo_bin("ob").unwrap();
     let enc_output = enc_cmd
         .env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("--key")
         .arg(TEST_KEY_B64_ALT)
-        .arg("--ob31")
+        .arg("--adgs")
         .arg("--base32rfc")
         .arg("sensitive_data")
         .output()
@@ -208,7 +208,7 @@ fn test_enc_dec_with_explicit_key_ob31() {
         .arg("dec")
         .arg("--key")
         .arg(TEST_KEY_B64_ALT)
-        .arg("--ob31") // Use same scheme as enc
+        .arg("--adgs") // Use same scheme as enc
         .arg("--base32rfc")
         .arg(&encd)
         .assert()
@@ -219,7 +219,7 @@ fn test_enc_dec_with_explicit_key_ob31() {
 }
 
 #[cfg(feature = "zdc")]
-#[cfg(feature = "ob31")]
+#[cfg(feature = "adgs")]
 #[cfg(feature = "ob32")]
 #[cfg(feature = "upc")]
 #[cfg(feature = "apgs")]
@@ -227,7 +227,7 @@ fn test_enc_dec_with_explicit_key_ob31() {
 #[test]
 fn test_enc_different_schemes() {
     let test_home = test_home_dir();
-    let schemes = vec!["--zdc", "--ob31", "--ob32", "--upc", "--apgs", "--ob32p"];
+    let schemes = vec!["--zdc", "--adgs", "--ob32", "--upc", "--apgs", "--ob32p"];
 
     for scheme in schemes {
         let mut cmd = Command::cargo_bin("ob").unwrap();
@@ -266,12 +266,12 @@ fn test_enc_different_encodings() {
 }
 
 #[cfg(feature = "zdc")]
-#[cfg(feature = "ob31")]
+#[cfg(feature = "adgs")]
 #[cfg(feature = "ob32")]
 #[test]
 fn test_enc_with_format_string() {
     let test_home = test_home_dir();
-    let formats = vec!["zdc:b32", "ob31:b64", "ob32:hex"];
+    let formats = vec!["zdc:b32", "adgs:b64", "ob32:hex"];
 
     for format in formats {
         let mut cmd = Command::cargo_bin("ob").unwrap();

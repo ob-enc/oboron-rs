@@ -16,7 +16,7 @@ default = ["all-schemes"]
 
 ob00 = ["oboron/ob00"]
 zdc = ["oboron/zdc"]
-ob31 = ["oboron/ob31"]
+adgs = ["oboron/adgs"]
 ob32 = ["oboron/ob32"]
 upc = ["oboron/upc"]
 apgs = ["oboron/apgs"]
@@ -29,12 +29,12 @@ ob71 = ["oboron/ob71"]
 ob0x = ["zdc"] # insecure, not authenticated
 ob1x = []  # insecure, authenticated
 ob2x = ["upc"]  # secure, not authenticated
-ob3x = ["ob31", "apgs", "ob32", "ob32p"]  # secure, authenticated
+ob3x = ["adgs", "apgs", "ob32", "ob32p"]  # secure, authenticated
 ob7x = ["ob70", "ob71"]  # testing
 insecure-schemes = ["ob0x", "ob1x"]
 secure-schemes = ["ob2x", "ob3x"]
 authenticated-schemes = ["ob3x"]
-deterministic-schemes = ["zdc", "ob31", "ob32"]
+deterministic-schemes = ["zdc", "adgs", "ob32"]
 probabilistic-schemes = ["upc", "apgs", "ob32p"]
 all-schemes = ["ob0x", "ob1x", "ob2x", "ob3x"]
 

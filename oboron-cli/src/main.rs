@@ -35,10 +35,10 @@ struct SchemeFlags {
     #[arg(short = '2', long, alias = "21p")]
     upc: bool,
 
-    /// Use ob31 scheme (deterministic AES-GCM-SIV)
-    #[cfg(feature = "ob31")]
+    /// Use adgs scheme (deterministic AES-GCM-SIV)
+    #[cfg(feature = "adgs")]
     #[arg(short = 'g', long, alias = "31")]
-    ob31: bool,
+    adgs: bool,
 
     /// Use apgs scheme (probabilistic AES-GCM-SIV)
     #[cfg(feature = "apgs")]
@@ -71,7 +71,7 @@ impl SchemeFlags {
     #[cfg(any(
         feature = "zdc",
         feature = "upc",
-        feature = "ob31",
+        feature = "adgs",
         feature = "apgs",
         feature = "ob32",
         feature = "ob32p",
@@ -98,10 +98,10 @@ impl SchemeFlags {
             count += 1;
             scheme = Some(Scheme::Upc);
         }
-        #[cfg(feature = "ob31")]
-        if self.ob31 {
+        #[cfg(feature = "adgs")]
+        if self.adgs {
             count += 1;
-            scheme = Some(Scheme::Ob31);
+            scheme = Some(Scheme::Adgs);
         }
         #[cfg(feature = "apgs")]
         if self.apgs {
@@ -140,7 +140,7 @@ impl SchemeFlags {
     #[cfg(any(
         feature = "zdc",
         feature = "upc",
-        feature = "ob31",
+        feature = "adgs",
         feature = "apgs",
         feature = "ob32",
         feature = "ob32p",
@@ -157,8 +157,8 @@ impl SchemeFlags {
         if self.zdc {
             return true;
         }
-        #[cfg(feature = "ob31")]
-        if self.ob31 {
+        #[cfg(feature = "adgs")]
+        if self.adgs {
             return true;
         }
         #[cfg(feature = "ob32")]
@@ -313,7 +313,7 @@ enum Commands {
         #[arg(short = 'z', long)]
         keyless: bool,
 
-        /// Format specification (e.g., "zdc:b64", "ob31:b32")
+        /// Format specification (e.g., "zdc:b64", "adgs:b32")
         /// Cannot be combined with scheme or encoding flags
         #[arg(short, long)]
         format: Option<String>,
@@ -345,7 +345,7 @@ enum Commands {
         #[arg(short = 'z', long)]
         keyless: bool,
 
-        /// Format specification (e.g., "zdc:b64", "ob31:b32")
+        /// Format specification (e.g., "zdc:b64", "adgs:b32")
         /// Cannot be combined with scheme or encoding flags
         #[arg(short, long)]
         format: Option<String>,
@@ -818,7 +818,7 @@ mod tests {
         #[cfg(not(any(
             feature = "zdc",
             feature = "upc",
-            feature = "ob31",
+            feature = "adgs",
             feature = "apgs",
             feature = "ob32",
             feature = "ob32p",
@@ -834,8 +834,8 @@ mod tests {
             zdc: false,
             #[cfg(feature = "upc")]
             upc: false,
-            #[cfg(feature = "ob31")]
-            ob31: false,
+            #[cfg(feature = "adgs")]
+            adgs: false,
             #[cfg(feature = "apgs")]
             apgs: false,
             #[cfg(feature = "ob32")]
@@ -857,7 +857,7 @@ mod tests {
         #[cfg(not(any(
             feature = "zdc",
             feature = "upc",
-            feature = "ob31",
+            feature = "adgs",
             feature = "apgs",
             feature = "ob32",
             feature = "ob32p",
@@ -873,8 +873,8 @@ mod tests {
             zdc: false,
             #[cfg(feature = "upc")]
             upc: false,
-            #[cfg(feature = "ob31")]
-            ob31: false,
+            #[cfg(feature = "adgs")]
+            adgs: false,
             #[cfg(feature = "apgs")]
             apgs: false,
             #[cfg(feature = "ob32")]
@@ -894,7 +894,7 @@ mod tests {
         #[cfg(not(any(
             feature = "zdc",
             feature = "upc",
-            feature = "ob31",
+            feature = "adgs",
             feature = "apgs",
             feature = "ob32",
             feature = "ob32p",
@@ -910,8 +910,8 @@ mod tests {
             zdc: false,
             #[cfg(feature = "upc")]
             upc: false,
-            #[cfg(feature = "ob31")]
-            ob31: false,
+            #[cfg(feature = "adgs")]
+            adgs: false,
             #[cfg(feature = "apgs")]
             apgs: false,
             #[cfg(feature = "ob32")]
@@ -960,7 +960,7 @@ mod tests {
         #[cfg(not(any(
             feature = "zdc",
             feature = "upc",
-            feature = "ob31",
+            feature = "adgs",
             feature = "apgs",
             feature = "ob32",
             feature = "ob32p",
@@ -976,8 +976,8 @@ mod tests {
             zdc: false,
             #[cfg(feature = "upc")]
             upc: false,
-            #[cfg(feature = "ob31")]
-            ob31: false,
+            #[cfg(feature = "adgs")]
+            adgs: false,
             #[cfg(feature = "apgs")]
             apgs: false,
             #[cfg(feature = "ob32")]
@@ -1014,7 +1014,7 @@ mod tests {
         #[cfg(not(any(
             feature = "zdc",
             feature = "upc",
-            feature = "ob31",
+            feature = "adgs",
             feature = "apgs",
             feature = "ob32",
             feature = "ob32p",
@@ -1030,8 +1030,8 @@ mod tests {
             zdc: false,
             #[cfg(feature = "upc")]
             upc: false,
-            #[cfg(feature = "ob31")]
-            ob31: false,
+            #[cfg(feature = "adgs")]
+            adgs: false,
             #[cfg(feature = "apgs")]
             apgs: false,
             #[cfg(feature = "ob32")]
@@ -1069,7 +1069,7 @@ mod tests {
         #[cfg(not(any(
             feature = "zdc",
             feature = "upc",
-            feature = "ob31",
+            feature = "adgs",
             feature = "apgs",
             feature = "ob32",
             feature = "ob32p",
@@ -1085,8 +1085,8 @@ mod tests {
             zdc: false,
             #[cfg(feature = "upc")]
             upc: false,
-            #[cfg(feature = "ob31")]
-            ob31: false,
+            #[cfg(feature = "adgs")]
+            adgs: false,
             #[cfg(feature = "apgs")]
             apgs: false,
             #[cfg(feature = "ob32")]
@@ -1131,7 +1131,7 @@ mod tests {
         #[cfg(not(any(
             feature = "zdc",
             feature = "upc",
-            feature = "ob31",
+            feature = "adgs",
             feature = "apgs",
             feature = "ob32",
             feature = "ob32p",
@@ -1147,8 +1147,8 @@ mod tests {
             zdc: false,
             #[cfg(feature = "upc")]
             upc: false,
-            #[cfg(feature = "ob31")]
-            ob31: false,
+            #[cfg(feature = "adgs")]
+            adgs: false,
             #[cfg(feature = "apgs")]
             apgs: false,
             #[cfg(feature = "ob32")]
@@ -1186,7 +1186,7 @@ mod tests {
         #[cfg(not(any(
             feature = "zdc",
             feature = "upc",
-            feature = "ob31",
+            feature = "adgs",
             feature = "apgs",
             feature = "ob32",
             feature = "ob32p",
@@ -1202,8 +1202,8 @@ mod tests {
             zdc: false,
             #[cfg(feature = "upc")]
             upc: false,
-            #[cfg(feature = "ob31")]
-            ob31: false,
+            #[cfg(feature = "adgs")]
+            adgs: false,
             #[cfg(feature = "apgs")]
             apgs: false,
             #[cfg(feature = "ob32")]

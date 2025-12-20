@@ -1,7 +1,7 @@
 """Format string constants for Oboron. 
 
 All constants follow the pattern:  {SCHEME}_{ENCODING}
-- Schemes: ZDC, UPC, OB31, APGS, OB32, OB32P, OB70, OB71, OB00 (legacy)
+- Schemes: ZDC, UPC, ADGS, APGS, OB32, OB32P, OB70, OB71, OB00 (legacy)
 - Encodings: C32 (Base32Crockford), B32 (Base32Rfc), B64 (Base64), HEX
 
 Example:
@@ -24,11 +24,11 @@ UPC_B32: str = "upc:b32"
 UPC_B64: str = "upc:b64"
 UPC_HEX: str = "upc:hex"
 
-# ob31 - AES-GCM-SIV (deterministic, secure and authenticated)
-OB31_C32: str = "ob31:c32"
-OB31_B32: str = "ob31:b32"
-OB31_B64: str = "ob31:b64"
-OB31_HEX: str = "ob31:hex"
+# adgs - AES-GCM-SIV (deterministic, secure and authenticated)
+ADGS_C32: str = "adgs:c32"
+ADGS_B32: str = "adgs:b32"
+ADGS_B64: str = "adgs:b64"
+ADGS_HEX: str = "adgs:hex"
 
 # apgs - AES-GCM-SIV (probabilistic, secure and authenticated)
 APGS_C32: str = "apgs:c32"
@@ -70,8 +70,8 @@ __all__ = [
     "ZDC_C32", "ZDC_B32", "ZDC_B64", "ZDC_HEX",
     # upc
     "UPC_C32", "UPC_B32", "UPC_B64", "UPC_HEX",
-    # ob31
-    "OB31_C32", "OB31_B32", "OB31_B64", "OB31_HEX",
+    # adgs
+    "ADGS_C32", "ADGS_B32", "ADGS_B64", "ADGS_HEX",
     # apgs
     "APGS_C32", "APGS_B32", "APGS_B64", "APGS_HEX",
     # ob32

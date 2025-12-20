@@ -1,5 +1,5 @@
-#[cfg(feature = "ob31")]
-use oboron::Ob31Base64;
+#[cfg(feature = "adgs")]
+use oboron::AdgsB64;
 #[cfg(feature = "upc")]
 use oboron::UpcB64;
 #[cfg(feature = "zdc")]
@@ -170,7 +170,7 @@ fn test_ob32p_all_encodings() {
 #[test]
 #[cfg(feature = "zdc")]
 #[cfg(feature = "upc")]
-#[cfg(feature = "ob31")]
+#[cfg(feature = "adgs")]
 #[cfg(feature = "apgs")]
 #[cfg(feature = "ob32")]
 #[cfg(feature = "ob32p")]
@@ -184,7 +184,7 @@ fn test_obflex_basic() {
     for scheme in &[
         Scheme::Zdc,
         Scheme::Upc,
-        Scheme::Ob31,
+        Scheme::Adgs,
         Scheme::Apgs,
         Scheme::Ob32,
         Scheme::Ob32p,
@@ -208,7 +208,7 @@ fn test_obflex_basic() {
 #[test]
 #[cfg(feature = "zdc")]
 #[cfg(feature = "upc")]
-#[cfg(feature = "ob31")]
+#[cfg(feature = "adgs")]
 #[cfg(feature = "apgs")]
 #[cfg(feature = "ob32")]
 #[cfg(feature = "ob32p")]
@@ -225,9 +225,9 @@ fn test_obflex_all_formats() {
         "upc:c32",
         "upc:b64",
         "upc:hex",
-        "ob31:c32",
-        "ob31:b64",
-        "ob31:hex",
+        "adgs:c32",
+        "adgs:b64",
+        "adgs:hex",
         "apgs:c32",
         "apgs:b64",
         "apgs:hex",
@@ -257,10 +257,10 @@ fn test_obflex_all_formats() {
 }
 
 #[test]
-#[cfg(feature = "ob31")]
+#[cfg(feature = "adgs")]
 fn test_obflex_encoding_changes() {
     let key = [0u8; 64];
-    let mut ob = ObFlex::from_bytes("ob31:c32", &key).expect("Failed to create ObFlex");
+    let mut ob = ObFlex::from_bytes("adgs:c32", &key).expect("Failed to create ObFlex");
 
     let plaintext = "Testing encoding changes";
 
@@ -394,23 +394,23 @@ fn test_all_schemes_long_string() {
 }
 
 #[test]
-#[cfg(feature = "ob31")]
+#[cfg(feature = "adgs")]
 #[cfg(feature = "ob32")]
 fn test_cross_scheme_decoding_should_fail() {
     let key = [0u8; 64];
     let plaintext = "Test cross-scheme decoding";
 
-    // Encode with ob31
-    let ob31 = Ob31Base64::from_bytes(&key).expect("Failed to create ob31");
-    let encd_ob31 = ob31.enc(plaintext).expect("Failed to enc with ob31");
+    // Encode with adgs
+    let adgs = AdgsB64::from_bytes(&key).expect("Failed to create adgs");
+    let encd_adgs = adgs.enc(plaintext).expect("Failed to enc with adgs");
 
     // Try to dec with ob32 using dec_strict (should fail)
     let ob32 = Ob32Base64::from_bytes(&key).expect("Failed to create ob32");
-    let result = ob32.dec_strict(&encd_ob31);
+    let result = ob32.dec_strict(&encd_adgs);
 
     assert!(
         result.is_err(),
-        "dec_strict should fail when decoding ob31 ciphertext with ob32 decr"
+        "dec_strict should fail when decoding adgs ciphertext with ob32 decr"
     );
 
     eprintln!("✓ Cross-scheme decoding failure test passed");
@@ -475,7 +475,7 @@ fn test_probabilistic_schemes_uniqueness() {
 
 #[test]
 #[cfg(feature = "zdc")]
-#[cfg(feature = "ob31")]
+#[cfg(feature = "adgs")]
 #[cfg(feature = "ob32")]
 fn test_deterministic_schemes_consistency() {
     let key = [0u8; 64];
@@ -490,12 +490,12 @@ fn test_deterministic_schemes_consistency() {
         assert_eq!(encd, first, "ZdcB64 should produce identical obtexts");
     }
 
-    // Test Ob31
-    let ob31 = Ob31Base64::from_bytes(&key).expect("Failed to create ob31");
-    let first = ob31.enc(plaintext).expect("Failed to enc with ob31");
+    // Test Adgs
+    let adgs = AdgsB64::from_bytes(&key).expect("Failed to create adgs");
+    let first = adgs.enc(plaintext).expect("Failed to enc with adgs");
     for _ in 0..iterations {
-        let encd = ob31.enc(plaintext).expect("Failed to enc with ob31");
-        assert_eq!(encd, first, "Ob31 should produce identical obtexts");
+        let encd = adgs.enc(plaintext).expect("Failed to enc with adgs");
+        assert_eq!(encd, first, "Adgs should produce identical obtexts");
     }
 
     // Test Ob32

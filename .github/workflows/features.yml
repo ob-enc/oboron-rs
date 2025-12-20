@@ -18,7 +18,7 @@ jobs:
           - ob00
           - zdc
           - upc
-          - ob31
+          - adgs
           - apgs
           - ob32
           - ob32p
@@ -81,11 +81,11 @@ jobs:
       matrix:
         include:
           - name: "deterministic only"
-            features: "zdc,ob31,ob32"
+            features: "zdc,adgs,ob32"
           - name: "probabilistic only"
             features: "upc,apgs,ob32p"
           - name: "modern schemes"
-            features: "ob31,ob32"
+            features: "adgs,ob32"
           - name: "ob32 only"
             features: "ob32,keyless"
     steps:

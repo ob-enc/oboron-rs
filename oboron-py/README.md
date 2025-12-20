@@ -99,7 +99,7 @@ Formats are represented by compact identifiers: `{scheme}:{encoding}`,
 for example:
 - `zdc:c32` - zdc scheme, Crockford base32 encoding
 - `upc:b32` - upc scheme, standard RFC 4648 base32 encoding
-- `ob31:hex` - ob31 scheme, hex encoding
+- `adgs:hex` - adgs scheme, hex encoding
 - `ob32p:b64` - ob32p scheme (`p`=probabilistic), base64 encoding
 
 A format thus defines the complete transformation, specifying not just
@@ -155,7 +155,7 @@ odd = authenticated.
 | :------ | :---------- | :------------- | :------------- | :---- |
 | `zdc`  | AES-CBC     | Yes            | No             | Legacy; uses constant IV. Prioritizes determinism and performance over security. |
 | `upc` | AES-CBC     | No             | No             |       |
-| `ob31`  | AES-GCM-SIV | Yes            | Yes            |       |
+| `adgs`  | AES-GCM-SIV | Yes            | Yes            |       |
 | `apgs` | AES-GCM-SIV | No             | Yes            |       |
 | `ob32`  | AES-SIV     | Yes            | Yes            |       |
 | `ob32p` | AES-SIV     | No             | Yes            |       |
@@ -186,7 +186,7 @@ the following:
   **Use `zdc` only for** maximum compactness and strong prefix entropy
   in non-security-critical contexts (e.g., development or obfuscation).
   For sensitive data, **always use authenticated schemes** (ob3x tier:
-  ob31 or ob32).
+  adgs or ob32).
 
 We reiterate that the first digit in the scheme is a critically important
 one (see [Scheme Tiers](#scheme-tiers) above):
@@ -353,7 +353,7 @@ The master-key is partitioned into algorithm-specific keys in the
 following way:
 - `zdc`, `upc`: use the first 16 bytes (128 bits) for AES key
 - `zdc`: uses the second 16 bytes for IV
-- `ob31`, `apgs`: use the last 32 bytes (256 bits) for AES-GCM-SIV key
+- `adgs`, `apgs`: use the last 32 bytes (256 bits) for AES-GCM-SIV key
 - `ob32`, `ob32p`: use the full 64 bytes (512 bits) for AES-SIV key
 
 The master key never leaves your application. Algorithm-specific keys
@@ -727,14 +727,14 @@ jwt.encode(claims, 'a', algorithm="HS256")  # works fine
 import os
 import json
 import datetime
-from oboron import Ob31Base64  # Deterministic, authenticated scheme
+from oboron import AdgsB64  # Deterministic, authenticated scheme
 
 # Same 86 base64 characters format used for all agorithms
 # Each algorithm gets proper length cryptographic key
 # (e.g. 256-bit key for AES-GCM-SIV)
 key = os.environ.get("OBORON_KEY")
 
-ob = Ob31Base64(key)
+ob = AdgsB64(key)
 
 claims = {
     "user_id": 123,
@@ -807,7 +807,7 @@ full_id = ob.enc(f"user:alice")
   - Strong obfuscation where attackers have no context of Oboron use
 
 Possible security tightening if reversibility is needed:
-- Use `ob31` or `ob32` for strong 256-bit tamper-proof encryption.
+- Use `adgs` or `ob32` for strong 256-bit tamper-proof encryption.
   (Trade-off: longer output: 44 chars; 2-3x slower than `zdc` but still
   comparable performance to SHA256)
 - Keep the payload securely encrypted by having a shared secret:
@@ -902,12 +902,12 @@ assert pt2 == "hello"
 ```
 
 Available types include all combinations of scheme variants (e.g.,
-`Zdc`, `Upc`, `Ob31`, `Apgs`, `Ob32`, `Ob32p`) with encoding
+`Zdc`, `Upc`, `Adgs`, `Apgs`, `Ob32`, `Ob32p`) with encoding
 specifications (`Base64`, `Hex`, `Base32Rfc`, or `Base32Crockford`),
 and concatenates the two in class names, for example:
 - `ZdcB32` - encoder for `zdc:b32` format
 - `UpcHex` - encoder for `upc:hex` format
-- `Ob31Base64` - encoder for `ob31:b64` format
+- `AdgsB64` - encoder for `adgs:b64` format
 - `Ob32Base32Crockford = Ob32` - encoder for `ob32:c32` format.
 
 ### 2. Runtime Format Selection (`Ob`)
@@ -924,8 +924,8 @@ assert pt2 == "hello"
 ob.set_encoding("c32")  # switch format to ob32:c32
 ob.enc("hello")  # now ob32:c32-encoded obtext
 
-ob.set_scheme("ob31")  # switch wormat to ob31:c32
-ob.enc("hello")  # now ob31:c32-encoded obtext
+ob.set_scheme("adgs")  # switch wormat to adgs:c32
+ob.enc("hello")  # now adgs:c32-encoded obtext
 
 ob.set_format("upc:b64")
 ob.enc("hello")  # now upc:b64-encoded obtext
@@ -989,7 +989,7 @@ ot_hex = obm.enc("data", formats.OB32_HEX)
 Available constants:
 - `ZDC_C32`, `ZDC_B32`, `ZDC_B64`, `ZDC_HEX`
 - `UPC_C32`, `UPC_B32`, `UPC_B64`, `UPC_HEX`
-- `OB31_C32`, `OB31_B32`, `OB31_B64`, `OB31_HEX`
+- `ADGS_C32`, `ADGS_B32`, `ADGS_B64`, `ADGS_HEX`
 - `APGS_C32`, `APGS_B32`, `APGS_B64`, `APGS_HEX`
 - `OB32_C32`, `OB32_B32`, `OB32_B64`, `OB32_HEX`
 - `OB32P_C32`, `OB32P_B32`, `OB32P_B64`, `OB32P_HEX`
@@ -1029,7 +1029,7 @@ Properties:
 ### Working with Keys
 
 ```python
-ob = Ob31Base64(os.environ.get("OBORON_KEY")) # base64 key
+ob = AdgsB64(os.environ.get("OBORON_KEY")) # base64 key
 ```
 
 **Warning**: `new_keyless()` uses the publicly available hardcoded key
@@ -1037,7 +1037,7 @@ providing no security. Use only for testing or obfuscation contexts where
 encryption is not required.
 
 ```python
-ob = Ob31Base64(keyless=True)  # hardcoded key
+ob = AdgsB64(keyless=True)  # hardcoded key
 ```
 
 
@@ -1085,7 +1085,7 @@ group.)
 |--------|----------|----:|----:|----:|----:|----:|----:|-----:|-----:|
 | ob70   | b32/c32  | 8   | 15  | 21  | 28  | 40  | 53  | 104  | 207  |
 | zdc   | b32/c32  | 28  | 28  | 28  | 28  | 53  | 53  | 104  | 207  |
-| ob31   | b32/c32  | 34  | 40  | 47  | 53  | 66  | 79  | 130  | 232  |
+| adgs   | b32/c32  | 34  | 40  | 47  | 53  | 66  | 79  | 130  | 232  |
 | ob32   | b32/c32  | 34  | 40  | 47  | 53  | 66  | 79  | 130  | 232  |
 | upc  | b32/c32  | 53  | 53  | 53  | 53  | 79  | 79  | 130  | 232  |
 | apgs  | b32/c32  | 53  | 60  | 66  | 72  | 85  | 98  | 149  | 252  |
@@ -1097,7 +1097,7 @@ group.)
 |--------|----------|----:|----:|----:|----:|----:|----:|-----:|-----:|
 | ob70   | b64      | 7   | 12  | 18  | 23  | 34  | 44  | 87   | 172  |
 | zdc   | b64      | 23  | 23  | 23  | 23  | 44  | 44  | 87   | 172  |
-| ob31   | b64      | 28  | 34  | 39  | 44  | 55  | 66  | 108  | 194  |
+| adgs   | b64      | 28  | 34  | 39  | 44  | 55  | 66  | 108  | 194  |
 | ob32   | b64      | 28  | 34  | 39  | 44  | 55  | 66  | 108  | 194  |
 | upc  | b64      | 44  | 44  | 44  | 44  | 66  | 66  | 108  | 215  |
 | apgs  | b64      | 40  | 50  | 55  | 60  | 71  | 82  | 124  | 210  |
@@ -1109,7 +1109,7 @@ group.)
 |--------|---------:|----:|----:|----:|----:|----:|----:|-----:|-----:|
 | ob70   | hex      | 10  | 18  | 26  | 34  | 50  | 66  | 130  | 258  |
 | zdc   | hex      | 34  | 34  | 34  | 34  | 66  | 66  | 130  | 258  |
-| ob31   | hex      | 42  | 50  | 58  | 66  | 82  | 98  | 162  | 290  |
+| adgs   | hex      | 42  | 50  | 58  | 66  | 82  | 98  | 162  | 290  |
 | ob32   | hex      | 42  | 50  | 58  | 66  | 82  | 98  | 162  | 290  |
 | upc  | hex      | 66  | 66  | 66  | 66  | 98  | 98  | 162  | 290  |
 | apgs  | hex      | 66  | 74  | 82  | 90  | 106 | 122 | 186  | 314  |

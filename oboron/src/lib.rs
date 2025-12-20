@@ -201,7 +201,7 @@
 //! # Encryption Schemes
 //!
 //! - `Zdc`: AES-CBC (deterministic)
-//! - `Ob31`: AES-GCM-SIV (deterministic)
+//! - `Adgs`: AES-GCM-SIV (deterministic)
 //! - `Ob32`: AES-SIV (deterministic, nonce-misuse resistant)
 //! - `Upc`, `Apgs`, `Ob32p`: Probabilistic variants (different output each time)
 //!
@@ -269,10 +269,10 @@ pub use error::Error;
 // Re-export from obcrypt
 pub(crate) use obcrypt::Keychain;
 
+#[cfg(feature = "adgs")]
+pub(crate) use obcrypt::{decrypt_adgs, encrypt_adgs};
 #[cfg(feature = "apgs")]
 pub(crate) use obcrypt::{decrypt_apgs, encrypt_apgs};
-#[cfg(feature = "ob31")]
-pub(crate) use obcrypt::{decrypt_ob31, encrypt_ob31};
 #[cfg(feature = "ob32")]
 pub(crate) use obcrypt::{decrypt_ob32, encrypt_ob32};
 #[cfg(feature = "ob32p")]
@@ -313,10 +313,10 @@ pub use oboron::{new, new_with_format, ObAny, Oboron};
 pub use oboron::{new_keyless, new_keyless_with_format};
 
 // Conditionally export format string constants (scheme+encoding combinations)
+#[cfg(feature = "adgs")]
+pub use constants::{ADGS_B32, ADGS_B64, ADGS_C32, ADGS_HEX};
 #[cfg(feature = "apgs")]
 pub use constants::{APGS_B32, APGS_B64, APGS_C32, APGS_HEX};
-#[cfg(feature = "ob31")]
-pub use constants::{OB31_B32, OB31_B64, OB31_C32, OB31_HEX};
 #[cfg(feature = "ob32p")]
 pub use constants::{OB32P_B32, OB32P_B64, OB32P_C32, OB32P_HEX};
 #[cfg(feature = "ob32")]
@@ -335,10 +335,10 @@ pub use constants::{OB71_B32, OB71_B64, OB71_C32, OB71_HEX};
 pub use constants::{OB00_B32, OB00_B64, OB00_C32, OB00_HEX};
 
 // Conditionally export format-specific structs (scheme+encoding combinations)
+#[cfg(feature = "adgs")]
+pub use oboron::{AdgsB32, AdgsB64, AdgsC32, AdgsHex};
 #[cfg(feature = "apgs")]
 pub use oboron::{ApgsB32, ApgsB64, ApgsC32, ApgsHex};
-#[cfg(feature = "ob31")]
-pub use oboron::{Ob31Base32Crockford, Ob31Base32Rfc, Ob31Base64, Ob31Hex};
 #[cfg(feature = "ob32")]
 pub use oboron::{Ob32Base32Crockford, Ob32Base32Rfc, Ob32Base64, Ob32Hex};
 #[cfg(feature = "ob32p")]
@@ -361,8 +361,8 @@ pub use legacy::{Ob00Base32Crockford, Ob00Base32Rfc, Ob00Base64, Ob00Hex};
 pub type Zdc = ZdcC32;
 #[cfg(feature = "upc")]
 pub type Upc = UpcC32;
-#[cfg(feature = "ob31")]
-pub type Ob31 = Ob31Base32Crockford;
+#[cfg(feature = "adgs")]
+pub type Adgs = AdgsC32;
 #[cfg(feature = "apgs")]
 pub type Apgs = ApgsC32;
 #[cfg(feature = "ob32")]

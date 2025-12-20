@@ -29,9 +29,9 @@ pub const UPC_BYTE: u8 = 0x23;
 
 // Tier ob3x - Secure, authenticated
 // ---------------------------------
-// ob31: tier=3 (011), scheme=1 (0001), probabilistic=0 -> 01100010 = 0x62 (decimal: 98)
-#[cfg(feature = "ob31")]
-pub const OB31_BYTE: u8 = 0x62;
+// adgs: tier=3 (011), scheme=1 (0001), probabilistic=0 -> 01100010 = 0x62 (decimal: 98)
+#[cfg(feature = "adgs")]
+pub const ADGS_BYTE: u8 = 0x62;
 
 // apgs: tier=3 (011), scheme=1 (0001), probabilistic=1 -> 01100011 = 0x63 (decimal: 99)
 #[cfg(feature = "apgs")]
@@ -76,8 +76,8 @@ pub const REVERSED_SCHEME_BYTES: &[u8] = get_reversed_schemes();
 pub const ZDC_C32: &str = "zdc:c32";
 #[cfg(feature = "upc")]
 pub const UPC_C32: &str = "upc:c32";
-#[cfg(feature = "ob31")]
-pub const OB31_C32: &str = "ob31:c32";
+#[cfg(feature = "adgs")]
+pub const ADGS_C32: &str = "adgs:c32";
 #[cfg(feature = "apgs")]
 pub const APGS_C32: &str = "apgs:c32";
 #[cfg(feature = "ob32")]
@@ -98,8 +98,8 @@ pub const OB00_C32: &str = "ob00:c32";
 pub const ZDC_B32: &str = "zdc:b32";
 #[cfg(feature = "upc")]
 pub const UPC_B32: &str = "upc:b32";
-#[cfg(feature = "ob31")]
-pub const OB31_B32: &str = "ob31:b32";
+#[cfg(feature = "adgs")]
+pub const ADGS_B32: &str = "adgs:b32";
 #[cfg(feature = "apgs")]
 pub const APGS_B32: &str = "apgs:b32";
 #[cfg(feature = "ob32")]
@@ -120,8 +120,8 @@ pub const OB00_B32: &str = "ob00:b32";
 pub const ZDC_B64: &str = "zdc:b64";
 #[cfg(feature = "upc")]
 pub const UPC_B64: &str = "upc:b64";
-#[cfg(feature = "ob31")]
-pub const OB31_B64: &str = "ob31:b64";
+#[cfg(feature = "adgs")]
+pub const ADGS_B64: &str = "adgs:b64";
 #[cfg(feature = "apgs")]
 pub const APGS_B64: &str = "apgs:b64";
 #[cfg(feature = "ob32")]
@@ -142,8 +142,8 @@ pub const OB00_B64: &str = "ob00:b64";
 pub const ZDC_HEX: &str = "zdc:hex";
 #[cfg(feature = "upc")]
 pub const UPC_HEX: &str = "upc:hex";
-#[cfg(feature = "ob31")]
-pub const OB31_HEX: &str = "ob31:hex";
+#[cfg(feature = "adgs")]
+pub const ADGS_HEX: &str = "adgs:hex";
 #[cfg(feature = "apgs")]
 pub const APGS_HEX: &str = "apgs:hex";
 #[cfg(feature = "ob32")]

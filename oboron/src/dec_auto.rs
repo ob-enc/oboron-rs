@@ -5,10 +5,10 @@ use crate::{Format, Scheme};
 // Always available
 use crate::constants::REVERSED_SCHEME_BYTES;
 
+#[cfg(feature = "adgs")]
+use crate::{constants::ADGS_BYTE, decrypt_adgs};
 #[cfg(feature = "apgs")]
 use crate::{constants::APGS_BYTE, decrypt_apgs};
-#[cfg(feature = "ob31")]
-use crate::{constants::OB31_BYTE, decrypt_ob31};
 #[cfg(feature = "ob32p")]
 use crate::{constants::OB32P_BYTE, decrypt_ob32p};
 #[cfg(feature = "ob32")]
@@ -71,8 +71,8 @@ pub fn dec_any_scheme(
         ZDC_BYTE => decrypt_zdc(keychain, &buffer)?,
         #[cfg(feature = "upc")]
         UPC_BYTE => decrypt_upc(keychain, &buffer)?,
-        #[cfg(feature = "ob31")]
-        OB31_BYTE => decrypt_ob31(keychain, &buffer)?,
+        #[cfg(feature = "adgs")]
+        ADGS_BYTE => decrypt_adgs(keychain, &buffer)?,
         #[cfg(feature = "apgs")]
         APGS_BYTE => decrypt_apgs(keychain, &buffer)?,
         #[cfg(feature = "ob32")]

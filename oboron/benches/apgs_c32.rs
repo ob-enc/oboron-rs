@@ -1,5 +1,5 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use oboron::{Ob31p, Oboron};
+use oboron::{ApgsC32, Oboron};
 use serde::Deserialize;
 use std::fs;
 use std::path::PathBuf;
@@ -60,7 +60,7 @@ fn run_apgs_c32_benchmarks(c: &mut Criterion) {
     }
 
     // Create ob once, OUTSIDE the timed loop
-    let ob = Ob31p::new_keyless().unwrap();
+    let ob = ApgsC32::new_keyless().unwrap();
 
     let mut bench_count = 0;
     for spec in specs {

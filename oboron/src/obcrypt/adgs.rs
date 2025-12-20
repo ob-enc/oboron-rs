@@ -1,4 +1,4 @@
-#![cfg(feature = "ob31")]
+#![cfg(feature = "adgs")]
 use super::keychain::Keychain;
 use crate::Error;
 use aes_gcm_siv::{
@@ -8,7 +8,7 @@ use aes_gcm_siv::{
 
 const NONCE_SIZE: usize = 12;
 
-/// Encrypt plaintext bytes using deterministic AES-GCM-SIV (ob31 scheme).
+/// Encrypt plaintext bytes using deterministic AES-GCM-SIV (adgs scheme).
 /// Returns raw ciphertext bytes with authentication tag (deterministic with zero nonce).
 pub fn encrypt(keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
     if plaintext_bytes.is_empty() {
@@ -29,7 +29,7 @@ pub fn encrypt(keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, E
     Ok(ciphertext)
 }
 
-/// Decrypt ciphertext using deterministic AES-GCM-SIV (ob31 scheme).
+/// Decrypt ciphertext using deterministic AES-GCM-SIV (adgs scheme).
 /// Returns plaintext bytes after authentication verification.
 pub fn decrypt(keychain: &Keychain, data: &[u8]) -> Result<Vec<u8>, Error> {
     // Minimum: 1 byte plaintext + 16 byte tag = 17 bytes

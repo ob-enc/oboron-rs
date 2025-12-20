@@ -121,7 +121,7 @@ macro_rules! impl_cipher_class {
             /// Get the current format string.
             ///
             /// Returns:
-            ///     Format string like "zdc:c32", "zdc:b32", "ob31:b64", etc.
+            ///     Format string like "zdc:c32", "zdc:b32", "adgs:b64", etc.
             #[getter]
             fn format(&self) -> String {
                 format!("{}", self.inner.format())
@@ -184,31 +184,31 @@ impl_cipher_class!(
     "Upc cipher with Hex encoding (Probabilistic AES-CBC)"
 );
 
-// Ob31 variants
+// Adgs variants
 // -------------
-#[cfg(feature = "ob31")]
+#[cfg(feature = "adgs")]
 impl_cipher_class!(
-    Ob31Base32Crockford,
-    ::oboron::Ob31Base32Crockford,
-    "Ob31 cipher with Base32Crockford encoding (AES-GCM-SIV, deterministic)"
+    AdgsC32,
+    ::oboron::AdgsC32,
+    "Adgs cipher with Base32Crockford encoding (AES-GCM-SIV, deterministic)"
 );
-#[cfg(feature = "ob31")]
+#[cfg(feature = "adgs")]
 impl_cipher_class!(
-    Ob31Base32Rfc,
-    ::oboron::Ob31Base32Rfc,
-    "Ob31 cipher with Base32Rfc encoding (AES-GCM-SIV, deterministic)"
+    AdgsB32,
+    ::oboron::AdgsB32,
+    "Adgs cipher with Base32Rfc encoding (AES-GCM-SIV, deterministic)"
 );
-#[cfg(feature = "ob31")]
+#[cfg(feature = "adgs")]
 impl_cipher_class!(
-    Ob31Base64,
-    ::oboron::Ob31Base64,
-    "Ob31 cipher with Base64 encoding (AES-GCM-SIV, deterministic)"
+    AdgsB64,
+    ::oboron::AdgsB64,
+    "Adgs cipher with Base64 encoding (AES-GCM-SIV, deterministic)"
 );
-#[cfg(feature = "ob31")]
+#[cfg(feature = "adgs")]
 impl_cipher_class!(
-    Ob31Hex,
-    ::oboron::Ob31Hex,
-    "Ob31 cipher with Hex encoding (AES-GCM-SIV, deterministic)"
+    AdgsHex,
+    ::oboron::AdgsHex,
+    "Adgs cipher with Hex encoding (AES-GCM-SIV, deterministic)"
 );
 
 // Apgs variants
@@ -348,7 +348,7 @@ impl_cipher_class!(
     ::oboron::Ob00Base32Crockford,
     "Ob00 cipher with Base32Crockford encoding (LEGACY AES-CBC with custom padding)\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
-     For new projects, use Zdc or more secure schemes like Ob31/Ob32."
+     For new projects, use Zdc or more secure schemes like Adgs/Ob32."
 );
 #[cfg(feature = "ob00")]
 impl_cipher_class!(
@@ -356,7 +356,7 @@ impl_cipher_class!(
     ::oboron::Ob00Base32Rfc,
     "Ob00 cipher with Base32Rfc encoding (LEGACY AES-CBC with custom padding)\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
-     For new projects, use Zdc or more secure schemes like Ob31/Ob32."
+     For new projects, use Zdc or more secure schemes like Adgs/Ob32."
 );
 #[cfg(feature = "ob00")]
 impl_cipher_class!(
@@ -364,7 +364,7 @@ impl_cipher_class!(
     ::oboron::Ob00Base64,
     "Ob00 cipher with Base64 encoding (LEGACY AES-CBC with custom padding)\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
-     For new projects, use Zdc or more secure schemes like Ob31/Ob32."
+     For new projects, use Zdc or more secure schemes like Adgs/Ob32."
 );
 #[cfg(feature = "ob00")]
 impl_cipher_class!(
@@ -372,7 +372,7 @@ impl_cipher_class!(
     ::oboron::Ob00Hex,
     "Ob00 cipher with Hex encoding (LEGACY AES-CBC with custom padding)\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
-     For new projects, use Zdc or more secure schemes like Ob31/Ob32."
+     For new projects, use Zdc or more secure schemes like Adgs/Ob32."
 );
 
 /// Ob - Flexible cipher with runtime format selection.   
@@ -392,7 +392,7 @@ impl Ob {
     /// Create a new Ob instance.
     ///
     /// Args:
-    ///     format: Format string like "zdc:c32", "zdc:b32", "ob31:b64", "ob32p:hex", etc.
+    ///     format: Format string like "zdc:c32", "zdc:b32", "adgs:b64", "ob32p:hex", etc.
     ///     key:     86-character base64 string key (512 bits). Optional if keyless=True.
     ///     keyless: If True, uses the hardcoded key (testing only, NOT SECURE).
     ///
@@ -467,7 +467,7 @@ impl Ob {
     /// Change the format (scheme + encoding).   
     ///
     /// Args:
-    ///     format: Format string like "zdc:c32", "zdc:b32", "ob31:b64", "ob32p:hex", etc.
+    ///     format: Format string like "zdc:c32", "zdc:b32", "adgs:b64", "ob32p:hex", etc.
     ///
     /// Raises:
     ///     ValueError: If format is invalid.
@@ -480,7 +480,7 @@ impl Ob {
     /// Change the scheme while keeping the current encoding.
     ///
     /// Args:
-    ///     scheme: Scheme name like "Zdc", "Ob31", "Ob32p", etc.  
+    ///     scheme: Scheme name like "Zdc", "Adgs", "Ob32p", etc.  
     ///
     /// Raises:
     ///     ValueError: If scheme is invalid.
@@ -511,7 +511,7 @@ impl Ob {
     /// Get the current format string.
     ///
     /// Returns:
-    ///     Format string like "zdc:c32", "zdc:b32", "ob31:b64", etc.
+    ///     Format string like "zdc:c32", "zdc:b32", "adgs:b64", etc.
     #[getter]
     fn format(&self) -> String {
         format!("{}", self.inner.format())
@@ -596,7 +596,7 @@ impl ObMulti {
     ///
     /// Args:
     ///     plaintext: The plaintext string to encrypt+encode.
-    ///     format: Format string like "zdc:c32", "zdc:b32", "ob31:b64", "ob32p:hex", etc.
+    ///     format: Format string like "zdc:c32", "zdc:b32", "adgs:b64", "ob32p:hex", etc.
     ///
     /// Returns:
     ///     The obtext string.
@@ -613,7 +613,7 @@ impl ObMulti {
     ///
     /// Args:
     ///     obtext: The encrypted+encoded string to decode+decrypt.  
-    ///     format: Format string like "zdc:c32", "zdc:b32", "ob31:b64", "ob32p:hex", etc.
+    ///     format: Format string like "zdc:c32", "zdc:b32", "adgs:b64", "ob32p:hex", etc.
     ///
     /// Returns:
     ///     The decoded+decrypted plaintext string.
@@ -629,7 +629,7 @@ impl ObMulti {
     /// Decode+decrypt with automatic scheme and encoding detection.
     ///
     /// This is the only decoder that can automatically detect both the scheme
-    /// (zdc, ob31, etc.) AND the encoding (base32, base64, hex).   
+    /// (zdc, adgs, etc.) AND the encoding (base32, base64, hex).   
     ///
     /// Args:
     ///     obtext: The encrypted+encoded string to decode+decrypt.
@@ -685,7 +685,7 @@ fn generate_key_bytes(py: Python) -> PyResult<Py<PyBytes>> {
 ///
 /// Args:
 ///     plaintext: The plaintext string to encode.
-///     format: Format string like "zdc:b32", "ob31:b64", "ob32p:hex", etc.
+///     format: Format string like "zdc:b32", "adgs:b64", "ob32p:hex", etc.
 ///     key:     86-character base64 string key (512 bits).
 ///
 /// Returns:
@@ -703,7 +703,7 @@ fn enc(plaintext: &str, format: &str, key: &str) -> PyResult<String> {
 ///
 /// Args:
 ///     plaintext: The plaintext string to encrypt+encode.
-///     format: Format string like "zdc:b32", "ob31:b64", "ob32p:hex", etc.
+///     format: Format string like "zdc:b32", "adgs:b64", "ob32p:hex", etc.
 ///
 /// Returns:
 ///     The obtext string.
@@ -721,7 +721,7 @@ fn enc_keyless(plaintext: &str, format: &str) -> PyResult<String> {
 ///
 /// Args:
 ///     obtext: The encrypted+encoded string to decode+decrypt
-///     format: Format string like "zdc:b32", "ob31:b64", "ob32p:hex", etc.
+///     format: Format string like "zdc:b32", "adgs:b64", "ob32p:hex", etc.
 ///     key:    86-character base64 string key (512 bits).
 ///
 /// Returns:
@@ -739,7 +739,7 @@ fn dec(obtext: &str, format: &str, key: &str) -> PyResult<String> {
 ///
 /// Args:
 ///     obtext: The encrypted+encoded string to decode+decrypt.
-///     format: Format string like "zdc:b32", "ob31:b64", "ob32p:hex", etc.
+///     format: Format string like "zdc:b32", "adgs:b64", "ob32p:hex", etc.
 ///
 /// Returns:
 ///     The decoded+decrypted plaintext string.
@@ -826,13 +826,13 @@ fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m.add_class::<UpcHex>()?;
     }
 
-    // Ob31 variants
-    #[cfg(feature = "ob31")]
+    // Adgs variants
+    #[cfg(feature = "adgs")]
     {
-        m.add_class::<Ob31Base32Crockford>()?;
-        m.add_class::<Ob31Base32Rfc>()?;
-        m.add_class::<Ob31Base64>()?;
-        m.add_class::<Ob31Hex>()?;
+        m.add_class::<AdgsC32>()?;
+        m.add_class::<AdgsB32>()?;
+        m.add_class::<AdgsB64>()?;
+        m.add_class::<AdgsHex>()?;
     }
 
     // Apgs variants

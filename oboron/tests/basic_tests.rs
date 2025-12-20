@@ -1,5 +1,5 @@
-#[cfg(feature = "ob31")]
-use oboron::Ob31;
+#[cfg(feature = "adgs")]
+use oboron::Adgs;
 #[cfg(feature = "upc")]
 use oboron::UpcC32;
 #[cfg(feature = "zdc")]
@@ -51,15 +51,15 @@ fn test_convenience_functions() {
 }
 
 #[test]
-#[cfg(feature = "ob31")]
-fn test_ob31_deterministic() {
+#[cfg(feature = "adgs")]
+fn test_adgs_deterministic() {
     let original = "deterministic test";
-    let ob = Ob31::new_keyless().unwrap();
+    let ob = Adgs::new_keyless().unwrap();
 
     let ot1 = ob.enc(original).unwrap();
     let ot2 = ob.enc(original).unwrap();
 
-    // ob31 is deterministic - same input produces same output
+    // adgs is deterministic - same input produces same output
     assert_eq!(ot1, ot2);
 
     let pt2 = ob.dec_strict(&ot1).unwrap();
@@ -101,11 +101,11 @@ fn test_autodetect_all_formats() {
         let pt2 = ob.autodec(&ot).unwrap();
         assert_eq!(original, pt2, "Failed for format upc");
     }
-    #[cfg(feature = "ob31")]
+    #[cfg(feature = "adgs")]
     {
-        let ot = ob.enc(original, "ob31:c32").unwrap();
+        let ot = ob.enc(original, "adgs:c32").unwrap();
         let pt2 = ob.autodec(&ot).unwrap();
-        assert_eq!(original, pt2, "Failed for format ob31");
+        assert_eq!(original, pt2, "Failed for format adgs");
     }
     #[cfg(feature = "apgs")]
     {

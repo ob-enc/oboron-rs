@@ -174,13 +174,8 @@ macro_rules! impl_oboron {
 impl_oboron!(ZdcC32, Scheme::Zdc, Encoding::Base32Crockford, "zdc:c32");
 #[cfg(feature = "upc")]
 impl_oboron!(UpcC32, Scheme::Upc, Encoding::Base32Crockford, "upc:c32");
-#[cfg(feature = "ob31")]
-impl_oboron!(
-    Ob31Base32Crockford,
-    Scheme::Ob31,
-    Encoding::Base32Crockford,
-    "ob31:c32"
-);
+#[cfg(feature = "adgs")]
+impl_oboron!(AdgsC32, Scheme::Adgs, Encoding::Base32Crockford, "adgs:c32");
 #[cfg(feature = "apgs")]
 impl_oboron!(ApgsC32, Scheme::Apgs, Encoding::Base32Crockford, "apgs:c32");
 #[cfg(feature = "ob32")]
@@ -203,8 +198,8 @@ impl_oboron!(
 impl_oboron!(ZdcB32, Scheme::Zdc, Encoding::Base32Rfc, "zdc:b32");
 #[cfg(feature = "upc")]
 impl_oboron!(UpcB32, Scheme::Upc, Encoding::Base32Rfc, "upc:b32");
-#[cfg(feature = "ob31")]
-impl_oboron!(Ob31Base32Rfc, Scheme::Ob31, Encoding::Base32Rfc, "ob31:b32");
+#[cfg(feature = "adgs")]
+impl_oboron!(AdgsB32, Scheme::Adgs, Encoding::Base32Rfc, "adgs:b32");
 #[cfg(feature = "apgs")]
 impl_oboron!(ApgsB32, Scheme::Apgs, Encoding::Base32Rfc, "apgs:b32");
 #[cfg(feature = "ob32")]
@@ -222,8 +217,8 @@ impl_oboron!(
 impl_oboron!(ZdcB64, Scheme::Zdc, Encoding::Base64, "zdc:b64");
 #[cfg(feature = "upc")]
 impl_oboron!(UpcB64, Scheme::Upc, Encoding::Base64, "upc:b64");
-#[cfg(feature = "ob31")]
-impl_oboron!(Ob31Base64, Scheme::Ob31, Encoding::Base64, "ob31:b64");
+#[cfg(feature = "adgs")]
+impl_oboron!(AdgsB64, Scheme::Adgs, Encoding::Base64, "adgs:b64");
 #[cfg(feature = "apgs")]
 impl_oboron!(ApgsB64, Scheme::Apgs, Encoding::Base64, "apgs:b64");
 #[cfg(feature = "ob32")]
@@ -236,8 +231,8 @@ impl_oboron!(Ob32pBase64, Scheme::Ob32p, Encoding::Base64, "ob32p:b64");
 impl_oboron!(ZdcHex, Scheme::Zdc, Encoding::Hex, "zdc:hex");
 #[cfg(feature = "upc")]
 impl_oboron!(UpcHex, Scheme::Upc, Encoding::Hex, "upc:hex");
-#[cfg(feature = "ob31")]
-impl_oboron!(Ob31Hex, Scheme::Ob31, Encoding::Hex, "ob31:hex");
+#[cfg(feature = "adgs")]
+impl_oboron!(AdgsHex, Scheme::Adgs, Encoding::Hex, "adgs:hex");
 #[cfg(feature = "apgs")]
 impl_oboron!(ApgsHex, Scheme::Apgs, Encoding::Hex, "apgs:hex");
 #[cfg(feature = "ob32")]
@@ -299,14 +294,14 @@ pub enum ObAny {
     UpcB64(UpcB64),
     #[cfg(feature = "upc")]
     UpcHex(UpcHex),
-    #[cfg(feature = "ob31")]
-    Ob31Base32Crockford(Ob31Base32Crockford),
-    #[cfg(feature = "ob31")]
-    Ob31Base32Rfc(Ob31Base32Rfc),
-    #[cfg(feature = "ob31")]
-    Ob31Base64(Ob31Base64),
-    #[cfg(feature = "ob31")]
-    Ob31Hex(Ob31Hex),
+    #[cfg(feature = "adgs")]
+    AdgsC32(AdgsC32),
+    #[cfg(feature = "adgs")]
+    AdgsB32(AdgsB32),
+    #[cfg(feature = "adgs")]
+    AdgsB64(AdgsB64),
+    #[cfg(feature = "adgs")]
+    AdgsHex(AdgsHex),
     #[cfg(feature = "apgs")]
     ApgsC32(ApgsC32),
     #[cfg(feature = "apgs")]
@@ -380,14 +375,14 @@ macro_rules! delegate_to_inner {
                 ObAny::UpcB64(ob) => ob.$method($($arg),*),
                 #[cfg(feature = "upc")]
                 ObAny::UpcHex(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "ob31")]
-                ObAny::Ob31Base32Crockford(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "ob31")]
-                ObAny::Ob31Base32Rfc(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "ob31")]
-                ObAny::Ob31Base64(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "ob31")]
-                ObAny::Ob31Hex(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "adgs")]
+                ObAny::AdgsC32(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "adgs")]
+                ObAny::AdgsB32(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "adgs")]
+                ObAny::AdgsB64(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "adgs")]
+                ObAny::AdgsHex(ob) => ob.$method($($arg),*),
                 #[cfg(feature = "apgs")]
                 ObAny::ApgsC32(ob) => ob.$method($($arg),*),
                 #[cfg(feature = "apgs")]
@@ -474,16 +469,16 @@ impl ObAny {
         #[cfg(feature = "upc")]
         #[cfg(not(any(feature = "ob70", feature = "ob71", feature = "zdc")))]
         return Ok(ObAny::UpcC32(UpcC32::new(key)?));
-        #[cfg(feature = "ob31")]
+        #[cfg(feature = "adgs")]
         #[cfg(not(any(feature = "ob70", feature = "ob71", feature = "zdc", feature = "upc")))]
-        return Ok(ObAny::Ob31Base32Crockford(Ob31Base32Crockford::new(key)?));
+        return Ok(ObAny::AdgsC32(AdgsC32::new(key)?));
         #[cfg(feature = "apgs")]
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
             feature = "zdc",
             feature = "upc",
-            feature = "ob31"
+            feature = "adgs"
         )))]
         return Ok(ObAny::ApgsC32(ApgsC32::new(key)?));
         #[cfg(feature = "ob32")]
@@ -492,7 +487,7 @@ impl ObAny {
             feature = "ob71",
             feature = "zdc",
             feature = "upc",
-            feature = "ob31",
+            feature = "adgs",
             feature = "apgs"
         )))]
         return Ok(ObAny::Ob32Base32Crockford(Ob32Base32Crockford::new(key)?));
@@ -502,7 +497,7 @@ impl ObAny {
             feature = "ob71",
             feature = "zdc",
             feature = "upc",
-            feature = "ob31",
+            feature = "adgs",
             feature = "apgs",
             feature = "ob32"
         )))]
@@ -513,7 +508,7 @@ impl ObAny {
             feature = "ob71",
             feature = "zdc",
             feature = "upc",
-            feature = "ob31",
+            feature = "adgs",
             feature = "apgs",
             feature = "ob32",
             feature = "ob32p"
@@ -524,7 +519,7 @@ impl ObAny {
             feature = "ob71",
             feature = "zdc",
             feature = "upc",
-            feature = "ob31",
+            feature = "adgs",
             feature = "apgs",
             feature = "ob32",
             feature = "ob32p",
@@ -558,9 +553,9 @@ impl ObAny {
         return Ok(ObAny::UpcC32(UpcC32 {
             keychain: Keychain::from_bytes(key_bytes)?,
         }));
-        #[cfg(feature = "ob31")]
+        #[cfg(feature = "adgs")]
         #[cfg(not(any(feature = "ob70", feature = "ob71", feature = "zdc", feature = "upc")))]
-        return Ok(ObAny::Ob31Base32Crockford(Ob31Base32Crockford {
+        return Ok(ObAny::AdgsC32(AdgsC32 {
             keychain: Keychain::from_bytes(key_bytes)?,
         }));
         #[cfg(feature = "apgs")]
@@ -569,7 +564,7 @@ impl ObAny {
             feature = "ob71",
             feature = "zdc",
             feature = "upc",
-            feature = "ob31"
+            feature = "adgs"
         )))]
         return Ok(ObAny::ApgsC32(ApgsC32 {
             keychain: Keychain::from_bytes(key_bytes)?,
@@ -580,7 +575,7 @@ impl ObAny {
             feature = "ob71",
             feature = "zdc",
             feature = "upc",
-            feature = "ob31",
+            feature = "adgs",
             feature = "apgs"
         )))]
         return Ok(ObAny::Ob32Base32Crockford(Ob32Base32Crockford {
@@ -592,7 +587,7 @@ impl ObAny {
             feature = "ob71",
             feature = "zdc",
             feature = "upc",
-            feature = "ob31",
+            feature = "adgs",
             feature = "apgs",
             feature = "ob32"
         )))]
@@ -605,7 +600,7 @@ impl ObAny {
             feature = "ob71",
             feature = "zdc",
             feature = "upc",
-            feature = "ob31",
+            feature = "adgs",
             feature = "apgs",
             feature = "ob32",
             feature = "ob32p"
@@ -618,7 +613,7 @@ impl ObAny {
             feature = "ob71",
             feature = "zdc",
             feature = "upc",
-            feature = "ob31",
+            feature = "adgs",
             feature = "apgs",
             feature = "ob32",
             feature = "ob32p",
@@ -644,18 +639,16 @@ impl ObAny {
         #[cfg(feature = "upc")]
         #[cfg(not(any(feature = "ob70", feature = "ob71", feature = "zdc")))]
         return Ok(ObAny::UpcC32(UpcC32::from_hex_key(key_hex)?));
-        #[cfg(feature = "ob31")]
+        #[cfg(feature = "adgs")]
         #[cfg(not(any(feature = "ob70", feature = "ob71", feature = "zdc", feature = "upc")))]
-        return Ok(ObAny::Ob31Base32Crockford(
-            Ob31Base32Crockford::from_hex_key(key_hex)?,
-        ));
+        return Ok(ObAny::AdgsC32(AdgsC32::from_hex_key(key_hex)?));
         #[cfg(feature = "apgs")]
         #[cfg(not(any(
             feature = "ob70",
             feature = "ob71",
             feature = "zdc",
             feature = "upc",
-            feature = "ob31"
+            feature = "adgs"
         )))]
         return Ok(ObAny::ApgsC32(ApgsC32::from_hex_key(key_hex)?));
         #[cfg(feature = "ob32")]
@@ -664,7 +657,7 @@ impl ObAny {
             feature = "ob71",
             feature = "zdc",
             feature = "upc",
-            feature = "ob31",
+            feature = "adgs",
             feature = "apgs"
         )))]
         return Ok(ObAny::Ob32Base32Crockford(
@@ -676,7 +669,7 @@ impl ObAny {
             feature = "ob71",
             feature = "zdc",
             feature = "upc",
-            feature = "ob31",
+            feature = "adgs",
             feature = "apgs",
             feature = "ob32"
         )))]
@@ -689,7 +682,7 @@ impl ObAny {
             feature = "ob71",
             feature = "zdc",
             feature = "upc",
-            feature = "ob31",
+            feature = "adgs",
             feature = "apgs",
             feature = "ob32",
             feature = "ob32p"
@@ -702,7 +695,7 @@ impl ObAny {
             feature = "ob71",
             feature = "zdc",
             feature = "upc",
-            feature = "ob31",
+            feature = "adgs",
             feature = "apgs",
             feature = "ob32",
             feature = "ob32p",
@@ -735,9 +728,9 @@ impl ObAny {
         return Ok(ObAny::UpcC32(UpcC32 {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
         }));
-        #[cfg(feature = "ob31")]
+        #[cfg(feature = "adgs")]
         #[cfg(not(any(feature = "ob70", feature = "ob71", feature = "zdc", feature = "upc")))]
-        return Ok(ObAny::Ob31Base32Crockford(Ob31Base32Crockford {
+        return Ok(ObAny::AdgsC32(AdgsC32 {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
         }));
         #[cfg(feature = "apgs")]
@@ -746,7 +739,7 @@ impl ObAny {
             feature = "ob71",
             feature = "zdc",
             feature = "upc",
-            feature = "ob31"
+            feature = "adgs"
         )))]
         return Ok(ObAny::ApgsC32(ApgsC32 {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
@@ -757,7 +750,7 @@ impl ObAny {
             feature = "ob71",
             feature = "zdc",
             feature = "upc",
-            feature = "ob31",
+            feature = "adgs",
             feature = "apgs"
         )))]
         return Ok(ObAny::Ob32Base32Crockford(Ob32Base32Crockford {
@@ -769,7 +762,7 @@ impl ObAny {
             feature = "ob71",
             feature = "zdc",
             feature = "upc",
-            feature = "ob31",
+            feature = "adgs",
             feature = "apgs",
             feature = "ob32"
         )))]
@@ -782,7 +775,7 @@ impl ObAny {
             feature = "ob71",
             feature = "zdc",
             feature = "upc",
-            feature = "ob31",
+            feature = "adgs",
             feature = "apgs",
             feature = "ob32",
             feature = "ob32p"
@@ -795,7 +788,7 @@ impl ObAny {
             feature = "ob71",
             feature = "zdc",
             feature = "upc",
-            feature = "ob31",
+            feature = "adgs",
             feature = "apgs",
             feature = "ob32",
             feature = "ob32p",
@@ -830,16 +823,14 @@ pub fn new_with_format(format: Format, key: &str) -> Result<ObAny, Error> {
         (Scheme::Upc, Encoding::Base64) => Ok(ObAny::UpcB64(UpcB64::new(key)?)),
         #[cfg(feature = "upc")]
         (Scheme::Upc, Encoding::Hex) => Ok(ObAny::UpcHex(UpcHex::new(key)?)),
-        #[cfg(feature = "ob31")]
-        (Scheme::Ob31, Encoding::Base32Crockford) => {
-            Ok(ObAny::Ob31Base32Crockford(Ob31Base32Crockford::new(key)?))
-        }
-        #[cfg(feature = "ob31")]
-        (Scheme::Ob31, Encoding::Base32Rfc) => Ok(ObAny::Ob31Base32Rfc(Ob31Base32Rfc::new(key)?)),
-        #[cfg(feature = "ob31")]
-        (Scheme::Ob31, Encoding::Base64) => Ok(ObAny::Ob31Base64(Ob31Base64::new(key)?)),
-        #[cfg(feature = "ob31")]
-        (Scheme::Ob31, Encoding::Hex) => Ok(ObAny::Ob31Hex(Ob31Hex::new(key)?)),
+        #[cfg(feature = "adgs")]
+        (Scheme::Adgs, Encoding::Base32Crockford) => Ok(ObAny::AdgsC32(AdgsC32::new(key)?)),
+        #[cfg(feature = "adgs")]
+        (Scheme::Adgs, Encoding::Base32Rfc) => Ok(ObAny::AdgsB32(AdgsB32::new(key)?)),
+        #[cfg(feature = "adgs")]
+        (Scheme::Adgs, Encoding::Base64) => Ok(ObAny::AdgsB64(AdgsB64::new(key)?)),
+        #[cfg(feature = "adgs")]
+        (Scheme::Adgs, Encoding::Hex) => Ok(ObAny::AdgsHex(AdgsHex::new(key)?)),
         #[cfg(feature = "apgs")]
         (Scheme::Apgs, Encoding::Base32Crockford) => Ok(ObAny::ApgsC32(ApgsC32::new(key)?)),
         #[cfg(feature = "apgs")]
@@ -938,21 +929,21 @@ fn from_bytes_with_format_internal(format: Format, key_bytes: &[u8; 64]) -> Resu
         }
         #[cfg(feature = "upc")]
         (Scheme::Upc, Encoding::Hex) => Ok(ObAny::UpcHex(UpcHex::from_bytes_internal(key_bytes)?)),
-        #[cfg(feature = "ob31")]
-        (Scheme::Ob31, Encoding::Base32Crockford) => Ok(ObAny::Ob31Base32Crockford(
-            Ob31Base32Crockford::from_bytes_internal(key_bytes)?,
-        )),
-        #[cfg(feature = "ob31")]
-        (Scheme::Ob31, Encoding::Base32Rfc) => Ok(ObAny::Ob31Base32Rfc(
-            Ob31Base32Rfc::from_bytes_internal(key_bytes)?,
-        )),
-        #[cfg(feature = "ob31")]
-        (Scheme::Ob31, Encoding::Base64) => Ok(ObAny::Ob31Base64(Ob31Base64::from_bytes_internal(
-            key_bytes,
-        )?)),
-        #[cfg(feature = "ob31")]
-        (Scheme::Ob31, Encoding::Hex) => {
-            Ok(ObAny::Ob31Hex(Ob31Hex::from_bytes_internal(key_bytes)?))
+        #[cfg(feature = "adgs")]
+        (Scheme::Adgs, Encoding::Base32Crockford) => {
+            Ok(ObAny::AdgsC32(AdgsC32::from_bytes_internal(key_bytes)?))
+        }
+        #[cfg(feature = "adgs")]
+        (Scheme::Adgs, Encoding::Base32Rfc) => {
+            Ok(ObAny::AdgsB32(AdgsB32::from_bytes_internal(key_bytes)?))
+        }
+        #[cfg(feature = "adgs")]
+        (Scheme::Adgs, Encoding::Base64) => {
+            Ok(ObAny::AdgsB64(AdgsB64::from_bytes_internal(key_bytes)?))
+        }
+        #[cfg(feature = "adgs")]
+        (Scheme::Adgs, Encoding::Hex) => {
+            Ok(ObAny::AdgsHex(AdgsHex::from_bytes_internal(key_bytes)?))
         }
         #[cfg(feature = "apgs")]
         (Scheme::Apgs, Encoding::Base32Crockford) => {
@@ -1118,8 +1109,8 @@ mod tests {
             Scheme::Zdc,
             #[cfg(feature = "upc")]
             Scheme::Upc,
-            #[cfg(feature = "ob31")]
-            Scheme::Ob31,
+            #[cfg(feature = "adgs")]
+            Scheme::Adgs,
             #[cfg(feature = "apgs")]
             Scheme::Apgs,
             #[cfg(feature = "ob32")]
@@ -1189,8 +1180,8 @@ mod tests {
             Scheme::Zdc,
             #[cfg(feature = "upc")]
             Scheme::Upc,
-            #[cfg(feature = "ob31")]
-            Scheme::Ob31,
+            #[cfg(feature = "adgs")]
+            Scheme::Adgs,
             #[cfg(feature = "apgs")]
             Scheme::Apgs,
             #[cfg(feature = "ob32")]
@@ -1246,8 +1237,8 @@ mod tests {
             Scheme::Ob70,
             #[cfg(feature = "zdc")]
             Scheme::Zdc,
-            #[cfg(feature = "ob31")]
-            Scheme::Ob31,
+            #[cfg(feature = "adgs")]
+            Scheme::Adgs,
             #[cfg(feature = "ob32")]
             Scheme::Ob32,
         ];

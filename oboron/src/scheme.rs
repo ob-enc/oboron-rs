@@ -9,8 +9,8 @@ pub enum Scheme {
     Zdc,
     #[cfg(feature = "upc")]
     Upc,
-    #[cfg(feature = "ob31")]
-    Ob31,
+    #[cfg(feature = "adgs")]
+    Adgs,
     #[cfg(feature = "apgs")]
     Apgs,
     #[cfg(feature = "ob32")]
@@ -35,8 +35,8 @@ impl Scheme {
             Scheme::Zdc => "zdc",
             #[cfg(feature = "upc")]
             Scheme::Upc => "upc",
-            #[cfg(feature = "ob31")]
-            Scheme::Ob31 => "ob31",
+            #[cfg(feature = "adgs")]
+            Scheme::Adgs => "adgs",
             #[cfg(feature = "apgs")]
             Scheme::Apgs => "apgs",
             #[cfg(feature = "ob32")]
@@ -66,8 +66,8 @@ impl Scheme {
             Scheme::Zdc => true,
             #[cfg(feature = "upc")]
             Scheme::Upc => false,
-            #[cfg(feature = "ob31")]
-            Scheme::Ob31 => true,
+            #[cfg(feature = "adgs")]
+            Scheme::Adgs => true,
             #[cfg(feature = "apgs")]
             Scheme::Apgs => false,
             #[cfg(feature = "ob32")]
@@ -102,8 +102,8 @@ impl Scheme {
             Scheme::Zdc => constants::ZDC_BYTE,
             #[cfg(feature = "upc")]
             Scheme::Upc => constants::UPC_BYTE,
-            #[cfg(feature = "ob31")]
-            Scheme::Ob31 => constants::OB31_BYTE,
+            #[cfg(feature = "adgs")]
+            Scheme::Adgs => constants::ADGS_BYTE,
             #[cfg(feature = "apgs")]
             Scheme::Apgs => constants::APGS_BYTE,
             #[cfg(feature = "ob32")]
@@ -131,8 +131,8 @@ impl std::str::FromStr for Scheme {
             "zdc" => Ok(Scheme::Zdc),
             #[cfg(feature = "upc")]
             "upc" => Ok(Scheme::Upc),
-            #[cfg(feature = "ob31")]
-            "ob31" => Ok(Scheme::Ob31),
+            #[cfg(feature = "adgs")]
+            "adgs" => Ok(Scheme::Adgs),
             #[cfg(feature = "apgs")]
             "apgs" => Ok(Scheme::Apgs),
             #[cfg(feature = "ob32")]

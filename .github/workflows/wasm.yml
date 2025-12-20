@@ -24,10 +24,10 @@ jobs:
             features: "--no-default-features --features ob32"
           - name: "ob32p only (probabilistic)"
             features: "--no-default-features --features ob32p"
-          - name: "ob31 only"
-            features: "--no-default-features --features ob31"
+          - name: "adgs only"
+            features: "--no-default-features --features adgs"
           - name: "modern schemes"
-            features: "--no-default-features --features ob31,ob32"
+            features: "--no-default-features --features adgs,ob32"
           - name: "SIV schemes (both)"
             features: "--no-default-features --features all-siv-schemes"
     steps:
