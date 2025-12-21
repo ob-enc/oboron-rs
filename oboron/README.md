@@ -86,7 +86,10 @@ assert_eq!(pt2, "hello, world");
 
 ## Formats
 
-Oboron encoding is a multi-stage process:
+Oboron provides various formats for encrypted text (obtext).  Each format
+combines a cryptographic scheme with a string encoding.
+
+More specifically, obtext construciton is a multi-stage process:
 1. **Encryption**: Plaintext UTF-8 string encrypted to ciphertext bytes
 2. **Byte Reversal** (select schemes only): Ciphertext bytes are reversed
    to maximize entropy in output prefixes
@@ -110,6 +113,12 @@ for example:
 A format thus defines the complete transformation, specifying not just
 the output encoding but also the encryption algorithm and payload byte
 arrangement.
+
+Terminology:
+- *Scheme*: Cryptographic algorithm + mode + parameters (e.g., `adsv`)
+- *Encoding*: String representation method (e.g., `.b64`)
+- *Format*: Scheme + encoding = complete transformation (e.g.,
+  `adsv.b64`)
 
 **API Note**: The public interface uses `enc`/`dec` names for methods
 and functions. Thus the `enc` operation comprises the full process,
@@ -140,40 +149,63 @@ just like base64url (`*.b64`) and hex (`*.hex`).
 
 ### Schemes
 
-A scheme defines the encryption algorithm and its properties
-(deterministic vs. probabilistic, authenticated).
+A scheme defines the encryption algorithm, its mode (deterministic or
+probabilistic), and any other parameters for the cryptographic cipher, or
+custom post-processing (optional byte reversal for prefix entropy).
 
 #### Scheme Tiers
 
-Schemes are classified into tiers:
-- ob0x - insecure, non-authenticated
-- ob1x - insecure, authenticated
-- ob2x - secure, non-authenticated
-- ob3x - secure, authenticated
+Schemes are classified into *tiers*, which are encapsulated in the scheme
+ID prefix:
+- `a` - authenticated (e.g., `adsv`, `apgs`)
+- `u` - unauthenticated (e.g., `upc`)
+- `z` - insecure, obfuscation only (e.g., `zdc`)
 
-**Note:** The ob1x tier (insecure, authenticated) currently has
-no implementations. It is reserved for potential future additions,
-maintaining the pattern: even scheme tiers = non-authenticated;
-odd = authenticated.
+The second letter of the scheme ID further describe the properties of the
+scheme by specifying one of two modes: deterministic and probabilistic:
+- `.d..` - deterministic (e.g. `adsv`, `adgs`, `zdc`)
+- `.p..` - probabilistic (e.g. `apsv`, `apgs`, `upc`)
 
-| Scheme  | Algorithm   | Deterministic? | Authenticated? | Notes |
-| :------ | :---------- | :------------- | :------------- | :---- |
-| `zdc`  | AES-CBC     | Yes            | No             | Legacy; uses constant IV. Prioritizes determinism and performance over security. |
-| `upc` | AES-CBC     | No             | No             |       |
-| `adgs`  | AES-GCM-SIV | Yes            | Yes            |       |
+Schemes in the `u` and `z` tiers use 3-letter IDs, while `a`-tier schemes
+use 4-letter IDs. This visual distinction reinforces the security
+difference: fully authenticated schemes (`a`-tier) have more descriptive
+names.  Compare:
+- `adsv`, `apgs` - fully secure and authenticated
+- `upc`, `zdc` - some security compromise: either non-authenticated
+  (`upc` not tamper-evident), or cryptographically broken (`zdc` uses
+  constant IV)
+
+The remaining two letters in `a`-tier schemes represent the algorithm used:
+- `gs` = GCM-SIV (AES-GCM-SIV)
+- `sv` = SIV (AES-SIV)
+
+The `c` in `upc` and `zdc` stands for CBC (AES-CBC).
+
+Summary table:
+
+| Scheme | Algorithm   | Deterministic? | Authenticated? | Notes |
+| :----- | :---------- | :------------- | :------------- | :---- |
+| `adgs` | AES-GCM-SIV | Yes            | Yes            |       |
+| `adsv` | AES-SIV     | Yes            | Yes            |       |
 | `apgs` | AES-GCM-SIV | No             | Yes            |       |
-| `adsv`  | AES-SIV     | Yes            | Yes            |       |
 | `apsv` | AES-SIV     | No             | Yes            |       |
+| `upc`  | AES-CBC     | No             | No             |       |
+| `zdc`  | AES-CBC     | Yes            | No             | INSECURE, uses constant IV. Prioritizes determinism and performance over security. |
 
-**Key Concepts:**
-* **Deterministic:** Same input (key + plaintext) always produces same
-  output. Useful for idempotent operations, lookup keys, caching,
-  or hash-like references.
-* **Probabilistic (`p` suffix):** Incorporates a random nonce,
-  producing different ciphertexts for identical plaintexts.
-  Standard for most cryptographic use cases.
-* **Authenticated:** Ciphertext is tamper-proof.
-  Any modification results in decryption failure.
+Key Concepts:
+* *Deterministic:* Same input (key + plaintext) always produces same
+  output. Useful for idempotent operations, lookup keys, caching, or
+  hash-like references.
+* *Probabilistic:* Incorporates a random nonce, producing different
+  ciphertexts for identical plaintexts.  Standard for most cryptographic
+  use cases (non-cached, not used as hidden references).
+* *Authenticated:* Ciphertext is tamper-proof.  Any modification (even
+  a single bit flipped) results in decryption failure.
+
+Other than `a`-, `u`-, and `z`-schemes, you may also encounter these
+special-purpose schemes:
+- `mock1`, `mock2` - testing/identity transforms (non-cryptographic)
+- `legacy`- legacy scheme for backwards compatibility
 
 #### Important Scheme Security Notes
 
@@ -190,44 +222,39 @@ the following:
   where confidentiality or integrity matters.
   **Use `zdc` only for** maximum compactness and strong prefix entropy
   in non-security-critical contexts (e.g., development or obfuscation).
-  For sensitive data, **always use authenticated schemes** (ob3x tier:
-  adgs or adsv).
+  For sensitive data, **always use authenticated schemes** (`a`-tier:
+  `adgs` or `adsv`).
 
-We reiterate that the first digit in the scheme is a critically important
-one (see [Scheme Tiers](#scheme-tiers) above):
-- ***`ob0x` and `ob1x` scheme tiers should be viewed as obfuscation, not
-  encryption.***
-- ***For encryption applications, always use ob2x or ob3x tier schemes***
+We reiterate that the first letter in the scheme ID is a critically
+important one (see [Scheme Tiers](#scheme-tiers) above):
+- ***`z`-tier schemes should be viewed as obfuscation, not encryption.***
+  (mnemonic: "zero protection")
+- ***For encryption applications, always use `a` (authenticated), or
+  `u`-tier (unauthenticated) schemes***
 
 
 > **FAQ:** *Why include an insecure scheme?*
 > 
 > Oboron is a general purpose library whose utility and application
 > domain extend beyond encryption.  For applications such as obfuscation
-> or hashing alternative (see Application section below), ob0x schemes
-> are sufficient, while outperforming ob2x and ob3x schemes by 2x to 4x.
-> In our benchmarks, `zdc` shows ~40% lower latency than SHA256 for
-> short inputs on modern x86 CPUs.
+> or hashing alternative (see Application section below), `z`-schemes
+> are sufficient, while outperforming `a`-schemes by 2x to 4x.  In our
+> benchmarks, `zdc` shows ~40% lower latency than SHA256 for short inputs
+> on modern x86 CPUs.
 
-> **FAQ:** *Why use numeric identifiers (e.g., `zdc`) instead of
-> algorithm names (e.g., `AES-CBC`)?*
->
-> Oboron's main target audience is developers who are not cryptography
-> experts, to whom algorithm names are not likely to mean much.  For
-> them, Oboron hopes to provide value by making the algorithm's main
-> properties obvious from the tier (e.g., `ob3x`) and optional suffix
-> (`p` = probabilistic), while relegating actual algorithm names to the
-> documentation.  Besides, each algorithm is used in two different
-> variants: deterministic and probabilistic, so to identify a scheme one
-> would have to speak of "deterministic AES-CBC", as opposed to "zdc",
-> or "probabilistic AES-CBC" as opposed to "upc", which is a mouthful.
+> FAQ: *Why do schemes not include the traditional 128/256/... bit
+> encryption designations?*
+> Oboron uses the strongest possible encryption with its 512-bit key.
+> Both AES-GCM-SIV and AES-SIV use 256-bit encryption (AES-SIV uses a
+> 512-bit key for two instance layers, but each is 256-bit encryption.)
+> AES-CBC uses 128-bit encryption.
 
 
 ### Secure Defaults
 
 Oboron presets (default features) only include secure schemes.  In order
-to use `ob0x` or `ob1x` schemes, you need to enable them explicitly in
-your `Cargo.toml`.
+to use `z`-schemes, you need to enable them explicitly in your
+`Cargo.toml`.
 
 The same holds for the `keyless` feature: while it is handy for
 development and quick obfuscation (using a hard-coded key), this feature
@@ -468,10 +495,9 @@ both SHA256 and JWT performance while providing reversible encryption.
 | SHA256 | 191 ns    | N/A       | One-way       | Hashing only                    |
 
 `*` **Note**: JWT baseline (HMAC-SHA256) provides authentication without
-encryption, comparable to Oboron's unimplemented **ob1x tier**.  Despite
-comparing against our stronger **ob3x tier** (secure + authenticated),
-Oboron maintains performance advantages while providing full
-confidentiality.
+encryption.  Despite comparing against our stronger **`a`-tier** (secure
++ authenticated), Oboron maintains performance advantages while providing
+full confidentiality.
 
 More detailed benchmark results are presented in a separate document:
 - [BENCHMARKS.md](BENCHMARKS.md).
@@ -537,7 +563,7 @@ Quick examples:
 # Minimal: only adsv (deterministic AES-SIV)
 oboron = { version = "1.0", default-features = false, features = ["adsv"] }
 
-# All authenticated schemes (ob3x tier)
+# All authenticated schemes (`a`-tier)
 oboron = { version = "1.0", default-features = false, features = ["authenticated-schemes"] }
 
 # All SIV schemes for WebAssembly
@@ -657,7 +683,7 @@ let token = encode(&Header::default(), &claims, &EncodingKey)?;
 let ob = AdgsC32::new(&env::var("OBORON_KEY")?);
 let state = serde_json::to_string(&claims)?;
 let token = ob.enc(&state)?; // ~50 characters
-// "adgs:b4g9lao2xd7fnbq5z53cb63ukc"
+// "b4g9lao2xd7fnbq5z53cb63ukc"
 ```
 
 **When to prefer Oboron over JWT:**
