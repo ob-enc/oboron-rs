@@ -161,6 +161,15 @@
 //! - Performance: Small overhead (format parsing per operation)
 //! - Flexibility: Maximum - handles any format, autodetects on dec
 //!
+//! # Quick Reference
+//!
+//! | Type            | Format             | Use Case          | Performance         |
+//! |-----------------|--------------------|-------------------|---------------------|
+//! | `AdsvC32`, etc. | Compile-time       | Known format      | Fastest (zero-cost) |
+//! | `Ob`            | Runtime, immutable | Config-driven     | Near-zero overhead  |
+//! | `ObFlex`        | Runtime, mutable   | Dynamic switching | Minimal overhead    |
+//! | `ObMulti`       | Per-operation      | Multiple formats  | Small overhead      |
+//!
 //! # Typical Production Usage: Fixed ObtextCodec
 //!
 //! Best performance and type safety for multiple operations with the same format:
