@@ -75,35 +75,11 @@ class OboronBase(ABC):
 # Register all Rust classes as virtual subclasses
 # ============================================================================
 
-# Legacy variants (LEGACY)
-OboronBase.register(_oboron.LegacyC32)
-OboronBase.register(_oboron.LegacyB32)
-OboronBase.register(_oboron.LegacyB64)
-OboronBase.register(_oboron.LegacyHex)
-
-# Zdc variants
-OboronBase.register(_oboron.ZdcC32)
-OboronBase.register(_oboron.ZdcB32)
-OboronBase.register(_oboron.ZdcB64)
-OboronBase.register(_oboron.ZdcHex)
-
-# Upc variants
-OboronBase.register(_oboron.UpcC32)
-OboronBase.register(_oboron.UpcB32)
-OboronBase.register(_oboron.UpcB64)
-OboronBase.register(_oboron.UpcHex)
-
 # Adgs variants
 OboronBase.register(_oboron.AdgsC32)
 OboronBase.register(_oboron.AdgsB32)
 OboronBase.register(_oboron.AdgsB64)
 OboronBase.register(_oboron.AdgsHex)
-
-# Apgs variants
-OboronBase.register(_oboron.ApgsC32)
-OboronBase.register(_oboron.ApgsB32)
-OboronBase.register(_oboron.ApgsB64)
-OboronBase.register(_oboron.ApgsHex)
 
 # Adsv variants
 OboronBase.register(_oboron.AdsvC32)
@@ -111,23 +87,47 @@ OboronBase.register(_oboron.AdsvB32)
 OboronBase.register(_oboron.AdsvB64)
 OboronBase.register(_oboron.AdsvHex)
 
+# Apgs variants
+OboronBase.register(_oboron.ApgsC32)
+OboronBase.register(_oboron.ApgsB32)
+OboronBase.register(_oboron.ApgsB64)
+OboronBase.register(_oboron.ApgsHex)
+
 # Apsv variants
 OboronBase.register(_oboron.ApsvC32)
 OboronBase.register(_oboron.ApsvB32)
 OboronBase.register(_oboron.ApsvB64)
 OboronBase.register(_oboron.ApsvHex)
 
-# Mock2 variants (testing)
-OboronBase.register(_oboron.Mock2C32)
-OboronBase.register(_oboron.Mock2B32)
-OboronBase.register(_oboron.Mock2B64)
-OboronBase.register(_oboron.Mock2Hex)
+# Upc variants
+OboronBase.register(_oboron.UpcC32)
+OboronBase.register(_oboron.UpcB32)
+OboronBase.register(_oboron.UpcB64)
+OboronBase.register(_oboron.UpcHex)
+
+# Zdc variants
+OboronBase.register(_oboron.ZdcC32)
+OboronBase.register(_oboron.ZdcB32)
+OboronBase.register(_oboron.ZdcB64)
+OboronBase.register(_oboron.ZdcHex)
+
+# Legacy variants
+OboronBase.register(_oboron.LegacyC32)
+OboronBase.register(_oboron.LegacyB32)
+OboronBase.register(_oboron.LegacyB64)
+OboronBase.register(_oboron.LegacyHex)
 
 # Mock1 variants (testing)
 OboronBase.register(_oboron.Mock1C32)
 OboronBase.register(_oboron.Mock1B32)
 OboronBase.register(_oboron.Mock1B64)
 OboronBase.register(_oboron.Mock1Hex)
+
+# Mock2 variants (testing)
+OboronBase.register(_oboron.Mock2C32)
+OboronBase.register(_oboron.Mock2B32)
+OboronBase.register(_oboron.Mock2B64)
+OboronBase.register(_oboron.Mock2Hex)
 
 # Flexible interface
 OboronBase.register(_oboron.Ob)
@@ -139,35 +139,11 @@ OboronBase.register(_oboron.Ob)
 # Main flexible interface
 Ob = _oboron.Ob
 
-# Legacy variants (LEGACY)
-LegacyC32 = _oboron.LegacyC32
-LegacyB32 = _oboron.LegacyB32
-LegacyB64 = _oboron.LegacyB64
-LegacyHex = _oboron.LegacyHex
-
-# Zdc variants
-ZdcC32 = _oboron.ZdcC32
-ZdcB32 = _oboron.ZdcB32
-ZdcB64 = _oboron.ZdcB64
-ZdcHex = _oboron.ZdcHex
-
-# Upc variants
-UpcC32 = _oboron.UpcC32
-UpcB32 = _oboron.UpcB32
-UpcB64 = _oboron.UpcB64
-UpcHex = _oboron.UpcHex
-
 # Adgs variants
 AdgsC32 = _oboron.AdgsC32
 AdgsB32 = _oboron.AdgsB32
 AdgsB64 = _oboron.AdgsB64
 AdgsHex = _oboron.AdgsHex
-
-# Apgs variants
-ApgsC32 = _oboron.ApgsC32
-ApgsB32 = _oboron.ApgsB32
-ApgsB64 = _oboron.ApgsB64
-ApgsHex = _oboron.ApgsHex
 
 # Adsv variants
 AdsvC32 = _oboron.AdsvC32
@@ -175,11 +151,35 @@ AdsvB32 = _oboron.AdsvB32
 AdsvB64 = _oboron.AdsvB64
 AdsvHex = _oboron.AdsvHex
 
+# Apgs variants
+ApgsC32 = _oboron.ApgsC32
+ApgsB32 = _oboron.ApgsB32
+ApgsB64 = _oboron.ApgsB64
+ApgsHex = _oboron.ApgsHex
+
 # Apsv variants
 ApsvC32 = _oboron.ApsvC32
 ApsvB32 = _oboron.ApsvB32
 ApsvB64 = _oboron.ApsvB64
 ApsvHex = _oboron.ApsvHex
+
+# Upc variants
+UpcC32 = _oboron.UpcC32
+UpcB32 = _oboron.UpcB32
+UpcB64 = _oboron.UpcB64
+UpcHex = _oboron.UpcHex
+
+# Zdc variants
+ZdcC32 = _oboron.ZdcC32
+ZdcB32 = _oboron.ZdcB32
+ZdcB64 = _oboron.ZdcB64
+ZdcHex = _oboron.ZdcHex
+
+# Legacy variants (LEGACY)
+LegacyC32 = _oboron.LegacyC32
+LegacyB32 = _oboron.LegacyB32
+LegacyB64 = _oboron.LegacyB64
+LegacyHex = _oboron.LegacyHex
 
 # Mock1 variants (testing)
 Mock1C32 = _oboron.Mock1C32
@@ -216,35 +216,11 @@ __all__ = [
     # Main interfaces
     'Ob',
 
-    # Legacy
-    'LegacyC32',
-    'LegacyB32',
-    'LegacyB64',
-    'LegacyHex',
-
-    # Zdc
-    'ZdcC32',
-    'ZdcB32',
-    'ZdcB64',
-    'ZdcHex',
-
-    # Upc
-    'UpcC32',
-    'UpcB32',
-    'UpcB64',
-    'UpcHex',
-
     # Adgs
     'AdgsC32',
     'AdgsB32',
     'AdgsB64',
     'AdgsHex',
-
-    # Apgs
-    'ApgsC32',
-    'ApgsB32',
-    'ApgsB64',
-    'ApgsHex',
 
     # Adsv
     'AdsvC32',
@@ -252,11 +228,35 @@ __all__ = [
     'AdsvB64',
     'AdsvHex',
 
+    # Apgs
+    'ApgsC32',
+    'ApgsB32',
+    'ApgsB64',
+    'ApgsHex',
+
     # Apsv
     'ApsvC32',
     'ApsvB32',
     'ApsvB64',
     'ApsvHex',
+
+    # Upc
+    'UpcC32',
+    'UpcB32',
+    'UpcB64',
+    'UpcHex',
+
+    # Zdc
+    'ZdcC32',
+    'ZdcB32',
+    'ZdcB64',
+    'ZdcHex',
+
+    # Legacy
+    'LegacyC32',
+    'LegacyB32',
+    'LegacyB64',
+    'LegacyHex',
 
     # Mock1 (testing)
     'Mock1C32',
