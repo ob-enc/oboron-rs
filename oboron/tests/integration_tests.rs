@@ -58,15 +58,15 @@ fn test_format_string_parsing() {
     #[cfg(feature = "adsv")]
     {
         use oboron::Format;
-        let format = Format::from_str("adsv:c32").unwrap();
-        assert_eq!(format.to_string(), "adsv:c32");
+        let format = Format::from_str("adsv.c32").unwrap();
+        assert_eq!(format.to_string(), "adsv.c32");
     }
 
     // Test that disabled schemes return error
     #[cfg(not(feature = "zdc"))]
     {
         use oboron::Format;
-        assert!(Format::from_str("zdc:c32").is_err());
+        assert!(Format::from_str("zdc.c32").is_err());
     }
 }
 

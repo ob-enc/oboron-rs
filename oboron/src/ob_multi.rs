@@ -23,7 +23,7 @@ use crate::{Error, Format, Keychain};
 /// let obm = ObMulti::new(&key)?;
 ///
 /// // Encode with explicit format
-/// let ot1 = obm.enc("hello", "adsv:c32")?; // using explicit string
+/// let ot1 = obm.enc("hello", "adsv.c32")?; // using explicit string
 /// let ot2 = obm.enc("world", MOCK1_B64)?; // using string constant
 ///
 /// // autodec detects both scheme and encoding
@@ -53,7 +53,7 @@ impl ObMulti {
 
     /// Encrypt+encode with a specific format string.
     ///
-    /// Accepts format strings like "zdc:c32", "adgs:b64", etc.
+    /// Accepts format strings like "zdc.c32", "adgs.b64", etc.
     /// For pre-parsed Format instances, use [`enc_with_format`](Self::enc_with_format).
     ///
     /// # Examples
@@ -66,8 +66,8 @@ impl ObMulti {
     /// let key = oboron::generate_key();
     /// let obm = ObMulti::new(&key)?;
     ///
-    /// let ot = obm.enc("hello", "adsv:c32")?;
-    /// let ot2 = obm.enc("world", "mock1:b64")?;
+    /// let ot = obm.enc("hello", "adsv.c32")?;
+    /// let ot2 = obm.enc("world", "mock1.b64")?;
     /// # }
     /// # Ok(())
     /// # }
@@ -117,8 +117,8 @@ impl ObMulti {
     /// # use oboron::ObMulti;
     /// # let key = oboron::generate_key();
     /// # let obm = ObMulti::new(&key)?;
-    /// let ot = obm.enc("hello", "adsv:b64")?;
-    /// let pt2 = obm.dec(&ot, "adsv:b64")? ;
+    /// let ot = obm.enc("hello", "adsv.b64")?;
+    /// let pt2 = obm.dec(&ot, "adsv.b64")? ;
     /// assert_eq!(pt2, "hello");
     /// # }
     /// # Ok(())
@@ -167,8 +167,8 @@ impl ObMulti {
     /// # use oboron::ObMulti;
     /// # let key = oboron::generate_key();
     /// # let obm = ObMulti::new(&key)?;
-    /// let ot = obm.enc("hello", "adsv:b64")?;
-    /// let pt2 = obm.autodec(&ot)?;  // Autodetects adsv:b64
+    /// let ot = obm.enc("hello", "adsv.b64")?;
+    /// let pt2 = obm.autodec(&ot)?;  // Autodetects adsv.b64
     /// assert_eq!(pt2, "hello");
     /// # }
     /// # Ok(())

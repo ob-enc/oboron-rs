@@ -31,7 +31,7 @@ impl Format {
         self.encoding
     }
 
-    /// Parse format from compact string representation (e.g., "zdc:c32", "adgs:b64")
+    /// Parse format from compact string representation (e.g., "zdc.c32", "adgs.b64")
     ///
     /// This uses fast match-based parsing for maximum performance.
     pub fn from_str(s: &str) -> Result<Self, Error> {
@@ -139,7 +139,7 @@ impl std::str::FromStr for Format {
 
 impl std::fmt::Display for Format {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}:{}", self.scheme.as_str(), self.encoding.as_str())
+        write!(f, "{}.{}", self.scheme.as_str(), self.encoding.as_str())
     }
 }
 
@@ -178,8 +178,8 @@ mod tests {
 
         for scheme in &schemes {
             for encoding in &encodings {
-                // Test short string identifiers (e.g., "zdc:c32", "zdc:b32")
-                let format_str = format!("{}:{}", scheme.as_str(), encoding.as_str());
+                // Test short string identifiers (e.g., "zdc.c32", "zdc.b32")
+                let format_str = format!("{}.{}", scheme.as_str(), encoding.as_str());
                 let result = Format::from_str(&format_str);
                 assert!(result.is_ok(), "Failed to parse: {}", format_str);
                 let format = result.unwrap();
@@ -204,8 +204,8 @@ mod tests {
         // Test invalid format strings
         assert!(Format::from_str("invalid").is_err());
         assert!(Format::from_str("zdc").is_err());
-        assert!(Format::from_str("zdc:").is_err());
-        assert!(Format::from_str(":b64").is_err());
+        assert!(Format::from_str("zdc.").is_err());
+        assert!(Format::from_str(".b64").is_err());
         assert!(Format::from_str("mock1:invalid").is_err());
     }
 
@@ -214,70 +214,70 @@ mod tests {
         // Define test cases: (scheme, encoding, expected_string)
         #[cfg(feature = "mock")]
         let mut test_cases = vec![
-            (Scheme::Mock2, Encoding::C32, "mock2:c32"),
-            (Scheme::Mock2, Encoding::B32, "mock2:b32"),
-            (Scheme::Mock2, Encoding::B64, "mock2:b64"),
-            (Scheme::Mock2, Encoding::Hex, "mock2:hex"),
-            (Scheme::Mock1, Encoding::C32, "mock1:c32"),
-            (Scheme::Mock1, Encoding::B32, "mock1:b32"),
-            (Scheme::Mock1, Encoding::B64, "mock1:b64"),
-            (Scheme::Mock1, Encoding::Hex, "mock1:hex"),
+            (Scheme::Mock2, Encoding::C32, "mock2.c32"),
+            (Scheme::Mock2, Encoding::B32, "mock2.b32"),
+            (Scheme::Mock2, Encoding::B64, "mock2.b64"),
+            (Scheme::Mock2, Encoding::Hex, "mock2.hex"),
+            (Scheme::Mock1, Encoding::C32, "mock1.c32"),
+            (Scheme::Mock1, Encoding::B32, "mock1.b32"),
+            (Scheme::Mock1, Encoding::B64, "mock1.b64"),
+            (Scheme::Mock1, Encoding::Hex, "mock1.hex"),
         ];
 
         #[cfg(feature = "legacy")]
         test_cases.extend(vec![
-            (Scheme::Legacy, Encoding::C32, "legacy:c32"),
-            (Scheme::Legacy, Encoding::B32, "legacy:b32"),
-            (Scheme::Legacy, Encoding::B64, "legacy:b64"),
-            (Scheme::Legacy, Encoding::Hex, "legacy:hex"),
+            (Scheme::Legacy, Encoding::C32, "legacy.c32"),
+            (Scheme::Legacy, Encoding::B32, "legacy.b32"),
+            (Scheme::Legacy, Encoding::B64, "legacy.b64"),
+            (Scheme::Legacy, Encoding::Hex, "legacy.hex"),
         ]);
 
         #[cfg(feature = "zdc")]
         test_cases.extend(vec![
-            (Scheme::Zdc, Encoding::C32, "zdc:c32"),
-            (Scheme::Zdc, Encoding::B32, "zdc:b32"),
-            (Scheme::Zdc, Encoding::B64, "zdc:b64"),
-            (Scheme::Zdc, Encoding::Hex, "zdc:hex"),
+            (Scheme::Zdc, Encoding::C32, "zdc.c32"),
+            (Scheme::Zdc, Encoding::B32, "zdc.b32"),
+            (Scheme::Zdc, Encoding::B64, "zdc.b64"),
+            (Scheme::Zdc, Encoding::Hex, "zdc.hex"),
         ]);
 
         #[cfg(feature = "upc")]
         test_cases.extend(vec![
-            (Scheme::Upc, Encoding::C32, "upc:c32"),
-            (Scheme::Upc, Encoding::B32, "upc:b32"),
-            (Scheme::Upc, Encoding::B64, "upc:b64"),
-            (Scheme::Upc, Encoding::Hex, "upc:hex"),
+            (Scheme::Upc, Encoding::C32, "upc.c32"),
+            (Scheme::Upc, Encoding::B32, "upc.b32"),
+            (Scheme::Upc, Encoding::B64, "upc.b64"),
+            (Scheme::Upc, Encoding::Hex, "upc.hex"),
         ]);
 
         #[cfg(feature = "adgs")]
         test_cases.extend(vec![
-            (Scheme::Adgs, Encoding::C32, "adgs:c32"),
-            (Scheme::Adgs, Encoding::B32, "adgs:b32"),
-            (Scheme::Adgs, Encoding::B64, "adgs:b64"),
-            (Scheme::Adgs, Encoding::Hex, "adgs:hex"),
+            (Scheme::Adgs, Encoding::C32, "adgs.c32"),
+            (Scheme::Adgs, Encoding::B32, "adgs.b32"),
+            (Scheme::Adgs, Encoding::B64, "adgs.b64"),
+            (Scheme::Adgs, Encoding::Hex, "adgs.hex"),
         ]);
 
         #[cfg(feature = "apgs")]
         test_cases.extend(vec![
-            (Scheme::Apgs, Encoding::C32, "apgs:c32"),
-            (Scheme::Apgs, Encoding::B32, "apgs:b32"),
-            (Scheme::Apgs, Encoding::B64, "apgs:b64"),
-            (Scheme::Apgs, Encoding::Hex, "apgs:hex"),
+            (Scheme::Apgs, Encoding::C32, "apgs.c32"),
+            (Scheme::Apgs, Encoding::B32, "apgs.b32"),
+            (Scheme::Apgs, Encoding::B64, "apgs.b64"),
+            (Scheme::Apgs, Encoding::Hex, "apgs.hex"),
         ]);
 
         #[cfg(feature = "adsv")]
         test_cases.extend(vec![
-            (Scheme::Adsv, Encoding::C32, "adsv:c32"),
-            (Scheme::Adsv, Encoding::B32, "adsv:b32"),
-            (Scheme::Adsv, Encoding::B64, "adsv:b64"),
-            (Scheme::Adsv, Encoding::Hex, "adsv:hex"),
+            (Scheme::Adsv, Encoding::C32, "adsv.c32"),
+            (Scheme::Adsv, Encoding::B32, "adsv.b32"),
+            (Scheme::Adsv, Encoding::B64, "adsv.b64"),
+            (Scheme::Adsv, Encoding::Hex, "adsv.hex"),
         ]);
 
         #[cfg(feature = "apsv")]
         test_cases.extend(vec![
-            (Scheme::Apsv, Encoding::C32, "apsv:c32"),
-            (Scheme::Apsv, Encoding::B32, "apsv:b32"),
-            (Scheme::Apsv, Encoding::B64, "apsv:b64"),
-            (Scheme::Apsv, Encoding::Hex, "apsv:hex"),
+            (Scheme::Apsv, Encoding::C32, "apsv.c32"),
+            (Scheme::Apsv, Encoding::B32, "apsv.b32"),
+            (Scheme::Apsv, Encoding::B64, "apsv.b64"),
+            (Scheme::Apsv, Encoding::Hex, "apsv.hex"),
         ]);
 
         for (scheme, encoding, expected_str) in test_cases {
@@ -286,7 +286,7 @@ mod tests {
             let format_str = format.to_string();
             assert_eq!(
                 format_str, expected_str,
-                "Format string mismatch for {:? }:{:? }",
+                "Format string mismatch for {:? }.{:? }",
                 scheme, encoding
             );
 
@@ -311,11 +311,11 @@ mod tests {
     #[cfg(feature = "legacy")]
     fn test_legacy_supports_both_base32_variants() {
         // legacy should support both B32 and C32
-        let format_rfc = Format::from_str("legacy:b32").unwrap();
+        let format_rfc = Format::from_str("legacy.b32").unwrap();
         assert_eq!(format_rfc.scheme(), Scheme::Legacy);
         assert_eq!(format_rfc.encoding(), Encoding::B32);
 
-        let format_crock = Format::from_str("legacy:c32").unwrap();
+        let format_crock = Format::from_str("legacy.c32").unwrap();
         assert_eq!(format_crock.scheme(), Scheme::Legacy);
         assert_eq!(format_crock.encoding(), Encoding::C32);
     }
@@ -330,7 +330,7 @@ mod tests {
 
         for scheme_str in schemes {
             // Test Crockford base32 (c32)
-            let format_str_crock = format!("{}:c32", scheme_str);
+            let format_str_crock = format!("{}.c32", scheme_str);
             let result_crock = Format::from_str(&format_str_crock);
             if result_crock.is_ok() {
                 // Only test if feature is enabled
@@ -343,7 +343,7 @@ mod tests {
             }
 
             // Test RFC 4648 base32 (b32)
-            let format_str_rfc = format!("{}:b32", scheme_str);
+            let format_str_rfc = format!("{}.b32", scheme_str);
             let result_rfc = Format::from_str(&format_str_rfc);
             if result_rfc.is_ok() {
                 // Only test if feature is enabled

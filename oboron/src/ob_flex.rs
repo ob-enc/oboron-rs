@@ -17,20 +17,20 @@ use crate::{ob_core::ObCore, Encoding, Error, Format, Oboron, Scheme};
 /// # {
 /// # use oboron::{Oboron, ObFlex, Scheme, Encoding, Format, ADSV_HEX};
 /// # let key = oboron::generate_key();
-/// let mut ob = ObFlex::new("adsv:c32", &key)?;
-/// let obtext = ob.enc("hello")?; // adsv:c32 format
+/// let mut ob = ObFlex::new("adsv.c32", &key)?;
+/// let obtext = ob.enc("hello")?; // adsv.c32 format
 ///
 /// // Switch to mock1 scheme (format remains c32)
 /// ob.set_scheme(Scheme::Mock1)?;
-/// let obtext = ob.enc("hello")?; // mock1:c32 format
+/// let obtext = ob.enc("hello")?; // mock1.c32 format
 ///
-/// // Switch to mock2:b64 using Format instance
+/// // Switch to mock2.b64 using Format instance
 /// ob.set_format(Format::new(Scheme::Mock2, Encoding::B64))?;
-/// let obtext = ob.enc("hello")?; // mock2:b64 format
+/// let obtext = ob.enc("hello")?; // mock2.b64 format
 ///
-/// // Switch to adsv:hex using string constant
+/// // Switch to adsv.hex using string constant
 /// ob.set_format(ADSV_HEX)?;
-/// let obtext = ob.enc("hello")?; // adsv:hex format
+/// let obtext = ob.enc("hello")?; // adsv.hex format
 /// # }
 /// # Ok(())
 /// # }
@@ -54,7 +54,7 @@ impl ObFlex {
     /// # use oboron::{ObFlex, Format, Scheme, Encoding};
     /// # let key = oboron::generate_key();
     /// // Using format string
-    /// let ob1 = ObFlex::new("adsv:b64", &key)?;
+    /// let ob1 = ObFlex::new("adsv.b64", &key)?;
     ///
     /// // Same, using Format
     /// let format = Format::new(Scheme::Adsv, Encoding::B64);
@@ -82,7 +82,7 @@ impl ObFlex {
     /// # {
     /// # use oboron::{ObFlex, Format, Scheme, Encoding};
     /// // Using format string
-    /// let ob1 = ObFlex::new_keyless("adsv:c32")?;
+    /// let ob1 = ObFlex::new_keyless("adsv.c32")?;
     ///
     /// // Using Format instance
     /// let format = Format::new(Scheme::Adsv, Encoding::C32);
@@ -109,7 +109,7 @@ impl ObFlex {
     /// # {
     /// # use oboron::{ObFlex, Scheme, Encoding};
     /// # let key = oboron::generate_key();
-    /// let ob = ObFlex::new("adsv:b64", &key)?;
+    /// let ob = ObFlex::new("adsv.b64", &key)?;
     /// let format = ob.format();
     /// assert_eq!(format.scheme(), Scheme::Adsv);
     /// assert_eq!(format.encoding(), Encoding::B64);
@@ -133,8 +133,8 @@ impl ObFlex {
     /// # {
     /// # use oboron::{ObFlex, Format, Scheme, Encoding};
     /// # let key = oboron::generate_key();
-    /// let mut ob = ObFlex::new("adsv:c32", &key)?;
-    /// ob.set_format("mock1:b64")?; // switch using string
+    /// let mut ob = ObFlex::new("adsv.c32", &key)?;
+    /// ob.set_format("mock1.b64")?; // switch using string
     /// ob.set_format(Format::new(Scheme::Mock2, Encoding::Hex))?; // switch using Format
     /// # }
     /// # Ok(())
@@ -155,7 +155,7 @@ impl ObFlex {
     /// # {
     /// # use oboron::{ObFlex, Scheme};
     /// # let key = oboron::generate_key();
-    /// let mut ob = ObFlex::new("adsv:c32", &key)? ;
+    /// let mut ob = ObFlex::new("adsv.c32", &key)? ;
     /// ob.set_scheme(Scheme::Mock1)?; // switch to mock1, keeping c32 encoding
     /// # }
     /// # Ok(())
@@ -176,7 +176,7 @@ impl ObFlex {
     /// # {
     /// # use oboron::{ObFlex, Encoding};
     /// # let key = oboron::generate_key();
-    /// let mut ob = ObFlex::new("adsv:c32", &key)?;
+    /// let mut ob = ObFlex::new("adsv.c32", &key)?;
     /// ob.set_encoding(Encoding::B64)?; // switch to b64, keeping adsv scheme
     /// # }
     /// # Ok(())
@@ -202,7 +202,7 @@ impl ObFlex {
     /// # use oboron::{ObFlex, Format, Scheme, Encoding};
     /// let key_hex = oboron::generate_key_hex();
     /// // Using format string
-    /// let ob1 = ObFlex::from_hex_key("adsv:b64", &key_hex)?;
+    /// let ob1 = ObFlex::from_hex_key("adsv.b64", &key_hex)?;
     ///
     /// // Using Format instance
     /// let format = Format::new(Scheme::Adsv, Encoding::B64);
@@ -231,7 +231,7 @@ impl ObFlex {
     /// # {
     /// # use oboron::{ObFlex, Format, Scheme, Encoding};
     /// let key_bytes = oboron::generate_key_bytes();
-    /// let ob1 = ObFlex::from_bytes("adsv:b64", &key_bytes)?; // using format string
+    /// let ob1 = ObFlex::from_bytes("adsv.b64", &key_bytes)?; // using format string
     /// let format = Format::new(Scheme::Adsv, Encoding::B64); // using Format
     /// let ob2 = ObFlex::from_bytes(format, &key_bytes)?;
     /// # }

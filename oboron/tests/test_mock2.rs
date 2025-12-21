@@ -144,15 +144,15 @@ fn test_mock2_parse_scheme() {
 
 #[test]
 fn test_mock2_format_parsing() {
-    let format = Format::from_str("mock2:c32").unwrap();
+    let format = Format::from_str("mock2.c32").unwrap();
     assert_eq!(format.scheme(), Scheme::Mock2);
     assert_eq!(format.encoding(), Encoding::C32);
 
-    let format = Format::from_str("mock2:b64").unwrap();
+    let format = Format::from_str("mock2.b64").unwrap();
     assert_eq!(format.scheme(), Scheme::Mock2);
     assert_eq!(format.encoding(), Encoding::B64);
 
-    let format = Format::from_str("mock2:hex").unwrap();
+    let format = Format::from_str("mock2.hex").unwrap();
     assert_eq!(format.scheme(), Scheme::Mock2);
     assert_eq!(format.encoding(), Encoding::Hex);
 }

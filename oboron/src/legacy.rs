@@ -286,10 +286,10 @@ macro_rules! impl_legacy_oboron {
 }
 
 // Generate all legacy encoding variants
-impl_legacy_oboron!(LegacyC32, Encoding::C32, "legacy:c32");
-impl_legacy_oboron!(LegacyB32, Encoding::B32, "legacy:b32");
-impl_legacy_oboron!(LegacyB64, Encoding::B64, "legacy:b64");
-impl_legacy_oboron!(LegacyHex, Encoding::Hex, "legacy:hex");
+impl_legacy_oboron!(LegacyC32, Encoding::C32, "legacy.c32");
+impl_legacy_oboron!(LegacyB32, Encoding::B32, "legacy.b32");
+impl_legacy_oboron!(LegacyB64, Encoding::B64, "legacy.b64");
+impl_legacy_oboron!(LegacyHex, Encoding::Hex, "legacy.hex");
 
 #[cfg(test)]
 mod tests {

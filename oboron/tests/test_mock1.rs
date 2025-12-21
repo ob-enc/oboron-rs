@@ -149,13 +149,13 @@ fn test_mock1_format_string() {
     let key = oboron::generate_key();
 
     // Test creating via format string
-    let ob = oboron::new("mock1:c32", &key).unwrap();
+    let ob = oboron::new("mock1.c32", &key).unwrap();
     let encd = ob.enc("format test").unwrap();
     let decd = ob.dec(&encd).unwrap();
     assert_eq!(decd, "format test");
 
     // Test all format strings
-    let formats = vec!["mock1:c32", "mock1:b64", "mock1:hex"];
+    let formats = vec!["mock1.c32", "mock1.b64", "mock1.hex"];
     for format_str in formats {
         let ob = oboron::new(format_str, &key).unwrap();
         assert_eq!(ob.scheme(), Scheme::Mock1);
@@ -177,7 +177,7 @@ fn test_mock1_from_bytes() {
 #[test]
 fn test_mock1_factory_from_bytes() {
     let key_bytes = [0u8; 64];
-    let ob = oboron::from_bytes("mock1:c32", &key_bytes).unwrap();
+    let ob = oboron::from_bytes("mock1.c32", &key_bytes).unwrap();
 
     let plaintext = "factory from bytes";
     let encd = ob.enc(plaintext).unwrap();
@@ -192,8 +192,8 @@ fn test_mock1_convenience_functions() {
 
     // Test enc/dec convenience functions
     let plaintext = "convenience test";
-    let encd = oboron::enc(plaintext, "mock1:c32", &key).unwrap();
-    let decd = oboron::dec(&encd, "mock1:c32", &key).unwrap();
+    let encd = oboron::enc(plaintext, "mock1.c32", &key).unwrap();
+    let decd = oboron::dec(&encd, "mock1.c32", &key).unwrap();
 
     assert_eq!(decd, plaintext);
 }
@@ -203,7 +203,7 @@ fn test_mock1_autodec() {
     let key = oboron::generate_key();
 
     let plaintext = "autodec test";
-    let encd = oboron::enc(plaintext, "mock1:c32", &key).unwrap();
+    let encd = oboron::enc(plaintext, "mock1.c32", &key).unwrap();
 
     // Autodec should work without specifying format
     let decd = oboron::autodec(&encd, &key).unwrap();
@@ -214,8 +214,8 @@ fn test_mock1_autodec() {
 fn test_mock1_keyless_functions() {
     let plaintext = "keyless convenience";
 
-    let encd = oboron::enc_keyless(plaintext, "mock1:c32").unwrap();
-    let decd = oboron::dec_keyless(&encd, "mock1:c32").unwrap();
+    let encd = oboron::enc_keyless(plaintext, "mock1.c32").unwrap();
+    let decd = oboron::dec_keyless(&encd, "mock1.c32").unwrap();
 
     assert_eq!(decd, plaintext);
 }
@@ -323,15 +323,15 @@ fn test_mock1_parse_scheme() {
 
 #[test]
 fn test_mock1_format_parsing() {
-    let format = Format::from_str("mock1:c32").unwrap();
+    let format = Format::from_str("mock1.c32").unwrap();
     assert_eq!(format.scheme(), Scheme::Mock1);
     assert_eq!(format.encoding(), Encoding::C32);
 
-    let format = Format::from_str("mock1:b64").unwrap();
+    let format = Format::from_str("mock1.b64").unwrap();
     assert_eq!(format.scheme(), Scheme::Mock1);
     assert_eq!(format.encoding(), Encoding::B64);
 
-    let format = Format::from_str("mock1:hex").unwrap();
+    let format = Format::from_str("mock1.hex").unwrap();
     assert_eq!(format.scheme(), Scheme::Mock1);
     assert_eq!(format.encoding(), Encoding::Hex);
 }

@@ -102,10 +102,10 @@ encryption key, the format thus uniquely specifies the complete
 transformation from a plaintext string to an encoded "obtext" string.
 Formats are represented by compact identifiers: `{scheme}:{encoding}`,
 for example:
-- `zdc:c32` - zdc scheme, Crockford base32 encoding
-- `upc:b32` - upc scheme, standard RFC 4648 base32 encoding
-- `adgs:hex` - adgs scheme, hex encoding
-- `apsv:b64` - apsv scheme (`p`=probabilistic), base64 encoding
+- `zdc.c32` - zdc scheme, Crockford base32 encoding
+- `upc.b32` - upc scheme, standard RFC 4648 base32 encoding
+- `adgs.hex` - adgs scheme, hex encoding
+- `apsv.b64` - apsv scheme (`p`=probabilistic), base64 encoding
 
 A format thus defines the complete transformation, specifying not just
 the output encoding but also the encryption algorithm and payload byte
@@ -135,8 +135,8 @@ including the encryption and encoding stages.
 > safe in this regard, the standard base32 is not.
 
 Even though Crockford's base32 encoding is recommended, the standard
-base32 encoding (RFC 4648) is also fully supported (`*:b32` formats),
-just like base64url (`*:b64`) and hex (`*:hex`).
+base32 encoding (RFC 4648) is also fully supported (`*.b32` formats),
+just like base64url (`*.b64`) and hex (`*.hex`).
 
 ### Schemes
 
@@ -573,8 +573,8 @@ prefix entropy and compactness—enables specialized applications:
 
 | Use Case            | Traditional Solution | Oboron Approach |
 |---------------------|----------------------|------------------|
-| Short unique IDs    | UUIDv4 (36 chars)    | zdc:c32 (28 chars, reversible) |
-| URL parameters      | JWT (150+ chars)     | adsv:b64 (4.5x smaller, 4x faster) |
+| Short unique IDs    | UUIDv4 (36 chars)    | zdc.c32 (28 chars, reversible) |
+| URL parameters      | JWT (150+ chars)     | adsv.b64 (4.5x smaller, 4x faster) |
 | Database ID masking | Hashids (not secure) | Proper encryption |
 | Simple encryption   | Libsodium (complex)  | String in, string out API |
 
@@ -800,10 +800,10 @@ Available types include all combinations of scheme variants (e.g.,
 `Zdc`, `Upc`, `Adgs`, `Apgs`, `Adsv`, `Apsv`) with encoding
 specifications (`B64`, `Hex`, `B32`, or `C32`),
 and concatenates the two in struct names, for example:
-- `ZdcB32` - encoder for `zdc:b32` format
-- `UpcHex` - encoder for `upc:hex` format
-- `AdgsB64` - encoder for `adgs:b64` format
-- `AdsvC32` - encoder for `adsv:c32` format.
+- `ZdcB32` - encoder for `zdc.b32` format
+- `UpcHex` - encoder for `upc.hex` format
+- `AdgsB64` - encoder for `adgs.b64` format
+- `AdsvC32` - encoder for `adsv.c32` format.
 
 Note that the `zdc` scheme is not included by default as
 cryptographically insecure.  In order to use the associated structs
@@ -819,7 +819,7 @@ unnecessary, use `Ob`:
 use oboron::{Ob, Oboron};
 
 let key = env::var("OBORON_KEY")?;
-let ob = Ob::new("adsv:b64", &key)?;
+let ob = Ob::new("adsv.b64", &key)?;
 
 let ot = ob.enc("hello")?;
 let pt2 = ob.dec(&ot)?;
@@ -836,12 +836,12 @@ Similar to `Ob` but with mutable format specification:
 ```rust
 use oboron::{ObFlex, Oboron};
 
-let mut ob = ObFlex::new("adgs:b64", &key)?;
-let ot = ob.enc("hello")?; // adgs:b64 obtext
+let mut ob = ObFlex::new("adgs.b64", &key)?;
+let ot = ob.enc("hello")?; // adgs.b64 obtext
 
 // Format modification
-ob.set_format("apsv:hex")?;
-let ot_hex = ob.enc("world")?; // apsv:hex obtext
+ob.set_format("apsv.hex")?;
+let ot_hex = ob.enc("world")?; // apsv.hex obtext
 ```
 
 ### 4. **Multiple Format Support** (`ObMulti`)
@@ -857,9 +857,9 @@ use oboron::{ObMulti, Oboron};
 let obm = ObMulti::new(&key)?;
 
 // Format specification per operation
-let ot = obm.enc("test", "apsv:b64");
-let pt2 = obm.dec(&ot, "apsv:b64");
-let pt_other = obm.dec(&other, "zdc:c32");
+let ot = obm.enc("test", "apsv.b64");
+let pt2 = obm.dec(&ot, "apsv.b64");
+let pt_other = obm.dec(&other, "zdc.c32");
 ```
 
 **Autodecode:** While other interfaces perform *scheme* autodetection in
@@ -975,7 +975,7 @@ the hardcoded key.
 - **Key errors**: Ensure keys are exactly 86 base64 characters characters
   properly encoded from 512 bits (see note about
   [valid base64 keys](#valid-base64-keys))
-- **Format strings**: Must match exactly, e.g., "adsv:b64" not "adsv-b64"
+- **Format strings**: Must match exactly, e.g., "adsv.b64" not "adsv-b64"
 - **Decoding errors**: Use `autodec()` when format is unknown
 
 ### Minimum Supported Rust Version (MSRV)

@@ -73,91 +73,91 @@ pub const REVERSED_SCHEME_BYTES: &[u8] = get_reversed_schemes();
 //
 // c32 - Crockford base32 encoding
 #[cfg(feature = "zdc")]
-pub const ZDC_C32: &str = "zdc:c32";
+pub const ZDC_C32: &str = "zdc.c32";
 #[cfg(feature = "upc")]
-pub const UPC_C32: &str = "upc:c32";
+pub const UPC_C32: &str = "upc.c32";
 #[cfg(feature = "adgs")]
-pub const ADGS_C32: &str = "adgs:c32";
+pub const ADGS_C32: &str = "adgs.c32";
 #[cfg(feature = "apgs")]
-pub const APGS_C32: &str = "apgs:c32";
+pub const APGS_C32: &str = "apgs.c32";
 #[cfg(feature = "adsv")]
-pub const ADSV_C32: &str = "adsv:c32";
+pub const ADSV_C32: &str = "adsv.c32";
 #[cfg(feature = "apsv")]
-pub const APSV_C32: &str = "apsv:c32";
+pub const APSV_C32: &str = "apsv.c32";
 // Tier ob7x - Testing
 #[cfg(feature = "mock")]
-pub const MOCK1_C32: &str = "mock1:c32";
+pub const MOCK1_C32: &str = "mock1.c32";
 #[cfg(feature = "mock")]
-pub const MOCK2_C32: &str = "mock2:c32";
+pub const MOCK2_C32: &str = "mock2.c32";
 // Legacy
 #[cfg(feature = "legacy")]
-pub const LEGACY_C32: &str = "legacy:c32";
+pub const LEGACY_C32: &str = "legacy.c32";
 
 // b32 - RFC 4648 Base32 encoding
 #[cfg(feature = "zdc")]
-pub const ZDC_B32: &str = "zdc:b32";
+pub const ZDC_B32: &str = "zdc.b32";
 #[cfg(feature = "upc")]
-pub const UPC_B32: &str = "upc:b32";
+pub const UPC_B32: &str = "upc.b32";
 #[cfg(feature = "adgs")]
-pub const ADGS_B32: &str = "adgs:b32";
+pub const ADGS_B32: &str = "adgs.b32";
 #[cfg(feature = "apgs")]
-pub const APGS_B32: &str = "apgs:b32";
+pub const APGS_B32: &str = "apgs.b32";
 #[cfg(feature = "adsv")]
-pub const ADSV_B32: &str = "adsv:b32";
+pub const ADSV_B32: &str = "adsv.b32";
 #[cfg(feature = "apsv")]
-pub const APSV_B32: &str = "apsv:b32";
+pub const APSV_B32: &str = "apsv.b32";
 // Tier ob7x - Testing
 #[cfg(feature = "mock")]
-pub const MOCK1_B32: &str = "mock1:b32";
+pub const MOCK1_B32: &str = "mock1.b32";
 #[cfg(feature = "mock")]
-pub const MOCK2_B32: &str = "mock2:b32";
+pub const MOCK2_B32: &str = "mock2.b32";
 // Legacy
 #[cfg(feature = "legacy")]
-pub const LEGACY_B32: &str = "legacy:b32";
+pub const LEGACY_B32: &str = "legacy.b32";
 
 // b64 - Base64 encoding
 #[cfg(feature = "zdc")]
-pub const ZDC_B64: &str = "zdc:b64";
+pub const ZDC_B64: &str = "zdc.b64";
 #[cfg(feature = "upc")]
-pub const UPC_B64: &str = "upc:b64";
+pub const UPC_B64: &str = "upc.b64";
 #[cfg(feature = "adgs")]
-pub const ADGS_B64: &str = "adgs:b64";
+pub const ADGS_B64: &str = "adgs.b64";
 #[cfg(feature = "apgs")]
-pub const APGS_B64: &str = "apgs:b64";
+pub const APGS_B64: &str = "apgs.b64";
 #[cfg(feature = "adsv")]
-pub const ADSV_B64: &str = "adsv:b64";
+pub const ADSV_B64: &str = "adsv.b64";
 #[cfg(feature = "apsv")]
-pub const APSV_B64: &str = "apsv:b64";
+pub const APSV_B64: &str = "apsv.b64";
 // Tier ob7x - Testing
 #[cfg(feature = "mock")]
-pub const MOCK1_B64: &str = "mock1:b64";
+pub const MOCK1_B64: &str = "mock1.b64";
 #[cfg(feature = "mock")]
-pub const MOCK2_B64: &str = "mock2:b64";
+pub const MOCK2_B64: &str = "mock2.b64";
 // Legacy
 #[cfg(feature = "legacy")]
-pub const LEGACY_B64: &str = "legacy:b64";
+pub const LEGACY_B64: &str = "legacy.b64";
 
 // hex - Hex encoding
 #[cfg(feature = "zdc")]
-pub const ZDC_HEX: &str = "zdc:hex";
+pub const ZDC_HEX: &str = "zdc.hex";
 #[cfg(feature = "upc")]
-pub const UPC_HEX: &str = "upc:hex";
+pub const UPC_HEX: &str = "upc.hex";
 #[cfg(feature = "adgs")]
-pub const ADGS_HEX: &str = "adgs:hex";
+pub const ADGS_HEX: &str = "adgs.hex";
 #[cfg(feature = "apgs")]
-pub const APGS_HEX: &str = "apgs:hex";
+pub const APGS_HEX: &str = "apgs.hex";
 #[cfg(feature = "adsv")]
-pub const ADSV_HEX: &str = "adsv:hex";
+pub const ADSV_HEX: &str = "adsv.hex";
 #[cfg(feature = "apsv")]
-pub const APSV_HEX: &str = "apsv:hex";
+pub const APSV_HEX: &str = "apsv.hex";
 // Tier ob7x - Testing
 #[cfg(feature = "mock")]
-pub const MOCK1_HEX: &str = "mock1:hex";
+pub const MOCK1_HEX: &str = "mock1.hex";
 #[cfg(feature = "mock")]
-pub const MOCK2_HEX: &str = "mock2:hex";
+pub const MOCK2_HEX: &str = "mock2.hex";
 // Legacy
 #[cfg(feature = "legacy")]
-pub const LEGACY_HEX: &str = "legacy:hex";
+pub const LEGACY_HEX: &str = "legacy.hex";
 
 #[cfg(test)]
 mod tests {

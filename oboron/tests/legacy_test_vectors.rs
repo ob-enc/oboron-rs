@@ -39,10 +39,10 @@ fn load_test_vectors() -> Vec<TestVector> {
 
 fn get_ob_for_format(format: &str) -> Box<dyn Oboron> {
     match format {
-        "legacy:base32crockford" | "legacy:c32" => Box::new(Legacy::new_keyless().unwrap()),
-        "legacy:base32rfc" | "legacy:b32" => Box::new(LegacyB32::new_keyless().unwrap()),
-        "legacy:base64" | "legacy:b64" => Box::new(LegacyB64::new_keyless().unwrap()),
-        "legacy:hex" => Box::new(LegacyHex::new_keyless().unwrap()),
+        "legacy:base32crockford" | "legacy.c32" => Box::new(Legacy::new_keyless().unwrap()),
+        "legacy:base32rfc" | "legacy.b32" => Box::new(LegacyB32::new_keyless().unwrap()),
+        "legacy:base64" | "legacy.b64" => Box::new(LegacyB64::new_keyless().unwrap()),
+        "legacy.hex" => Box::new(LegacyHex::new_keyless().unwrap()),
         _ => panic!("Unsupported legacy format: {}", format),
     }
 }

@@ -42,8 +42,8 @@ fn test_zdc_all_printable_ascii() {
 fn test_convenience_functions() {
     let original = "convenience test";
 
-    let ot_zdc = oboron::enc_keyless(original, "zdc:c32").unwrap();
-    let pt2_zdc = oboron::dec_keyless(&ot_zdc, "zdc:c32").unwrap();
+    let ot_zdc = oboron::enc_keyless(original, "zdc.c32").unwrap();
+    let pt2_zdc = oboron::dec_keyless(&ot_zdc, "zdc.c32").unwrap();
     assert_eq!(original, pt2_zdc);
 
     let autodecd_zdc = oboron::autodec_keyless(&ot_zdc).unwrap();
@@ -91,37 +91,37 @@ fn test_autodetect_all_formats() {
 
     #[cfg(feature = "zdc")]
     {
-        let ot = ob.enc(original, "zdc:c32").unwrap();
+        let ot = ob.enc(original, "zdc.c32").unwrap();
         let pt2 = ob.autodec(&ot).unwrap();
         assert_eq!(original, pt2, "Failed for format zdc");
     }
     #[cfg(feature = "upc")]
     {
-        let ot = ob.enc(original, "upc:c32").unwrap();
+        let ot = ob.enc(original, "upc.c32").unwrap();
         let pt2 = ob.autodec(&ot).unwrap();
         assert_eq!(original, pt2, "Failed for format upc");
     }
     #[cfg(feature = "adgs")]
     {
-        let ot = ob.enc(original, "adgs:c32").unwrap();
+        let ot = ob.enc(original, "adgs.c32").unwrap();
         let pt2 = ob.autodec(&ot).unwrap();
         assert_eq!(original, pt2, "Failed for format adgs");
     }
     #[cfg(feature = "apgs")]
     {
-        let ot = ob.enc(original, "apgs:c32").unwrap();
+        let ot = ob.enc(original, "apgs.c32").unwrap();
         let pt2 = ob.autodec(&ot).unwrap();
         assert_eq!(original, pt2, "Failed for format apgs");
     }
     #[cfg(feature = "adsv")]
     {
-        let ot = ob.enc(original, "adsv:c32").unwrap();
+        let ot = ob.enc(original, "adsv.c32").unwrap();
         let pt2 = ob.autodec(&ot).unwrap();
         assert_eq!(original, pt2, "Failed for format adsv");
     }
     #[cfg(feature = "apsv")]
     {
-        let ot = ob.enc(original, "apsv:c32").unwrap();
+        let ot = ob.enc(original, "apsv.c32").unwrap();
         let pt2 = ob.autodec(&ot).unwrap();
         assert_eq!(original, pt2, "Failed for format apsv");
     }

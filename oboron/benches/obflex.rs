@@ -74,7 +74,7 @@ fn run_obflex_benchmarks(c: &mut Criterion) {
     }
 
     // Create ObFlex once, OUTSIDE the timed loop
-    let mut ob = ObFlex::new_keyless("mock1:c32").unwrap();
+    let mut ob = ObFlex::new_keyless("mock1.c32").unwrap();
 
     let mut bench_count = 0;
     for spec in specs {

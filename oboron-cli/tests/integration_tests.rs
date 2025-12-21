@@ -271,7 +271,7 @@ fn test_enc_different_encodings() {
 #[test]
 fn test_enc_with_format_string() {
     let test_home = test_home_dir();
-    let formats = vec!["zdc:b32", "adgs:b64", "adsv:hex"];
+    let formats = vec!["zdc.b32", "adgs.b64", "adsv.hex"];
 
     for format in formats {
         let mut cmd = Command::cargo_bin("ob").unwrap();

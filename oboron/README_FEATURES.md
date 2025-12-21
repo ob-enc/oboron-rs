@@ -13,7 +13,7 @@ oboron = "1.0"
 
 This includes: `upc`, `adgs`, `apgs`, `adsv`, `apsv`.
 
-All encodings (`:c32`-Crockford base32, `:b32`-standard base32, `:b64`-URL-safe base64, and `:hex`-hex) are always included.
+All encodings (`.c32`-Crockford base32, `.b32`-standard base32, `.b64`-URL-safe base64, and `.hex`-hex) are always included.
 
 ### NOT INCLUDED BY DEFAULT
 

@@ -176,7 +176,7 @@ fn test_apsv_all_encodings() {
 #[cfg(feature = "apsv")]
 fn test_obflex_basic() {
     let key = [0u8; 64];
-    let mut ob = ObFlex::from_bytes("zdc:c32", &key).expect("Failed to create ObFlex");
+    let mut ob = ObFlex::from_bytes("zdc.c32", &key).expect("Failed to create ObFlex");
 
     let plaintext = "Testing ObFlex";
 
@@ -214,14 +214,14 @@ fn test_obflex_basic() {
 #[cfg(feature = "apsv")]
 fn test_obflex_all_formats() {
     let key = [0u8; 64];
-    let mut ob = ObFlex::from_bytes("zdc:c32", &key).expect("Failed to create ObFlex");
+    let mut ob = ObFlex::from_bytes("zdc.c32", &key).expect("Failed to create ObFlex");
 
     let plaintext = "Testing all ObFlex formats";
 
     let formats = [
-        "zdc:c32", "zdc:b64", "zdc:hex", "upc:c32", "upc:b64", "upc:hex", "adgs:c32", "adgs:b64",
-        "adgs:hex", "apgs:c32", "apgs:b64", "apgs:hex", "adsv:c32", "adsv:b64", "adsv:hex",
-        "apsv:c32", "apsv:b64", "apsv:hex",
+        "zdc.c32", "zdc.b64", "zdc.hex", "upc.c32", "upc.b64", "upc.hex", "adgs.c32", "adgs.b64",
+        "adgs.hex", "apgs.c32", "apgs.b64", "apgs.hex", "adsv.c32", "adsv.b64", "adsv.hex",
+        "apsv.c32", "apsv.b64", "apsv.hex",
     ];
 
     for format in &formats {
@@ -245,7 +245,7 @@ fn test_obflex_all_formats() {
 #[cfg(feature = "adgs")]
 fn test_obflex_encoding_changes() {
     let key = [0u8; 64];
-    let mut ob = ObFlex::from_bytes("adgs:c32", &key).expect("Failed to create ObFlex");
+    let mut ob = ObFlex::from_bytes("adgs.c32", &key).expect("Failed to create ObFlex");
 
     let plaintext = "Testing encoding changes";
 

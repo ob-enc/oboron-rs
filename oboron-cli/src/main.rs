@@ -287,7 +287,7 @@ impl FormatSpec {
         Ok(Self { scheme, encoding })
     }
 
-    /// Convert to format string (e.g., "zdc:b64")
+    /// Convert to format string (e.g., "zdc.b64")
     fn to_string(&self) -> String {
         format!("{}:{}", self.scheme.as_str(), self.encoding.as_str())
     }
@@ -313,7 +313,7 @@ enum Commands {
         #[arg(short = 'z', long)]
         keyless: bool,
 
-        /// Format specification (e.g., "zdc:b64", "adgs:b32")
+        /// Format specification (e.g., "zdc.b64", "adgs.b32")
         /// Cannot be combined with scheme or encoding flags
         #[arg(short, long)]
         format: Option<String>,
@@ -345,7 +345,7 @@ enum Commands {
         #[arg(short = 'z', long)]
         keyless: bool,
 
-        /// Format specification (e.g., "zdc:b64", "adgs:b32")
+        /// Format specification (e.g., "zdc.b64", "adgs.b32")
         /// Cannot be combined with scheme or encoding flags
         #[arg(short, long)]
         format: Option<String>,
@@ -997,7 +997,7 @@ mod tests {
         };
 
         let result = FormatSpec::parse(
-            Some("mock1:b64".to_string()),
+            Some("mock1.b64".to_string()),
             &scheme_flags,
             &encoding_flags,
             Some(&config),
@@ -1051,7 +1051,7 @@ mod tests {
         };
 
         let result = FormatSpec::parse(
-            Some("mock1:b64".to_string()),
+            Some("mock1.b64".to_string()),
             &scheme_flags,
             &encoding_flags,
             None,
@@ -1106,7 +1106,7 @@ mod tests {
         };
 
         let result = FormatSpec::parse(
-            Some("mock1:b64".to_string()),
+            Some("mock1.b64".to_string()),
             &scheme_flags,
             &encoding_flags,
             None,

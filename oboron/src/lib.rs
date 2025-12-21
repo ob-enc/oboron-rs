@@ -35,16 +35,16 @@
 //! # let key = oboron::generate_key();
 //! # let obm = oboron::ObMulti::new(&key)?;
 //! // Operations: data, format
-//! let ot = obm.enc("plaintext", "adsv:b64")?;
-//! obm.dec(&ot, "adsv:b64")?;
+//! let ot = obm.enc("plaintext", "adsv.b64")?;
+//! obm.dec(&ot, "adsv.b64")?;
 //!
 //! // Constructors: format, key
-//! oboron::Ob::new("adsv:b64", &key)?;
-//! oboron::ObFlex::new("adsv:b64", &key)?;
+//! oboron::Ob::new("adsv.b64", &key)?;
+//! oboron::ObFlex::new("adsv.b64", &key)?;
 //!
 //! // Convenience functions: data, format, key
-//! let ot = oboron::enc("plaintext", "adsv:b64", &key)?;
-//! oboron::dec(&ot, "adsv:b64", &key)?;
+//! let ot = oboron::enc("plaintext", "adsv.b64", &key)?;
+//! oboron::dec(&ot, "adsv.b64", &key)?;
 //! # }
 //! # Ok(())
 //! # }
@@ -64,8 +64,8 @@
 //! # {
 //! # use oboron::{AdsvC32, AdsvB64, Oboron};
 //! # let key = oboron::generate_key();
-//! let adsv = AdsvC32::new(&key)?;      // adsv:c32 format (Crockford base32)
-//! let adsv_b64 = AdsvB64::new(&key)?;  // adsv:b64 format (base64url)
+//! let adsv = AdsvC32::new(&key)?;      // adsv.c32 format (Crockford base32)
+//! let adsv_b64 = AdsvB64::new(&key)?;  // adsv.b64 format (base64url)
 //!
 //! let ot = adsv.enc("hello")?;
 //! let pt2 = adsv.dec(&ot)?;
@@ -89,7 +89,7 @@
 //! # use oboron::{Ob, Oboron};
 //! # let key = oboron::generate_key();
 //! // Format chosen at runtime, immutable instance
-//! let ob = Ob::new("adsv:b64", &key)?;
+//! let ob = Ob::new("adsv.b64", &key)?;
 //!
 //! let ot = ob.enc("hello")?;
 //! let pt2 = ob.dec(&ot)?;
@@ -112,15 +112,15 @@
 //! # {
 //! # use oboron::{ObFlex, Oboron, Scheme, Encoding};
 //! # let key = oboron::generate_key();
-//! let mut flex = ObFlex::new("adsv:b64", &key)?;
-//! let ot1 = flex.enc("hello")?;    // adsv:b64 format
+//! let mut flex = ObFlex::new("adsv.b64", &key)?;
+//! let ot1 = flex.enc("hello")?;    // adsv.b64 format
 //!
 //! // Change format at runtime
 //! flex.set_scheme(Scheme::Mock1)?;  // set_scheme() only with ObFlex
-//! let ot2 = flex.enc("hello")? ;   // mock1:b64 format output
+//! let ot2 = flex.enc("hello")? ;   // mock1.b64 format output
 //! // Also available:
-//! flex.set_encoding(Encoding::Hex)?; // now set as mock1:hex
-//! flex.set_format("adsv:b32")?;      // now adsv:b32
+//! flex.set_encoding(Encoding::Hex)?; // now set as mock1.hex
+//! flex.set_format("adsv.b32")?;      // now adsv.b32
 //! # }
 //! # Ok(())
 //! # }
@@ -143,9 +143,9 @@
 //! let obm = ObMulti::new(&key)?;
 //!
 //! // Encode to different formats
-//! let ot_b32 = obm.enc("data", "adsv:c32")?;
-//! let ot_b64 = obm.enc("data", "adsv:b64")?;
-//! let ot_hex = obm.enc("data", "adsv:hex")?;
+//! let ot_b32 = obm.enc("data", "adsv.c32")?;
+//! let ot_b64 = obm.enc("data", "adsv.b64")?;
+//! let ot_hex = obm.enc("data", "adsv.hex")?;
 //!
 //! // Decode with automatic format detection
 //! let pt2 = obm.autodec(&ot_b64)?;
@@ -170,8 +170,8 @@
 //! # use oboron;
 //! # let key = oboron::generate_key();
 //! // Fixed format types (best performance for multiple operations with same format)
-//! let adsv = oboron::AdsvC32::new(&key)?;  // "adsv:c32" format Oboron instance
-//! let mock1 = oboron::Mock1C32::new(&key)?;  // "mock1:c32" format Oboron instance
+//! let adsv = oboron::AdsvC32::new(&key)?;  // "adsv.c32" format Oboron instance
+//! let mock1 = oboron::Mock1C32::new(&key)?;  // "mock1.c32" format Oboron instance
 //!
 //! let ot_adsv = adsv.enc("data1")?;
 //! let ot_mock1 = mock1.enc("data2")?;
@@ -182,14 +182,14 @@
 //! assert_eq!(pt1, "data1");
 //! assert_eq!(pt2, "data2");
 //! // Note: The above autodetection works only with shared encodings
-//! // adsv:c32 and mock1:c32 are both base32crockford-encoded
+//! // adsv.c32 and mock1.c32 are both base32crockford-encoded
 //!
 //! // Use dec_strict to enforce scheme matching
 //! let pt3 = adsv.dec_strict(&ot_adsv)?;         // OK: Matches scheme
 //! assert!(adsv.dec_strict(&ot_mock1).is_err());  // Error: Wrong scheme (adsv != mock1)
 //!
 //! // Note: For fixed oborons, string encoding (c32/b32/b64/hex) must match the instance encoding
-//! let adsv_b64 = oboron::AdsvB64::new(&key)?;  // "adsv:b64" format Oboron
+//! let adsv_b64 = oboron::AdsvB64::new(&key)?;  // "adsv.b64" format Oboron
 //! let ot_b64 = adsv_b64.enc("data3")?;
 //! assert!(adsv.dec(&ot_b64).is_err());  // Error: Encoding mismatch (c32 != b64)
 //! // For mixed encodings, use ObMulti instead (see above)
@@ -232,7 +232,7 @@
 //! }
 //!
 //! let adsv = AdsvC32::new(&key)?;
-//! let ob = Ob::new("adsv:c32", &key)?;
+//! let ob = Ob::new("adsv.c32", &key)?;
 //!
 //! process(&adsv, "hello")?;
 //! process(&ob, "hello")?;
@@ -425,7 +425,7 @@ pub mod prelude {
 /// # {
 /// # use oboron;
 /// # let key = oboron::generate_key();
-/// let ot = oboron::enc("secret data", "adsv:b64", &key)?;
+/// let ot = oboron::enc("secret data", "adsv.b64", &key)?;
 /// # }
 /// # Ok(())
 /// # }
@@ -447,7 +447,7 @@ pub fn enc(plaintext: &str, format: &str, key: &str) -> Result<String, Error> {
 /// # #[cfg(feature = "adsv")]
 /// # {
 /// # use oboron;
-/// let ot = oboron::enc_keyless("test data", "adsv:b64")?;
+/// let ot = oboron::enc_keyless("test data", "adsv.b64")?;
 /// # }
 /// # Ok(())
 /// # }
@@ -474,8 +474,8 @@ pub fn enc_keyless(plaintext: &str, format: &str) -> Result<String, Error> {
 /// # use oboron;
 /// # {
 /// # let key = oboron::generate_key();
-/// # let ot = oboron::enc("test123", "adsv:b64", &key)?;
-/// let pt2 = oboron::dec(&ot, "adsv:b64", &key)?;
+/// # let ot = oboron::enc("test123", "adsv.b64", &key)?;
+/// let pt2 = oboron::dec(&ot, "adsv.b64", &key)?;
 /// # assert_eq!(pt2, "test123");
 /// # }
 /// # Ok(())
@@ -498,8 +498,8 @@ pub fn dec(obtext: &str, format: &str, key: &str) -> Result<String, Error> {
 /// # #[cfg(feature = "adsv")]
 /// # {
 /// # use oboron;
-/// # let ot = oboron::enc_keyless("test", "adsv:b64")?;
-/// let pt2 = oboron::dec_keyless(&ot, "adsv:b64")?;
+/// # let ot = oboron::enc_keyless("test", "adsv.b64")?;
+/// let pt2 = oboron::dec_keyless(&ot, "adsv.b64")?;
 /// # assert_eq!(pt2, "test");
 /// # }
 /// # Ok(())
@@ -527,7 +527,7 @@ pub fn dec_keyless(obtext: &str, format: &str) -> Result<String, Error> {
 /// # {
 /// # use oboron;
 /// # let key = oboron::generate_key();
-/// # let ot = oboron::enc("secret", "adsv:b64", &key)?;
+/// # let ot = oboron::enc("secret", "adsv.b64", &key)?;
 /// let pt2 = oboron::autodec(&ot, &key)?;  // Format autodetected, including encoding
 /// # assert_eq!(pt2, "secret");
 /// # }
@@ -551,7 +551,7 @@ pub fn autodec(obtext: &str, key: &str) -> Result<String, Error> {
 /// # #[cfg(feature = "adsv")]
 /// # {
 /// # use oboron;
-/// # let ot = oboron::enc_keyless("test", "mock1:b64")?;
+/// # let ot = oboron::enc_keyless("test", "mock1.b64")?;
 /// let pt2 = oboron::autodec_keyless(&ot)?; // Autodetect format; use hardcoded key
 /// # assert_eq!(pt2, "test");
 /// # }

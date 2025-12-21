@@ -18,7 +18,7 @@ use crate::{ob_core::ObCore, Encoding, Error, Format, Oboron, Scheme};
 /// # {
 /// # use oboron::{Ob, Oboron, generate_key};
 /// # let key = generate_key();
-/// let ob = Ob::new("adsv:b64", &key)?;
+/// let ob = Ob::new("adsv.b64", &key)?;
 /// let ot = ob.enc("hello")?; // obtext
 /// let pt2 = ob.dec(&ot)?; // recovered plaintext
 /// assert_eq!(pt2, "hello");
@@ -39,12 +39,12 @@ use crate::{ob_core::ObCore, Encoding, Error, Format, Oboron, Scheme};
 /// let adsv = AdsvB64::new(&key)?;
 ///
 /// // Runtime format, immutable (flexible, still efficient)
-/// let ob = Ob::new("adsv:b64", &key)?;
+/// let ob = Ob::new("adsv.b64", &key)?;
 /// // assert!(ob.set_format("mock1:64").is_err()); // <- doesn't work! - format is locked
 ///
 /// // Runtime format, mutable (maximum flexibility)
-/// let mut flex = ObFlex::new("adsv:b64", &key)?;
-/// flex.set_format("mock1:hex")?; // <- Can change format
+/// let mut flex = ObFlex::new("adsv.b64", &key)?;
+/// flex.set_format("mock1.hex")?; // <- Can change format
 /// # }
 /// # Ok(())
 /// # }
@@ -66,7 +66,7 @@ impl Ob {
     /// # {
     /// # use oboron::Ob;
     /// # let key = oboron::generate_key();
-    /// let ob = Ob::new("adsv:b64", &key)?;
+    /// let ob = Ob::new("adsv.b64", &key)?;
     /// # }
     /// # Ok(())
     /// # }
@@ -87,7 +87,7 @@ impl Ob {
     /// # {
     /// # use oboron::{Ob, Scheme, Encoding};
     /// # let key = oboron::generate_key();
-    /// let ob = Ob::new("adsv:b64", &key)?;
+    /// let ob = Ob::new("adsv.b64", &key)?;
     /// let format = ob.format();
     /// assert_eq!(format.scheme(), Scheme::Adsv);
     /// assert_eq!(format.encoding(), Encoding::B64);
@@ -138,7 +138,7 @@ impl Ob {
     /// # #[cfg(all(feature = "adsv", feature="keyless"))]
     /// # {
     /// # use oboron::Ob;
-    /// let ob = Ob::new_keyless("adsv:c32")?;
+    /// let ob = Ob::new_keyless("adsv.c32")?;
     /// # }
     /// # Ok(())
     /// # }
@@ -186,7 +186,7 @@ impl Ob {
     /// # {
     /// # use oboron::Ob;
     /// let key_hex = oboron::generate_key_hex();
-    /// let ob = Ob::from_hex_key("adsv:b64", &key_hex)?;
+    /// let ob = Ob::from_hex_key("adsv.b64", &key_hex)?;
     /// # }
     /// # Ok(())
     /// # }
@@ -208,7 +208,7 @@ impl Ob {
     /// # {
     /// # use oboron::Ob;
     /// let key_bytes = oboron::generate_key_bytes();
-    /// let ob = Ob::from_bytes("adsv:b64", &key_bytes)?;
+    /// let ob = Ob::from_bytes("adsv.b64", &key_bytes)?;
     /// # }
     /// # Ok(())
     /// # }

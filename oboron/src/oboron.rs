@@ -57,7 +57,7 @@ macro_rules! impl_oboron {
         $name:ident,           // Type name (e.g., ZdcC32)
         $scheme:expr,          // Scheme constant (e.g., Scheme::Zdc)
         $encoding:expr,        // Encoding constant (e.g., Encoding::C32)
-        $format_str:expr       // Format string for docs (e.g., "zdc:c32")
+        $format_str:expr       // Format string for docs (e.g., "zdc.c32")
     ) => {
         #[doc = concat!("Oboron implementation for ", $format_str, " format.\n\n")]
         #[doc = concat!("Corresponds to format string: `\"", $format_str, "\"`")]
@@ -171,81 +171,81 @@ macro_rules! impl_oboron {
 
 // C32 variants
 #[cfg(feature = "zdc")]
-impl_oboron!(ZdcC32, Scheme::Zdc, Encoding::C32, "zdc:c32");
+impl_oboron!(ZdcC32, Scheme::Zdc, Encoding::C32, "zdc.c32");
 #[cfg(feature = "upc")]
-impl_oboron!(UpcC32, Scheme::Upc, Encoding::C32, "upc:c32");
+impl_oboron!(UpcC32, Scheme::Upc, Encoding::C32, "upc.c32");
 #[cfg(feature = "adgs")]
-impl_oboron!(AdgsC32, Scheme::Adgs, Encoding::C32, "adgs:c32");
+impl_oboron!(AdgsC32, Scheme::Adgs, Encoding::C32, "adgs.c32");
 #[cfg(feature = "apgs")]
-impl_oboron!(ApgsC32, Scheme::Apgs, Encoding::C32, "apgs:c32");
+impl_oboron!(ApgsC32, Scheme::Apgs, Encoding::C32, "apgs.c32");
 #[cfg(feature = "adsv")]
-impl_oboron!(AdsvC32, Scheme::Adsv, Encoding::C32, "adsv:c32");
+impl_oboron!(AdsvC32, Scheme::Adsv, Encoding::C32, "adsv.c32");
 #[cfg(feature = "apsv")]
-impl_oboron!(ApsvC32, Scheme::Apsv, Encoding::C32, "apsv:c32");
+impl_oboron!(ApsvC32, Scheme::Apsv, Encoding::C32, "apsv.c32");
 
 // B32 variants
 #[cfg(feature = "zdc")]
-impl_oboron!(ZdcB32, Scheme::Zdc, Encoding::B32, "zdc:b32");
+impl_oboron!(ZdcB32, Scheme::Zdc, Encoding::B32, "zdc.b32");
 #[cfg(feature = "upc")]
-impl_oboron!(UpcB32, Scheme::Upc, Encoding::B32, "upc:b32");
+impl_oboron!(UpcB32, Scheme::Upc, Encoding::B32, "upc.b32");
 #[cfg(feature = "adgs")]
-impl_oboron!(AdgsB32, Scheme::Adgs, Encoding::B32, "adgs:b32");
+impl_oboron!(AdgsB32, Scheme::Adgs, Encoding::B32, "adgs.b32");
 #[cfg(feature = "apgs")]
-impl_oboron!(ApgsB32, Scheme::Apgs, Encoding::B32, "apgs:b32");
+impl_oboron!(ApgsB32, Scheme::Apgs, Encoding::B32, "apgs.b32");
 #[cfg(feature = "adsv")]
-impl_oboron!(AdsvB32, Scheme::Adsv, Encoding::B32, "adsv:b32");
+impl_oboron!(AdsvB32, Scheme::Adsv, Encoding::B32, "adsv.b32");
 #[cfg(feature = "apsv")]
-impl_oboron!(ApsvB32, Scheme::Apsv, Encoding::B32, "apsv:b32");
+impl_oboron!(ApsvB32, Scheme::Apsv, Encoding::B32, "apsv.b32");
 
 // B64 variants
 #[cfg(feature = "zdc")]
-impl_oboron!(ZdcB64, Scheme::Zdc, Encoding::B64, "zdc:b64");
+impl_oboron!(ZdcB64, Scheme::Zdc, Encoding::B64, "zdc.b64");
 #[cfg(feature = "upc")]
-impl_oboron!(UpcB64, Scheme::Upc, Encoding::B64, "upc:b64");
+impl_oboron!(UpcB64, Scheme::Upc, Encoding::B64, "upc.b64");
 #[cfg(feature = "adgs")]
-impl_oboron!(AdgsB64, Scheme::Adgs, Encoding::B64, "adgs:b64");
+impl_oboron!(AdgsB64, Scheme::Adgs, Encoding::B64, "adgs.b64");
 #[cfg(feature = "apgs")]
-impl_oboron!(ApgsB64, Scheme::Apgs, Encoding::B64, "apgs:b64");
+impl_oboron!(ApgsB64, Scheme::Apgs, Encoding::B64, "apgs.b64");
 #[cfg(feature = "adsv")]
-impl_oboron!(AdsvB64, Scheme::Adsv, Encoding::B64, "adsv:b64");
+impl_oboron!(AdsvB64, Scheme::Adsv, Encoding::B64, "adsv.b64");
 #[cfg(feature = "apsv")]
-impl_oboron!(ApsvB64, Scheme::Apsv, Encoding::B64, "apsv:b64");
+impl_oboron!(ApsvB64, Scheme::Apsv, Encoding::B64, "apsv.b64");
 
 // Hex variants
 #[cfg(feature = "zdc")]
-impl_oboron!(ZdcHex, Scheme::Zdc, Encoding::Hex, "zdc:hex");
+impl_oboron!(ZdcHex, Scheme::Zdc, Encoding::Hex, "zdc.hex");
 #[cfg(feature = "upc")]
-impl_oboron!(UpcHex, Scheme::Upc, Encoding::Hex, "upc:hex");
+impl_oboron!(UpcHex, Scheme::Upc, Encoding::Hex, "upc.hex");
 #[cfg(feature = "adgs")]
-impl_oboron!(AdgsHex, Scheme::Adgs, Encoding::Hex, "adgs:hex");
+impl_oboron!(AdgsHex, Scheme::Adgs, Encoding::Hex, "adgs.hex");
 #[cfg(feature = "apgs")]
-impl_oboron!(ApgsHex, Scheme::Apgs, Encoding::Hex, "apgs:hex");
+impl_oboron!(ApgsHex, Scheme::Apgs, Encoding::Hex, "apgs.hex");
 #[cfg(feature = "adsv")]
-impl_oboron!(AdsvHex, Scheme::Adsv, Encoding::Hex, "adsv:hex");
+impl_oboron!(AdsvHex, Scheme::Adsv, Encoding::Hex, "adsv.hex");
 #[cfg(feature = "apsv")]
-impl_oboron!(ApsvHex, Scheme::Apsv, Encoding::Hex, "apsv:hex");
+impl_oboron!(ApsvHex, Scheme::Apsv, Encoding::Hex, "apsv.hex");
 
 // Testing
 
 // mock1 (identity scheme)
 #[cfg(feature = "mock")]
-impl_oboron!(Mock1C32, Scheme::Mock1, Encoding::C32, "mock1:c32");
+impl_oboron!(Mock1C32, Scheme::Mock1, Encoding::C32, "mock1.c32");
 #[cfg(feature = "mock")]
-impl_oboron!(Mock1B32, Scheme::Mock1, Encoding::B32, "mock1:b32");
+impl_oboron!(Mock1B32, Scheme::Mock1, Encoding::B32, "mock1.b32");
 #[cfg(feature = "mock")]
-impl_oboron!(Mock1B64, Scheme::Mock1, Encoding::B64, "mock1:b64");
+impl_oboron!(Mock1B64, Scheme::Mock1, Encoding::B64, "mock1.b64");
 #[cfg(feature = "mock")]
-impl_oboron!(Mock1Hex, Scheme::Mock1, Encoding::Hex, "mock1:hex");
+impl_oboron!(Mock1Hex, Scheme::Mock1, Encoding::Hex, "mock1.hex");
 
 // mock2 (reverse scheme)
 #[cfg(feature = "mock")]
-impl_oboron!(Mock2C32, Scheme::Mock2, Encoding::C32, "mock2:c32");
+impl_oboron!(Mock2C32, Scheme::Mock2, Encoding::C32, "mock2.c32");
 #[cfg(feature = "mock")]
-impl_oboron!(Mock2B32, Scheme::Mock2, Encoding::B32, "mock2:b32");
+impl_oboron!(Mock2B32, Scheme::Mock2, Encoding::B32, "mock2.b32");
 #[cfg(feature = "mock")]
-impl_oboron!(Mock2B64, Scheme::Mock2, Encoding::B64, "mock2:b64");
+impl_oboron!(Mock2B64, Scheme::Mock2, Encoding::B64, "mock2.b64");
 #[cfg(feature = "mock")]
-impl_oboron!(Mock2Hex, Scheme::Mock2, Encoding::Hex, "mock2:hex");
+impl_oboron!(Mock2Hex, Scheme::Mock2, Encoding::Hex, "mock2.hex");
 
 /// Type-erased Oboron encoder that can hold any scheme+encoding combination.
 ///
@@ -431,7 +431,7 @@ impl Oboron for ObAny {
 impl ObAny {
     /// Create a new instance with a 128-character hex string key.
     ///
-    /// Defaults to mock1:c32 format.
+    /// Defaults to mock1.c32 format.
     pub fn new(key: &str) -> Result<Self, Error> {
         #[cfg(feature = "mock")]
         return Ok(ObAny::Mock1C32(Mock1C32::new(key)?));
@@ -492,7 +492,7 @@ impl ObAny {
 
     /// Create a new instance from a 64-byte key.
     ///
-    /// Defaults to mock1:c32 format.
+    /// Defaults to mock1.c32 format.
     #[inline]
     #[cfg(feature = "bytes-keys")]
     pub fn from_bytes(key_bytes: &[u8; 64]) -> Result<Self, Error> {
@@ -630,7 +630,7 @@ impl ObAny {
 
     /// Create a new instance with hardcoded key (testing only).
     ///
-    /// Defaults to mock1:c32 format.
+    /// Defaults to mock1.c32 format.
     #[cfg(feature = "keyless")]
     pub fn new_keyless() -> Result<Self, Error> {
         #[cfg(feature = "mock")]
@@ -1075,7 +1075,7 @@ mod tests {
 
         for scheme in schemes {
             for encoding in &encodings {
-                let format_str = format!("{}:{}", scheme.as_str(), encoding.as_str());
+                let format_str = format!("{}.{}", scheme.as_str(), encoding.as_str());
                 let result = new(format_str.as_str(), &key);
 
                 assert!(

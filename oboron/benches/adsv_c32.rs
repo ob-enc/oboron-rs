@@ -35,14 +35,14 @@ fn load_benchmark_specs() -> Vec<BenchmarkSpec> {
 
     for path in &possible_paths {
         if path.exists() {
-            eprintln!("Found adsv:c32 benchmarks at: {:?}", path);
+            eprintln!("Found adsv.c32 benchmarks at: {:?}", path);
             let data = fs::read_to_string(path).expect("Failed to read benchmarks");
             let specs: Vec<BenchmarkSpec> = data
                 .lines()
                 .filter(|line| !line.trim().is_empty())
                 .map(|line| serde_json::from_str(line).expect("Failed to parse"))
                 .collect();
-            eprintln!("Loaded {} adsv:c32 benchmark specifications", specs.len());
+            eprintln!("Loaded {} adsv.c32 benchmark specifications", specs.len());
             return specs;
         }
     }
@@ -55,7 +55,7 @@ fn run_adsv_c32_benchmarks(c: &mut Criterion) {
     let specs = load_benchmark_specs();
 
     if specs.is_empty() {
-        eprintln!("No adsv:c32 specs loaded");
+        eprintln!("No adsv.c32 specs loaded");
         return;
     }
 
@@ -103,7 +103,7 @@ fn run_adsv_c32_benchmarks(c: &mut Criterion) {
             }
         }
     }
-    eprintln!("Registered {} adsv:c32 benchmarks", bench_count);
+    eprintln!("Registered {} adsv.c32 benchmarks", bench_count);
 }
 
 criterion_group!(benches, run_adsv_c32_benchmarks);

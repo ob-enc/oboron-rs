@@ -151,13 +151,13 @@ fn benchmark_dec_apsv(c: &mut Criterion) {
 fn benchmark_adsv_obm_enc(c: &mut Criterion) {
     let ob = ObMulti::new_keyless().unwrap();
     c.bench_function("auto_encode_adsv", |b| {
-        b.iter(|| ob.enc(black_box("test123"), "adsv:c32").unwrap());
+        b.iter(|| ob.enc(black_box("test123"), "adsv.c32").unwrap());
     });
 }
 
 fn benchmark_adsv_obm_autodec(c: &mut Criterion) {
     let ob = ObMulti::new_keyless().unwrap();
-    let ot = ob.enc("test123", "adsv:c32").unwrap();
+    let ot = ob.enc("test123", "adsv.c32").unwrap();
     c.bench_function("auto_decode_adsv", |b| {
         b.iter(|| ob.autodec(black_box(&ot)).unwrap());
     });

@@ -16,8 +16,8 @@ mod bytes_keys_enabled {
         #[cfg(feature = "adsv")]
         {
             let _ = AdsvC32::from_bytes(&key);
-            let _ = Ob::from_bytes("adsv:c32", &key);
-            let _ = ObFlex::from_bytes("adsv:c32", &key);
+            let _ = Ob::from_bytes("adsv.c32", &key);
+            let _ = ObFlex::from_bytes("adsv.c32", &key);
             let _ = ObMulti::from_bytes(&key);
         }
     }
@@ -48,8 +48,8 @@ mod hex_keys_enabled {
         #[cfg(feature = "adsv")]
         {
             let _ = AdsvC32::from_hex_key(&key);
-            let _ = Ob::from_hex_key("adsv:c32", &key);
-            let _ = ObFlex::from_hex_key("adsv:c32", &key);
+            let _ = Ob::from_hex_key("adsv.c32", &key);
+            let _ = ObFlex::from_hex_key("adsv.c32", &key);
             let _ = ObMulti::from_key_hex(&key);
         }
     }
@@ -78,8 +78,8 @@ mod keyless_enabled {
         #[cfg(feature = "adsv")]
         {
             let _ = AdsvC32::new_keyless();
-            let _ = Ob::new_keyless("adsv:c32");
-            let _ = ObFlex::new_keyless("adsv:c32");
+            let _ = Ob::new_keyless("adsv.c32");
+            let _ = ObFlex::new_keyless("adsv.c32");
             let _ = ObMulti::new_keyless();
         }
     }
@@ -89,8 +89,8 @@ mod keyless_enabled {
         #[cfg(feature = "adsv")]
         {
             // These should compile with keyless feature
-            let ot = enc_keyless("test", "adsv:c32").unwrap();
-            let _pt = dec_keyless(&ot, "adsv:c32").unwrap();
+            let ot = enc_keyless("test", "adsv.c32").unwrap();
+            let _pt = dec_keyless(&ot, "adsv.c32").unwrap();
             let _pt2 = autodec_keyless(&ot).unwrap();
         }
     }
