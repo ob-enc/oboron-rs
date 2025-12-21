@@ -289,7 +289,7 @@ impl FormatSpec {
 
     /// Convert to format string (e.g., "zdc.b64")
     fn to_string(&self) -> String {
-        format!("{}:{}", self.scheme.as_str(), self.encoding.as_str())
+        format!("{}.{}", self.scheme.as_str(), self.encoding.as_str())
     }
 }
 
