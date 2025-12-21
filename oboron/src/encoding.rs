@@ -58,6 +58,6 @@ impl std::str::FromStr for Encoding {
 
 impl std::fmt::Display for Encoding {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.as_long_str())
+        write!(f, "{}", self.as_str())
     }
 }

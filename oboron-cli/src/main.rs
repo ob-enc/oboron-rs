@@ -192,15 +192,15 @@ impl SchemeFlags {
 /// Encoding selection flags (mutually exclusive)
 #[derive(Args, Debug)]
 struct EncodingFlags {
-    /// Use base32crockford encoding
+    /// Use c32 encoding
     #[arg(long, alias = "base32crockford")]
     c32: bool,
 
-    /// Use base32rfc encoding
+    /// Use b32 encoding
     #[arg(long, alias = "base32rfc")]
     b32: bool,
 
-    /// Use base64 encoding
+    /// Use b64 encoding
     #[arg(long, alias = "base64")]
     b64: bool,
 
