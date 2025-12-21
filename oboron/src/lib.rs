@@ -8,9 +8,9 @@
 //! # #[cfg(feature = "adsv")]
 //! # {
 //! use oboron::{AdsvC32, Oboron};
-//! let key = oboron::generate_key();   // get key
-//! let ob = AdsvC32::new(&key)?;          // instantiate Oboron (cipher+encoder)
-//! let ot = ob.enc("secret data")?;    // get obtext (encoded ciphertext)
+//! let key = oboron::generate_key(); // get key
+//! let ob = AdsvC32::new(&key)?;     // instantiate Oboron (cipher+encoder)
+//! let ot = ob.enc("secret data")?;  // get obtext (encoded ciphertext)
 //! # }
 //! # Ok(())
 //! # }
@@ -22,9 +22,9 @@
 //!
 //! **`data` < `format` < `key`**
 //!
-//! - **Data** (plaintext/obtext) comes first - it's what you're operating on
-//! - **Format** comes second (when present) - it's configuration/options
-//! - **Key** comes last (when present) - it's the security credential
+//! - `data` (plaintext/obtext) comes first - it's what you're operating on
+//! - `format` comes second (when present) - it's configuration/options
+//! - `key` comes last (when present) - it's the security credential
 //!
 //! Examples:
 //! ```rust
@@ -43,7 +43,9 @@
 //! oboron::ObFlex::new("adsv.b64", &key)?;
 //!
 //! // Convenience functions: data, format, key
+//! # #[cfg(feature = "convenience")]
 //! let ot = oboron::enc("plaintext", "adsv.b64", &key)?;
+//! # #[cfg(feature = "convenience")]
 //! oboron::dec(&ot, "adsv.b64", &key)?;
 //! # }
 //! # Ok(())
@@ -54,9 +56,9 @@
 //!
 //! Oboron provides several types optimized for different use cases:
 //!
-//! ## 1. Static Format Types (Fastest, Compile-Time)
+//! ## 1. Fixed-Format Types (Fastest, Compile-Time)
 //!
-//! Use scheme-specific types when you know the format at compile time:
+//! Use format-specific types when you know the format at compile time:
 //!
 //! ```rust
 //! # fn main() -> Result<(), oboron::Error> {
@@ -74,9 +76,9 @@
 //! # }
 //! ```
 //!
-//! - Use case: Format is known at compile time  
-//! - Performance: Fastest (zero overhead)  
-//! - Flexibility: Format fixed in type name
+//! - Use case: Format is known at compile time
+//! - Performance: Fastest (zero overhead)
+//! - Flexibility: Format fixed, explicit in type name
 //!
 //! ## 2. `Ob` - Runtime Format (Immutable)
 //!
@@ -110,17 +112,18 @@
 //! # fn main() -> Result<(), oboron::Error> {
 //! # #[cfg(all(feature = "adsv", feature = "mock"))]
 //! # {
-//! # use oboron::{ObFlex, Oboron, Scheme, Encoding};
+//! # use oboron::{ObFlex, Oboron, Scheme, Encoding, ADSV_B64};
 //! # let key = oboron::generate_key();
 //! let mut flex = ObFlex::new("adsv.b64", &key)?;
 //! let ot1 = flex.enc("hello")?;    // adsv.b64 format
 //!
 //! // Change format at runtime
-//! flex.set_scheme(Scheme::Mock1)?;  // set_scheme() only with ObFlex
+//! flex.set_scheme(Scheme::Mock1)?; // set_scheme() only with ObFlex
 //! let ot2 = flex.enc("hello")? ;   // mock1.b64 format output
 //! // Also available:
 //! flex.set_encoding(Encoding::Hex)?; // now set as mock1.hex
-//! flex.set_format("adsv.b32")?;      // now adsv.b32
+//! flex.set_format("adsv.b32")?;    // now adsv.b32
+//! flex.set_format(ADSV_B64)?;      // now adsv.b64 (using constant)
 //! # }
 //! # Ok(())
 //! # }
@@ -164,32 +167,32 @@
 //!
 //! ```rust
 //! # fn main() -> Result<(), oboron::Error> {
-//! # #[cfg(all(feature = "adsv", feature = "mock"))]
+//! # #[cfg(all(feature = "adsv", feature = "apgs"))]
 //! # {
 //! # use oboron::Oboron;
 //! # use oboron;
 //! # let key = oboron::generate_key();
 //! // Fixed format types (best performance for multiple operations with same format)
-//! let adsv = oboron::AdsvC32::new(&key)?;  // "adsv.c32" format Oboron instance
-//! let mock1 = oboron::Mock1C32::new(&key)?;  // "mock1.c32" format Oboron instance
+//! let adsv = oboron::AdsvC32::new(&key)?;  // "adsv.c32" fixed-format Oboron instance
+//! let apgs = oboron::ApgsC32::new(&key)?;  // "apgs.c32" fixed-format Oboron instance
 //!
 //! let ot_adsv = adsv.enc("data1")?;
-//! let ot_mock1 = mock1.enc("data2")?;
+//! let ot_apgs = apgs.enc("data2")?;
 //!
 //! // Decoding uses scheme autodetection by default
 //! let pt1 = adsv.dec(&ot_adsv)?;  // Decodes successfully
-//! let pt2 = adsv.dec(&ot_mock1)?;  // Also works (autodetects mock1)
+//! let pt2 = adsv.dec(&ot_apgs)?;  // Also works (autodetects apgs)
 //! assert_eq!(pt1, "data1");
 //! assert_eq!(pt2, "data2");
 //! // Note: The above autodetection works only with shared encodings
-//! // adsv.c32 and mock1.c32 are both base32crockford-encoded
+//! // adsv.c32 and apgs.c32 are both Crockford-base32-encoded
 //!
 //! // Use dec_strict to enforce scheme matching
 //! let pt3 = adsv.dec_strict(&ot_adsv)?;         // OK: Matches scheme
-//! assert!(adsv.dec_strict(&ot_mock1).is_err());  // Error: Wrong scheme (adsv != mock1)
+//! assert!(adsv.dec_strict(&ot_apgs).is_err());  // Error: Wrong scheme (adsv != apgs)
 //!
 //! // Note: For fixed oborons, string encoding (c32/b32/b64/hex) must match the instance encoding
-//! let adsv_b64 = oboron::AdsvB64::new(&key)?;  // "adsv.b64" format Oboron
+//! let adsv_b64 = oboron::AdsvB64::new(&key)?;  // "adsv.b64" fixed-format Oboron
 //! let ot_b64 = adsv_b64.enc("data3")?;
 //! assert!(adsv.dec(&ot_b64).is_err());  // Error: Encoding mismatch (c32 != b64)
 //! // For mixed encodings, use ObMulti instead (see above)
@@ -200,20 +203,25 @@
 //!
 //! # Encryption Schemes
 //!
-//! - `Zdc`: AES-CBC (deterministic)
-//! - `Adgs`: AES-GCM-SIV (deterministic)
-//! - `Adsv`: AES-SIV (deterministic, nonce-misuse resistant)
-//! - `Upc`, `Apgs`, `Apsv`: Probabilistic variants (different output each time)
+//! - Authenticated:
+//!   - `Adgs`: deterministic AES-GCM-SIV
+//!   - `Adsv`: deterministic AES-SIV (nonce-misuse resistant)
+//!   - `Apgs`: probabilistic AES-GCM-SIV
+//!   - `Apsv`: probabilistic AES-SIV
+//! - Un-authenticated:
+//!   - `Upc`: probabilistic AES-CBC
+//! - Insecure (obfuscation only):
+//!   - `Zdc`: deterministic AES-CBC with constant IV
 //!
 //! Testing/Demo only schemes using no encryption (`mock` feature group):
 //! - `Mock1`: Identity
 //! - `Mock2`: Reverse plaintext
 //!
 //! Each scheme supports four string encodings:
-//! - C32,
-//! - B32 (RFC 4648 standard),
-//! - B64 (URL-safe RFC 4648 standard),
-//! - Hex
+//! - B64 - URL-safe base64 (RFC 4648 base64url standard)
+//! - B32 - Standard base32 (RFC 4648)
+//! - C32 - Crockford base32
+//! - Hex - Hexadecimal
 //!
 //! # The `Oboron` Trait
 //!
@@ -325,14 +333,14 @@ pub use constants::{APSV_B32, APSV_B64, APSV_C32, APSV_HEX};
 pub use constants::{UPC_B32, UPC_B64, UPC_C32, UPC_HEX};
 #[cfg(feature = "zdc")]
 pub use constants::{ZDC_B32, ZDC_B64, ZDC_C32, ZDC_HEX};
+// Legacy
+#[cfg(feature = "legacy")]
+pub use constants::{LEGACY_B32, LEGACY_B64, LEGACY_C32, LEGACY_HEX};
 // Testing
 #[cfg(feature = "mock")]
 pub use constants::{MOCK1_B32, MOCK1_B64, MOCK1_C32, MOCK1_HEX};
 #[cfg(feature = "mock")]
 pub use constants::{MOCK2_B32, MOCK2_B64, MOCK2_C32, MOCK2_HEX};
-// Legacy
-#[cfg(feature = "legacy")]
-pub use constants::{LEGACY_B32, LEGACY_B64, LEGACY_C32, LEGACY_HEX};
 
 // Conditionally export format-specific structs (scheme+encoding combinations)
 #[cfg(feature = "adgs")]
@@ -347,14 +355,14 @@ pub use oboron::{ApsvB32, ApsvB64, ApsvC32, ApsvHex};
 pub use oboron::{UpcB32, UpcB64, UpcC32, UpcHex};
 #[cfg(feature = "zdc")]
 pub use oboron::{ZdcB32, ZdcB64, ZdcC32, ZdcHex};
+// Legacy
+#[cfg(feature = "legacy")]
+pub use legacy::{LegacyB32, LegacyB64, LegacyC32, LegacyHex};
 // Testing
 #[cfg(feature = "mock")]
 pub use oboron::{Mock1B32, Mock1B64, Mock1C32, Mock1Hex};
 #[cfg(feature = "mock")]
 pub use oboron::{Mock2B32, Mock2B64, Mock2C32, Mock2Hex};
-// Legacy
-#[cfg(feature = "legacy")]
-pub use legacy::{LegacyB32, LegacyB64, LegacyC32, LegacyHex};
 
 // Aliases for default encoding:
 #[cfg(feature = "zdc")]
@@ -369,14 +377,14 @@ pub type Apgs = ApgsC32;
 pub type Adsv = AdsvC32;
 #[cfg(feature = "apsv")]
 pub type Apsv = ApsvC32;
+// Legacy
+#[cfg(feature = "legacy")]
+pub type Legacy = LegacyB32;
 // Testing
 #[cfg(feature = "mock")]
 pub type Mock1 = Mock1C32;
 #[cfg(feature = "mock")]
 pub type Mock2 = Mock2C32;
-// Legacy
-#[cfg(feature = "legacy")]
-pub type Legacy = LegacyB32;
 
 // Re-export multi-format Oboron implementation
 pub use ob_multi::ObMulti;
