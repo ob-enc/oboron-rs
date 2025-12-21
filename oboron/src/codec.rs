@@ -52,7 +52,7 @@ use crate::legacy::{LegacyB32, LegacyB64, LegacyC32, LegacyHex};
 /// - Direct function calls to encrypt/decrypt
 /// - Encoding functions called directly (no dispatch)
 /// - All constants baked in at compile time
-macro_rules! impl_oboron {
+macro_rules! impl_codec {
     (
         $name:ident,           // Type name (e.g., ZdcC32)
         $scheme:expr,          // Scheme constant (e.g., Scheme::Zdc)
@@ -164,88 +164,149 @@ macro_rules! impl_oboron {
                 self.keychain.key_bytes()
             }
         }
+
+        // Add inherent methods that delegate to trait methods
+        impl $name {
+            /// Encrypt and encode plaintext
+            #[inline]
+            pub fn enc(&self, plaintext: &str) -> Result<String, Error> {
+                <Self as ObtextCodec>::enc(self, plaintext)
+            }
+
+            /// Decode and decrypt obtext (with scheme autodetection)
+            #[inline]
+            pub fn dec(&self, obtext: &str) -> Result<String, Error> {
+                <Self as ObtextCodec>::dec(self, obtext)
+            }
+
+            /// Decode and decrypt obtext (strict - no autodetection)
+            #[inline]
+            pub fn dec_strict(&self, obtext: &str) -> Result<String, Error> {
+                <Self as ObtextCodec>::dec_strict(self, obtext)
+            }
+
+            /// Get the format
+            #[inline]
+            pub fn format(&self) -> Format {
+                <Self as ObtextCodec>::format(self)
+            }
+
+            /// Get the scheme
+            #[inline]
+            pub fn scheme(&self) -> Scheme {
+                <Self as ObtextCodec>::scheme(self)
+            }
+
+            /// Get the encoding
+            #[inline]
+            pub fn encoding(&self) -> Encoding {
+                <Self as ObtextCodec>::encoding(self)
+            }
+
+            /// Get the key as base64
+            #[inline]
+            pub fn key(&self) -> String {
+                <Self as ObtextCodec>::key(self)
+            }
+
+            #[cfg(feature = "hex-keys")]
+            #[inline]
+            pub fn key_hex(&self) -> String {
+                <Self as ObtextCodec>::key_hex(self)
+            }
+
+            #[cfg(feature = "bytes-keys")]
+            #[inline]
+            pub fn key_bytes(&self) -> &[u8; 64] {
+                <Self as ObtextCodec>::key_bytes(self)
+            }
+        }
     };
 }
 
 // Generate all scheme+encoding combinations using the optimized macro
 
-// C32 variants
-#[cfg(feature = "zdc")]
-impl_oboron!(ZdcC32, Scheme::Zdc, Encoding::C32, "zdc.c32");
-#[cfg(feature = "upc")]
-impl_oboron!(UpcC32, Scheme::Upc, Encoding::C32, "upc.c32");
+// adgs variants
 #[cfg(feature = "adgs")]
-impl_oboron!(AdgsC32, Scheme::Adgs, Encoding::C32, "adgs.c32");
-#[cfg(feature = "apgs")]
-impl_oboron!(ApgsC32, Scheme::Apgs, Encoding::C32, "apgs.c32");
-#[cfg(feature = "adsv")]
-impl_oboron!(AdsvC32, Scheme::Adsv, Encoding::C32, "adsv.c32");
-#[cfg(feature = "apsv")]
-impl_oboron!(ApsvC32, Scheme::Apsv, Encoding::C32, "apsv.c32");
+impl_codec!(AdgsB32, Scheme::Adgs, Encoding::B32, "adgs.b32");
+#[cfg(feature = "adgs")]
+impl_codec!(AdgsC32, Scheme::Adgs, Encoding::C32, "adgs.c32");
+#[cfg(feature = "adgs")]
+impl_codec!(AdgsB64, Scheme::Adgs, Encoding::B64, "adgs.b64");
+#[cfg(feature = "adgs")]
+impl_codec!(AdgsHex, Scheme::Adgs, Encoding::Hex, "adgs.hex");
 
-// B32 variants
-#[cfg(feature = "zdc")]
-impl_oboron!(ZdcB32, Scheme::Zdc, Encoding::B32, "zdc.b32");
-#[cfg(feature = "upc")]
-impl_oboron!(UpcB32, Scheme::Upc, Encoding::B32, "upc.b32");
-#[cfg(feature = "adgs")]
-impl_oboron!(AdgsB32, Scheme::Adgs, Encoding::B32, "adgs.b32");
-#[cfg(feature = "apgs")]
-impl_oboron!(ApgsB32, Scheme::Apgs, Encoding::B32, "apgs.b32");
+// adsv variants
 #[cfg(feature = "adsv")]
-impl_oboron!(AdsvB32, Scheme::Adsv, Encoding::B32, "adsv.b32");
-#[cfg(feature = "apsv")]
-impl_oboron!(ApsvB32, Scheme::Apsv, Encoding::B32, "apsv.b32");
+impl_codec!(AdsvB32, Scheme::Adsv, Encoding::B32, "adsv.b32");
+#[cfg(feature = "adsv")]
+impl_codec!(AdsvC32, Scheme::Adsv, Encoding::C32, "adsv.c32");
+#[cfg(feature = "adsv")]
+impl_codec!(AdsvB64, Scheme::Adsv, Encoding::B64, "adsv.b64");
+#[cfg(feature = "adsv")]
+impl_codec!(AdsvHex, Scheme::Adsv, Encoding::Hex, "adsv.hex");
 
-// B64 variants
-#[cfg(feature = "zdc")]
-impl_oboron!(ZdcB64, Scheme::Zdc, Encoding::B64, "zdc.b64");
-#[cfg(feature = "upc")]
-impl_oboron!(UpcB64, Scheme::Upc, Encoding::B64, "upc.b64");
-#[cfg(feature = "adgs")]
-impl_oboron!(AdgsB64, Scheme::Adgs, Encoding::B64, "adgs.b64");
+// apgs variants
 #[cfg(feature = "apgs")]
-impl_oboron!(ApgsB64, Scheme::Apgs, Encoding::B64, "apgs.b64");
-#[cfg(feature = "adsv")]
-impl_oboron!(AdsvB64, Scheme::Adsv, Encoding::B64, "adsv.b64");
-#[cfg(feature = "apsv")]
-impl_oboron!(ApsvB64, Scheme::Apsv, Encoding::B64, "apsv.b64");
+impl_codec!(ApgsB32, Scheme::Apgs, Encoding::B32, "apgs.b32");
+#[cfg(feature = "apgs")]
+impl_codec!(ApgsC32, Scheme::Apgs, Encoding::C32, "apgs.c32");
+#[cfg(feature = "apgs")]
+impl_codec!(ApgsB64, Scheme::Apgs, Encoding::B64, "apgs.b64");
+#[cfg(feature = "apgs")]
+impl_codec!(ApgsHex, Scheme::Apgs, Encoding::Hex, "apgs.hex");
 
-// Hex variants
-#[cfg(feature = "zdc")]
-impl_oboron!(ZdcHex, Scheme::Zdc, Encoding::Hex, "zdc.hex");
-#[cfg(feature = "upc")]
-impl_oboron!(UpcHex, Scheme::Upc, Encoding::Hex, "upc.hex");
-#[cfg(feature = "adgs")]
-impl_oboron!(AdgsHex, Scheme::Adgs, Encoding::Hex, "adgs.hex");
-#[cfg(feature = "apgs")]
-impl_oboron!(ApgsHex, Scheme::Apgs, Encoding::Hex, "apgs.hex");
-#[cfg(feature = "adsv")]
-impl_oboron!(AdsvHex, Scheme::Adsv, Encoding::Hex, "adsv.hex");
+// apsv variants
 #[cfg(feature = "apsv")]
-impl_oboron!(ApsvHex, Scheme::Apsv, Encoding::Hex, "apsv.hex");
+impl_codec!(ApsvB32, Scheme::Apsv, Encoding::B32, "apsv.b32");
+#[cfg(feature = "apsv")]
+impl_codec!(ApsvC32, Scheme::Apsv, Encoding::C32, "apsv.c32");
+#[cfg(feature = "apsv")]
+impl_codec!(ApsvB64, Scheme::Apsv, Encoding::B64, "apsv.b64");
+#[cfg(feature = "apsv")]
+impl_codec!(ApsvHex, Scheme::Apsv, Encoding::Hex, "apsv.hex");
+
+// upc variants
+#[cfg(feature = "upc")]
+impl_codec!(UpcB32, Scheme::Upc, Encoding::B32, "upc.b32");
+#[cfg(feature = "upc")]
+impl_codec!(UpcC32, Scheme::Upc, Encoding::C32, "upc.c32");
+#[cfg(feature = "upc")]
+impl_codec!(UpcB64, Scheme::Upc, Encoding::B64, "upc.b64");
+#[cfg(feature = "upc")]
+impl_codec!(UpcHex, Scheme::Upc, Encoding::Hex, "upc.hex");
+
+// zdc variants
+#[cfg(feature = "zdc")]
+impl_codec!(ZdcB32, Scheme::Zdc, Encoding::B32, "zdc.b32");
+#[cfg(feature = "zdc")]
+impl_codec!(ZdcC32, Scheme::Zdc, Encoding::C32, "zdc.c32");
+#[cfg(feature = "zdc")]
+impl_codec!(ZdcB64, Scheme::Zdc, Encoding::B64, "zdc.b64");
+#[cfg(feature = "zdc")]
+impl_codec!(ZdcHex, Scheme::Zdc, Encoding::Hex, "zdc.hex");
 
 // Testing
 
 // mock1 (identity scheme)
 #[cfg(feature = "mock")]
-impl_oboron!(Mock1C32, Scheme::Mock1, Encoding::C32, "mock1.c32");
+impl_codec!(Mock1B32, Scheme::Mock1, Encoding::B32, "mock1.b32");
 #[cfg(feature = "mock")]
-impl_oboron!(Mock1B32, Scheme::Mock1, Encoding::B32, "mock1.b32");
+impl_codec!(Mock1C32, Scheme::Mock1, Encoding::C32, "mock1.c32");
 #[cfg(feature = "mock")]
-impl_oboron!(Mock1B64, Scheme::Mock1, Encoding::B64, "mock1.b64");
+impl_codec!(Mock1B64, Scheme::Mock1, Encoding::B64, "mock1.b64");
 #[cfg(feature = "mock")]
-impl_oboron!(Mock1Hex, Scheme::Mock1, Encoding::Hex, "mock1.hex");
+impl_codec!(Mock1Hex, Scheme::Mock1, Encoding::Hex, "mock1.hex");
 
 // mock2 (reverse scheme)
 #[cfg(feature = "mock")]
-impl_oboron!(Mock2C32, Scheme::Mock2, Encoding::C32, "mock2.c32");
+impl_codec!(Mock2B32, Scheme::Mock2, Encoding::B32, "mock2.b32");
 #[cfg(feature = "mock")]
-impl_oboron!(Mock2B32, Scheme::Mock2, Encoding::B32, "mock2.b32");
+impl_codec!(Mock2C32, Scheme::Mock2, Encoding::C32, "mock2.c32");
 #[cfg(feature = "mock")]
-impl_oboron!(Mock2B64, Scheme::Mock2, Encoding::B64, "mock2.b64");
+impl_codec!(Mock2B64, Scheme::Mock2, Encoding::B64, "mock2.b64");
 #[cfg(feature = "mock")]
-impl_oboron!(Mock2Hex, Scheme::Mock2, Encoding::Hex, "mock2.hex");
+impl_codec!(Mock2Hex, Scheme::Mock2, Encoding::Hex, "mock2.hex");
 
 /// Type-erased ObtextCodec encoder that can hold any scheme+encoding combination.
 ///

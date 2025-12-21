@@ -1,10 +1,10 @@
 #[cfg(feature = "adgs")]
 use oboron::Adgs;
+use oboron::ObMulti;
 #[cfg(feature = "upc")]
 use oboron::UpcC32;
 #[cfg(feature = "zdc")]
 use oboron::ZdcC32;
-use oboron::{ObMulti, ObtextCodec};
 
 #[test]
 #[cfg(feature = "zdc")]
