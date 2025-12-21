@@ -5,6 +5,11 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
 
+const CONFIG_DIR: &str = ".ob";
+const PROFILES_SUBDIR: &str = "profiles";
+const BACKUP_SUBDIR: &str = "bkp";
+const CONFIG_FILENAME: &str = "config.json";
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
     #[serde(rename = "profile")]
@@ -21,15 +26,15 @@ pub struct KeyProfile {
 pub fn config_path() -> PathBuf {
     dirs::home_dir()
         .expect("Failed to get home directory")
-        .join(".ob")
-        .join("config.json")
+        .join(CONFIG_DIR)
+        .join(CONFIG_FILENAME)
 }
 
 pub fn profile_dir() -> PathBuf {
     dirs::home_dir()
         .expect("Failed to get home directory")
-        .join(".ob")
-        .join("profiles")
+        .join(CONFIG_DIR)
+        .join(PROFILES_SUBDIR)
 }
 
 pub fn profile_path(name: &str) -> PathBuf {
@@ -39,8 +44,8 @@ pub fn profile_path(name: &str) -> PathBuf {
 pub fn backup_dir() -> PathBuf {
     dirs::home_dir()
         .expect("Failed to get home directory")
-        .join(".ob")
-        .join("bkp")
+        .join(CONFIG_DIR)
+        .join(BACKUP_SUBDIR)
 }
 
 fn backup_profile(name: &str) -> Result<PathBuf> {
@@ -82,9 +87,9 @@ pub fn load_config() -> Result<Config> {
         config.scheme = "adsv".to_string();
     }
 
-    // Default to base32crockford if not set
+    // Default to Crockford base32 if not set
     if config.encoding.is_empty() {
-        config.encoding = "base32crockford".to_string();
+        config.encoding = "c32".to_string();
     }
 
     // Default to "default" profile if not set
@@ -195,16 +200,16 @@ pub fn init_command(name: &str) -> Result<()> {
 
     let config = Config {
         profile: name.to_string(),
-        scheme: "adsv".to_string(), // Default to adsv
-        encoding: "base32crockford".to_string(),
+        scheme: "adsv".to_string(),  // Default to adsv
+        encoding: "c32".to_string(), // Default to Crockford base32
     };
 
     save_config(&config)?;
 
     println!("✓ Configuration saved to {}", config_path().display());
     println!("\nYour profile '{}':", name);
-    println!("  Default scheme: adsv");
-    println!("  Default encoding: base32crockford");
+    println!("  Default scheme:  adsv");
+    println!("  Default encoding: c32");
     println!("  Key: {}", key);
     println!("\n⚠️  Keep these keys secure! Anyone with these keys can decode your data.");
 
@@ -298,7 +303,7 @@ pub fn profile_activate_command(name: &str) -> Result<()> {
     let mut config = load_config().unwrap_or(Config {
         profile: "default".to_string(),
         scheme: "adsv".to_string(),
-        encoding: "base32crockford".to_string(),
+        encoding: "c32".to_string(),
     });
 
     config.profile = name.to_string();
@@ -495,7 +500,7 @@ mod tests {
             config.scheme = "adsv".to_string();
         }
         if config.encoding.is_empty() {
-            config.encoding = "base32crockford".to_string();
+            config.encoding = "c32".to_string();
         }
         if config.profile.is_empty() {
             config.profile = "default".to_string();
@@ -503,29 +508,22 @@ mod tests {
 
         assert_eq!(config.profile, "default");
         assert_eq!(config.scheme, "adsv");
-        assert_eq!(config.encoding, "base32crockford");
+        assert_eq!(config.encoding, "c32");
     }
 
     #[test]
     fn test_profile_path_construction() {
         let path = profile_path("myprofile");
         assert!(path.to_string_lossy().contains("myprofile.json"));
-        assert!(path.to_string_lossy().contains(".ob"));
-        assert!(path.to_string_lossy().contains("profiles"));
+        assert!(path.to_string_lossy().contains(CONFIG_DIR));
+        assert!(path.to_string_lossy().contains(PROFILES_SUBDIR));
     }
 
     #[test]
     fn test_config_path_construction() {
         let path = config_path();
-        assert!(path.to_string_lossy().contains("config.json"));
-        assert!(path.to_string_lossy().contains(".ob"));
-    }
-
-    #[test]
-    fn test_backup_dir_construction() {
-        let path = backup_dir();
-        assert!(path.to_string_lossy().contains("bkp"));
-        assert!(path.to_string_lossy().contains(".ob"));
+        assert!(path.to_string_lossy().contains(CONFIG_FILENAME));
+        assert!(path.to_string_lossy().contains(CONFIG_DIR));
     }
 
     #[test]
@@ -534,11 +532,11 @@ mod tests {
         let mut config: Config = serde_json::from_str(json).unwrap();
 
         if config.encoding.is_empty() {
-            config.encoding = "base32crockford".to_string();
+            config.encoding = "c32".to_string();
         }
 
         assert_eq!(config.profile, "custom");
         assert_eq!(config.scheme, "zdc");
-        assert_eq!(config.encoding, "base32crockford");
+        assert_eq!(config.encoding, "c32");
     }
 }

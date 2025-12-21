@@ -1274,4 +1274,13 @@ mod tests {
         key_str.push('!'); // Invalid base64 character
         assert!(validate_base64_key(&key_str).is_err());
     }
+    #[test]
+    #[cfg(feature = "adsv")]
+    fn test_format_spec_to_string() {
+        let spec = FormatSpec {
+            scheme: Scheme::Adsv,
+            encoding: Encoding::B64,
+        };
+        assert_eq!(spec.to_string(), "adsv.b64");
+    }
 }

@@ -33,7 +33,7 @@ fn test_enc_keyless() {
         .arg("enc")
         .arg("-z")
         .arg("--adsv")
-        .arg("--base32rfc")
+        .arg("--b32")
         .arg("test123")
         .assert()
         .success()
@@ -50,7 +50,7 @@ fn test_enc_keyless_apsv() {
         .arg("enc")
         .arg("-z")
         .arg("--apsv")
-        .arg("--base32rfc")
+        .arg("--b32")
         .arg("test123")
         .assert()
         .success()
@@ -70,7 +70,7 @@ fn test_enc_dec_roundtrip_keyless() {
         .arg("enc")
         .arg("-z")
         .arg("--apsv")
-        .arg("--base32rfc")
+        .arg("--b32")
         .arg("hello_world")
         .output()
         .unwrap();
@@ -89,7 +89,7 @@ fn test_enc_dec_roundtrip_keyless() {
         .arg("dec")
         .arg("-z")
         .arg("--apsv")
-        .arg("--base32rfc")
+        .arg("--b32")
         .arg(&encd)
         .assert()
         .success()
@@ -108,7 +108,7 @@ fn test_enc_with_explicit_key() {
         .arg("--key")
         .arg(TEST_KEY_B64)
         .arg("--adsv")
-        .arg("--base32rfc")
+        .arg("--b32")
         .arg("test_data")
         .assert()
         .success()
@@ -128,7 +128,7 @@ fn test_enc_with_explicit_key_apsv() {
         .arg("--key")
         .arg(TEST_KEY_B64)
         .arg("--apsv")
-        .arg("--base32rfc")
+        .arg("--b32")
         .arg("test_data")
         .assert()
         .success()
@@ -149,7 +149,7 @@ fn test_enc_dec_with_explicit_key() {
         .arg("--key")
         .arg(TEST_KEY_B64_ALT)
         .arg("--adsv")
-        .arg("--base32rfc")
+        .arg("--b32")
         .arg("sensitive_data")
         .output()
         .unwrap();
@@ -168,7 +168,7 @@ fn test_enc_dec_with_explicit_key() {
         .arg("--key")
         .arg(TEST_KEY_B64_ALT)
         .arg("--adsv") // Use same scheme as enc
-        .arg("--base32rfc")
+        .arg("--b32")
         .arg(&encd)
         .assert()
         .success()
@@ -190,7 +190,7 @@ fn test_enc_dec_with_explicit_key_adgs() {
         .arg("--key")
         .arg(TEST_KEY_B64_ALT)
         .arg("--adgs")
-        .arg("--base32rfc")
+        .arg("--b32")
         .arg("sensitive_data")
         .output()
         .unwrap();
@@ -209,7 +209,7 @@ fn test_enc_dec_with_explicit_key_adgs() {
         .arg("--key")
         .arg(TEST_KEY_B64_ALT)
         .arg("--adgs") // Use same scheme as enc
-        .arg("--base32rfc")
+        .arg("--b32")
         .arg(&encd)
         .assert()
         .success()
@@ -235,7 +235,7 @@ fn test_enc_different_schemes() {
             .arg("enc")
             .arg("-z")
             .arg(scheme)
-            .arg("--base32rfc")
+            .arg("--b32")
             .arg("test")
             .assert()
             .success();
@@ -248,7 +248,7 @@ fn test_enc_different_schemes() {
 #[test]
 fn test_enc_different_encodings() {
     let test_home = test_home_dir();
-    let encodings = vec!["--base32rfc", "--base64", "--hex"];
+    let encodings = vec!["--b32", "--b64", "--hex"];
 
     for encoding in encodings {
         let mut cmd = Command::cargo_bin("ob").unwrap();
