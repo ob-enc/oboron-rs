@@ -43,7 +43,7 @@ class OboronBase(ABC):
     @property
     @abstractmethod
     def format(self) -> str:
-        """Get the format identifier (e.g., 'adsv:b64')."""
+        """Get the format identifier (e.g., 'adsv.b64')."""
         ...
 
     @property

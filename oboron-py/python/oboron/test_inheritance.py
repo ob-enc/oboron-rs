@@ -14,7 +14,7 @@ def test_isinstance_checks():
     assert isinstance(zdc, oboron.OboronBase)
     
     # Test flexible interfaces
-    ob = oboron.Ob("adsv:b64", key=key)
+    ob = oboron.Ob("adsv.b64", key=key)
     assert isinstance(ob, oboron.OboronBase)
     
     ob_multi = oboron.ObMulti(key=key)
