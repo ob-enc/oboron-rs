@@ -83,7 +83,7 @@ fn test_ob_with_format_instance() {
     let ob = Ob::from_bytes(format, &key).expect("Failed to create Ob with format string");
 
     assert_eq!(ob.scheme(), Scheme::Mock1);
-    assert_eq!(ob.encoding(), Encoding::Base64);
+    assert_eq!(ob.encoding(), Encoding::B64);
 }
 
 #[test]
@@ -93,7 +93,7 @@ fn test_ob_format_getter() {
 
     let format = ob.format();
     assert_eq!(format.scheme(), Scheme::Mock1);
-    assert_eq!(format.encoding(), Encoding::Base64);
+    assert_eq!(format.encoding(), Encoding::B64);
 }
 
 #[test]
@@ -105,7 +105,7 @@ fn test_ob_immutable_format() {
 
     // Verify format is set
     assert_eq!(ob.scheme(), Scheme::Mock1);
-    assert_eq!(ob.encoding(), Encoding::Base32Crockford);
+    assert_eq!(ob.encoding(), Encoding::C32);
 
     // Format cannot be changed (no set_format method exists)
     // This is compile-time enforced, but we document the intent
@@ -134,11 +134,11 @@ fn test_ob_scheme_autodetection() {
 fn test_ob_encoding_must_match() {
     let key = [0u8; 64];
 
-    // Encode with Base32Crockford
+    // Encode with C32
     let ob_b32 = Ob::from_bytes("mock1:c32", &key).expect("Failed to create Ob with b32");
     let encd = ob_b32.enc("test").expect("Failed to enc");
 
-    // Try to dec with Base64 (wrong encoding)
+    // Try to dec with B64 (wrong encoding)
     let ob_b64 = Ob::from_bytes("mock1:b64", &key).expect("Failed to create Ob with b64");
     assert!(
         ob_b64.dec(&encd).is_err(),

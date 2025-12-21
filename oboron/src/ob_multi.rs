@@ -90,7 +90,7 @@ impl ObMulti {
     /// # use oboron::{ObMulti, Format, Scheme, Encoding};
     /// # let key = oboron::generate_key();
     /// # let obm = ObMulti::new(&key)?;
-    /// let format = Format::new(Scheme::Adsv, Encoding::Base32Crockford);
+    /// let format = Format::new(Scheme::Adsv, Encoding::C32);
     ///
     /// // Reuse format across multiple calls
     /// let ot1 = obm.enc_with_format("hello", format)? ;
@@ -143,7 +143,7 @@ impl ObMulti {
     /// # use oboron::{ObMulti, Format, Scheme, Encoding};
     /// # let key = oboron::generate_key();
     /// # let obm = ObMulti::new(&key)?;
-    /// let format = Format::new(Scheme::Adsv, Encoding::Base64);
+    /// let format = Format::new(Scheme::Adsv, Encoding::B64);
     ///
     /// let ot = obm.enc_with_format("hello", format)?;
     /// let pt2 = obm.dec_with_format(&ot, format)?;

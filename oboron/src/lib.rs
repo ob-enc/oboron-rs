@@ -64,8 +64,8 @@
 //! # {
 //! # use oboron::{AdsvC32, AdsvB64, Oboron};
 //! # let key = oboron::generate_key();
-//! let adsv = AdsvC32::new(&key)?;            // adsv:c32 format (Base32Crockford)
-//! let adsv_b64 = AdsvB64::new(&key)?;  // adsv:b64 format (Base64)
+//! let adsv = AdsvC32::new(&key)?;      // adsv:c32 format (Crockford base32)
+//! let adsv_b64 = AdsvB64::new(&key)?;  // adsv:b64 format (base64url)
 //!
 //! let ot = adsv.enc("hello")?;
 //! let pt2 = adsv.dec(&ot)?;
@@ -210,9 +210,9 @@
 //! - `Mock2`: Reverse plaintext
 //!
 //! Each scheme supports four string encodings:
-//! - Base32Crockford,
-//! - Base32Rfc (RFC 4648 standard),
-//! - Base64 (URL-safe RFC 4648 standard),
+//! - C32,
+//! - B32 (RFC 4648 standard),
+//! - B64 (URL-safe RFC 4648 standard),
 //! - Hex
 //!
 //! # The `Oboron` Trait

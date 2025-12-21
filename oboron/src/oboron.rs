@@ -56,7 +56,7 @@ macro_rules! impl_oboron {
     (
         $name:ident,           // Type name (e.g., ZdcC32)
         $scheme:expr,          // Scheme constant (e.g., Scheme::Zdc)
-        $encoding:expr,        // Encoding constant (e.g., Encoding::Base32Crockford)
+        $encoding:expr,        // Encoding constant (e.g., Encoding::C32)
         $format_str:expr       // Format string for docs (e.g., "zdc:c32")
     ) => {
         #[doc = concat!("Oboron implementation for ", $format_str, " format.\n\n")]
@@ -169,49 +169,49 @@ macro_rules! impl_oboron {
 
 // Generate all scheme+encoding combinations using the optimized macro
 
-// Base32Crockford (default) variants
+// C32 variants
 #[cfg(feature = "zdc")]
-impl_oboron!(ZdcC32, Scheme::Zdc, Encoding::Base32Crockford, "zdc:c32");
+impl_oboron!(ZdcC32, Scheme::Zdc, Encoding::C32, "zdc:c32");
 #[cfg(feature = "upc")]
-impl_oboron!(UpcC32, Scheme::Upc, Encoding::Base32Crockford, "upc:c32");
+impl_oboron!(UpcC32, Scheme::Upc, Encoding::C32, "upc:c32");
 #[cfg(feature = "adgs")]
-impl_oboron!(AdgsC32, Scheme::Adgs, Encoding::Base32Crockford, "adgs:c32");
+impl_oboron!(AdgsC32, Scheme::Adgs, Encoding::C32, "adgs:c32");
 #[cfg(feature = "apgs")]
-impl_oboron!(ApgsC32, Scheme::Apgs, Encoding::Base32Crockford, "apgs:c32");
+impl_oboron!(ApgsC32, Scheme::Apgs, Encoding::C32, "apgs:c32");
 #[cfg(feature = "adsv")]
-impl_oboron!(AdsvC32, Scheme::Adsv, Encoding::Base32Crockford, "adsv:c32");
+impl_oboron!(AdsvC32, Scheme::Adsv, Encoding::C32, "adsv:c32");
 #[cfg(feature = "apsv")]
-impl_oboron!(ApsvC32, Scheme::Apsv, Encoding::Base32Crockford, "apsv:c32");
+impl_oboron!(ApsvC32, Scheme::Apsv, Encoding::C32, "apsv:c32");
 
-// Base32Rfc variants
+// B32 variants
 #[cfg(feature = "zdc")]
-impl_oboron!(ZdcB32, Scheme::Zdc, Encoding::Base32Rfc, "zdc:b32");
+impl_oboron!(ZdcB32, Scheme::Zdc, Encoding::B32, "zdc:b32");
 #[cfg(feature = "upc")]
-impl_oboron!(UpcB32, Scheme::Upc, Encoding::Base32Rfc, "upc:b32");
+impl_oboron!(UpcB32, Scheme::Upc, Encoding::B32, "upc:b32");
 #[cfg(feature = "adgs")]
-impl_oboron!(AdgsB32, Scheme::Adgs, Encoding::Base32Rfc, "adgs:b32");
+impl_oboron!(AdgsB32, Scheme::Adgs, Encoding::B32, "adgs:b32");
 #[cfg(feature = "apgs")]
-impl_oboron!(ApgsB32, Scheme::Apgs, Encoding::Base32Rfc, "apgs:b32");
+impl_oboron!(ApgsB32, Scheme::Apgs, Encoding::B32, "apgs:b32");
 #[cfg(feature = "adsv")]
-impl_oboron!(AdsvB32, Scheme::Adsv, Encoding::Base32Rfc, "adsv:b32");
+impl_oboron!(AdsvB32, Scheme::Adsv, Encoding::B32, "adsv:b32");
 #[cfg(feature = "apsv")]
-impl_oboron!(ApsvB32, Scheme::Apsv, Encoding::Base32Rfc, "apsv:b32");
+impl_oboron!(ApsvB32, Scheme::Apsv, Encoding::B32, "apsv:b32");
 
-// Base64 variants - with Base64 suffix
+// B64 variants
 #[cfg(feature = "zdc")]
-impl_oboron!(ZdcB64, Scheme::Zdc, Encoding::Base64, "zdc:b64");
+impl_oboron!(ZdcB64, Scheme::Zdc, Encoding::B64, "zdc:b64");
 #[cfg(feature = "upc")]
-impl_oboron!(UpcB64, Scheme::Upc, Encoding::Base64, "upc:b64");
+impl_oboron!(UpcB64, Scheme::Upc, Encoding::B64, "upc:b64");
 #[cfg(feature = "adgs")]
-impl_oboron!(AdgsB64, Scheme::Adgs, Encoding::Base64, "adgs:b64");
+impl_oboron!(AdgsB64, Scheme::Adgs, Encoding::B64, "adgs:b64");
 #[cfg(feature = "apgs")]
-impl_oboron!(ApgsB64, Scheme::Apgs, Encoding::Base64, "apgs:b64");
+impl_oboron!(ApgsB64, Scheme::Apgs, Encoding::B64, "apgs:b64");
 #[cfg(feature = "adsv")]
-impl_oboron!(AdsvB64, Scheme::Adsv, Encoding::Base64, "adsv:b64");
+impl_oboron!(AdsvB64, Scheme::Adsv, Encoding::B64, "adsv:b64");
 #[cfg(feature = "apsv")]
-impl_oboron!(ApsvB64, Scheme::Apsv, Encoding::Base64, "apsv:b64");
+impl_oboron!(ApsvB64, Scheme::Apsv, Encoding::B64, "apsv:b64");
 
-// Hex variants - with Hex suffix
+// Hex variants
 #[cfg(feature = "zdc")]
 impl_oboron!(ZdcHex, Scheme::Zdc, Encoding::Hex, "zdc:hex");
 #[cfg(feature = "upc")]
@@ -229,31 +229,21 @@ impl_oboron!(ApsvHex, Scheme::Apsv, Encoding::Hex, "apsv:hex");
 
 // mock1 (identity scheme)
 #[cfg(feature = "mock")]
-impl_oboron!(
-    Mock1C32,
-    Scheme::Mock1,
-    Encoding::Base32Crockford,
-    "mock1:c32"
-);
+impl_oboron!(Mock1C32, Scheme::Mock1, Encoding::C32, "mock1:c32");
 #[cfg(feature = "mock")]
-impl_oboron!(Mock1B32, Scheme::Mock1, Encoding::Base32Rfc, "mock1:b32");
+impl_oboron!(Mock1B32, Scheme::Mock1, Encoding::B32, "mock1:b32");
 #[cfg(feature = "mock")]
-impl_oboron!(Mock1B64, Scheme::Mock1, Encoding::Base64, "mock1:b64");
+impl_oboron!(Mock1B64, Scheme::Mock1, Encoding::B64, "mock1:b64");
 #[cfg(feature = "mock")]
 impl_oboron!(Mock1Hex, Scheme::Mock1, Encoding::Hex, "mock1:hex");
 
 // mock2 (reverse scheme)
 #[cfg(feature = "mock")]
-impl_oboron!(
-    Mock2C32,
-    Scheme::Mock2,
-    Encoding::Base32Crockford,
-    "mock2:c32"
-);
+impl_oboron!(Mock2C32, Scheme::Mock2, Encoding::C32, "mock2:c32");
 #[cfg(feature = "mock")]
-impl_oboron!(Mock2B32, Scheme::Mock2, Encoding::Base32Rfc, "mock2:b32");
+impl_oboron!(Mock2B32, Scheme::Mock2, Encoding::B32, "mock2:b32");
 #[cfg(feature = "mock")]
-impl_oboron!(Mock2B64, Scheme::Mock2, Encoding::Base64, "mock2:b64");
+impl_oboron!(Mock2B64, Scheme::Mock2, Encoding::B64, "mock2:b64");
 #[cfg(feature = "mock")]
 impl_oboron!(Mock2Hex, Scheme::Mock2, Encoding::Hex, "mock2:hex");
 
@@ -727,77 +717,77 @@ pub fn new(fmt: &str, key: &str) -> Result<ObAny, Error> {
 pub fn new_with_format(format: Format, key: &str) -> Result<ObAny, Error> {
     match (format.scheme(), format.encoding()) {
         #[cfg(feature = "zdc")]
-        (Scheme::Zdc, Encoding::Base32Crockford) => Ok(ObAny::ZdcC32(ZdcC32::new(key)?)),
+        (Scheme::Zdc, Encoding::C32) => Ok(ObAny::ZdcC32(ZdcC32::new(key)?)),
         #[cfg(feature = "zdc")]
-        (Scheme::Zdc, Encoding::Base32Rfc) => Ok(ObAny::ZdcB32(ZdcB32::new(key)?)),
+        (Scheme::Zdc, Encoding::B32) => Ok(ObAny::ZdcB32(ZdcB32::new(key)?)),
         #[cfg(feature = "zdc")]
-        (Scheme::Zdc, Encoding::Base64) => Ok(ObAny::ZdcB64(ZdcB64::new(key)?)),
+        (Scheme::Zdc, Encoding::B64) => Ok(ObAny::ZdcB64(ZdcB64::new(key)?)),
         #[cfg(feature = "zdc")]
         (Scheme::Zdc, Encoding::Hex) => Ok(ObAny::ZdcHex(ZdcHex::new(key)?)),
         #[cfg(feature = "upc")]
-        (Scheme::Upc, Encoding::Base32Crockford) => Ok(ObAny::UpcC32(UpcC32::new(key)?)),
+        (Scheme::Upc, Encoding::C32) => Ok(ObAny::UpcC32(UpcC32::new(key)?)),
         #[cfg(feature = "upc")]
-        (Scheme::Upc, Encoding::Base32Rfc) => Ok(ObAny::UpcB32(UpcB32::new(key)?)),
+        (Scheme::Upc, Encoding::B32) => Ok(ObAny::UpcB32(UpcB32::new(key)?)),
         #[cfg(feature = "upc")]
-        (Scheme::Upc, Encoding::Base64) => Ok(ObAny::UpcB64(UpcB64::new(key)?)),
+        (Scheme::Upc, Encoding::B64) => Ok(ObAny::UpcB64(UpcB64::new(key)?)),
         #[cfg(feature = "upc")]
         (Scheme::Upc, Encoding::Hex) => Ok(ObAny::UpcHex(UpcHex::new(key)?)),
         #[cfg(feature = "adgs")]
-        (Scheme::Adgs, Encoding::Base32Crockford) => Ok(ObAny::AdgsC32(AdgsC32::new(key)?)),
+        (Scheme::Adgs, Encoding::C32) => Ok(ObAny::AdgsC32(AdgsC32::new(key)?)),
         #[cfg(feature = "adgs")]
-        (Scheme::Adgs, Encoding::Base32Rfc) => Ok(ObAny::AdgsB32(AdgsB32::new(key)?)),
+        (Scheme::Adgs, Encoding::B32) => Ok(ObAny::AdgsB32(AdgsB32::new(key)?)),
         #[cfg(feature = "adgs")]
-        (Scheme::Adgs, Encoding::Base64) => Ok(ObAny::AdgsB64(AdgsB64::new(key)?)),
+        (Scheme::Adgs, Encoding::B64) => Ok(ObAny::AdgsB64(AdgsB64::new(key)?)),
         #[cfg(feature = "adgs")]
         (Scheme::Adgs, Encoding::Hex) => Ok(ObAny::AdgsHex(AdgsHex::new(key)?)),
         #[cfg(feature = "apgs")]
-        (Scheme::Apgs, Encoding::Base32Crockford) => Ok(ObAny::ApgsC32(ApgsC32::new(key)?)),
+        (Scheme::Apgs, Encoding::C32) => Ok(ObAny::ApgsC32(ApgsC32::new(key)?)),
         #[cfg(feature = "apgs")]
-        (Scheme::Apgs, Encoding::Base32Rfc) => Ok(ObAny::ApgsB32(ApgsB32::new(key)?)),
+        (Scheme::Apgs, Encoding::B32) => Ok(ObAny::ApgsB32(ApgsB32::new(key)?)),
         #[cfg(feature = "apgs")]
-        (Scheme::Apgs, Encoding::Base64) => Ok(ObAny::ApgsB64(ApgsB64::new(key)?)),
+        (Scheme::Apgs, Encoding::B64) => Ok(ObAny::ApgsB64(ApgsB64::new(key)?)),
         #[cfg(feature = "apgs")]
         (Scheme::Apgs, Encoding::Hex) => Ok(ObAny::ApgsHex(ApgsHex::new(key)?)),
         #[cfg(feature = "adsv")]
-        (Scheme::Adsv, Encoding::Base32Crockford) => Ok(ObAny::AdsvC32(AdsvC32::new(key)?)),
+        (Scheme::Adsv, Encoding::C32) => Ok(ObAny::AdsvC32(AdsvC32::new(key)?)),
         #[cfg(feature = "adsv")]
-        (Scheme::Adsv, Encoding::Base32Rfc) => Ok(ObAny::AdsvB32(AdsvB32::new(key)?)),
+        (Scheme::Adsv, Encoding::B32) => Ok(ObAny::AdsvB32(AdsvB32::new(key)?)),
         #[cfg(feature = "adsv")]
-        (Scheme::Adsv, Encoding::Base64) => Ok(ObAny::AdsvB64(AdsvB64::new(key)?)),
+        (Scheme::Adsv, Encoding::B64) => Ok(ObAny::AdsvB64(AdsvB64::new(key)?)),
         #[cfg(feature = "adsv")]
         (Scheme::Adsv, Encoding::Hex) => Ok(ObAny::AdsvHex(AdsvHex::new(key)?)),
         #[cfg(feature = "apsv")]
-        (Scheme::Apsv, Encoding::Base32Crockford) => Ok(ObAny::ApsvC32(ApsvC32::new(key)?)),
+        (Scheme::Apsv, Encoding::C32) => Ok(ObAny::ApsvC32(ApsvC32::new(key)?)),
         #[cfg(feature = "apsv")]
-        (Scheme::Apsv, Encoding::Base32Rfc) => Ok(ObAny::ApsvB32(ApsvB32::new(key)?)),
+        (Scheme::Apsv, Encoding::B32) => Ok(ObAny::ApsvB32(ApsvB32::new(key)?)),
         #[cfg(feature = "apsv")]
-        (Scheme::Apsv, Encoding::Base64) => Ok(ObAny::ApsvB64(ApsvB64::new(key)?)),
+        (Scheme::Apsv, Encoding::B64) => Ok(ObAny::ApsvB64(ApsvB64::new(key)?)),
         #[cfg(feature = "apsv")]
         (Scheme::Apsv, Encoding::Hex) => Ok(ObAny::ApsvHex(ApsvHex::new(key)?)),
         // Testing
         #[cfg(feature = "mock")]
-        (Scheme::Mock1, Encoding::Base32Crockford) => Ok(ObAny::Mock1C32(Mock1C32::new(key)?)),
+        (Scheme::Mock1, Encoding::C32) => Ok(ObAny::Mock1C32(Mock1C32::new(key)?)),
         #[cfg(feature = "mock")]
-        (Scheme::Mock1, Encoding::Base32Rfc) => Ok(ObAny::Mock1B32(Mock1B32::new(key)?)),
+        (Scheme::Mock1, Encoding::B32) => Ok(ObAny::Mock1B32(Mock1B32::new(key)?)),
         #[cfg(feature = "mock")]
-        (Scheme::Mock1, Encoding::Base64) => Ok(ObAny::Mock1B64(Mock1B64::new(key)?)),
+        (Scheme::Mock1, Encoding::B64) => Ok(ObAny::Mock1B64(Mock1B64::new(key)?)),
         #[cfg(feature = "mock")]
         (Scheme::Mock1, Encoding::Hex) => Ok(ObAny::Mock1Hex(Mock1Hex::new(key)?)),
         #[cfg(feature = "mock")]
-        (Scheme::Mock2, Encoding::Base32Crockford) => Ok(ObAny::Mock2C32(Mock2C32::new(key)?)),
+        (Scheme::Mock2, Encoding::C32) => Ok(ObAny::Mock2C32(Mock2C32::new(key)?)),
         #[cfg(feature = "mock")]
-        (Scheme::Mock2, Encoding::Base32Rfc) => Ok(ObAny::Mock2B32(Mock2B32::new(key)?)),
+        (Scheme::Mock2, Encoding::B32) => Ok(ObAny::Mock2B32(Mock2B32::new(key)?)),
         #[cfg(feature = "mock")]
-        (Scheme::Mock2, Encoding::Base64) => Ok(ObAny::Mock2B64(Mock2B64::new(key)?)),
+        (Scheme::Mock2, Encoding::B64) => Ok(ObAny::Mock2B64(Mock2B64::new(key)?)),
         #[cfg(feature = "mock")]
         (Scheme::Mock2, Encoding::Hex) => Ok(ObAny::Mock2Hex(Mock2Hex::new(key)?)),
         // Legacy
         #[cfg(feature = "legacy")]
-        (Scheme::Legacy, Encoding::Base32Crockford) => Ok(ObAny::LegacyC32(LegacyC32::new(key)?)),
+        (Scheme::Legacy, Encoding::C32) => Ok(ObAny::LegacyC32(LegacyC32::new(key)?)),
         #[cfg(feature = "legacy")]
-        (Scheme::Legacy, Encoding::Base32Rfc) => Ok(ObAny::LegacyB32(LegacyB32::new(key)?)),
+        (Scheme::Legacy, Encoding::B32) => Ok(ObAny::LegacyB32(LegacyB32::new(key)?)),
         #[cfg(feature = "legacy")]
-        (Scheme::Legacy, Encoding::Base64) => Ok(ObAny::LegacyB64(LegacyB64::new(key)?)),
+        (Scheme::Legacy, Encoding::B64) => Ok(ObAny::LegacyB64(LegacyB64::new(key)?)),
         #[cfg(feature = "legacy")]
         (Scheme::Legacy, Encoding::Hex) => Ok(ObAny::LegacyHex(LegacyHex::new(key)?)),
         #[allow(unreachable_patterns)]
@@ -809,43 +799,31 @@ pub fn new_with_format(format: Format, key: &str) -> Result<ObAny, Error> {
 fn from_bytes_with_format_internal(format: Format, key_bytes: &[u8; 64]) -> Result<ObAny, Error> {
     match (format.scheme(), format.encoding()) {
         #[cfg(feature = "zdc")]
-        (Scheme::Zdc, Encoding::Base32Crockford) => {
-            Ok(ObAny::ZdcC32(ZdcC32::from_bytes_internal(key_bytes)?))
-        }
+        (Scheme::Zdc, Encoding::C32) => Ok(ObAny::ZdcC32(ZdcC32::from_bytes_internal(key_bytes)?)),
         #[cfg(feature = "zdc")]
-        (Scheme::Zdc, Encoding::Base32Rfc) => {
-            Ok(ObAny::ZdcB32(ZdcB32::from_bytes_internal(key_bytes)?))
-        }
+        (Scheme::Zdc, Encoding::B32) => Ok(ObAny::ZdcB32(ZdcB32::from_bytes_internal(key_bytes)?)),
         #[cfg(feature = "zdc")]
-        (Scheme::Zdc, Encoding::Base64) => {
-            Ok(ObAny::ZdcB64(ZdcB64::from_bytes_internal(key_bytes)?))
-        }
+        (Scheme::Zdc, Encoding::B64) => Ok(ObAny::ZdcB64(ZdcB64::from_bytes_internal(key_bytes)?)),
         #[cfg(feature = "zdc")]
         (Scheme::Zdc, Encoding::Hex) => Ok(ObAny::ZdcHex(ZdcHex::from_bytes_internal(key_bytes)?)),
         #[cfg(feature = "upc")]
-        (Scheme::Upc, Encoding::Base32Crockford) => {
-            Ok(ObAny::UpcC32(UpcC32::from_bytes_internal(key_bytes)?))
-        }
+        (Scheme::Upc, Encoding::C32) => Ok(ObAny::UpcC32(UpcC32::from_bytes_internal(key_bytes)?)),
         #[cfg(feature = "upc")]
-        (Scheme::Upc, Encoding::Base32Rfc) => {
-            Ok(ObAny::UpcB32(UpcB32::from_bytes_internal(key_bytes)?))
-        }
+        (Scheme::Upc, Encoding::B32) => Ok(ObAny::UpcB32(UpcB32::from_bytes_internal(key_bytes)?)),
         #[cfg(feature = "upc")]
-        (Scheme::Upc, Encoding::Base64) => {
-            Ok(ObAny::UpcB64(UpcB64::from_bytes_internal(key_bytes)?))
-        }
+        (Scheme::Upc, Encoding::B64) => Ok(ObAny::UpcB64(UpcB64::from_bytes_internal(key_bytes)?)),
         #[cfg(feature = "upc")]
         (Scheme::Upc, Encoding::Hex) => Ok(ObAny::UpcHex(UpcHex::from_bytes_internal(key_bytes)?)),
         #[cfg(feature = "adgs")]
-        (Scheme::Adgs, Encoding::Base32Crockford) => {
+        (Scheme::Adgs, Encoding::C32) => {
             Ok(ObAny::AdgsC32(AdgsC32::from_bytes_internal(key_bytes)?))
         }
         #[cfg(feature = "adgs")]
-        (Scheme::Adgs, Encoding::Base32Rfc) => {
+        (Scheme::Adgs, Encoding::B32) => {
             Ok(ObAny::AdgsB32(AdgsB32::from_bytes_internal(key_bytes)?))
         }
         #[cfg(feature = "adgs")]
-        (Scheme::Adgs, Encoding::Base64) => {
+        (Scheme::Adgs, Encoding::B64) => {
             Ok(ObAny::AdgsB64(AdgsB64::from_bytes_internal(key_bytes)?))
         }
         #[cfg(feature = "adgs")]
@@ -853,15 +831,15 @@ fn from_bytes_with_format_internal(format: Format, key_bytes: &[u8; 64]) -> Resu
             Ok(ObAny::AdgsHex(AdgsHex::from_bytes_internal(key_bytes)?))
         }
         #[cfg(feature = "apgs")]
-        (Scheme::Apgs, Encoding::Base32Crockford) => {
+        (Scheme::Apgs, Encoding::C32) => {
             Ok(ObAny::ApgsC32(ApgsC32::from_bytes_internal(key_bytes)?))
         }
         #[cfg(feature = "apgs")]
-        (Scheme::Apgs, Encoding::Base32Rfc) => {
+        (Scheme::Apgs, Encoding::B32) => {
             Ok(ObAny::ApgsB32(ApgsB32::from_bytes_internal(key_bytes)?))
         }
         #[cfg(feature = "apgs")]
-        (Scheme::Apgs, Encoding::Base64) => {
+        (Scheme::Apgs, Encoding::B64) => {
             Ok(ObAny::ApgsB64(ApgsB64::from_bytes_internal(key_bytes)?))
         }
         #[cfg(feature = "apgs")]
@@ -869,15 +847,15 @@ fn from_bytes_with_format_internal(format: Format, key_bytes: &[u8; 64]) -> Resu
             Ok(ObAny::ApgsHex(ApgsHex::from_bytes_internal(key_bytes)?))
         }
         #[cfg(feature = "adsv")]
-        (Scheme::Adsv, Encoding::Base32Crockford) => {
+        (Scheme::Adsv, Encoding::C32) => {
             Ok(ObAny::AdsvC32(AdsvC32::from_bytes_internal(key_bytes)?))
         }
         #[cfg(feature = "adsv")]
-        (Scheme::Adsv, Encoding::Base32Rfc) => {
+        (Scheme::Adsv, Encoding::B32) => {
             Ok(ObAny::AdsvB32(AdsvB32::from_bytes_internal(key_bytes)?))
         }
         #[cfg(feature = "adsv")]
-        (Scheme::Adsv, Encoding::Base64) => {
+        (Scheme::Adsv, Encoding::B64) => {
             Ok(ObAny::AdsvB64(AdsvB64::from_bytes_internal(key_bytes)?))
         }
         #[cfg(feature = "adsv")]
@@ -885,15 +863,15 @@ fn from_bytes_with_format_internal(format: Format, key_bytes: &[u8; 64]) -> Resu
             Ok(ObAny::AdsvHex(AdsvHex::from_bytes_internal(key_bytes)?))
         }
         #[cfg(feature = "apsv")]
-        (Scheme::Apsv, Encoding::Base32Crockford) => {
+        (Scheme::Apsv, Encoding::C32) => {
             Ok(ObAny::ApsvC32(ApsvC32::from_bytes_internal(key_bytes)?))
         }
         #[cfg(feature = "apsv")]
-        (Scheme::Apsv, Encoding::Base32Rfc) => {
+        (Scheme::Apsv, Encoding::B32) => {
             Ok(ObAny::ApsvB32(ApsvB32::from_bytes_internal(key_bytes)?))
         }
         #[cfg(feature = "apsv")]
-        (Scheme::Apsv, Encoding::Base64) => {
+        (Scheme::Apsv, Encoding::B64) => {
             Ok(ObAny::ApsvB64(ApsvB64::from_bytes_internal(key_bytes)?))
         }
         #[cfg(feature = "apsv")]
@@ -902,15 +880,15 @@ fn from_bytes_with_format_internal(format: Format, key_bytes: &[u8; 64]) -> Resu
         }
         // Testing
         #[cfg(feature = "mock")]
-        (Scheme::Mock1, Encoding::Base32Crockford) => {
+        (Scheme::Mock1, Encoding::C32) => {
             Ok(ObAny::Mock1C32(Mock1C32::from_bytes_internal(key_bytes)?))
         }
         #[cfg(feature = "mock")]
-        (Scheme::Mock1, Encoding::Base32Rfc) => {
+        (Scheme::Mock1, Encoding::B32) => {
             Ok(ObAny::Mock1B32(Mock1B32::from_bytes_internal(key_bytes)?))
         }
         #[cfg(feature = "mock")]
-        (Scheme::Mock1, Encoding::Base64) => {
+        (Scheme::Mock1, Encoding::B64) => {
             Ok(ObAny::Mock1B64(Mock1B64::from_bytes_internal(key_bytes)?))
         }
         #[cfg(feature = "mock")]
@@ -918,15 +896,15 @@ fn from_bytes_with_format_internal(format: Format, key_bytes: &[u8; 64]) -> Resu
             Ok(ObAny::Mock1Hex(Mock1Hex::from_bytes_internal(key_bytes)?))
         }
         #[cfg(feature = "mock")]
-        (Scheme::Mock2, Encoding::Base32Crockford) => {
+        (Scheme::Mock2, Encoding::C32) => {
             Ok(ObAny::Mock2C32(Mock2C32::from_bytes_internal(key_bytes)?))
         }
         #[cfg(feature = "mock")]
-        (Scheme::Mock2, Encoding::Base32Rfc) => {
+        (Scheme::Mock2, Encoding::B32) => {
             Ok(ObAny::Mock2B32(Mock2B32::from_bytes_internal(key_bytes)?))
         }
         #[cfg(feature = "mock")]
-        (Scheme::Mock2, Encoding::Base64) => {
+        (Scheme::Mock2, Encoding::B64) => {
             Ok(ObAny::Mock2B64(Mock2B64::from_bytes_internal(key_bytes)?))
         }
         #[cfg(feature = "mock")]
@@ -935,15 +913,15 @@ fn from_bytes_with_format_internal(format: Format, key_bytes: &[u8; 64]) -> Resu
         }
         // Legacy
         #[cfg(feature = "legacy")]
-        (Scheme::Legacy, Encoding::Base32Crockford) => {
+        (Scheme::Legacy, Encoding::C32) => {
             Ok(ObAny::LegacyC32(LegacyC32::from_bytes_internal(key_bytes)?))
         }
         #[cfg(feature = "legacy")]
-        (Scheme::Legacy, Encoding::Base32Rfc) => {
+        (Scheme::Legacy, Encoding::B32) => {
             Ok(ObAny::LegacyB32(LegacyB32::from_bytes_internal(key_bytes)?))
         }
         #[cfg(feature = "legacy")]
-        (Scheme::Legacy, Encoding::Base64) => {
+        (Scheme::Legacy, Encoding::B64) => {
             Ok(ObAny::LegacyB64(LegacyB64::from_bytes_internal(key_bytes)?))
         }
         #[cfg(feature = "legacy")]
@@ -1035,12 +1013,7 @@ mod tests {
         ];
 
         // Define all encodings
-        let encodings = vec![
-            Encoding::Base32Crockford,
-            Encoding::Base32Rfc,
-            Encoding::Base64,
-            Encoding::Hex,
-        ];
+        let encodings = vec![Encoding::C32, Encoding::B32, Encoding::B64, Encoding::Hex];
 
         for scheme in &schemes {
             for encoding in &encodings {
@@ -1098,16 +1071,11 @@ mod tests {
         ];
 
         // Define all encodings
-        let encodings = vec![
-            Encoding::Base32Crockford,
-            Encoding::Base32Rfc,
-            Encoding::Base64,
-            Encoding::Hex,
-        ];
+        let encodings = vec![Encoding::C32, Encoding::B32, Encoding::B64, Encoding::Hex];
 
         for scheme in schemes {
             for encoding in &encodings {
-                let format_str = format!("{}:{}", scheme.as_str(), encoding.as_short_str());
+                let format_str = format!("{}:{}", scheme.as_str(), encoding.as_str());
                 let result = new(format_str.as_str(), &key);
 
                 assert!(
@@ -1151,12 +1119,7 @@ mod tests {
         ];
 
         // Define all encodings
-        let encodings = vec![
-            Encoding::Base32Crockford,
-            Encoding::Base32Rfc,
-            Encoding::Base64,
-            Encoding::Hex,
-        ];
+        let encodings = vec![Encoding::C32, Encoding::B32, Encoding::B64, Encoding::Hex];
 
         for scheme in &schemes {
             // Skip probabilistic schemes for this test (they can't roundtrip with the same output)

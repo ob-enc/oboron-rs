@@ -42,14 +42,20 @@ class OboronBase(ABC):
 
     @property
     @abstractmethod
+    def format(self) -> str:
+        """Get the format identifier (e.g., 'adsv:b64')."""
+        ...
+
+    @property
+    @abstractmethod
     def scheme(self) -> str:
-        """Get the scheme identifier (e.g., 'AdsvC32')."""
+        """Get the scheme identifier (e.g., 'adsv')."""
         ...
 
     @property
     @abstractmethod
     def encoding(self) -> str:
-        """Get the encoding format (e.g., 'Base32Crockford')."""
+        """Get the encoding format (e.g., 'c32')."""
         ...
 
     @property

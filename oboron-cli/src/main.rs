@@ -217,15 +217,15 @@ impl EncodingFlags {
 
         if self.c32 {
             count += 1;
-            encoding = Some(Encoding::Base32Crockford);
+            encoding = Some(Encoding::C32);
         }
         if self.b32 {
             count += 1;
-            encoding = Some(Encoding::Base32Rfc);
+            encoding = Some(Encoding::B32);
         }
         if self.b64 {
             count += 1;
-            encoding = Some(Encoding::Base64);
+            encoding = Some(Encoding::B64);
         }
         if self.hex {
             count += 1;
@@ -289,7 +289,7 @@ impl FormatSpec {
 
     /// Convert to format string (e.g., "zdc:b64")
     fn to_string(&self) -> String {
-        format!("{}:{}", self.scheme.as_str(), self.encoding.as_short_str())
+        format!("{}:{}", self.scheme.as_str(), self.encoding.as_str())
     }
 }
 
@@ -934,7 +934,7 @@ mod tests {
             b64: true,
             hex: false,
         };
-        assert_eq!(flags.to_encoding().unwrap(), Some(Encoding::Base64));
+        assert_eq!(flags.to_encoding().unwrap(), Some(Encoding::B64));
     }
 
     #[test]
@@ -1005,7 +1005,7 @@ mod tests {
         .unwrap();
 
         assert_eq!(result.scheme, Scheme::Mock1);
-        assert_eq!(result.encoding, Encoding::Base64);
+        assert_eq!(result.encoding, Encoding::B64);
     }
 
     #[test]
@@ -1171,7 +1171,7 @@ mod tests {
             FormatSpec::parse(None, &scheme_flags, &encoding_flags, Some(&config)).unwrap();
 
         assert_eq!(result.scheme, Scheme::Mock1);
-        assert_eq!(result.encoding, Encoding::Base64);
+        assert_eq!(result.encoding, Encoding::B64);
     }
 
     #[test]

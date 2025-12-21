@@ -115,7 +115,7 @@ macro_rules! impl_cipher_class {
             /// The encoding format used by this instance.
             #[getter]
             fn encoding(&self) -> String {
-                self.inner.encoding().as_short_str().to_string()
+                self.inner.encoding().as_str().to_string()
             }
 
             /// Get the current format string.
@@ -136,19 +136,19 @@ macro_rules! impl_cipher_class {
 impl_cipher_class!(
     ZdcC32,
     ::oboron::ZdcC32,
-    "Zdc cipher with Base32Crockford encoding (AES-CBC, deterministic)"
+    "Zdc cipher with C32 encoding (AES-CBC, deterministic)"
 );
 #[cfg(feature = "zdc")]
 impl_cipher_class!(
     ZdcB32,
     ::oboron::ZdcB32,
-    "Zdc cipher with Base32Rfc encoding (AES-CBC, deterministic)"
+    "Zdc cipher with B32 encoding (AES-CBC, deterministic)"
 );
 #[cfg(feature = "zdc")]
 impl_cipher_class!(
     ZdcB64,
     ::oboron::ZdcB64,
-    "Zdc cipher with Base64 encoding (AES-CBC, deterministic)"
+    "Zdc cipher with B64 encoding (AES-CBC, deterministic)"
 );
 #[cfg(feature = "zdc")]
 impl_cipher_class!(
@@ -163,19 +163,19 @@ impl_cipher_class!(
 impl_cipher_class!(
     UpcC32,
     ::oboron::UpcC32,
-    "Upc cipher with Base32Crockford encoding (Probabilistic AES-CBC)"
+    "Upc cipher with C32 encoding (Probabilistic AES-CBC)"
 );
 #[cfg(feature = "upc")]
 impl_cipher_class!(
     UpcB32,
     ::oboron::UpcB32,
-    "Upc cipher with Base32Rfc encoding (Probabilistic AES-CBC)"
+    "Upc cipher with B32 encoding (Probabilistic AES-CBC)"
 );
 #[cfg(feature = "upc")]
 impl_cipher_class!(
     UpcB64,
     ::oboron::UpcB64,
-    "Upc cipher with Base64 encoding (Probabilistic AES-CBC)"
+    "Upc cipher with B64 encoding (Probabilistic AES-CBC)"
 );
 #[cfg(feature = "upc")]
 impl_cipher_class!(
@@ -190,19 +190,19 @@ impl_cipher_class!(
 impl_cipher_class!(
     AdgsC32,
     ::oboron::AdgsC32,
-    "Adgs cipher with Base32Crockford encoding (AES-GCM-SIV, deterministic)"
+    "Adgs cipher with C32 encoding (AES-GCM-SIV, deterministic)"
 );
 #[cfg(feature = "adgs")]
 impl_cipher_class!(
     AdgsB32,
     ::oboron::AdgsB32,
-    "Adgs cipher with Base32Rfc encoding (AES-GCM-SIV, deterministic)"
+    "Adgs cipher with B32 encoding (AES-GCM-SIV, deterministic)"
 );
 #[cfg(feature = "adgs")]
 impl_cipher_class!(
     AdgsB64,
     ::oboron::AdgsB64,
-    "Adgs cipher with Base64 encoding (AES-GCM-SIV, deterministic)"
+    "Adgs cipher with B64 encoding (AES-GCM-SIV, deterministic)"
 );
 #[cfg(feature = "adgs")]
 impl_cipher_class!(
@@ -217,19 +217,19 @@ impl_cipher_class!(
 impl_cipher_class!(
     ApgsC32,
     ::oboron::ApgsC32,
-    "Apgs cipher with Base32Crockford encoding (Probabilistic AES-GCM-SIV)"
+    "Apgs cipher with C32 encoding (Probabilistic AES-GCM-SIV)"
 );
 #[cfg(feature = "apgs")]
 impl_cipher_class!(
     ApgsB32,
     ::oboron::ApgsB32,
-    "Apgs cipher with Base32Rfc encoding (Probabilistic AES-GCM-SIV)"
+    "Apgs cipher with B32 encoding (Probabilistic AES-GCM-SIV)"
 );
 #[cfg(feature = "apgs")]
 impl_cipher_class!(
     ApgsB64,
     ::oboron::ApgsB64,
-    "Apgs cipher with Base64 encoding (Probabilistic AES-GCM-SIV)"
+    "Apgs cipher with B64 encoding (Probabilistic AES-GCM-SIV)"
 );
 #[cfg(feature = "apgs")]
 impl_cipher_class!(
@@ -244,19 +244,19 @@ impl_cipher_class!(
 impl_cipher_class!(
     AdsvC32,
     ::oboron::AdsvC32,
-    "Adsv cipher with Base32Crockford encoding (AES-SIV, deterministic, nonce-misuse resistant)"
+    "Adsv cipher with C32 encoding (AES-SIV, deterministic, nonce-misuse resistant)"
 );
 #[cfg(feature = "adsv")]
 impl_cipher_class!(
     AdsvB32,
     ::oboron::AdsvB32,
-    "Adsv cipher with Base32Rfc encoding (AES-SIV, deterministic, nonce-misuse resistant)"
+    "Adsv cipher with B32 encoding (AES-SIV, deterministic, nonce-misuse resistant)"
 );
 #[cfg(feature = "adsv")]
 impl_cipher_class!(
     AdsvB64,
     ::oboron::AdsvB64,
-    "Adsv cipher with Base64 encoding (AES-SIV, deterministic, nonce-misuse resistant)"
+    "Adsv cipher with B64 encoding (AES-SIV, deterministic, nonce-misuse resistant)"
 );
 #[cfg(feature = "adsv")]
 impl_cipher_class!(
@@ -271,19 +271,19 @@ impl_cipher_class!(
 impl_cipher_class!(
     ApsvC32,
     ::oboron::ApsvC32,
-    "Apsv cipher with Base32Crockford encoding (Probabilistic AES-SIV)"
+    "Apsv cipher with C32 encoding (Probabilistic AES-SIV)"
 );
 #[cfg(feature = "apsv")]
 impl_cipher_class!(
     ApsvB32,
     ::oboron::ApsvB32,
-    "Apsv cipher with Base32Rfc encoding (Probabilistic AES-SIV)"
+    "Apsv cipher with B32 encoding (Probabilistic AES-SIV)"
 );
 #[cfg(feature = "apsv")]
 impl_cipher_class!(
     ApsvB64,
     ::oboron::ApsvB64,
-    "Apsv cipher with Base64 encoding (Probabilistic AES-SIV)"
+    "Apsv cipher with B64 encoding (Probabilistic AES-SIV)"
 );
 #[cfg(feature = "apsv")]
 impl_cipher_class!(
@@ -299,17 +299,17 @@ impl_cipher_class!(
 impl_cipher_class!(
     Mock1C32,
     ::oboron::Mock1C32,
-    "Mock1 cipher with Base32Crockford encoding (Identity scheme, for testing)"
+    "Mock1 cipher with C32 encoding (Identity scheme, for testing)"
 );
 impl_cipher_class!(
     Mock1B32,
     ::oboron::Mock1B32,
-    "Mock1 cipher with Base32Rfc encoding (Identity scheme, for testing)"
+    "Mock1 cipher with B32 encoding (Identity scheme, for testing)"
 );
 impl_cipher_class!(
     Mock1B64,
     ::oboron::Mock1B64,
-    "Mock1 cipher with Base64 encoding (Identity scheme, for testing)"
+    "Mock1 cipher with B64 encoding (Identity scheme, for testing)"
 );
 impl_cipher_class!(
     Mock1Hex,
@@ -322,17 +322,17 @@ impl_cipher_class!(
 impl_cipher_class!(
     Mock2C32,
     ::oboron::Mock2C32,
-    "Mock2 cipher with Base32Crockford encoding (Reverse scheme, for testing)"
+    "Mock2 cipher with C32 encoding (Reverse scheme, for testing)"
 );
 impl_cipher_class!(
     Mock2B32,
     ::oboron::Mock2B32,
-    "Mock2 cipher with Base32Rfc encoding (Reverse scheme, for testing)"
+    "Mock2 cipher with B32 encoding (Reverse scheme, for testing)"
 );
 impl_cipher_class!(
     Mock2B64,
     ::oboron::Mock2B64,
-    "Mock2 cipher with Base64 encoding (Reverse scheme, for testing)"
+    "Mock2 cipher with B64 encoding (Reverse scheme, for testing)"
 );
 impl_cipher_class!(
     Mock2Hex,
@@ -346,7 +346,7 @@ impl_cipher_class!(
 impl_cipher_class!(
     LegacyC32,
     ::oboron::LegacyC32,
-    "Legacy cipher with Base32Crockford encoding (LEGACY AES-CBC with custom padding)\n\n\
+    "Legacy cipher with C32 encoding (LEGACY AES-CBC with custom padding)\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
      For new projects, use Zdc or more secure schemes like Adgs/Adsv."
 );
@@ -354,7 +354,7 @@ impl_cipher_class!(
 impl_cipher_class!(
     LegacyB32,
     ::oboron::LegacyB32,
-    "Legacy cipher with Base32Rfc encoding (LEGACY AES-CBC with custom padding)\n\n\
+    "Legacy cipher with B32 encoding (LEGACY AES-CBC with custom padding)\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
      For new projects, use Zdc or more secure schemes like Adgs/Adsv."
 );
@@ -362,7 +362,7 @@ impl_cipher_class!(
 impl_cipher_class!(
     LegacyB64,
     ::oboron::LegacyB64,
-    "Legacy cipher with Base64 encoding (LEGACY AES-CBC with custom padding)\n\n\
+    "Legacy cipher with B64 encoding (LEGACY AES-CBC with custom padding)\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
      For new projects, use Zdc or more secure schemes like Adgs/Adsv."
 );
@@ -538,7 +538,7 @@ impl Ob {
     /// The encoding format used by this instance.
     #[getter]
     fn encoding(&self) -> String {
-        self.inner.encoding().as_short_str().to_string()
+        self.inner.encoding().as_str().to_string()
     }
 }
 

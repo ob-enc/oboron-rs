@@ -15,7 +15,7 @@
 
 #![cfg(feature = "legacy")]
 
-use oboron::{Legacy, LegacyBase64, LegacyHex, Oboron};
+use oboron::{Legacy, LegacyB64, LegacyHex, Oboron};
 
 // 128 hex characters = 64 bytes
 const HEX_KEY: &str = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
@@ -86,7 +86,7 @@ fn test_legacy_all_encodings() {
     let key = [42u8; 64];
 
     let ob_b32 = Legacy::from_bytes(&key).unwrap();
-    let ob_b64 = LegacyBase64::from_bytes(&key).unwrap();
+    let ob_b64 = LegacyB64::from_bytes(&key).unwrap();
     let ob_hex = LegacyHex::from_bytes(&key).unwrap();
 
     let enc_b32 = ob_b32.enc(pt).unwrap();
@@ -105,7 +105,7 @@ fn test_legacy_all_encodings() {
 
     // Cross-scheme getter tests
     assert_eq!(ob_b32.scheme(), oboron::Scheme::Legacy);
-    assert_eq!(ob_b64.encoding(), oboron::Encoding::Base64);
+    assert_eq!(ob_b64.encoding(), oboron::Encoding::B64);
     assert_eq!(ob_hex.encoding(), oboron::Encoding::Hex);
 }
 

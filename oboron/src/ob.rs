@@ -90,7 +90,7 @@ impl Ob {
     /// let ob = Ob::new("adsv:b64", &key)?;
     /// let format = ob.format();
     /// assert_eq!(format.scheme(), Scheme::Adsv);
-    /// assert_eq!(format.encoding(), Encoding::Base64);
+    /// assert_eq!(format.encoding(), Encoding::B64);
     /// # }
     /// # Ok(())
     /// # }
@@ -115,7 +115,7 @@ impl Ob {
     /// # {
     /// # use oboron::{Ob, Format, Scheme, Encoding};
     /// # let key = oboron::generate_key();
-    /// let format = Format::new(Scheme::Adsv, Encoding::Base64);
+    /// let format = Format::new(Scheme::Adsv, Encoding::B64);
     /// let ob = Ob::new_with_format(format, &key)?;
     /// # }
     /// # Ok(())
@@ -159,7 +159,7 @@ impl Ob {
     /// # #[cfg(all(feature = "adsv", feature="keyless"))]
     /// # {
     /// # use oboron::{Ob, Format, Scheme, Encoding};
-    /// let format = Format::new(Scheme::Adsv, Encoding::Base32Crockford);
+    /// let format = Format::new(Scheme::Adsv, Encoding::C32);
     /// let ob = Ob::new_keyless_with_format(format)?;
     /// # }
     /// # Ok(())
@@ -232,7 +232,7 @@ impl Ob {
     /// # {
     /// # use oboron::{Ob, Format, Scheme, Encoding};
     /// let key_hex = oboron::generate_key_hex();
-    /// let format = Format::new(Scheme::Adsv, Encoding::Base64);
+    /// let format = Format::new(Scheme::Adsv, Encoding::B64);
     /// let ob = Ob::from_hex_key_with_format(format, &key_hex)?;
     /// # }
     /// # Ok(())
@@ -255,7 +255,7 @@ impl Ob {
     /// # {
     /// # use oboron::{Ob, Format, Scheme, Encoding};
     /// let key_bytes = oboron::generate_key_bytes();
-    /// let format = Format::new(Scheme::Adsv, Encoding::Base64);
+    /// let format = Format::new(Scheme::Adsv, Encoding::B64);
     /// let ob = Ob::from_bytes_with_format(format, &key_bytes)?;
     /// # }
     /// # Ok(())

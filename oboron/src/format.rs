@@ -18,7 +18,7 @@ impl Format {
 
     /// Create a format with the specified scheme and default Base32 encoding.
     pub fn with_scheme(scheme: Scheme) -> Self {
-        Self::new(scheme, Encoding::Base32Crockford)
+        Self::new(scheme, Encoding::C32)
     }
 
     /// Get the scheme.
@@ -37,56 +37,56 @@ impl Format {
     pub fn from_str(s: &str) -> Result<Self, Error> {
         Ok(match s {
             #[cfg(feature = "zdc")]
-            constants::ZDC_C32 => Format::new(Scheme::Zdc, Encoding::Base32Crockford),
+            constants::ZDC_C32 => Format::new(Scheme::Zdc, Encoding::C32),
             #[cfg(feature = "zdc")]
-            constants::ZDC_B32 => Format::new(Scheme::Zdc, Encoding::Base32Rfc),
+            constants::ZDC_B32 => Format::new(Scheme::Zdc, Encoding::B32),
             #[cfg(feature = "zdc")]
-            constants::ZDC_B64 => Format::new(Scheme::Zdc, Encoding::Base64),
+            constants::ZDC_B64 => Format::new(Scheme::Zdc, Encoding::B64),
             #[cfg(feature = "zdc")]
             constants::ZDC_HEX => Format::new(Scheme::Zdc, Encoding::Hex),
 
             #[cfg(feature = "upc")]
-            constants::UPC_C32 => Format::new(Scheme::Upc, Encoding::Base32Crockford),
+            constants::UPC_C32 => Format::new(Scheme::Upc, Encoding::C32),
             #[cfg(feature = "upc")]
-            constants::UPC_B32 => Format::new(Scheme::Upc, Encoding::Base32Rfc),
+            constants::UPC_B32 => Format::new(Scheme::Upc, Encoding::B32),
             #[cfg(feature = "upc")]
-            constants::UPC_B64 => Format::new(Scheme::Upc, Encoding::Base64),
+            constants::UPC_B64 => Format::new(Scheme::Upc, Encoding::B64),
             #[cfg(feature = "upc")]
             constants::UPC_HEX => Format::new(Scheme::Upc, Encoding::Hex),
 
             #[cfg(feature = "adgs")]
-            constants::ADGS_C32 => Format::new(Scheme::Adgs, Encoding::Base32Crockford),
+            constants::ADGS_C32 => Format::new(Scheme::Adgs, Encoding::C32),
             #[cfg(feature = "adgs")]
-            constants::ADGS_B32 => Format::new(Scheme::Adgs, Encoding::Base32Rfc),
+            constants::ADGS_B32 => Format::new(Scheme::Adgs, Encoding::B32),
             #[cfg(feature = "adgs")]
-            constants::ADGS_B64 => Format::new(Scheme::Adgs, Encoding::Base64),
+            constants::ADGS_B64 => Format::new(Scheme::Adgs, Encoding::B64),
             #[cfg(feature = "adgs")]
             constants::ADGS_HEX => Format::new(Scheme::Adgs, Encoding::Hex),
 
             #[cfg(feature = "apgs")]
-            constants::APGS_C32 => Format::new(Scheme::Apgs, Encoding::Base32Crockford),
+            constants::APGS_C32 => Format::new(Scheme::Apgs, Encoding::C32),
             #[cfg(feature = "apgs")]
-            constants::APGS_B32 => Format::new(Scheme::Apgs, Encoding::Base32Rfc),
+            constants::APGS_B32 => Format::new(Scheme::Apgs, Encoding::B32),
             #[cfg(feature = "apgs")]
-            constants::APGS_B64 => Format::new(Scheme::Apgs, Encoding::Base64),
+            constants::APGS_B64 => Format::new(Scheme::Apgs, Encoding::B64),
             #[cfg(feature = "apgs")]
             constants::APGS_HEX => Format::new(Scheme::Apgs, Encoding::Hex),
 
             #[cfg(feature = "adsv")]
-            constants::ADSV_C32 => Format::new(Scheme::Adsv, Encoding::Base32Crockford),
+            constants::ADSV_C32 => Format::new(Scheme::Adsv, Encoding::C32),
             #[cfg(feature = "adsv")]
-            constants::ADSV_B32 => Format::new(Scheme::Adsv, Encoding::Base32Rfc),
+            constants::ADSV_B32 => Format::new(Scheme::Adsv, Encoding::B32),
             #[cfg(feature = "adsv")]
-            constants::ADSV_B64 => Format::new(Scheme::Adsv, Encoding::Base64),
+            constants::ADSV_B64 => Format::new(Scheme::Adsv, Encoding::B64),
             #[cfg(feature = "adsv")]
             constants::ADSV_HEX => Format::new(Scheme::Adsv, Encoding::Hex),
 
             #[cfg(feature = "apsv")]
-            constants::APSV_C32 => Format::new(Scheme::Apsv, Encoding::Base32Crockford),
+            constants::APSV_C32 => Format::new(Scheme::Apsv, Encoding::C32),
             #[cfg(feature = "apsv")]
-            constants::APSV_B32 => Format::new(Scheme::Apsv, Encoding::Base32Rfc),
+            constants::APSV_B32 => Format::new(Scheme::Apsv, Encoding::B32),
             #[cfg(feature = "apsv")]
-            constants::APSV_B64 => Format::new(Scheme::Apsv, Encoding::Base64),
+            constants::APSV_B64 => Format::new(Scheme::Apsv, Encoding::B64),
             #[cfg(feature = "apsv")]
             constants::APSV_HEX => Format::new(Scheme::Apsv, Encoding::Hex),
 
@@ -94,21 +94,21 @@ impl Format {
 
             // mock1 variants
             #[cfg(feature = "mock")]
-            constants::MOCK1_C32 => Format::new(Scheme::Mock1, Encoding::Base32Crockford),
+            constants::MOCK1_C32 => Format::new(Scheme::Mock1, Encoding::C32),
             #[cfg(feature = "mock")]
-            constants::MOCK1_B32 => Format::new(Scheme::Mock1, Encoding::Base32Rfc),
+            constants::MOCK1_B32 => Format::new(Scheme::Mock1, Encoding::B32),
             #[cfg(feature = "mock")]
-            constants::MOCK1_B64 => Format::new(Scheme::Mock1, Encoding::Base64),
+            constants::MOCK1_B64 => Format::new(Scheme::Mock1, Encoding::B64),
             #[cfg(feature = "mock")]
             constants::MOCK1_HEX => Format::new(Scheme::Mock1, Encoding::Hex),
 
             // mock2 variants
             #[cfg(feature = "mock")]
-            constants::MOCK2_C32 => Format::new(Scheme::Mock2, Encoding::Base32Crockford),
+            constants::MOCK2_C32 => Format::new(Scheme::Mock2, Encoding::C32),
             #[cfg(feature = "mock")]
-            constants::MOCK2_B32 => Format::new(Scheme::Mock2, Encoding::Base32Rfc),
+            constants::MOCK2_B32 => Format::new(Scheme::Mock2, Encoding::B32),
             #[cfg(feature = "mock")]
-            constants::MOCK2_B64 => Format::new(Scheme::Mock2, Encoding::Base64),
+            constants::MOCK2_B64 => Format::new(Scheme::Mock2, Encoding::B64),
             #[cfg(feature = "mock")]
             constants::MOCK2_HEX => Format::new(Scheme::Mock2, Encoding::Hex),
 
@@ -116,11 +116,11 @@ impl Format {
 
             // legacy variants
             #[cfg(feature = "legacy")]
-            constants::LEGACY_C32 => Format::new(Scheme::Legacy, Encoding::Base32Crockford),
+            constants::LEGACY_C32 => Format::new(Scheme::Legacy, Encoding::C32),
             #[cfg(feature = "legacy")]
-            constants::LEGACY_B32 => Format::new(Scheme::Legacy, Encoding::Base32Rfc),
+            constants::LEGACY_B32 => Format::new(Scheme::Legacy, Encoding::B32),
             #[cfg(feature = "legacy")]
-            constants::LEGACY_B64 => Format::new(Scheme::Legacy, Encoding::Base64),
+            constants::LEGACY_B64 => Format::new(Scheme::Legacy, Encoding::B64),
             #[cfg(feature = "legacy")]
             constants::LEGACY_HEX => Format::new(Scheme::Legacy, Encoding::Hex),
 
@@ -139,12 +139,7 @@ impl std::str::FromStr for Format {
 
 impl std::fmt::Display for Format {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{}:{}",
-            self.scheme.as_str(),
-            self.encoding.as_short_str()
-        )
+        write!(f, "{}:{}", self.scheme.as_str(), self.encoding.as_str())
     }
 }
 
@@ -179,17 +174,12 @@ mod tests {
         ];
 
         // Define all encodings
-        let encodings = vec![
-            Encoding::Base32Crockford,
-            Encoding::Base32Rfc,
-            Encoding::Base64,
-            Encoding::Hex,
-        ];
+        let encodings = vec![Encoding::C32, Encoding::B32, Encoding::B64, Encoding::Hex];
 
         for scheme in &schemes {
             for encoding in &encodings {
                 // Test short string identifiers (e.g., "zdc:c32", "zdc:b32")
-                let format_str = format!("{}:{}", scheme.as_str(), encoding.as_short_str());
+                let format_str = format!("{}:{}", scheme.as_str(), encoding.as_str());
                 let result = Format::from_str(&format_str);
                 assert!(result.is_ok(), "Failed to parse: {}", format_str);
                 let format = result.unwrap();
@@ -224,69 +214,69 @@ mod tests {
         // Define test cases: (scheme, encoding, expected_string)
         #[cfg(feature = "mock")]
         let mut test_cases = vec![
-            (Scheme::Mock2, Encoding::Base32Crockford, "mock2:c32"),
-            (Scheme::Mock2, Encoding::Base32Rfc, "mock2:b32"),
-            (Scheme::Mock2, Encoding::Base64, "mock2:b64"),
+            (Scheme::Mock2, Encoding::C32, "mock2:c32"),
+            (Scheme::Mock2, Encoding::B32, "mock2:b32"),
+            (Scheme::Mock2, Encoding::B64, "mock2:b64"),
             (Scheme::Mock2, Encoding::Hex, "mock2:hex"),
-            (Scheme::Mock1, Encoding::Base32Crockford, "mock1:c32"),
-            (Scheme::Mock1, Encoding::Base32Rfc, "mock1:b32"),
-            (Scheme::Mock1, Encoding::Base64, "mock1:b64"),
+            (Scheme::Mock1, Encoding::C32, "mock1:c32"),
+            (Scheme::Mock1, Encoding::B32, "mock1:b32"),
+            (Scheme::Mock1, Encoding::B64, "mock1:b64"),
             (Scheme::Mock1, Encoding::Hex, "mock1:hex"),
         ];
 
         #[cfg(feature = "legacy")]
         test_cases.extend(vec![
-            (Scheme::Legacy, Encoding::Base32Crockford, "legacy:c32"),
-            (Scheme::Legacy, Encoding::Base32Rfc, "legacy:b32"),
-            (Scheme::Legacy, Encoding::Base64, "legacy:b64"),
+            (Scheme::Legacy, Encoding::C32, "legacy:c32"),
+            (Scheme::Legacy, Encoding::B32, "legacy:b32"),
+            (Scheme::Legacy, Encoding::B64, "legacy:b64"),
             (Scheme::Legacy, Encoding::Hex, "legacy:hex"),
         ]);
 
         #[cfg(feature = "zdc")]
         test_cases.extend(vec![
-            (Scheme::Zdc, Encoding::Base32Crockford, "zdc:c32"),
-            (Scheme::Zdc, Encoding::Base32Rfc, "zdc:b32"),
-            (Scheme::Zdc, Encoding::Base64, "zdc:b64"),
+            (Scheme::Zdc, Encoding::C32, "zdc:c32"),
+            (Scheme::Zdc, Encoding::B32, "zdc:b32"),
+            (Scheme::Zdc, Encoding::B64, "zdc:b64"),
             (Scheme::Zdc, Encoding::Hex, "zdc:hex"),
         ]);
 
         #[cfg(feature = "upc")]
         test_cases.extend(vec![
-            (Scheme::Upc, Encoding::Base32Crockford, "upc:c32"),
-            (Scheme::Upc, Encoding::Base32Rfc, "upc:b32"),
-            (Scheme::Upc, Encoding::Base64, "upc:b64"),
+            (Scheme::Upc, Encoding::C32, "upc:c32"),
+            (Scheme::Upc, Encoding::B32, "upc:b32"),
+            (Scheme::Upc, Encoding::B64, "upc:b64"),
             (Scheme::Upc, Encoding::Hex, "upc:hex"),
         ]);
 
         #[cfg(feature = "adgs")]
         test_cases.extend(vec![
-            (Scheme::Adgs, Encoding::Base32Crockford, "adgs:c32"),
-            (Scheme::Adgs, Encoding::Base32Rfc, "adgs:b32"),
-            (Scheme::Adgs, Encoding::Base64, "adgs:b64"),
+            (Scheme::Adgs, Encoding::C32, "adgs:c32"),
+            (Scheme::Adgs, Encoding::B32, "adgs:b32"),
+            (Scheme::Adgs, Encoding::B64, "adgs:b64"),
             (Scheme::Adgs, Encoding::Hex, "adgs:hex"),
         ]);
 
         #[cfg(feature = "apgs")]
         test_cases.extend(vec![
-            (Scheme::Apgs, Encoding::Base32Crockford, "apgs:c32"),
-            (Scheme::Apgs, Encoding::Base32Rfc, "apgs:b32"),
-            (Scheme::Apgs, Encoding::Base64, "apgs:b64"),
+            (Scheme::Apgs, Encoding::C32, "apgs:c32"),
+            (Scheme::Apgs, Encoding::B32, "apgs:b32"),
+            (Scheme::Apgs, Encoding::B64, "apgs:b64"),
             (Scheme::Apgs, Encoding::Hex, "apgs:hex"),
         ]);
 
         #[cfg(feature = "adsv")]
         test_cases.extend(vec![
-            (Scheme::Adsv, Encoding::Base32Crockford, "adsv:c32"),
-            (Scheme::Adsv, Encoding::Base32Rfc, "adsv:b32"),
-            (Scheme::Adsv, Encoding::Base64, "adsv:b64"),
+            (Scheme::Adsv, Encoding::C32, "adsv:c32"),
+            (Scheme::Adsv, Encoding::B32, "adsv:b32"),
+            (Scheme::Adsv, Encoding::B64, "adsv:b64"),
             (Scheme::Adsv, Encoding::Hex, "adsv:hex"),
         ]);
 
         #[cfg(feature = "apsv")]
         test_cases.extend(vec![
-            (Scheme::Apsv, Encoding::Base32Crockford, "apsv:c32"),
-            (Scheme::Apsv, Encoding::Base32Rfc, "apsv:b32"),
-            (Scheme::Apsv, Encoding::Base64, "apsv:b64"),
+            (Scheme::Apsv, Encoding::C32, "apsv:c32"),
+            (Scheme::Apsv, Encoding::B32, "apsv:b32"),
+            (Scheme::Apsv, Encoding::B64, "apsv:b64"),
             (Scheme::Apsv, Encoding::Hex, "apsv:hex"),
         ]);
 
@@ -320,46 +310,46 @@ mod tests {
     #[test]
     #[cfg(feature = "legacy")]
     fn test_legacy_supports_both_base32_variants() {
-        // legacy should support both Base32Rfc and Base32Crockford
+        // legacy should support both B32 and C32
         let format_rfc = Format::from_str("legacy:b32").unwrap();
         assert_eq!(format_rfc.scheme(), Scheme::Legacy);
-        assert_eq!(format_rfc.encoding(), Encoding::Base32Rfc);
+        assert_eq!(format_rfc.encoding(), Encoding::B32);
 
         let format_crock = Format::from_str("legacy:c32").unwrap();
         assert_eq!(format_crock.scheme(), Scheme::Legacy);
-        assert_eq!(format_crock.encoding(), Encoding::Base32Crockford);
+        assert_eq!(format_crock.encoding(), Encoding::C32);
     }
 
     #[test]
     #[cfg(all(feature = "all-schemes", feature = "mock"))]
     fn test_all_schemes_support_both_base32_variants() {
-        // All schemes should support both Base32Rfc (b32) and Base32Crockford (c32)
+        // All schemes should support both RFC 4648 base32 (b32) and Crockford base32 (c32)
         let schemes = vec![
             "zdc", "upc", "adgs", "apgs", "adsv", "apsv", "mock1", "mock2",
         ];
 
         for scheme_str in schemes {
-            // Test Base32Crockford (c32)
+            // Test Crockford base32 (c32)
             let format_str_crock = format!("{}:c32", scheme_str);
             let result_crock = Format::from_str(&format_str_crock);
             if result_crock.is_ok() {
                 // Only test if feature is enabled
                 assert_eq!(
                     result_crock.unwrap().encoding(),
-                    Encoding::Base32Crockford,
+                    Encoding::C32,
                     "{} should support c32",
                     scheme_str
                 );
             }
 
-            // Test Base32Rfc (b32)
+            // Test RFC 4648 base32 (b32)
             let format_str_rfc = format!("{}:b32", scheme_str);
             let result_rfc = Format::from_str(&format_str_rfc);
             if result_rfc.is_ok() {
                 // Only test if feature is enabled
                 assert_eq!(
                     result_rfc.unwrap().encoding(),
-                    Encoding::Base32Rfc,
+                    Encoding::B32,
                     "{} should support b32",
                     scheme_str
                 );

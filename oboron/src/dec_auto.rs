@@ -140,17 +140,17 @@ fn validate_legacy_output(plaintext: &str) -> Result<(), Error> {
 
 /// Decode c32, autodetect the scheme and decrypt accordingly
 pub(crate) fn dec_any_scheme_c32(keychain: &Keychain, obtext: &str) -> Result<String, Error> {
-    dec_any_scheme(keychain, Encoding::Base32Crockford, obtext)
+    dec_any_scheme(keychain, Encoding::C32, obtext)
 }
 
 /// Decode b32, autodetect the scheme and decrypt accordingly
 pub(crate) fn dec_any_scheme_b32(keychain: &Keychain, obtext: &str) -> Result<String, Error> {
-    dec_any_scheme(keychain, Encoding::Base32Rfc, obtext)
+    dec_any_scheme(keychain, Encoding::B32, obtext)
 }
 
 /// Decode b64, autodetect the scheme and decrypt accordingly
 pub(crate) fn dec_any_scheme_b64(keychain: &Keychain, obtext: &str) -> Result<String, Error> {
-    dec_any_scheme(keychain, Encoding::Base64, obtext)
+    dec_any_scheme(keychain, Encoding::B64, obtext)
 }
 
 /// Decode hex, autodetect the scheme and decrypt accordingly
@@ -165,11 +165,11 @@ pub(crate) fn dec_any_scheme_hex(keychain: &Keychain, obtext: &str) -> Result<St
 /// If the most likely encoding fails, it falls back to trying other encodings.
 ///
 /// Detection logic:
-/// 1. If text contains '-', '_', or uppercase letters -> Base64 (definitive)
-/// 2. Else if text contains non-hex lowercase letters (g-z) -> Try Base32, fallback to Base64
-/// 3. Else -> Try Hex, fallback to Base32, then Base64
+/// 1. If text contains '-', '_', or uppercase letters -> B64 (definitive)
+/// 2. Else if text contains non-hex lowercase letters (g-z) -> Try Base32, fallback to B64
+/// 3. Else -> Try Hex, fallback to Base32, then B64
 pub fn dec_any_format(keychain: &Keychain, obtext: &str) -> Result<String, Error> {
-    // Check for Base64 indicators:  '-', '_', or mixed case letters (definitive)
+    // Check for B64 indicators:  '-', '_', or mixed case letters (definitive)
     if obtext.contains('-')
         || obtext.contains('_')
         || (obtext.chars().any(|c| c.is_ascii_lowercase())
@@ -180,9 +180,9 @@ pub fn dec_any_format(keychain: &Keychain, obtext: &str) -> Result<String, Error
         }
     }
 
-    // Check for uppercase letters, indicating Base32Rfc
+    // Check for uppercase letters, indicating B32
     if obtext.chars().any(|c| c.is_ascii_uppercase()) {
-        // Try Base32Rfc first, fallback to Base64 (no point trying hex)
+        // Try B32 first, fallback to B64 (no point trying hex)
         if let Ok(result) = dec_any_scheme_b32(keychain, obtext) {
             return Ok(result);
         }
@@ -191,9 +191,9 @@ pub fn dec_any_format(keychain: &Keychain, obtext: &str) -> Result<String, Error
         }
     }
 
-    // Check for non-hex lowercase letters (g-z), indicating Base32Crockford
+    // Check for non-hex lowercase letters (g-z), indicating C32
     if obtext.chars().any(|c| c.is_ascii_lowercase() && c > 'f') {
-        // Try Base32Crockford first, fallback to Base64 (no point trying hex)
+        // Try C32 first, fallback to B64 (no point trying hex)
         if let Ok(result) = dec_any_scheme_c32(keychain, obtext) {
             return Ok(result);
         }
@@ -202,7 +202,7 @@ pub fn dec_any_format(keychain: &Keychain, obtext: &str) -> Result<String, Error
         }
     }
 
-    // Likely hex - try Hex, then Base32, then Base64
+    // Likely hex - try Hex, then Base32, then B64
     if let Ok(result) = dec_any_scheme_hex(keychain, obtext) {
         return Ok(result);
     }

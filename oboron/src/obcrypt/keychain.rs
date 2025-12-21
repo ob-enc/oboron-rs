@@ -15,7 +15,7 @@ impl Keychain {
     pub fn from_base64(key_base64: &str) -> Result<Self, Error> {
         let key: [u8; 64] = BASE64URL_NOPAD
             .decode(key_base64.as_bytes())
-            .map_err(|_| Error::InvalidBase64)?
+            .map_err(|_| Error::InvalidB64)?
             .try_into()
             .map_err(|_| Error::InvalidKeyLength)?;
 

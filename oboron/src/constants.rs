@@ -71,7 +71,7 @@ pub const REVERSED_SCHEME_BYTES: &[u8] = get_reversed_schemes();
 
 // Format identifiers
 //
-// c32 - Base32Crockford encoding
+// c32 - Crockford base32 encoding
 #[cfg(feature = "zdc")]
 pub const ZDC_C32: &str = "zdc:c32";
 #[cfg(feature = "upc")]
@@ -93,7 +93,7 @@ pub const MOCK2_C32: &str = "mock2:c32";
 #[cfg(feature = "legacy")]
 pub const LEGACY_C32: &str = "legacy:c32";
 
-// b32 - Base32Rfc encoding
+// b32 - RFC 4648 Base32 encoding
 #[cfg(feature = "zdc")]
 pub const ZDC_B32: &str = "zdc:b32";
 #[cfg(feature = "upc")]

@@ -44,13 +44,13 @@ fn test_apgs_all_encodings() {
     let key = [0u8; 64];
     let plaintext = "Test apgs with different encodings";
 
-    // Base32Crockford (default)
+    // C32 (default)
     let ob_b32 = Apgs::from_bytes(&key).expect("Failed to create Apgs with base32");
     let ot = ob_b32.enc(plaintext).expect("Failed to enc with base32");
     let pt2 = ob_b32.dec(&ot).expect("Failed to dec with base32");
     assert_eq!(pt2, plaintext, "Decoding mismatch for base32");
 
-    // Base64
+    // B64
     let ob_b64 = ApgsB64::from_bytes(&key).expect("Failed to create Apgs with base64");
     let ot = ob_b64.enc(plaintext).expect("Failed to enc with base64");
     let pt2 = ob_b64.dec(&ot).expect("Failed to dec with base64");
@@ -93,13 +93,13 @@ fn test_adsv_all_encodings() {
     let key = [0u8; 64];
     let plaintext = "Test adsv with different encodings";
 
-    // Base32Crockford (default)
+    // C32 (default)
     let ob_b32 = AdsvC32::from_bytes(&key).expect("Failed to create AdsvC32");
     let ot = ob_b32.enc(plaintext).expect("Failed to enc with base32");
     let pt2 = ob_b32.dec(&ot).expect("Failed to dec with base32");
     assert_eq!(pt2, plaintext, "Decoding mismatch for base32");
 
-    // Base64
+    // B64
     let ob_b64 = AdsvB64::from_bytes(&key).expect("Failed to create AdsvC32");
     let ot = ob_b64.enc(plaintext).expect("Failed to enc with base64");
     let pt2 = ob_b64.dec(&ot).expect("Failed to dec with base64");
@@ -146,13 +146,13 @@ fn test_apsv_all_encodings() {
     let key = [0u8; 64];
     let plaintext = "Test apsv with different encodings";
 
-    // Base32Crockford (default)
+    // C32 (default)
     let ob_b32 = ApsvC32::from_bytes(&key).expect("Failed to create ApsvC32");
     let ot = ob_b32.enc(plaintext).expect("Failed to enc with base32");
     let pt2 = ob_b32.dec(&ot).expect("Failed to dec with base32");
     assert_eq!(pt2, plaintext, "Decoding mismatch for base32");
 
-    // Base64
+    // B64
     let ob_b64 = ApsvB64::from_bytes(&key).expect("Failed to create ApsvB64");
     let ot = ob_b64.enc(plaintext).expect("Failed to enc with base64");
     let pt2 = ob_b64.dec(&ot).expect("Failed to dec with base64");
@@ -249,7 +249,7 @@ fn test_obflex_encoding_changes() {
 
     let plaintext = "Testing encoding changes";
 
-    for encoding in &[Encoding::Base32Crockford, Encoding::Base64, Encoding::Hex] {
+    for encoding in &[Encoding::C32, Encoding::B64, Encoding::Hex] {
         ob.set_encoding(*encoding)
             .expect(&format!("Failed to set encoding {:?}", encoding));
 

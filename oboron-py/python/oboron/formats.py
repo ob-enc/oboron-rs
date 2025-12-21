@@ -2,7 +2,7 @@
 
 All constants follow the pattern:  {SCHEME}_{ENCODING}
 - Schemes: ZDC, UPC, ADGS, APGS, ADSV, APSV, MOCK1, MOCK2, LEGACY (legacy)
-- Encodings: C32 (Base32Crockford), B32 (Base32Rfc), B64 (Base64), HEX
+- Encodings: C32 (Crockford base32), B32 (RFC 4648 base32), B64 (RFC 4648 base64url), HEX
 
 Example:
     >>> from oboron import formats

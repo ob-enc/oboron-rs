@@ -3,7 +3,7 @@
 Performance metrics for different schemes and input sizes.
 
 All benchmarks were carried out with static format structs using
-Base32Crockford encoding (e.g., `AdgsC32`).
+Crockford base32 encoding (e.g., `AdgsC32`).
 
 
 ## Performance for Typical IDs (8-16 bytes)

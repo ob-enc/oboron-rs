@@ -21,12 +21,12 @@ fn test_mock1_basic_roundtrip() {
 fn test_mock1_all_encodings() {
     let key = oboron::generate_key();
 
-    // Base32Crockford (default)
+    // C32 (default)
     let ob_b32 = oboron::Mock1C32::new(&key).unwrap();
     let enc_b32 = ob_b32.enc("test").unwrap();
     assert_eq!(ob_b32.dec(&enc_b32).unwrap(), "test");
 
-    // Base64
+    // B64
     let ob_b64 = oboron::Mock1B64::new(&key).unwrap();
     let enc_b64 = ob_b64.enc("test").unwrap();
     assert_eq!(ob_b64.dec(&enc_b64).unwrap(), "test");
@@ -140,7 +140,7 @@ fn test_mock1_scheme_info() {
     let ob = oboron::Mock1C32::new(&key).unwrap();
 
     assert_eq!(ob.scheme(), Scheme::Mock1);
-    assert_eq!(ob.encoding(), Encoding::Base32Crockford);
+    assert_eq!(ob.encoding(), Encoding::C32);
     assert!(ob.scheme().is_deterministic());
 }
 
@@ -325,11 +325,11 @@ fn test_mock1_parse_scheme() {
 fn test_mock1_format_parsing() {
     let format = Format::from_str("mock1:c32").unwrap();
     assert_eq!(format.scheme(), Scheme::Mock1);
-    assert_eq!(format.encoding(), Encoding::Base32Crockford);
+    assert_eq!(format.encoding(), Encoding::C32);
 
     let format = Format::from_str("mock1:b64").unwrap();
     assert_eq!(format.scheme(), Scheme::Mock1);
-    assert_eq!(format.encoding(), Encoding::Base64);
+    assert_eq!(format.encoding(), Encoding::B64);
 
     let format = Format::from_str("mock1:hex").unwrap();
     assert_eq!(format.scheme(), Scheme::Mock1);

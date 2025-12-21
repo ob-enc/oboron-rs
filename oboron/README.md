@@ -798,7 +798,7 @@ assert_eq!(pt2, "hello");
 
 Available types include all combinations of scheme variants (e.g.,
 `Zdc`, `Upc`, `Adgs`, `Apgs`, `Adsv`, `Apsv`) with encoding
-specifications (`Base64`, `Hex`, `Base32Rfc`, or `Base32Crockford`),
+specifications (`B64`, `Hex`, `B32`, or `C32`),
 and concatenates the two in struct names, for example:
 - `ZdcB32` - encoder for `zdc:b32` format
 - `UpcHex` - encoder for `upc:hex` format
@@ -915,7 +915,7 @@ string constants:
 ```rust
 use oboron::{Ob, Format, Scheme, Encoding};
 
-let format = Format::new(Scheme::Adsv, Encoding::Base64);
+let format = Format::new(Scheme::Adsv, Encoding::B64);
 let ob = Ob::new_with_format(format, &key)?;
 ```
 

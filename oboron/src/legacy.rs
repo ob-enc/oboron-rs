@@ -35,21 +35,21 @@ use data_encoding::{BASE32, BASE64URL_NOPAD, HEXLOWER};
 /// Encode raw ciphertext bytes to oboron legacy string format.
 fn encode_ciphertext_to_obtext(encoding: Encoding, ciphertext: &[u8]) -> String {
     let enc = match encoding {
-        Encoding::Base32Crockford => {
+        Encoding::C32 => {
             let encoded = BASE32_CROCKFORD.encode(ciphertext);
-            // Trim Base32Rfc padding and lowercase
+            // Trim '=' for consistency with b32 legacy bug; lowercase
             let end = encoded.trim_end_matches('=').len();
             encoded[..end].to_string() // already lowercase
         }
-        Encoding::Base32Rfc => {
+        Encoding::B32 => {
             let encoded = BASE32.encode(ciphertext);
-            // Trim Base32Rfc padding and lowercase
+            // Trim B32 padding and lowercase
             let end = encoded.trim_end_matches('=').len();
             encoded[..end].to_ascii_lowercase()
         }
-        Encoding::Base64 => {
+        Encoding::B64 => {
             let encoded = BASE64URL_NOPAD.encode(ciphertext);
-            // Trim Base64 padding
+            // Trim '=' for consistency with b32 legacy bug
             let end = encoded.trim_end_matches('=').len();
             encoded[..end].to_string()
         }
@@ -66,15 +66,15 @@ fn encode_ciphertext_to_obtext(encoding: Encoding, ciphertext: &[u8]) -> String 
 /// Decode oboron legacy string to raw ciphertext bytes.
 fn decode_obtext_to_ciphertext(encoding: Encoding, obtext: &str) -> Result<Vec<u8>, Error> {
     match encoding {
-        Encoding::Base32Crockford => {
+        Encoding::C32 => {
             // Reverse the string first
             let reversed: Vec<u8> = obtext.as_bytes().iter().rev().copied().collect();
             BASE32_CROCKFORD
                 .decode(&reversed)
-                .map_err(|_| Error::InvalidBase32Crockford)
+                .map_err(|_| Error::InvalidC32)
         }
-        Encoding::Base32Rfc => {
-            // Special handling for Base32Rfc: need to add padding
+        Encoding::B32 => {
+            // Special handling for B32: need to add padding
             let enc_len = obtext.len();
             let padding = (8 - (enc_len % 8)) % 8;
 
@@ -84,18 +84,18 @@ fn decode_obtext_to_ciphertext(encoding: Encoding, obtext: &str) -> Result<Vec<u
                 buffer.push(b.to_ascii_uppercase());
             }
 
-            // Add Base32Rfc padding
+            // Add B32 padding
             buffer.resize(enc_len + padding, b'=');
 
-            // Base32Rfc decode
-            BASE32.decode(&buffer).map_err(|_| Error::InvalidBase32Rfc)
+            // B32 decode
+            BASE32.decode(&buffer).map_err(|_| Error::InvalidB32)
         }
-        Encoding::Base64 => {
+        Encoding::B64 => {
             // Reverse the string first
             let reversed: Vec<u8> = obtext.as_bytes().iter().rev().copied().collect();
             BASE64URL_NOPAD
                 .decode(&reversed)
-                .map_err(|_| Error::InvalidBase64)
+                .map_err(|_| Error::InvalidB64)
         }
         Encoding::Hex => {
             // Reverse the hex string first
@@ -286,9 +286,9 @@ macro_rules! impl_legacy_oboron {
 }
 
 // Generate all legacy encoding variants
-impl_legacy_oboron!(LegacyC32, Encoding::Base32Crockford, "legacy:c32");
-impl_legacy_oboron!(LegacyB32, Encoding::Base32Rfc, "legacy:b32");
-impl_legacy_oboron!(LegacyB64, Encoding::Base64, "legacy:b64");
+impl_legacy_oboron!(LegacyC32, Encoding::C32, "legacy:c32");
+impl_legacy_oboron!(LegacyB32, Encoding::B32, "legacy:b32");
+impl_legacy_oboron!(LegacyB64, Encoding::B64, "legacy:b64");
 impl_legacy_oboron!(LegacyHex, Encoding::Hex, "legacy:hex");
 
 #[cfg(test)]

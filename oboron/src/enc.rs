@@ -82,9 +82,9 @@ pub(crate) fn enc_to_format(
 
     // Step 4: Encode to specified format
     match format.encoding() {
-        Encoding::Base32Crockford => Ok(BASE32_CROCKFORD.encode(&payload)),
-        Encoding::Base32Rfc => Ok(BASE32_RFC.encode(&payload)),
-        Encoding::Base64 => Ok(BASE64URL_NOPAD.encode(&payload)),
+        Encoding::C32 => Ok(BASE32_CROCKFORD.encode(&payload)),
+        Encoding::B32 => Ok(BASE32_RFC.encode(&payload)),
+        Encoding::B64 => Ok(BASE64URL_NOPAD.encode(&payload)),
         Encoding::Hex => Ok(HEXLOWER.encode(&payload)),
     }
 }
@@ -96,7 +96,7 @@ mod tests {
 
     #[test]
     fn test_enc_pipeline_mock1() {
-        let format = Format::new(Scheme::Mock1, Encoding::Base32Crockford);
+        let format = Format::new(Scheme::Mock1, Encoding::C32);
 
         // Create a real keychain for testing
         let key = [0u8; 64];

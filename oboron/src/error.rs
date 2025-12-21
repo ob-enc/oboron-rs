@@ -14,13 +14,13 @@ pub enum Error {
     InvalidHex,
 
     #[error("invalid base64 encoding")]
-    InvalidBase64,
+    InvalidB64,
 
     #[error("invalid base32rfc encoding")]
-    InvalidBase32Rfc,
+    InvalidB32,
 
     #[error("invalid base32crockford encoding")]
-    InvalidBase32Crockford,
+    InvalidC32,
 
     // Format/scheme errors
     // --------------------

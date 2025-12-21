@@ -102,15 +102,15 @@ pub(crate) fn dec_from_format(
 /// Decode text encoding to raw bytes.
 pub(crate) fn decode_obtext_to_payload(obtext: &str, encoding: Encoding) -> Result<Vec<u8>, Error> {
     match encoding {
-        Encoding::Base32Rfc => BASE32_RFC
+        Encoding::B32 => BASE32_RFC
             .decode(&obtext.as_bytes())
-            .map_err(|_| Error::InvalidBase32Rfc),
-        Encoding::Base32Crockford => BASE32_CROCKFORD
+            .map_err(|_| Error::InvalidB32),
+        Encoding::C32 => BASE32_CROCKFORD
             .decode(&obtext.as_bytes())
-            .map_err(|_| Error::InvalidBase32Crockford),
-        Encoding::Base64 => BASE64URL_NOPAD
+            .map_err(|_| Error::InvalidC32),
+        Encoding::B64 => BASE64URL_NOPAD
             .decode(obtext.as_bytes())
-            .map_err(|_| Error::InvalidBase64),
+            .map_err(|_| Error::InvalidB64),
         Encoding::Hex => HEXLOWER
             .decode(obtext.as_bytes())
             .map_err(|_| Error::InvalidHex),
@@ -124,7 +124,7 @@ mod tests {
     #[test]
     fn test_dec_base32() {
         let encoded = "c5h66";
-        let result = decode_obtext_to_payload(encoded, Encoding::Base32Crockford).unwrap();
+        let result = decode_obtext_to_payload(encoded, Encoding::C32).unwrap();
         assert_eq!(result, b"abc");
     }
 
