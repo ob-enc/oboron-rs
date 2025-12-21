@@ -34,15 +34,18 @@ impl Keychain {
 
     // Formatted keys - Convenience method for higher level
 
+    #[inline]
     pub fn key_base64(&self) -> String {
         BASE64URL_NOPAD.encode(&self.key)
     }
 
+    #[inline]
     #[cfg(feature = "bytes-keys")]
     pub fn key_bytes(&self) -> &[u8; 64] {
         &self.key
     }
 
+    #[inline]
     #[cfg(feature = "hex-keys")]
     pub fn key_hex(&self) -> String {
         hex::encode(&self.key)

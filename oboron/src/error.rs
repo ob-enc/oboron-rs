@@ -12,13 +12,10 @@ pub enum Error {
     // ---------------
     #[error("invalid hex encoding")]
     InvalidHex,
-
     #[error("invalid base64 encoding")]
     InvalidB64,
-
     #[error("invalid base32rfc encoding")]
     InvalidB32,
-
     #[error("invalid base32crockford encoding")]
     InvalidC32,
 
@@ -26,10 +23,8 @@ pub enum Error {
     // --------------------
     #[error("invalid format string")]
     InvalidFormat,
-
     #[error("unknown scheme")]
     UnknownScheme,
-
     #[error("unknown encoding")]
     UnknownEncoding,
 
@@ -37,13 +32,10 @@ pub enum Error {
     // -----------------
     #[error("enc failed")]
     EncryptionFailed,
-
     #[error("enc failed: empty plaintext")]
     EmptyPlaintext,
-
     #[error("dec failed: empty payload")]
     EmptyPayload,
-
     #[error("dec failed: payload too short")]
     PayloadTooShort,
 
@@ -51,13 +43,10 @@ pub enum Error {
     // -----------------
     #[error("decryption failed")]
     DecryptionFailed,
-
     #[error("invalid block length")]
     InvalidBlockLength,
-
     #[error("decoding failed: scheme byte mismatch")]
     SchemeByteMismatch,
-
     #[cfg(feature = "legacy")]
     #[error("legacy fallback produced invalid output (likely encoding mismatch)")]
     InvalidLegacyOutput,
