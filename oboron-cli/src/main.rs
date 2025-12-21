@@ -6,7 +6,7 @@ mod config;
 use anyhow::{Context, Result};
 use clap::{Args, Parser, Subcommand};
 use config::{load_profile, Config};
-use oboron::{Encoding, Format, Oboron, Scheme};
+use oboron::{Encoding, Format, ObtextCodec, Scheme};
 use std::io::{self, Read};
 
 #[derive(Parser)]

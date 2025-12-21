@@ -2,7 +2,7 @@
 //!
 //! mock2 reverses the plaintext and is always available for testing.
 
-use oboron::{Encoding, Format, Oboron, Scheme};
+use oboron::{Encoding, Format, ObtextCodec, Scheme};
 
 #[test]
 fn test_mock2_basic_roundtrip() {

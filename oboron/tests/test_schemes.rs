@@ -10,7 +10,7 @@ use oboron::{AdsvB64, AdsvC32, AdsvHex};
 use oboron::{Apgs, ApgsB64, ApgsHex};
 #[cfg(feature = "apsv")]
 use oboron::{ApsvB64, ApsvC32, ApsvHex};
-use oboron::{Encoding, ObFlex, Oboron, Scheme};
+use oboron::{Encoding, ObFlex, ObtextCodec, Scheme};
 
 #[test]
 #[cfg(feature = "apgs")]

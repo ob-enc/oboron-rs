@@ -1,6 +1,6 @@
 #[cfg(feature = "keyless")]
 use crate::constants::HARDCODED_KEY_BYTES;
-use crate::{Encoding, Error, Format, Keychain, Oboron, Scheme};
+use crate::{Encoding, Error, Format, Keychain, ObtextCodec, Scheme};
 
 /// Low-level encoder/decoder implementation.
 ///
@@ -107,7 +107,7 @@ impl ObCore {
     }
 }
 
-impl Oboron for ObCore {
+impl ObtextCodec for ObCore {
     fn enc(&self, plaintext: &str) -> Result<String, Error> {
         crate::enc::enc_to_format(plaintext, self.format, &self.keychain)
     }

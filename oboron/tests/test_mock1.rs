@@ -3,7 +3,7 @@
 //! mock1 is a non-encrypting identity scheme that's always available.
 //! It should be tested first since it has no crypto dependencies.
 
-use oboron::{Encoding, Format, Oboron, Scheme};
+use oboron::{Encoding, Format, ObtextCodec, Scheme};
 
 #[test]
 fn test_mock1_basic_roundtrip() {

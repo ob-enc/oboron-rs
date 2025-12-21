@@ -6,7 +6,7 @@
 //! with legacy scheme. Use the Legacy struct directly instead:
 //!
 //! ```ignore
-//! use oboron::{Oboron, Legacy};
+//! use oboron::{ObtextCodec, Legacy};
 //!
 //! let ob = Legacy::new_keyless()?;
 //! let ot = ob.enc("test")?;
@@ -15,7 +15,7 @@
 
 #![cfg(feature = "legacy")]
 
-use oboron::{Legacy, LegacyB64, LegacyHex, Oboron};
+use oboron::{Legacy, LegacyB64, LegacyHex, ObtextCodec};
 
 // 128 hex characters = 64 bytes
 const HEX_KEY: &str = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";

@@ -1,6 +1,6 @@
-use crate::{ob_core::ObCore, Encoding, Error, Format, Oboron, Scheme};
+use crate::{ob_core::ObCore, Encoding, Error, Format, ObtextCodec, Scheme};
 
-/// An Oboron implementation with runtime format selection, fixed at construction.
+/// An ObtextCodec implementation with runtime format selection, fixed at construction.
 ///
 /// Unlike scheme-specific types (`AdsvC32`, `AdsvB64`) which embed the format
 /// statically, `Ob` allows you to specify any format at runtime via
@@ -16,7 +16,7 @@ use crate::{ob_core::ObCore, Encoding, Error, Format, Oboron, Scheme};
 /// # fn main() -> Result<(), oboron::Error> {
 /// # #[cfg(feature = "adsv")]
 /// # {
-/// # use oboron::{Ob, Oboron, generate_key};
+/// # use oboron::{Ob, ObtextCodec, generate_key};
 /// # let key = generate_key();
 /// let ob = Ob::new("adsv.b64", &key)?;
 /// let ot = ob.enc("hello")?; // obtext
@@ -33,7 +33,7 @@ use crate::{ob_core::ObCore, Encoding, Error, Format, Oboron, Scheme};
 /// # fn main() -> Result<(), oboron::Error> {
 /// # #[cfg(all(feature = "adsv", feature = "mock"))]
 /// # {
-/// # use oboron::{Ob, AdsvB64, ObFlex, Oboron};
+/// # use oboron::{Ob, AdsvB64, ObFlex, ObtextCodec};
 /// # let key = oboron::generate_key();
 /// // Compile-time format (fastest, type-safe)
 /// let adsv = AdsvB64::new(&key)?;
@@ -77,7 +77,7 @@ impl Ob {
         })
     }
 
-    /// Get the format used by this Oboron instance.
+    /// Get the format used by this ObtextCodec instance.
     ///
     /// # Examples
     ///
@@ -269,7 +269,7 @@ impl Ob {
     }
 }
 
-impl Oboron for Ob {
+impl ObtextCodec for Ob {
     fn enc(&self, plaintext: &str) -> Result<String, Error> {
         self.core.enc(plaintext)
     }

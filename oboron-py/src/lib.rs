@@ -1,9 +1,9 @@
-use ::oboron::Oboron;
+use ::oboron::ObtextCodec;
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use pyo3::types::PyBytes;
 
-/// Macro to generate Python wrapper classes for fixed-format Oboron ciphers
+/// Macro to generate Python wrapper classes for fixed-format ObtextCodec ciphers
 macro_rules! impl_cipher_class {
     ($py_name:ident, $rust_type:ty, $doc:expr) => {
         #[doc = $doc]

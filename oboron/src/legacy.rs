@@ -23,8 +23,7 @@ use crate::{
     constants::HARDCODED_KEY_BYTES,
     error::Error,
     obcrypt::{decrypt_legacy, encrypt_legacy},
-    oboron::Oboron,
-    Encoding, Format, Keychain, Scheme,
+    Encoding, Format, Keychain, ObtextCodec, Scheme,
 };
 use data_encoding::{BASE32, BASE64URL_NOPAD, HEXLOWER};
 
@@ -120,13 +119,13 @@ pub(crate) fn dec_legacy(
 }
 
 // ============================================================================
-// Public Oboron Implementations (LegacyC32, LegacyB32, LegacyB64, LegacyHex)
+// Public ObtextCodec Implementations (LegacyC32, LegacyB32, LegacyB64, LegacyHex)
 // ============================================================================
 
-/// Macro to implement legacy Oboron variants with different encodings.
-macro_rules! impl_legacy_oboron {
+/// Macro to implement legacy ObtextCodec variants with different encodings.
+macro_rules! impl_legacy_codec {
     ($name:ident, $encoding:expr, $format_str:expr) => {
-        #[doc = concat!("Legacy Legacy Oboron implementation for ", $format_str, " format.\n\n")]
+        #[doc = concat!("Legacy ObtextCodec implementation for ", $format_str, " format.\n\n")]
         #[doc = "**LEGACY**: This scheme is maintained for backward compatibility only.\n"]
         #[doc = "The legacy scheme uses legacy AES-CBC encryption with custom padding.\n"]
         #[doc = "For new projects, consider using zdc or more secure schemes like adgs/adsv.\n"]
@@ -137,7 +136,7 @@ macro_rules! impl_legacy_oboron {
             format: Format,
         }
 
-        impl Oboron for $name {
+        impl ObtextCodec for $name {
             fn enc(&self, plaintext: &str) -> Result<String, Error> {
                 let ciphertext = encrypt_legacy(&self.keychain, plaintext.as_bytes())?;
                 Ok(encode_ciphertext_to_obtext(
@@ -197,7 +196,7 @@ macro_rules! impl_legacy_oboron {
             /// # Examples
             ///
             /// ```
-            /// # use oboron::{Oboron, LegacyB32};
+            /// # use oboron::{ObtextCodec, LegacyB32};
             /// let key = oboron::generate_key();
             /// let ob = LegacyB32::new(&key)? ;
             /// # Ok::<(), oboron::Error>(())
@@ -219,7 +218,7 @@ macro_rules! impl_legacy_oboron {
             /// # Examples
             ///
             /// ```
-            /// use oboron::{Oboron, LegacyB32};
+            /// use oboron::{ObtextCodec, LegacyB32};
             ///
             /// let key_hex = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
             /// let ob = LegacyB32::from_hex_key(key_hex)? ;
@@ -243,7 +242,7 @@ macro_rules! impl_legacy_oboron {
             /// # Examples
             ///
             /// ```
-            /// use oboron::{Oboron, LegacyB32};
+            /// use oboron::{ObtextCodec, LegacyB32};
             ///
             /// let key = [0u8; 64];
             /// let ob = LegacyB32::from_bytes(&key)?;
@@ -271,7 +270,7 @@ macro_rules! impl_legacy_oboron {
             /// # Examples
             ///
             /// ```
-            /// use oboron::{Oboron, LegacyB32};
+            /// use oboron::{ObtextCodec, LegacyB32};
             ///
             /// let ob = LegacyB32::new_keyless()?;
             /// let ot = ob.enc("test")?;
@@ -286,15 +285,15 @@ macro_rules! impl_legacy_oboron {
 }
 
 // Generate all legacy encoding variants
-impl_legacy_oboron!(LegacyC32, Encoding::C32, "legacy.c32");
-impl_legacy_oboron!(LegacyB32, Encoding::B32, "legacy.b32");
-impl_legacy_oboron!(LegacyB64, Encoding::B64, "legacy.b64");
-impl_legacy_oboron!(LegacyHex, Encoding::Hex, "legacy.hex");
+impl_legacy_codec!(LegacyC32, Encoding::C32, "legacy.c32");
+impl_legacy_codec!(LegacyB32, Encoding::B32, "legacy.b32");
+impl_legacy_codec!(LegacyB64, Encoding::B64, "legacy.b64");
+impl_legacy_codec!(LegacyHex, Encoding::Hex, "legacy.hex");
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::Oboron;
+    use crate::ObtextCodec;
 
     #[test]
     #[cfg(feature = "keyless")]

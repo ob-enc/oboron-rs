@@ -4,7 +4,7 @@ use oboron::Adgs;
 use oboron::UpcC32;
 #[cfg(feature = "zdc")]
 use oboron::ZdcC32;
-use oboron::{ObMulti, Oboron};
+use oboron::{ObMulti, ObtextCodec};
 
 #[test]
 #[cfg(feature = "zdc")]

@@ -1,4 +1,4 @@
-use oboron::{Encoding, Ob, Oboron, Scheme};
+use oboron::{Encoding, Ob, ObtextCodec, Scheme};
 
 #[test]
 fn test_ob_basic_roundtrip() {
@@ -181,8 +181,8 @@ fn test_ob_keyless() {
 
 #[test]
 fn test_ob_generic_usage() {
-    // Test that Ob works with generic Oboron trait
-    fn enc_with_oboron<O: Oboron>(ob: &O, data: &str) -> String {
+    // Test that Ob works with generic ObtextCodec trait
+    fn enc_with_oboron<O: ObtextCodec>(ob: &O, data: &str) -> String {
         ob.enc(data).unwrap()
     }
 

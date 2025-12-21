@@ -2,13 +2,13 @@
 use crate::constants::HARDCODED_KEY_BYTES;
 use crate::{Error, Format, Keychain};
 
-/// An Oboron implementation that takes format on enc operation and autodetects on dec operation.
+/// An ObtextCodec implementation that takes format on enc operation and autodetects on dec operation.
 /// Unlike all other implementations (Ob, ObFlex, ZdcC32, .. .) it does not have
 /// a format stored internally.
 ///
 /// This struct allows specifying the format (scheme + encoding) at enc call time,
 /// and automatically detects both scheme and encoding on dec calls.
-/// It is the only Oboron implementation that does full format autodetection,
+/// It is the only ObtextCodec implementation that does full format autodetection,
 /// all other implementations can only autodetect the scheme (e.g., upc),
 /// but not the encoding (e.g., base32 or base64).
 ///

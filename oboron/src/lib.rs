@@ -7,9 +7,9 @@
 //! # fn main() -> Result<(), oboron::Error> {
 //! # #[cfg(feature = "adsv")]
 //! # {
-//! use oboron::{AdsvC32, Oboron};
+//! use oboron::{AdsvC32, ObtextCodec};
 //! let key = oboron::generate_key(); // get key
-//! let ob = AdsvC32::new(&key)?;     // instantiate Oboron (cipher+encoder)
+//! let ob = AdsvC32::new(&key)?;     // instantiate ObtextCodec (cipher+encoder)
 //! let ot = ob.enc("secret data")?;  // get obtext (encoded ciphertext)
 //! # }
 //! # Ok(())
@@ -64,7 +64,7 @@
 //! # fn main() -> Result<(), oboron::Error> {
 //! # #[cfg(feature = "adsv")]
 //! # {
-//! # use oboron::{AdsvC32, AdsvB64, Oboron};
+//! # use oboron::{AdsvC32, AdsvB64, ObtextCodec};
 //! # let key = oboron::generate_key();
 //! let adsv = AdsvC32::new(&key)?;      // adsv.c32 format (Crockford base32)
 //! let adsv_b64 = AdsvB64::new(&key)?;  // adsv.b64 format (base64url)
@@ -88,7 +88,7 @@
 //! # fn main() -> Result<(), oboron::Error> {
 //! # #[cfg(feature = "adsv")]
 //! # {
-//! # use oboron::{Ob, Oboron};
+//! # use oboron::{Ob, ObtextCodec};
 //! # let key = oboron::generate_key();
 //! // Format chosen at runtime, immutable instance
 //! let ob = Ob::new("adsv.b64", &key)?;
@@ -112,7 +112,7 @@
 //! # fn main() -> Result<(), oboron::Error> {
 //! # #[cfg(all(feature = "adsv", feature = "mock"))]
 //! # {
-//! # use oboron::{ObFlex, Oboron, Scheme, Encoding, ADSV_B64};
+//! # use oboron::{ObFlex, ObtextCodec, Scheme, Encoding, ADSV_B64};
 //! # let key = oboron::generate_key();
 //! let mut flex = ObFlex::new("adsv.b64", &key)?;
 //! let ot1 = flex.enc("hello")?;    // adsv.b64 format
@@ -161,7 +161,7 @@
 //! - Performance: Small overhead (format parsing per operation)
 //! - Flexibility: Maximum - handles any format, autodetects on dec
 //!
-//! # Typical Production Usage: Fixed Oboron
+//! # Typical Production Usage: Fixed ObtextCodec
 //!
 //! Best performance and type safety for multiple operations with the same format:
 //!
@@ -169,12 +169,12 @@
 //! # fn main() -> Result<(), oboron::Error> {
 //! # #[cfg(all(feature = "adsv", feature = "apgs"))]
 //! # {
-//! # use oboron::Oboron;
+//! # use oboron::ObtextCodec;
 //! # use oboron;
 //! # let key = oboron::generate_key();
 //! // Fixed format types (best performance for multiple operations with same format)
-//! let adsv = oboron::AdsvC32::new(&key)?;  // "adsv.c32" fixed-format Oboron instance
-//! let apgs = oboron::ApgsC32::new(&key)?;  // "apgs.c32" fixed-format Oboron instance
+//! let adsv = oboron::AdsvC32::new(&key)?;  // "adsv.c32" fixed-format ObtextCodec instance
+//! let apgs = oboron::ApgsC32::new(&key)?;  // "apgs.c32" fixed-format ObtextCodec instance
 //!
 //! let ot_adsv = adsv.enc("data1")?;
 //! let ot_apgs = apgs.enc("data2")?;
@@ -192,7 +192,7 @@
 //! assert!(adsv.dec_strict(&ot_apgs).is_err());  // Error: Wrong scheme (adsv != apgs)
 //!
 //! // Note: For fixed oborons, string encoding (c32/b32/b64/hex) must match the instance encoding
-//! let adsv_b64 = oboron::AdsvB64::new(&key)?;  // "adsv.b64" fixed-format Oboron
+//! let adsv_b64 = oboron::AdsvB64::new(&key)?;  // "adsv.b64" fixed-format ObtextCodec
 //! let ot_b64 = adsv_b64.enc("data3")?;
 //! assert!(adsv.dec(&ot_b64).is_err());  // Error: Encoding mismatch (c32 != b64)
 //! // For mixed encodings, use ObMulti instead (see above)
@@ -223,18 +223,18 @@
 //! - C32 - Crockford base32
 //! - Hex - Hexadecimal
 //!
-//! # The `Oboron` Trait
+//! # The `ObtextCodec` Trait
 //!
-//! All types (`AdsvC32`, `Ob`, `ObFlex`, etc.) except `ObMulti` implement the `Oboron` trait,
+//! All types (`AdsvC32`, `Ob`, `ObFlex`, etc.) except `ObMulti` implement the `ObtextCodec` trait,
 //! providing a consistent interface:
 //!
 //! ```rust
 //! # fn main() -> Result<(), oboron::Error> {
 //! # #[cfg(feature = "adsv")]
 //! # {
-//! # use oboron::{Oboron, AdsvC32, Ob};
+//! # use oboron::{ObtextCodec, AdsvC32, Ob};
 //! # let key = oboron::generate_key();
-//! fn process<O: Oboron>(ob: &O, data: &str) -> Result<String, oboron::Error> {
+//! fn process<O: ObtextCodec>(ob: &O, data: &str) -> Result<String, oboron::Error> {
 //!     let ot = ob.enc(data)?;
 //!     ob.dec(&ot)
 //! }
@@ -249,9 +249,10 @@
 //! # }
 //! ```
 //!
-//! The `Oboron` trait is automatically imported via the prelude.
+//! The `ObtextCodec` trait is automatically imported via the prelude.
 
 mod base32;
+mod codec;
 mod constants;
 mod dec;
 mod dec_auto;
@@ -267,7 +268,6 @@ mod ob_core;
 mod ob_flex;
 mod ob_multi;
 mod obcrypt;
-mod oboron;
 mod scheme;
 
 // Re-export public types and constants
@@ -313,12 +313,12 @@ pub use ob_flex::ObFlex;
 
 // Factory functions
 #[cfg(feature = "bytes-keys")]
-pub use oboron::{from_bytes, from_bytes_with_format};
+pub use codec::{from_bytes, from_bytes_with_format};
 #[cfg(feature = "hex-keys")]
-pub use oboron::{from_hex_key, from_hex_key_with_format};
-pub use oboron::{new, new_with_format, ObAny, Oboron};
+pub use codec::{from_hex_key, from_hex_key_with_format};
+pub use codec::{new, new_with_format, ObAny, ObtextCodec};
 #[cfg(feature = "keyless")]
-pub use oboron::{new_keyless, new_keyless_with_format};
+pub use codec::{new_keyless, new_keyless_with_format};
 
 // Conditionally export format string constants (scheme+encoding combinations)
 #[cfg(feature = "adgs")]
@@ -344,25 +344,25 @@ pub use constants::{MOCK2_B32, MOCK2_B64, MOCK2_C32, MOCK2_HEX};
 
 // Conditionally export format-specific structs (scheme+encoding combinations)
 #[cfg(feature = "adgs")]
-pub use oboron::{AdgsB32, AdgsB64, AdgsC32, AdgsHex};
+pub use codec::{AdgsB32, AdgsB64, AdgsC32, AdgsHex};
 #[cfg(feature = "adsv")]
-pub use oboron::{AdsvB32, AdsvB64, AdsvC32, AdsvHex};
+pub use codec::{AdsvB32, AdsvB64, AdsvC32, AdsvHex};
 #[cfg(feature = "apgs")]
-pub use oboron::{ApgsB32, ApgsB64, ApgsC32, ApgsHex};
+pub use codec::{ApgsB32, ApgsB64, ApgsC32, ApgsHex};
 #[cfg(feature = "apsv")]
-pub use oboron::{ApsvB32, ApsvB64, ApsvC32, ApsvHex};
+pub use codec::{ApsvB32, ApsvB64, ApsvC32, ApsvHex};
 #[cfg(feature = "upc")]
-pub use oboron::{UpcB32, UpcB64, UpcC32, UpcHex};
+pub use codec::{UpcB32, UpcB64, UpcC32, UpcHex};
 #[cfg(feature = "zdc")]
-pub use oboron::{ZdcB32, ZdcB64, ZdcC32, ZdcHex};
+pub use codec::{ZdcB32, ZdcB64, ZdcC32, ZdcHex};
 // Legacy
 #[cfg(feature = "legacy")]
 pub use legacy::{LegacyB32, LegacyB64, LegacyC32, LegacyHex};
 // Testing
 #[cfg(feature = "mock")]
-pub use oboron::{Mock1B32, Mock1B64, Mock1C32, Mock1Hex};
+pub use codec::{Mock1B32, Mock1B64, Mock1C32, Mock1Hex};
 #[cfg(feature = "mock")]
-pub use oboron::{Mock2B32, Mock2B64, Mock2C32, Mock2Hex};
+pub use codec::{Mock2B32, Mock2B64, Mock2C32, Mock2Hex};
 
 // Aliases for default encoding:
 #[cfg(feature = "zdc")]
@@ -396,11 +396,15 @@ pub use ob_multi::ObMulti;
 /// use oboron::prelude::*;
 /// ```
 pub mod prelude {
+    #[cfg(feature = "adgs")]
+    pub use crate::{AdgsB32, AdgsB64, AdgsC32, AdgsHex};
     #[cfg(feature = "adsv")]
-    pub use crate::AdsvC32;
+    pub use crate::{AdsvB32, AdsvB64, AdsvC32, AdsvHex};
+    #[cfg(feature = "apgs")]
+    pub use crate::{ApgsB32, ApgsB64, ApgsC32, ApgsHex};
     #[cfg(feature = "apsv")]
-    pub use crate::ApsvC32;
-    pub use crate::{Encoding, Error, Format, Oboron, Scheme};
+    pub use crate::{ApsvB32, ApsvB64, ApsvC32, ApsvHex};
+    pub use crate::{Encoding, Error, Format, ObtextCodec, Scheme};
     pub use crate::{Ob, ObFlex, ObMulti};
 }
 

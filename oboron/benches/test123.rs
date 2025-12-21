@@ -1,7 +1,7 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 #[cfg(feature = "legacy")]
 use oboron::LegacyC32;
-use oboron::{AdgsC32, AdsvC32, ApgsC32, ApsvC32, ObMulti, Oboron, UpcC32, ZdcC32};
+use oboron::{AdgsC32, AdsvC32, ApgsC32, ApsvC32, ObMulti, ObtextCodec, UpcC32, ZdcC32};
 #[cfg(feature = "mock")]
 use oboron::{Mock1C32, Mock2C32};
 

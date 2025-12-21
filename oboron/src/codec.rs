@@ -1,16 +1,16 @@
-//! Trait-based interface for scheme-specific Oboron implementations.
+//! Trait-based interface for scheme-specific ObtextCodec implementations.
 #[cfg(feature = "keyless")]
 use crate::constants::HARDCODED_KEY_BYTES;
 use crate::{error::Error, Encoding, Format, Keychain, Scheme};
 
-/// Core trait for Oboron encryption+encoding/decoding+decryption implementations.
+/// Core trait for ObtextCodec encryption+encoding/decoding+decryption implementations.
 ///
 /// Each scheme+encoding combination (ZdcC32, ZdcB64, etc.) implements this trait
 /// to provide a consistent interface for encoding and decoding operations.
 ///
 /// Note: Construction methods (`new`, `from_bytes`, `new_keyless`) are not part of
 /// this trait.     Each type provides its own constructor with an appropriate signature.
-pub trait Oboron {
+pub trait ObtextCodec {
     /// Encode a plaintext string.
     fn enc(&self, plaintext: &str) -> Result<String, Error>;
 
@@ -44,9 +44,9 @@ pub trait Oboron {
 #[cfg(feature = "legacy")]
 use crate::legacy::{LegacyB32, LegacyB64, LegacyC32, LegacyHex};
 
-/// Macro to implement optimized Oboron types with compile-time specialization.
+/// Macro to implement optimized ObtextCodec types with compile-time specialization.
 ///
-/// This macro generates a complete Oboron implementation with all overhead eliminated:
+/// This macro generates a complete ObtextCodec implementation with all overhead eliminated:
 /// - No runtime scheme matching
 /// - No method call overhead for byte()
 /// - Direct function calls to encrypt/decrypt
@@ -59,7 +59,7 @@ macro_rules! impl_oboron {
         $encoding:expr,        // Encoding constant (e.g., Encoding::C32)
         $format_str:expr       // Format string for docs (e.g., "zdc.c32")
     ) => {
-        #[doc = concat!("Oboron implementation for ", $format_str, " format.\n\n")]
+        #[doc = concat!("ObtextCodec implementation for ", $format_str, " format.\n\n")]
         #[doc = concat!("Corresponds to format string: `\"", $format_str, "\"`")]
         #[allow(non_camel_case_types)]
         pub struct $name {
@@ -112,7 +112,7 @@ macro_rules! impl_oboron {
             }
         }
 
-        impl Oboron for $name {
+        impl ObtextCodec for $name {
             #[inline]
             fn enc(&self, plaintext: &str) -> Result<String, Error> {
                 let format = Format::new($scheme, $encoding);
@@ -247,7 +247,7 @@ impl_oboron!(Mock2B64, Scheme::Mock2, Encoding::B64, "mock2.b64");
 #[cfg(feature = "mock")]
 impl_oboron!(Mock2Hex, Scheme::Mock2, Encoding::Hex, "mock2.hex");
 
-/// Type-erased Oboron encoder that can hold any scheme+encoding combination.
+/// Type-erased ObtextCodec encoder that can hold any scheme+encoding combination.
 ///
 /// This enum allows for runtime scheme selection without heap allocation.
 /// It's returned by the `oboron::new()` factory function.
@@ -329,7 +329,7 @@ pub enum ObAny {
     LegacyHex(LegacyHex),
 }
 
-// Macro to delegate Oboron methods to the inner type
+// Macro to delegate ObtextCodec methods to the inner type
 macro_rules! delegate_to_inner {
     (fn $method:ident(&self $(, $arg:ident: $argty:ty)*) -> $ret:ty) => {
         fn $method(&self $(, $arg: $argty)*) -> $ret {
@@ -413,7 +413,7 @@ macro_rules! delegate_to_inner {
     };
 }
 
-impl Oboron for ObAny {
+impl ObtextCodec for ObAny {
     delegate_to_inner!(fn enc(&self, plaintext: &str) -> Result<String, Error>);
     delegate_to_inner!(fn dec(&self, obtext: &str) -> Result<String, Error>);
     delegate_to_inner!(fn dec_strict(&self, obtext: &str) -> Result<String, Error>);
@@ -1022,7 +1022,7 @@ mod tests {
 
                 assert!(
                     result.is_ok(),
-                    "Failed to create Oboron implementation for {:?}:{:?}",
+                    "Failed to create ObtextCodec implementation for {:?}:{:?}",
                     scheme,
                     encoding
                 );
@@ -1080,7 +1080,7 @@ mod tests {
 
                 assert!(
                     result.is_ok(),
-                    "Failed to create Oboron implementation from format string: {}",
+                    "Failed to create ObtextCodec implementation from format string: {}",
                     format_str
                 );
 

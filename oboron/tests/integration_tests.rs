@@ -1,6 +1,6 @@
 //! Integration tests for feature flag combinations
 
-use oboron::Oboron;
+use oboron::ObtextCodec;
 
 // Test that compiles with any feature combination
 #[test]

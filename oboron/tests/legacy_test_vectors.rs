@@ -1,6 +1,6 @@
 #![cfg(feature = "legacy")]
 
-use oboron::{Legacy, LegacyB32, LegacyB64, LegacyHex, Oboron};
+use oboron::{Legacy, LegacyB32, LegacyB64, LegacyHex, ObtextCodec};
 use serde::Deserialize;
 use std::fs;
 use std::path::PathBuf;
@@ -37,7 +37,7 @@ fn load_test_vectors() -> Vec<TestVector> {
     panic!("legacy-test-vectors.jsonl not found");
 }
 
-fn get_ob_for_format(format: &str) -> Box<dyn Oboron> {
+fn get_ob_for_format(format: &str) -> Box<dyn ObtextCodec> {
     match format {
         "legacy:base32crockford" | "legacy.c32" => Box::new(Legacy::new_keyless().unwrap()),
         "legacy:base32rfc" | "legacy.b32" => Box::new(LegacyB32::new_keyless().unwrap()),

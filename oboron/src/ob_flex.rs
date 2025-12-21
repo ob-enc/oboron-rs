@@ -1,6 +1,6 @@
-use crate::{ob_core::ObCore, Encoding, Error, Format, Oboron, Scheme};
+use crate::{ob_core::ObCore, Encoding, Error, Format, ObtextCodec, Scheme};
 
-/// A flexible Oboron implementation that allows changing schemes at runtime.
+/// A flexible ObtextCodec implementation that allows changing schemes at runtime.
 ///
 /// Unlike the scheme-specific types (`ZdcC32`, `AdgsB64`, etc.) which are locked to
 /// a single scheme+encoding at construction, `ObFlex` allows you to change the
@@ -15,7 +15,7 @@ use crate::{ob_core::ObCore, Encoding, Error, Format, Oboron, Scheme};
 /// # fn main() -> Result<(), oboron::Error> {
 /// # #[cfg(all(feature = "adsv", feature = "mock"))]
 /// # {
-/// # use oboron::{Oboron, ObFlex, Scheme, Encoding, Format, ADSV_HEX};
+/// # use oboron::{ObtextCodec, ObFlex, Scheme, Encoding, Format, ADSV_HEX};
 /// # let key = oboron::generate_key();
 /// let mut ob = ObFlex::new("adsv.c32", &key)?;
 /// let obtext = ob.enc("hello")?; // adsv.c32 format
@@ -247,7 +247,7 @@ impl ObFlex {
     }
 }
 
-impl Oboron for ObFlex {
+impl ObtextCodec for ObFlex {
     fn enc(&self, plaintext: &str) -> Result<String, Error> {
         self.core.enc(plaintext)
     }

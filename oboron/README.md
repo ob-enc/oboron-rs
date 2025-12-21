@@ -69,11 +69,11 @@ then save the key as an environment variable.
 Use AdsvC32 (a secure scheme, 256-bit encrypted with AES-SIV, encoded using
 Crockford's base32 variant) for enc/dec:
 ```rust
-use oboron::{AdsvC32, Oboron};
+use oboron::{AdsvC32, ObtextCodec};
 
 let key = env::var("OBORON_KEY")?; // get the key
 
-let ob = AdsvC32::new(&key)?; // create Oboron instance
+let ob = AdsvC32::new(&key)?; // create ObtextCodec instance
 
 let ot = ob.enc("hello, world")?; // encrypt+encode
 let pt2 = ob.dec(&ot)?; // decode+decrypt
@@ -786,7 +786,7 @@ Use scheme-specific types when formats are known at compile time for
 optimal performance and type safety:
 
 ```rust
-use oboron::{ApgsB64, Oboron};
+use oboron::{ApgsB64, ObtextCodec};
 
 let key = env::var("OBORON_KEY")?;
 let apgs = ApgsB64::new(&key)?;
@@ -816,7 +816,7 @@ When format specification at runtime is required but format changes are
 unnecessary, use `Ob`:
 
 ```rust
-use oboron::{Ob, Oboron};
+use oboron::{Ob, ObtextCodec};
 
 let key = env::var("OBORON_KEY")?;
 let ob = Ob::new("adsv.b64", &key)?;
@@ -834,7 +834,7 @@ between compile-time selection and full mutability.
 Similar to `Ob` but with mutable format specification:
 
 ```rust
-use oboron::{ObFlex, Oboron};
+use oboron::{ObFlex, ObtextCodec};
 
 let mut ob = ObFlex::new("adgs.b64", &key)?;
 let ot = ob.enc("hello")?; // adgs.b64 obtext
@@ -852,7 +852,7 @@ let ot_hex = ob.enc("world")?; // apsv.hex obtext
 **Multi-Format Workflow:** Designed for simultaneous work with different
 formats, requiring format specification in each operation:
 ```rust
-use oboron::{ObMulti, Oboron};
+use oboron::{ObMulti, ObtextCodec};
 
 let obm = ObMulti::new(&key)?;
 
@@ -884,7 +884,7 @@ For type safety and discoverability, use the provided format constants
 instead of string literals:
 
 ```rust
-use oboron::{Ob, ObMulti, Oboron, ADSV_B64, ADSV_HEX};
+use oboron::{Ob, ObMulti, ObtextCodec, ADSV_B64, ADSV_HEX};
 
 let key = oboron::generate_key();
 
@@ -925,16 +925,16 @@ For compile-time known schemes and encodings, however, static types
 provide optimal performance, concise syntax, and strongest type
 guarantees:
 ```rust
-use oboron::{AdsvB64, Oboron};
+use oboron::{AdsvB64, ObtextCodec};
 let ob = AdsvB64::new(&key)?;
 let ot = ob.enc("secret")?;
 ```
 The format is built into the struct, no format strings, constants,
 or Format structs are needed.
 
-### The `Oboron` Trait
+### The `ObtextCodec` Trait
 
-All types except `ObMulti` implement the `Oboron` trait, providing a
+All types except `ObMulti` implement the `ObtextCodec` trait, providing a
 consistent interface:
 
 - `enc(plaintext: &str) -> Result<String, Error>` - Encode plaintext to
