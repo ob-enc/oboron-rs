@@ -5,8 +5,8 @@ use crate::{constants, error::Error};
 /// Scheme identifier for oboron encoding schemes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Scheme {
-    #[cfg(feature = "zdc")]
-    Zdc,
+    #[cfg(feature = "zfbcx")]
+    Zfbcx,
     #[cfg(feature = "upc")]
     Upc,
     #[cfg(feature = "adgs")]
@@ -31,8 +31,8 @@ impl Scheme {
     /// Convert scheme to string representation.
     pub fn as_str(&self) -> &'static str {
         match self {
-            #[cfg(feature = "zdc")]
-            Scheme::Zdc => "zdc",
+            #[cfg(feature = "zfbcx")]
+            Scheme::Zfbcx => "zfbcx",
             #[cfg(feature = "upc")]
             Scheme::Upc => "upc",
             #[cfg(feature = "adgs")]
@@ -62,8 +62,8 @@ impl Scheme {
     /// Check if this scheme is deterministic (produces the same output for the same input).
     pub fn is_deterministic(&self) -> bool {
         match self {
-            #[cfg(feature = "zdc")]
-            Scheme::Zdc => true,
+            #[cfg(feature = "zfbcx")]
+            Scheme::Zfbcx => true,
             #[cfg(feature = "upc")]
             Scheme::Upc => false,
             #[cfg(feature = "adgs")]
@@ -98,8 +98,8 @@ impl Scheme {
     /// Get the tail byte for this scheme.
     pub fn byte(&self) -> u8 {
         match self {
-            #[cfg(feature = "zdc")]
-            Scheme::Zdc => constants::ZDC_BYTE,
+            #[cfg(feature = "zfbcx")]
+            Scheme::Zfbcx => constants::ZFBCX_BYTE,
             #[cfg(feature = "upc")]
             Scheme::Upc => constants::UPC_BYTE,
             #[cfg(feature = "adgs")]
@@ -127,8 +127,8 @@ impl std::str::FromStr for Scheme {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.to_lowercase().as_str() {
-            #[cfg(feature = "zdc")]
-            "zdc" => Ok(Scheme::Zdc),
+            #[cfg(feature = "zfbcx")]
+            "zfbcx" => Ok(Scheme::Zfbcx),
             #[cfg(feature = "upc")]
             "upc" => Ok(Scheme::Upc),
             #[cfg(feature = "adgs")]

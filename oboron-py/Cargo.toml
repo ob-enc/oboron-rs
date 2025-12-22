@@ -11,14 +11,14 @@ crate-type = ["cdylib"]
 default = ["all-schemes", "legacy", "keyless", "legacy", "mock"]
 
 legacy = ["oboron/legacy"]
-zdc = ["oboron/zdc"]
+zfbcx = ["oboron/zfbcx"]
 adgs = ["oboron/adgs"]
 adsv = ["oboron/adsv"]
 upc = ["oboron/upc"]
 apgs = ["oboron/apgs"]
 apsv = ["oboron/apsv"]
 mock = ["oboron/mock"]
-all-schemes = ["zdc", "upc", "adgs", "apgs", "adsv", "apsv"]
+all-schemes = ["zfbcx", "upc", "adgs", "apgs", "adsv", "apsv"]
 
 keyless = ["oboron/keyless"]
 

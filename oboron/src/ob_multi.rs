@@ -3,7 +3,7 @@ use crate::constants::HARDCODED_KEY_BYTES;
 use crate::{Error, Format, Keychain};
 
 /// An ObtextCodec implementation that takes format on enc operation and autodetects on dec operation.
-/// Unlike all other implementations (Ob, ObFlex, ZdcC32, .. .) it does not have
+/// Unlike all other implementations (Ob, ObFlex, ZfbcxC32, .. .) it does not have
 /// a format stored internally.
 ///
 /// This struct allows specifying the format (scheme + encoding) at enc call time,
@@ -53,7 +53,7 @@ impl ObMulti {
 
     /// Encrypt+encode with a specific format string.
     ///
-    /// Accepts format strings like "zdc.c32", "adgs.b64", etc.
+    /// Accepts format strings like "zfbcx.c32", "adgs.b64", etc.
     /// For pre-parsed Format instances, use [`enc_with_format`](Self::enc_with_format).
     ///
     /// # Examples

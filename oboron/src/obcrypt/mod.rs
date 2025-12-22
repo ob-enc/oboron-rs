@@ -13,8 +13,8 @@ mod apgs; // AES-GCM-SIV (probabilistic)
 mod apsv;
 #[cfg(feature = "upc")]
 mod upc; // AES-CBC (probabilistic)
-#[cfg(feature = "zdc")]
-mod zdc; //  AES-CBC (deterministic, not cryptographically secure - obfuscation only!) // AES-SIV (probabilistic)
+#[cfg(feature = "zfbcx")]
+mod zfbcx; //  AES-CBC (deterministic, not cryptographically secure - obfuscation only!) // AES-SIV (probabilistic)
 
 // Testing schemes (no encryption - no dependencies)
 #[cfg(feature = "mock")]
@@ -38,8 +38,8 @@ pub use apgs::{decrypt as decrypt_apgs, encrypt as encrypt_apgs};
 pub use apsv::{decrypt as decrypt_apsv, encrypt as encrypt_apsv};
 #[cfg(feature = "upc")]
 pub use upc::{decrypt as decrypt_upc, encrypt as encrypt_upc};
-#[cfg(feature = "zdc")]
-pub use zdc::{decrypt as decrypt_zdc, encrypt as encrypt_zdc};
+#[cfg(feature = "zfbcx")]
+pub use zfbcx::{decrypt as decrypt_zfbcx, encrypt as encrypt_zfbcx};
 
 // Testing
 #[cfg(feature = "mock")]

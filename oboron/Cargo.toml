@@ -33,13 +33,13 @@ keyless = []  # Hardcoded key methods (dev/testing only)
 
 # Algorithm family groups (BINARY SIZE OPTIMIZATION)
 # ==================================================
-all-cbc-schemes = ["zdc", "upc"]  # Shares AES+CBC deps
+all-cbc-schemes = ["zfbcx", "upc"]  # Shares AES+CBC deps
 all-gcm-schemes = ["adgs", "apgs"]  # Shares AES-GCM-SIV deps  
 all-siv-schemes = ["adsv", "apsv"]  # Shares AES-SIV deps
 
 # Individual schemes
 # ==================
-zdc = ["aes", "cipher", "cbc"]
+zfbcx = ["aes", "cipher", "cbc"]
 upc = ["aes", "cipher", "cbc"]
 adgs = ["aes-gcm-siv"]
 apgs = ["aes-gcm-siv"]
@@ -58,7 +58,7 @@ unchecked-utf8 = [] # Unsafe performance enhacement
 
 # Scheme categories
 # =================
-ob0x = ["zdc"] # insecure, not authenticated
+ob0x = ["zfbcx"] # insecure, not authenticated
 ob1x = []  # insecure, authenticated
 ob2x = ["upc"]  # secure, not authenticated
 ob3x = ["adgs", "apgs", "adsv", "apsv"]  # secure, authenticated
@@ -66,7 +66,7 @@ ob7x = ["mock"]  # testing
 insecure-schemes = ["ob0x", "ob1x"]
 secure-schemes = ["ob2x", "ob3x"]
 authenticated-schemes = ["ob3x"]
-deterministic-schemes = ["zdc", "adgs", "adsv"]
+deterministic-schemes = ["zfbcx", "adgs", "adsv"]
 probabilistic-schemes = ["upc", "apgs", "apsv"]
 all-schemes = ["ob0x", "ob1x", "ob2x", "ob3x"]
 
@@ -139,19 +139,19 @@ name = "obmulti"
 harness = false
 
 [[bench]]
-name = "zdc_c32"
+name = "zfbcx_c32"
 harness = false
 
 [[bench]]
-name = "zdc_b32"
+name = "zfbcx_b32"
 harness = false
 
 [[bench]]
-name = "zdc_b64"
+name = "zfbcx_b64"
 harness = false
 
 [[bench]]
-name = "zdc_hex"
+name = "zfbcx_hex"
 harness = false
 
 [[bench]]

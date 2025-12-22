@@ -218,7 +218,7 @@ fn test_enc_dec_with_explicit_key_adgs() {
     cleanup_test_home(&test_home);
 }
 
-#[cfg(feature = "zdc")]
+#[cfg(feature = "zfbcx")]
 #[cfg(feature = "adgs")]
 #[cfg(feature = "adsv")]
 #[cfg(feature = "upc")]
@@ -227,7 +227,7 @@ fn test_enc_dec_with_explicit_key_adgs() {
 #[test]
 fn test_enc_different_schemes() {
     let test_home = test_home_dir();
-    let schemes = vec!["--zdc", "--adgs", "--adsv", "--upc", "--apgs", "--apsv"];
+    let schemes = vec!["--zfbcx", "--adgs", "--adsv", "--upc", "--apgs", "--apsv"];
 
     for scheme in schemes {
         let mut cmd = Command::cargo_bin("ob").unwrap();
@@ -244,7 +244,7 @@ fn test_enc_different_schemes() {
     cleanup_test_home(&test_home);
 }
 
-#[cfg(feature = "zdc")]
+#[cfg(feature = "zfbcx")]
 #[test]
 fn test_enc_different_encodings() {
     let test_home = test_home_dir();
@@ -255,7 +255,7 @@ fn test_enc_different_encodings() {
         cmd.env("HOME", test_home.as_os_str())
             .arg("enc")
             .arg("-z")
-            .arg("--zdc")
+            .arg("--zfbcx")
             .arg(encoding)
             .arg("test")
             .assert()
@@ -265,13 +265,13 @@ fn test_enc_different_encodings() {
     cleanup_test_home(&test_home);
 }
 
-#[cfg(feature = "zdc")]
+#[cfg(feature = "zfbcx")]
 #[cfg(feature = "adgs")]
 #[cfg(feature = "adsv")]
 #[test]
 fn test_enc_with_format_string() {
     let test_home = test_home_dir();
-    let formats = vec!["zdc.b32", "adgs.b64", "adsv.hex"];
+    let formats = vec!["zfbcx.b32", "adgs.b64", "adsv.hex"];
 
     for format in formats {
         let mut cmd = Command::cargo_bin("ob").unwrap();

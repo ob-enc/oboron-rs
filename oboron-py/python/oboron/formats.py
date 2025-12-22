@@ -1,7 +1,7 @@
 """Format string constants for Oboron. 
 
 All constants follow the pattern:  {SCHEME}_{ENCODING}
-- Schemes: ADGS, ADSV, APGS, APSV, UPC, ZDC, LEGACY, MOCK1, MOCK2
+- Schemes: ADGS, ADSV, APGS, APSV, UPC, ZFBCX, LEGACY, MOCK1, MOCK2
 - Encodings:
   - B32 (RFC 4648 base32),
   - B64 (RFC 4648 base64url),
@@ -46,11 +46,11 @@ UPC_B64: str = "upc.b64"
 UPC_C32: str = "upc.c32"
 UPC_HEX: str = "upc.hex"
 
-# zdc - deterministic AES-CBC (insecure - obfuscation only)
-ZDC_B32: str = "zdc.b32"
-ZDC_B64: str = "zdc.b64"
-ZDC_C32: str = "zdc.c32"
-ZDC_HEX: str = "zdc.hex"
+# zfbcx - deterministic AES-CBC (insecure - obfuscation only)
+ZFBCX_B32: str = "zfbcx.b32"
+ZFBCX_B64: str = "zfbcx.b64"
+ZFBCX_C32: str = "zfbcx.c32"
+ZFBCX_HEX: str = "zfbcx.hex"
 
 # Testing schemes (no encryption)
 MOCK1_B32: str = "mock1.b32"
@@ -63,7 +63,7 @@ MOCK2_B64: str = "mock2.b64"
 MOCK2_C32: str = "mock2.c32"
 MOCK2_HEX: str = "mock2.hex"
 
-# Legacy (legacy - insecure - obfuscation only; backwards compatibility only - use zdc instead)
+# Legacy (legacy - insecure - obfuscation only; backwards compatibility only - use zfbcx instead)
 LEGACY_B32: str = "legacy.b32"
 LEGACY_B64: str = "legacy.b64"
 LEGACY_C32: str = "legacy.c32"
@@ -78,8 +78,8 @@ __all__ = [
     "APGS_B32", "APGS_B64", "APGS_C32", "APGS_HEX",
     # apsv
     "APSV_B32", "APSV_B64", "APSV_C32", "APSV_HEX",
-    # zdc
-    "ZDC_B32", "ZDC_B64", "ZDC_C32", "ZDC_HEX",
+    # zfbcx
+    "ZFBCX_B32", "ZFBCX_B64", "ZFBCX_C32", "ZFBCX_HEX",
     # upc
     "UPC_B32", "UPC_B64", "UPC_C32", "UPC_HEX",
     # Legacy

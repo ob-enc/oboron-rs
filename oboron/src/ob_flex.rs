@@ -2,7 +2,7 @@ use crate::{ob_core::ObCore, Encoding, Error, Format, ObtextCodec, Scheme};
 
 /// A flexible ObtextCodec implementation that allows changing schemes at runtime.
 ///
-/// Unlike the scheme-specific types (`ZdcC32`, `AdgsB64`, etc.) which are locked to
+/// Unlike the scheme-specific types (`ZfbcxC32`, `AdgsB64`, etc.) which are locked to
 /// a single scheme+encoding at construction, `ObFlex` allows you to change the
 /// scheme and encoding after creation using `set_format()`, `set_scheme()`, or `set_encoding()`.
 ///

@@ -2,8 +2,8 @@
 use oboron::AdgsB64;
 #[cfg(feature = "upc")]
 use oboron::UpcB64;
-#[cfg(feature = "zdc")]
-use oboron::ZdcB64;
+#[cfg(feature = "zfbcx")]
+use oboron::ZfbcxB64;
 #[cfg(feature = "adsv")]
 use oboron::{AdsvB64, AdsvC32, AdsvHex};
 #[cfg(feature = "apgs")]
@@ -168,7 +168,7 @@ fn test_apsv_all_encodings() {
 }
 
 #[test]
-#[cfg(feature = "zdc")]
+#[cfg(feature = "zfbcx")]
 #[cfg(feature = "upc")]
 #[cfg(feature = "adgs")]
 #[cfg(feature = "apgs")]
@@ -176,13 +176,13 @@ fn test_apsv_all_encodings() {
 #[cfg(feature = "apsv")]
 fn test_obflex_basic() {
     let key = [0u8; 64];
-    let mut ob = ObFlex::from_bytes("zdc.c32", &key).expect("Failed to create ObFlex");
+    let mut ob = ObFlex::from_bytes("zfbcx.c32", &key).expect("Failed to create ObFlex");
 
     let plaintext = "Testing ObFlex";
 
     // Test with different schemes
     for scheme in &[
-        Scheme::Zdc,
+        Scheme::Zfbcx,
         Scheme::Upc,
         Scheme::Adgs,
         Scheme::Apgs,
@@ -206,7 +206,7 @@ fn test_obflex_basic() {
 }
 
 #[test]
-#[cfg(feature = "zdc")]
+#[cfg(feature = "zfbcx")]
 #[cfg(feature = "upc")]
 #[cfg(feature = "adgs")]
 #[cfg(feature = "apgs")]
@@ -214,14 +214,29 @@ fn test_obflex_basic() {
 #[cfg(feature = "apsv")]
 fn test_obflex_all_formats() {
     let key = [0u8; 64];
-    let mut ob = ObFlex::from_bytes("zdc.c32", &key).expect("Failed to create ObFlex");
+    let mut ob = ObFlex::from_bytes("zfbcx.c32", &key).expect("Failed to create ObFlex");
 
     let plaintext = "Testing all ObFlex formats";
 
     let formats = [
-        "zdc.c32", "zdc.b64", "zdc.hex", "upc.c32", "upc.b64", "upc.hex", "adgs.c32", "adgs.b64",
-        "adgs.hex", "apgs.c32", "apgs.b64", "apgs.hex", "adsv.c32", "adsv.b64", "adsv.hex",
-        "apsv.c32", "apsv.b64", "apsv.hex",
+        "zfbcx.c32",
+        "zfbcx.b64",
+        "zfbcx.hex",
+        "upc.c32",
+        "upc.b64",
+        "upc.hex",
+        "adgs.c32",
+        "adgs.b64",
+        "adgs.hex",
+        "apgs.c32",
+        "apgs.b64",
+        "apgs.hex",
+        "adsv.c32",
+        "adsv.b64",
+        "adsv.hex",
+        "apsv.c32",
+        "apsv.b64",
+        "apsv.hex",
     ];
 
     for format in &formats {
@@ -453,7 +468,7 @@ fn test_probabilistic_schemes_uniqueness() {
 }
 
 #[test]
-#[cfg(feature = "zdc")]
+#[cfg(feature = "zfbcx")]
 #[cfg(feature = "adgs")]
 #[cfg(feature = "adsv")]
 fn test_deterministic_schemes_consistency() {
@@ -461,12 +476,12 @@ fn test_deterministic_schemes_consistency() {
     let plaintext = "Testing deterministic consistency";
     let iterations = 100;
 
-    // Test Zdc
-    let zdc = ZdcB64::from_bytes(&key).expect("Failed to create zdc");
-    let first = zdc.enc(plaintext).expect("Failed to enc with zdc");
+    // Test Zfbcx
+    let zfbcx = ZfbcxB64::from_bytes(&key).expect("Failed to create zfbcx");
+    let first = zfbcx.enc(plaintext).expect("Failed to enc with zfbcx");
     for _ in 0..iterations {
-        let ot = zdc.enc(plaintext).expect("Failed to enc with zdc");
-        assert_eq!(ot, first, "ZdcB64 should produce identical obtexts");
+        let ot = zfbcx.enc(plaintext).expect("Failed to enc with zfbcx");
+        assert_eq!(ot, first, "ZfbcxB64 should produce identical obtexts");
     }
 
     // Test Adgs

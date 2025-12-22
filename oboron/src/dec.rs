@@ -17,8 +17,8 @@ use crate::decrypt_apgs;
 use crate::decrypt_apsv;
 #[cfg(feature = "upc")]
 use crate::decrypt_upc;
-#[cfg(feature = "zdc")]
-use crate::decrypt_zdc;
+#[cfg(feature = "zfbcx")]
+use crate::decrypt_zfbcx;
 // Testing
 #[cfg(feature = "mock")]
 use crate::decrypt_mock1;
@@ -63,8 +63,8 @@ pub(crate) fn dec_from_format(
 
     // Step 4: Decrypt using scheme-specific function based on format
     let plaintext_bytes = match format.scheme() {
-        #[cfg(feature = "zdc")]
-        Scheme::Zdc => decrypt_zdc(keychain, &buffer)?,
+        #[cfg(feature = "zfbcx")]
+        Scheme::Zfbcx => decrypt_zfbcx(keychain, &buffer)?,
         #[cfg(feature = "upc")]
         Scheme::Upc => decrypt_upc(keychain, &buffer)?,
         #[cfg(feature = "adgs")]

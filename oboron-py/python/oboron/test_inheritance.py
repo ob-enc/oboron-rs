@@ -10,8 +10,8 @@ def test_isinstance_checks():
     adsv = oboron.AdsvC32(key=key)
     assert isinstance(adsv, oboron.OboronBase)
     
-    zdc = oboron.ZdcB64(key=key)
-    assert isinstance(zdc, oboron.OboronBase)
+    zfbcx = oboron.ZfbcxB64(key=key)
+    assert isinstance(zfbcx, oboron.OboronBase)
     
     # Test flexible interfaces
     ob = oboron.Ob("adsv.b64", key=key)
@@ -44,13 +44,13 @@ def test_polymorphic_function():
     
     # Test with different cipher types
     adsv = oboron.AdsvC32(key=key)
-    zdc = oboron.ZdcC32(key=key)
+    zfbcx = oboron.ZfbcxC32(key=key)
     
     ot1 = encrypt_with_cipher(adsv, plaintext)
-    ot2 = encrypt_with_cipher(zdc, plaintext)
+    ot2 = encrypt_with_cipher(zfbcx, plaintext)
     
     assert adsv.dec(ot1) == plaintext
-    assert zdc.dec(ot2) == plaintext
+    assert zfbcx.dec(ot2) == plaintext
     
     print("✓ Polymorphic function test passed!")
 

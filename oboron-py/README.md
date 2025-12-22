@@ -97,7 +97,7 @@ encryption key, the format thus uniquely specifies the complete
 transformation from a plaintext string to an encoded "obtext" string.
 Formats are represented by compact identifiers: `{scheme}:{encoding}`,
 for example:
-- `zdc.c32` - zdc scheme, Crockford base32 encoding
+- `zfbcx.c32` - zfbcx scheme, Crockford base32 encoding
 - `upc.b32` - upc scheme, standard RFC 4648 base32 encoding
 - `adgs.hex` - adgs scheme, hex encoding
 - `apsv.b64` - apsv scheme (`p`=probabilistic), base64 encoding
@@ -153,7 +153,7 @@ odd = authenticated.
 
 | Scheme  | Algorithm   | Deterministic? | Authenticated? | Notes |
 | :------ | :---------- | :------------- | :------------- | :---- |
-| `zdc`  | AES-CBC     | Yes            | No             | Legacy; uses constant IV. Prioritizes determinism and performance over security. |
+| `zfbcx`  | AES-CBC     | Yes            | No             | Legacy; uses constant IV. Prioritizes determinism and performance over security. |
 | `upc` | AES-CBC     | No             | No             |       |
 | `adgs`  | AES-GCM-SIV | Yes            | Yes            |       |
 | `apgs` | AES-GCM-SIV | No             | Yes            |       |
@@ -175,15 +175,15 @@ odd = authenticated.
 All schemes use well-regarded cryptographic primitives. However, note
 the following:
 
-* **`zdc` and `upc` are not authenticated** and vulnerable to
+* **`zfbcx` and `upc` are not authenticated** and vulnerable to
   tampering.
-* **SECURITY WARNING:** **`zdc` is cryptographically broken** due to
+* **SECURITY WARNING:** **`zfbcx` is cryptographically broken** due to
   its use of a constant IV (by design, in order to achieve deterministic
   output).  This scheme leaks equality and prefix structure and is
   vulnerable to chosen-plaintext attacks.  
-  **Do not use `zdc` for encrypting sensitive data** or any application
+  **Do not use `zfbcx` for encrypting sensitive data** or any application
   where confidentiality or integrity matters.
-  **Use `zdc` only for** maximum compactness and strong prefix entropy
+  **Use `zfbcx` only for** maximum compactness and strong prefix entropy
   in non-security-critical contexts (e.g., development or obfuscation).
   For sensitive data, **always use authenticated schemes** (ob3x tier:
   adgs or adsv).
@@ -201,10 +201,10 @@ one (see [Scheme Tiers](#scheme-tiers) above):
 > domain extend beyond encryption.  For applications such as obfuscation
 > or hashing alternative (see Application section below), ob0x schemes
 > are sufficient, while outperforming ob2x and ob3x schemes by 2x to 4x.
-> In our benchmarks, `zdc` shows ~40% lower latency than SHA256 for
+> In our benchmarks, `zfbcx` shows ~40% lower latency than SHA256 for
 > short inputs on modern x86 CPUs.
 
-> **FAQ:** *Why use numeric identifiers (e.g., `zdc`) instead of
+> **FAQ:** *Why use numeric identifiers (e.g., `zfbcx`) instead of
 > algorithm names (e.g., `AES-CBC`)?*
 >
 > Oboron's main target audience is developers who are not cryptography
@@ -214,7 +214,7 @@ one (see [Scheme Tiers](#scheme-tiers) above):
 > (`p` = probabilistic), while relegating actual algorithm names to the
 > documentation.  Besides, each algorithm is used in two different
 > variants: deterministic and probabilistic, so to identify a scheme one
-> would have to speak of "deterministic AES-CBC", as opposed to "zdc",
+> would have to speak of "deterministic AES-CBC", as opposed to "zfbcx",
 > or "probabilistic AES-CBC" as opposed to "upc", which is a mouthful.
 
 
@@ -273,7 +273,7 @@ two goals achieved with the payload structure are:
    decoding
 
 The first step gives a transformed ciphertext:
-- `[ciphertext'] = [reverse(ciphertext)]` for reversed schemes (`zdc`,
+- `[ciphertext'] = [reverse(ciphertext)]` for reversed schemes (`zfbcx`,
   `upc`),
 - `[ciphertext'] = [ciphertext]` for all other schemes (no change).
 
@@ -283,19 +283,19 @@ payload prior to encoding.
 - `[payload] = [ciphertext'][marker]`
 
 This marker byte is the result of an XOR operation on a constant byte
-identifier for the scheme (e.g., `oboron::constants::ZDC_BYTE = 0x02`),
+identifier for the scheme (e.g., `oboron::constants::ZFBCX_BYTE = 0x02`),
 and the first byte of the transformed ciphertext (`ciphertext'[0]`).
 
 - `marker = ciphertext'[0] XOR scheme-byte`
 
 The purpose of this XOR is entropy mix-in: by using the constant scheme
-byte directly, all `zdc` obtexts would have a constant suffix.
+byte directly, all `zfbcx` obtexts would have a constant suffix.
 
 
 > **FAQ:** *Why do some schemes reverse the ciphertext, while others
 > don't?*
 >
-> The reversal step in `zdc` and `upc` schemes moves the final AES
+> The reversal step in `zfbcx` and `upc` schemes moves the final AES
 > block to the beginning of the output, ensuring maximal entropy in the
 > encoded prefix.  Both of these schemes use AES-CBC, a block-chaining
 > algorithm: each 16-byte block's ciphertext becomes the IV for the next.
@@ -351,8 +351,8 @@ for Oboron’s threat model.
 
 The master-key is partitioned into algorithm-specific keys in the
 following way:
-- `zdc`, `upc`: use the first 16 bytes (128 bits) for AES key
-- `zdc`: uses the second 16 bytes for IV
+- `zfbcx`, `upc`: use the first 16 bytes (128 bits) for AES key
+- `zfbcx`: uses the second 16 bytes for IV
 - `adgs`, `apgs`: use the last 32 bytes (256 bits) for AES-GCM-SIV key
 - `adsv`, `apsv`: use the full 64 bytes (512 bits) for AES-SIV key
 
@@ -461,7 +461,7 @@ both SHA256 and JWT performance while providing reversible encryption.
 
 | Scheme | 8B Encode | 8B Decode | Security      | Use Case                        |
 |--------|----------:|-----------|---------------|---------------------------------|
-| zdc   | 132 ns    | 126 ns    | Insecure      | Maximum speed + compactness     |
+| zfbcx   | 132 ns    | 126 ns    | Insecure      | Maximum speed + compactness     |
 | adsv   | 334 ns    | 364 ns    | Secure + Auth | Balanced performance + security |
 | JWT    | 550 ns    | 846 ns    | Auth only`*`  | Signature without encryption    |
 | SHA256 | 191 ns    | N/A       | One-way       | Hashing only                    |
@@ -479,16 +479,16 @@ performed on the same machine is available here:
 - [BASELINE_BENCHMARKS.md](../oboron/BASELINE_BENCHMARKS.md)
 
 **Performance advantages:**
-- zdc encoding is 4.1x faster than JWT with 4.5x smaller output
+- zfbcx encoding is 4.1x faster than JWT with 4.5x smaller output
 - All Oboron schemes outperform JWT for both encoding and decoding
-- zdc shows lower latency than SHA256+hex for short strings while
+- zfbcx shows lower latency than SHA256+hex for short strings while
   providing reversible (cryptographically insecure) encryption
 
 ### Output Length Comparison
 
 | Method        | Small string output length |
 |---------------|----------------------------|
-| Oboron zdc:  | 28 characters              |
+| Oboron zfbcx:  | 28 characters              |
 | Oboron adsv:  | 34-47 characters           |
 | Oboron apsv: | 60-72 characters           |
 | SHA256:       | 64 characters              |
@@ -499,14 +499,14 @@ A more complete output length comparison is given in the
 
 ### Scheme Selection Guidelines
 
-- **zdc**: Non-security-critical applications prioritizing speed and
+- **zfbcx**: Non-security-critical applications prioritizing speed and
   compactness
 - **adsv**: General-purpose secure encryption with deterministic output
   and compact size
 - **apsv**: Maximum privacy protection with probabilistic output
   (larger size due to nonce)
 
-**Choose zdc when:**
+**Choose zfbcx when:**
 - Performance and compactness are primary requirements (~28 chars)
 - Security requirements are minimal (obfuscation contexts)
 
@@ -546,7 +546,7 @@ prefix entropy and compactness—enables specialized applications:
 
 | Use Case            | Traditional Solution | Oboron Approach                    |
 |---------------------|----------------------|------------------------------------|
-| Short unique IDs    | UUIDv4 (36 chars)    | zdc.c32 (28 chars, reversible)    |
+| Short unique IDs    | UUIDv4 (36 chars)    | zfbcx.c32 (28 chars, reversible)    |
 | URL parameters      | JWT (150+ chars)     | adsv.b64 (4.5x smaller, 4x faster) |
 | Database ID masking | Hashids (not secure) | Proper encryption                  |
 | Simple encryption   | Libsodium (complex)  | String in, string out API          |
@@ -784,13 +784,13 @@ Token size comparison:
 Oboron provides efficient alternatives to UUIDs and SHA256 for
 generating unique, referenceable identifiers.
 
-The examples in this section use `zdc` and `keyless` features, which are
+The examples in this section use `zfbcx` and `keyless` features, which are
 not included by default as cryptographically insecure.  Enable
 the required features explicitly in your `Cargo.toml`.
 
 ##### Approach 1: Full Oboron Output (Reversible)
 ```python
-ob = ZdcC32(keyless=True)  # Obfuscaton context
+ob = ZfbcxC32(keyless=True)  # Obfuscaton context
 full_id = ob.enc(f"user:alice")
 # "mdwsx9rdwkntyqcf806r9jhsp6gg" (28 base32 chars, reversible)
 ```
@@ -798,7 +798,7 @@ full_id = ob.enc(f"user:alice")
 - Pros:
   - *Reversible* (decodes to "user:alice"),
   - *Opaque structure:* When decoded with base32, the obtext produces a binary blob, revealing no input patterns.
-  - *Automatic handling:* Oboron detects the scheme (`zdc`), and can decrypt with its hardcoded key
+  - *Automatic handling:* Oboron detects the scheme (`zfbcx`), and can decrypt with its hardcoded key
 - Cons:
   - Using hardcoded key: Given the context (keyless Oboron), anyone can
     decode
@@ -808,14 +808,14 @@ full_id = ob.enc(f"user:alice")
 
 Possible security tightening if reversibility is needed:
 - Use `adgs` or `adsv` for strong 256-bit tamper-proof encryption.
-  (Trade-off: longer output: 44 chars; 2-3x slower than `zdc` but still
+  (Trade-off: longer output: 44 chars; 2-3x slower than `zfbcx` but still
   comparable performance to SHA256)
 - Keep the payload securely encrypted by having a shared secret:
   `env::var("OBORON_KEY")` (Trade-off: shared secret management)
 
 ##### Approach 2: Trimmed Prefix (Hash-like, Non-reversible)
 ```rust
-ob = ZdcC32(keyless=True)
+ob = ZfbcxC32(keyless=True)
 full = ob.enc("user:alice")
 short_id = full[:20]
 shorter_id = full[:6]  # "mdwsx9" ~ Git 7 char hex commit reference
@@ -843,8 +843,8 @@ SHA256 in this context may have drawbacks:
 
 **Performance considerations:**
 - SHA256 + hex: ~190 ns, 64 hex characters (128-bit collision resistance)
-- Oboron zdc (one block): ~130 ns, 28 base32/34 hex chars (37% faster)
-- Oboron zdc (two blocks): ~147 ns, 53 base32/66 hex chars (27% faster,
+- Oboron zfbcx (one block): ~130 ns, 28 base32/34 hex chars (37% faster)
+- Oboron zfbcx (two blocks): ~147 ns, 53 base32/66 hex chars (27% faster,
   stronger than SHA256)
 (Times from benchmarks run on an Intel i5 laptop.)
 
@@ -902,10 +902,10 @@ assert pt2 == "hello"
 ```
 
 Available types include all combinations of scheme variants (e.g.,
-`Zdc`, `Upc`, `Adgs`, `Apgs`, `Adsv`, `Apsv`) with encoding
+`Zfbcx`, `Upc`, `Adgs`, `Apgs`, `Adsv`, `Apsv`) with encoding
 specifications (`B64`, `Hex`, `B32`, or `C32`),
 and concatenates the two in class names, for example:
-- `ZdcB32` - encoder for `zdc.b32` format
+- `ZfbcxB32` - encoder for `zfbcx.b32` format
 - `UpcHex` - encoder for `upc.hex` format
 - `AdgsB64` - encoder for `adgs.b64` format
 - `AdsvC32` - encoder for `adsv.c32` format.
@@ -948,7 +948,7 @@ obm = ObMulti(key)
 # Format specification per operation
 ot = obm.enc("test", "apsv.b64")
 pt2 = obm.dec(ot, "apsv.b64")
-pt_other = obm.dec(other, "zdc.c32")
+pt_other = obm.dec(other, "zfbcx.c32")
 ```
 
 **Autodecode:** While other interfaces perform *scheme* autodetection in
@@ -987,7 +987,7 @@ ot_hex = obm.enc("data", formats.ADSV_HEX)
 ```
 
 Available constants:
-- `ZDC_C32`, `ZDC_B32`, `ZDC_B64`, `ZDC_HEX`
+- `ZFBCX_C32`, `ZFBCX_B32`, `ZFBCX_B64`, `ZFBCX_HEX`
 - `UPC_C32`, `UPC_B32`, `UPC_B64`, `UPC_HEX`
 - `ADGS_C32`, `ADGS_B32`, `ADGS_B64`, `ADGS_HEX`
 - `APGS_C32`, `APGS_B32`, `APGS_B64`, `APGS_HEX`
@@ -1084,7 +1084,7 @@ group.)
 | Scheme | Encoding | 4B  | 8B  | 12B | 16B | 24B | 32B | 64B  | 128B |
 |--------|----------|----:|----:|----:|----:|----:|----:|-----:|-----:|
 | mock1   | b32/c32  | 8   | 15  | 21  | 28  | 40  | 53  | 104  | 207  |
-| zdc   | b32/c32  | 28  | 28  | 28  | 28  | 53  | 53  | 104  | 207  |
+| zfbcx   | b32/c32  | 28  | 28  | 28  | 28  | 53  | 53  | 104  | 207  |
 | adgs   | b32/c32  | 34  | 40  | 47  | 53  | 66  | 79  | 130  | 232  |
 | adsv   | b32/c32  | 34  | 40  | 47  | 53  | 66  | 79  | 130  | 232  |
 | upc  | b32/c32  | 53  | 53  | 53  | 53  | 79  | 79  | 130  | 232  |
@@ -1096,7 +1096,7 @@ group.)
 | Scheme | Encoding | 4B  | 8B  | 12B | 16B | 24B | 32B | 64B  | 128B |
 |--------|----------|----:|----:|----:|----:|----:|----:|-----:|-----:|
 | mock1   | b64      | 7   | 12  | 18  | 23  | 34  | 44  | 87   | 172  |
-| zdc   | b64      | 23  | 23  | 23  | 23  | 44  | 44  | 87   | 172  |
+| zfbcx   | b64      | 23  | 23  | 23  | 23  | 44  | 44  | 87   | 172  |
 | adgs   | b64      | 28  | 34  | 39  | 44  | 55  | 66  | 108  | 194  |
 | adsv   | b64      | 28  | 34  | 39  | 44  | 55  | 66  | 108  | 194  |
 | upc  | b64      | 44  | 44  | 44  | 44  | 66  | 66  | 108  | 215  |
@@ -1108,7 +1108,7 @@ group.)
 | Scheme | Encoding | 4B  | 8B  | 12B | 16B | 24B | 32B | 64B  | 128B |
 |--------|---------:|----:|----:|----:|----:|----:|----:|-----:|-----:|
 | mock1   | hex      | 10  | 18  | 26  | 34  | 50  | 66  | 130  | 258  |
-| zdc   | hex      | 34  | 34  | 34  | 34  | 66  | 66  | 130  | 258  |
+| zfbcx   | hex      | 34  | 34  | 34  | 34  | 66  | 66  | 130  | 258  |
 | adgs   | hex      | 42  | 50  | 58  | 66  | 82  | 98  | 162  | 290  |
 | adsv   | hex      | 42  | 50  | 58  | 66  | 82  | 98  | 162  | 290  |
 | upc  | hex      | 66  | 66  | 66  | 66  | 98  | 98  | 162  | 290  |

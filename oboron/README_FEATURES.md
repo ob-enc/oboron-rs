@@ -17,7 +17,7 @@ All encodings (`.c32`-Crockford base32, `.b32`-standard base32, `.b64`-URL-safe 
 
 ### NOT INCLUDED BY DEFAULT
 
-- `zdc` scheme (cryptographically broken)
+- `zfbcx` scheme (cryptographically broken)
 - the `keyless` feature providing Oboron functionality with the hardcoded
   key
 - alternative key input formats `hex-keys`, `bytes-keys`
@@ -40,7 +40,7 @@ hex/bytes key interfaces and the keyless testing feature.
 
 ### Individual Schemes
 
-- `zdc` - AES-CBC (deterministic)
+- `zfbcx` - AES-CBC (deterministic)
 - `upc` - AES-CBC (probabilistic)
 - `adgs` - AES-GCM-SIV (deterministic)
 - `apgs` - AES-GCM-SIV (probabilistic)
@@ -66,7 +66,7 @@ Feature groups:
   deployments
 
 **Note:** `legacy` is a legacy scheme used internally by early adopters.
-New users should use `zdc` instead, which provides improved prefix
+New users should use `zfbcx` instead, which provides improved prefix
 entropy and better padding. This feature is only for maintaining
 compatibility with existing encrypted data.
 
@@ -76,19 +76,19 @@ versioning guarantees and may change or be removed in patch releases.
 ### Scheme Groups
 
 By algorithm
-- `all-cbc-schemes` - Includes `zdc`, `upc`
+- `all-cbc-schemes` - Includes `zfbcx`, `upc`
 - `all-gcm-schemes` - Includes `adgs`, `apgs`
 - `all-siv-schemes` - Includes `adsv`, `apsv`
 
 By properties:
-- `deterministic-schemes` - Includes `zdc`, `adgs`, `adsv`
+- `deterministic-schemes` - Includes `zfbcx`, `adgs`, `adsv`
 - `probabilistic-schemes` - Includes `upc`, `apgs`, `apsv`
 - `authenticated-schemes` - Includes `adgs`, `apgs`, `adsv`, `apsv`
-- `secure-schemes` - Includes all but `zdc`
-- `insecure-schemes` - Includes `zdc` only
+- `secure-schemes` - Includes all but `zfbcx`
+- `insecure-schemes` - Includes `zfbcx` only
 
 By tier:
-- `ob0x` - Includes `zdc` only
+- `ob0x` - Includes `zfbcx` only
 - `ob1x` - No current members
 - `ob2x` - Includes `upc` only
 - `ob3x` - Includes all authenticated schemes (= `authenticated-schemes`)
@@ -122,9 +122,9 @@ All disabled by default:
 ### Quick Selection Guide
 
 - **General purpose**: `adsv` (deterministic) or `apsv` (probabilistic)
-- **Maximum speed, most compact output**: `zdc` (insecure, deterministic
+- **Maximum speed, most compact output**: `zfbcx` (insecure, deterministic
   only)
-- **Testing/obfuscation**: `zdc` with `keyless` feature
+- **Testing/obfuscation**: `zfbcx` with `keyless` feature
 
 ### Binary Size Impact (WASM)
 

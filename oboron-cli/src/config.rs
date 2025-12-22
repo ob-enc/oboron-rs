@@ -528,7 +528,7 @@ mod tests {
 
     #[test]
     fn test_config_with_partial_fields() {
-        let json = r#"{"profile":"custom","scheme":"zdc","encoding":""}"#;
+        let json = r#"{"profile":"custom","scheme":"zfbcx","encoding":""}"#;
         let mut config: Config = serde_json::from_str(json).unwrap();
 
         if config.encoding.is_empty() {
@@ -536,7 +536,7 @@ mod tests {
         }
 
         assert_eq!(config.profile, "custom");
-        assert_eq!(config.scheme, "zdc");
+        assert_eq!(config.scheme, "zfbcx");
         assert_eq!(config.encoding, "c32");
     }
 }

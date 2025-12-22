@@ -15,7 +15,7 @@ readme = "README.md"
 default = ["all-schemes"]
 
 legacy = ["oboron/legacy"]
-zdc = ["oboron/zdc"]
+zfbcx = ["oboron/zfbcx"]
 adgs = ["oboron/adgs"]
 adsv = ["oboron/adsv"]
 upc = ["oboron/upc"]
@@ -25,7 +25,7 @@ mock = ["oboron/mock"]
 
 # Scheme categories
 # =================
-ob0x = ["zdc"] # insecure, not authenticated
+ob0x = ["zfbcx"] # insecure, not authenticated
 ob1x = []  # insecure, authenticated
 ob2x = ["upc"]  # secure, not authenticated
 ob3x = ["adgs", "apgs", "adsv", "apsv"]  # secure, authenticated
@@ -33,7 +33,7 @@ ob7x = ["mock"]  # testing
 insecure-schemes = ["ob0x", "ob1x"]
 secure-schemes = ["ob2x", "ob3x"]
 authenticated-schemes = ["ob3x"]
-deterministic-schemes = ["zdc", "adgs", "adsv"]
+deterministic-schemes = ["zfbcx", "adgs", "adsv"]
 probabilistic-schemes = ["upc", "apgs", "apsv"]
 all-schemes = ["ob0x", "ob1x", "ob2x", "ob3x"]
 

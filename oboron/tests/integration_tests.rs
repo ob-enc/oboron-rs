@@ -9,9 +9,9 @@ fn test_available_schemes() {
 
     // Test each scheme if its feature is enabled
 
-    #[cfg(feature = "zdc")]
+    #[cfg(feature = "zfbcx")]
     {
-        let ob = oboron::ZdcC32::new(&key).unwrap();
+        let ob = oboron::ZfbcxC32::new(&key).unwrap();
         let enc = ob.enc("test").unwrap();
         assert_eq!(ob.dec(&enc).unwrap(), "test");
     }
@@ -63,10 +63,10 @@ fn test_format_string_parsing() {
     }
 
     // Test that disabled schemes return error
-    #[cfg(not(feature = "zdc"))]
+    #[cfg(not(feature = "zfbcx"))]
     {
         use oboron::Format;
-        assert!(Format::from_str("zdc.c32").is_err());
+        assert!(Format::from_str("zfbcx.c32").is_err());
     }
 }
 

@@ -15,8 +15,8 @@ use crate::{constants::APGS_BYTE, decrypt_apgs};
 use crate::{constants::APSV_BYTE, decrypt_apsv};
 #[cfg(feature = "upc")]
 use crate::{constants::UPC_BYTE, decrypt_upc};
-#[cfg(feature = "zdc")]
-use crate::{constants::ZDC_BYTE, decrypt_zdc};
+#[cfg(feature = "zfbcx")]
+use crate::{constants::ZFBCX_BYTE, decrypt_zfbcx};
 // Testing
 #[cfg(feature = "mock")]
 use crate::{constants::MOCK1_BYTE, decrypt_mock1};
@@ -36,7 +36,7 @@ pub fn dec_any_scheme(
     let mut buffer = match crate::dec::decode_obtext_to_payload(obtext, encoding) {
         Ok(ct) => ct,
         Err(decode_err) => {
-            // Decoding failed - try legacy (legacy format with reversal applied to final encoding rather than bytes as in zdc)
+            // Decoding failed - try legacy (legacy format with reversal applied to final encoding rather than bytes as in zfbcx)
             #[cfg(feature = "legacy")]
             {
                 let format = Format::new(Scheme::Legacy, encoding);
@@ -67,8 +67,8 @@ pub fn dec_any_scheme(
 
     // Step 4: Match scheme byte and decrypt with available schemes
     let plaintext_bytes = match scheme_byte {
-        #[cfg(feature = "zdc")]
-        ZDC_BYTE => decrypt_zdc(keychain, &buffer)?,
+        #[cfg(feature = "zfbcx")]
+        ZFBCX_BYTE => decrypt_zfbcx(keychain, &buffer)?,
         #[cfg(feature = "upc")]
         UPC_BYTE => decrypt_upc(keychain, &buffer)?,
         #[cfg(feature = "adgs")]

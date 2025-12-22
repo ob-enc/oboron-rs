@@ -31,19 +31,19 @@ impl Format {
         self.encoding
     }
 
-    /// Parse format from compact string representation (e.g., "zdc.c32", "adgs.b64")
+    /// Parse format from compact string representation (e.g., "zfbcx.c32", "adgs.b64")
     ///
     /// This uses fast match-based parsing for maximum performance.
     pub fn from_str(s: &str) -> Result<Self, Error> {
         Ok(match s {
-            #[cfg(feature = "zdc")]
-            constants::ZDC_C32 => Format::new(Scheme::Zdc, Encoding::C32),
-            #[cfg(feature = "zdc")]
-            constants::ZDC_B32 => Format::new(Scheme::Zdc, Encoding::B32),
-            #[cfg(feature = "zdc")]
-            constants::ZDC_B64 => Format::new(Scheme::Zdc, Encoding::B64),
-            #[cfg(feature = "zdc")]
-            constants::ZDC_HEX => Format::new(Scheme::Zdc, Encoding::Hex),
+            #[cfg(feature = "zfbcx")]
+            constants::ZFBCX_C32 => Format::new(Scheme::Zfbcx, Encoding::C32),
+            #[cfg(feature = "zfbcx")]
+            constants::ZFBCX_B32 => Format::new(Scheme::Zfbcx, Encoding::B32),
+            #[cfg(feature = "zfbcx")]
+            constants::ZFBCX_B64 => Format::new(Scheme::Zfbcx, Encoding::B64),
+            #[cfg(feature = "zfbcx")]
+            constants::ZFBCX_HEX => Format::new(Scheme::Zfbcx, Encoding::Hex),
 
             #[cfg(feature = "upc")]
             constants::UPC_C32 => Format::new(Scheme::Upc, Encoding::C32),
@@ -151,8 +151,8 @@ mod tests {
     fn test_format_from_str_all_combinations() {
         // Define all schemes
         let schemes = vec![
-            #[cfg(feature = "zdc")]
-            Scheme::Zdc,
+            #[cfg(feature = "zfbcx")]
+            Scheme::Zfbcx,
             #[cfg(feature = "upc")]
             Scheme::Upc,
             #[cfg(feature = "adgs")]
@@ -178,7 +178,7 @@ mod tests {
 
         for scheme in &schemes {
             for encoding in &encodings {
-                // Test short string identifiers (e.g., "zdc.c32", "zdc.b32")
+                // Test short string identifiers (e.g., "zfbcx.c32", "zfbcx.b32")
                 let format_str = format!("{}.{}", scheme.as_str(), encoding.as_str());
                 let result = Format::from_str(&format_str);
                 assert!(result.is_ok(), "Failed to parse: {}", format_str);
@@ -203,8 +203,8 @@ mod tests {
     fn test_format_from_str_invalid() {
         // Test invalid format strings
         assert!(Format::from_str("invalid").is_err());
-        assert!(Format::from_str("zdc").is_err());
-        assert!(Format::from_str("zdc.").is_err());
+        assert!(Format::from_str("zfbcx").is_err());
+        assert!(Format::from_str("zfbcx.").is_err());
         assert!(Format::from_str(".b64").is_err());
         assert!(Format::from_str("mock1:invalid").is_err());
     }
@@ -232,12 +232,12 @@ mod tests {
             (Scheme::Legacy, Encoding::Hex, "legacy.hex"),
         ]);
 
-        #[cfg(feature = "zdc")]
+        #[cfg(feature = "zfbcx")]
         test_cases.extend(vec![
-            (Scheme::Zdc, Encoding::C32, "zdc.c32"),
-            (Scheme::Zdc, Encoding::B32, "zdc.b32"),
-            (Scheme::Zdc, Encoding::B64, "zdc.b64"),
-            (Scheme::Zdc, Encoding::Hex, "zdc.hex"),
+            (Scheme::Zfbcx, Encoding::C32, "zfbcx.c32"),
+            (Scheme::Zfbcx, Encoding::B32, "zfbcx.b32"),
+            (Scheme::Zfbcx, Encoding::B64, "zfbcx.b64"),
+            (Scheme::Zfbcx, Encoding::Hex, "zfbcx.hex"),
         ]);
 
         #[cfg(feature = "upc")]
@@ -325,7 +325,7 @@ mod tests {
     fn test_all_schemes_support_both_base32_variants() {
         // All schemes should support both RFC 4648 base32 (b32) and Crockford base32 (c32)
         let schemes = vec![
-            "zdc", "upc", "adgs", "apgs", "adsv", "apsv", "mock1", "mock2",
+            "zfbcx", "upc", "adgs", "apgs", "adsv", "apsv", "mock1", "mock2",
         ];
 
         for scheme_str in schemes {

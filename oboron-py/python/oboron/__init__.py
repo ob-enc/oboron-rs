@@ -18,7 +18,7 @@ class OboronBase(ABC):
     """
     Abstract base class for all Oboron cipher implementations.
 
-    All cipher classes (AdsvB32, ZdcB64, etc.) are registered as virtual
+    All cipher classes (AdsvB32, ZfbcxB64, etc.) are registered as virtual
     subclasses, enabling isinstance() and issubclass() checks.
 
     Example:
@@ -105,11 +105,11 @@ OboronBase.register(_oboron.UpcB32)
 OboronBase.register(_oboron.UpcB64)
 OboronBase.register(_oboron.UpcHex)
 
-# Zdc variants
-OboronBase.register(_oboron.ZdcC32)
-OboronBase.register(_oboron.ZdcB32)
-OboronBase.register(_oboron.ZdcB64)
-OboronBase.register(_oboron.ZdcHex)
+# Zfbcx variants
+OboronBase.register(_oboron.ZfbcxC32)
+OboronBase.register(_oboron.ZfbcxB32)
+OboronBase.register(_oboron.ZfbcxB64)
+OboronBase.register(_oboron.ZfbcxHex)
 
 # Legacy variants
 OboronBase.register(_oboron.LegacyC32)
@@ -169,11 +169,11 @@ UpcB32 = _oboron.UpcB32
 UpcB64 = _oboron.UpcB64
 UpcHex = _oboron.UpcHex
 
-# Zdc variants
-ZdcC32 = _oboron.ZdcC32
-ZdcB32 = _oboron.ZdcB32
-ZdcB64 = _oboron.ZdcB64
-ZdcHex = _oboron.ZdcHex
+# Zfbcx variants
+ZfbcxC32 = _oboron.ZfbcxC32
+ZfbcxB32 = _oboron.ZfbcxB32
+ZfbcxB64 = _oboron.ZfbcxB64
+ZfbcxHex = _oboron.ZfbcxHex
 
 # Legacy variants (LEGACY)
 LegacyC32 = _oboron.LegacyC32
@@ -246,11 +246,11 @@ __all__ = [
     'UpcB64',
     'UpcHex',
 
-    # Zdc
-    'ZdcC32',
-    'ZdcB32',
-    'ZdcB64',
-    'ZdcHex',
+    # Zfbcx
+    'ZfbcxC32',
+    'ZfbcxB32',
+    'ZfbcxB64',
+    'ZfbcxHex',
 
     # Legacy
     'LegacyC32',

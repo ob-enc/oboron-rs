@@ -1,7 +1,7 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 #[cfg(feature = "legacy")]
 use oboron::LegacyC32;
-use oboron::{AdgsC32, AdsvC32, ApgsC32, ApsvC32, ObMulti, ObtextCodec, UpcC32, ZdcC32};
+use oboron::{AdgsC32, AdsvC32, ApgsC32, ApsvC32, ObMulti, ObtextCodec, UpcC32, ZfbcxC32};
 #[cfg(feature = "mock")]
 use oboron::{Mock1C32, Mock2C32};
 
@@ -49,9 +49,9 @@ fn benchmark_legacy_enc(c: &mut Criterion) {
     });
 }
 
-fn benchmark_zdc_enc(c: &mut Criterion) {
-    let ob = ZdcC32::new_keyless().unwrap();
-    c.bench_function("enc_zdc", |b| {
+fn benchmark_zfbcx_enc(c: &mut Criterion) {
+    let ob = ZfbcxC32::new_keyless().unwrap();
+    c.bench_function("enc_zfbcx", |b| {
         b.iter(|| ob.enc(black_box("test123")).unwrap());
     });
 }
@@ -100,10 +100,10 @@ fn benchmark_legacy_dec(c: &mut Criterion) {
     });
 }
 
-fn benchmark_dec_zdc(c: &mut Criterion) {
-    let ob = ZdcC32::new_keyless().unwrap();
+fn benchmark_dec_zfbcx(c: &mut Criterion) {
+    let ob = ZfbcxC32::new_keyless().unwrap();
     let ot = ob.enc("test123").unwrap();
-    c.bench_function("dec_zdc", |b| {
+    c.bench_function("dec_zfbcx", |b| {
         b.iter(|| ob.dec(black_box(&ot)).unwrap());
     });
 }
@@ -174,7 +174,7 @@ criterion_group!(
     benchmark_dec_apgs,
     benchmark_dec_apsv,
     benchmark_dec_upc,
-    benchmark_dec_zdc,
+    benchmark_dec_zfbcx,
     benchmark_legacy_dec,
     benchmark_legacy_enc,
     benchmark_mock1_dec,
@@ -182,7 +182,7 @@ criterion_group!(
     benchmark_mock2_dec,
     benchmark_mock2_enc,
     benchmark_upc_enc,
-    benchmark_zdc_enc,
+    benchmark_zfbcx_enc,
     // ObMulti
     benchmark_adsv_obm_autodec
     benchmark_adsv_obm_enc,

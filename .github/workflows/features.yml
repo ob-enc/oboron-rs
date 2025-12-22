@@ -16,7 +16,7 @@ jobs:
       matrix:
         feature:
           - legacy
-          - zdc
+          - zfbcx
           - upc
           - adgs
           - apgs
@@ -81,7 +81,7 @@ jobs:
       matrix:
         include:
           - name: "deterministic only"
-            features: "zdc,adgs,adsv"
+            features: "zfbcx,adgs,adsv"
           - name: "probabilistic only"
             features: "upc,apgs,apsv"
           - name: "modern schemes"

@@ -25,10 +25,10 @@ struct SchemeFlags {
     #[arg(short = '0', long, alias = "00")]
     legacy: bool,
 
-    /// Use zdc scheme (optimized AES-CBC)
-    #[cfg(feature = "zdc")]
+    /// Use zfbcx scheme (optimized AES-CBC)
+    #[cfg(feature = "zfbcx")]
     #[arg(short = '1', long, alias = "01")]
-    zdc: bool,
+    zfbcx: bool,
 
     /// Use upc scheme (probabilistic AES-CBC with PKCS#7)
     #[cfg(feature = "upc")]
@@ -69,7 +69,7 @@ struct SchemeFlags {
 impl SchemeFlags {
     /// Convert flags to Option<Scheme>, returning error if multiple are set
     #[cfg(any(
-        feature = "zdc",
+        feature = "zfbcx",
         feature = "upc",
         feature = "adgs",
         feature = "apgs",
@@ -88,10 +88,10 @@ impl SchemeFlags {
             count += 1;
             scheme = Some(Scheme::Legacy);
         }
-        #[cfg(feature = "zdc")]
-        if self.zdc {
+        #[cfg(feature = "zfbcx")]
+        if self.zfbcx {
             count += 1;
-            scheme = Some(Scheme::Zdc);
+            scheme = Some(Scheme::Zfbcx);
         }
         #[cfg(feature = "upc")]
         if self.upc {
@@ -138,7 +138,7 @@ impl SchemeFlags {
 
     /// Check if any scheme flag is set
     #[cfg(any(
-        feature = "zdc",
+        feature = "zfbcx",
         feature = "upc",
         feature = "adgs",
         feature = "apgs",
@@ -153,8 +153,8 @@ impl SchemeFlags {
         if self.legacy {
             return true;
         }
-        #[cfg(feature = "zdc")]
-        if self.zdc {
+        #[cfg(feature = "zfbcx")]
+        if self.zfbcx {
             return true;
         }
         #[cfg(feature = "adgs")]
@@ -263,7 +263,9 @@ impl FormatSpec {
     ) -> Result<Self> {
         // Check for conflicts between --format and individual flags
         if format_str.is_some() && scheme_flags.is_set() {
-            anyhow::bail!("Cannot use --format together with scheme flags (--legacy, --zdc, etc.)");
+            anyhow::bail!(
+                "Cannot use --format together with scheme flags (--legacy, --zfbcx, etc.)"
+            );
         }
         if format_str.is_some() && encoding_flags.is_set() {
             anyhow::bail!(
@@ -287,7 +289,7 @@ impl FormatSpec {
         Ok(Self { scheme, encoding })
     }
 
-    /// Convert to format string (e.g., "zdc.b64")
+    /// Convert to format string (e.g., "zfbcx.b64")
     fn to_string(&self) -> String {
         format!("{}.{}", self.scheme.as_str(), self.encoding.as_str())
     }
@@ -313,7 +315,7 @@ enum Commands {
         #[arg(short = 'z', long)]
         keyless: bool,
 
-        /// Format specification (e.g., "zdc.b64", "adgs.b32")
+        /// Format specification (e.g., "zfbcx.b64", "adgs.b32")
         /// Cannot be combined with scheme or encoding flags
         #[arg(short, long)]
         format: Option<String>,
@@ -345,7 +347,7 @@ enum Commands {
         #[arg(short = 'z', long)]
         keyless: bool,
 
-        /// Format specification (e.g., "zdc.b64", "adgs.b32")
+        /// Format specification (e.g., "zfbcx.b64", "adgs.b32")
         /// Cannot be combined with scheme or encoding flags
         #[arg(short, long)]
         format: Option<String>,
@@ -816,7 +818,7 @@ mod tests {
     #[cfg(feature = "mock")]
     fn test_scheme_flags_to_scheme_single() {
         #[cfg(not(any(
-            feature = "zdc",
+            feature = "zfbcx",
             feature = "upc",
             feature = "adgs",
             feature = "apgs",
@@ -830,8 +832,8 @@ mod tests {
         let flags = SchemeFlags {
             #[cfg(feature = "legacy")]
             legacy: false,
-            #[cfg(feature = "zdc")]
-            zdc: false,
+            #[cfg(feature = "zfbcx")]
+            zfbcx: false,
             #[cfg(feature = "upc")]
             upc: false,
             #[cfg(feature = "adgs")]
@@ -855,7 +857,7 @@ mod tests {
     #[cfg(feature = "apsv")]
     fn test_scheme_flags_to_scheme_multiple_errors() {
         #[cfg(not(any(
-            feature = "zdc",
+            feature = "zfbcx",
             feature = "upc",
             feature = "adgs",
             feature = "apgs",
@@ -869,8 +871,8 @@ mod tests {
         let flags = SchemeFlags {
             #[cfg(feature = "legacy")]
             legacy: false,
-            #[cfg(feature = "zdc")]
-            zdc: false,
+            #[cfg(feature = "zfbcx")]
+            zfbcx: false,
             #[cfg(feature = "upc")]
             upc: false,
             #[cfg(feature = "adgs")]
@@ -892,7 +894,7 @@ mod tests {
     #[test]
     fn test_scheme_flags_to_scheme_none() {
         #[cfg(not(any(
-            feature = "zdc",
+            feature = "zfbcx",
             feature = "upc",
             feature = "adgs",
             feature = "apgs",
@@ -906,8 +908,8 @@ mod tests {
         let flags = SchemeFlags {
             #[cfg(feature = "legacy")]
             legacy: false,
-            #[cfg(feature = "zdc")]
-            zdc: false,
+            #[cfg(feature = "zfbcx")]
+            zfbcx: false,
             #[cfg(feature = "upc")]
             upc: false,
             #[cfg(feature = "adgs")]
@@ -958,7 +960,7 @@ mod tests {
         };
 
         #[cfg(not(any(
-            feature = "zdc",
+            feature = "zfbcx",
             feature = "upc",
             feature = "adgs",
             feature = "apgs",
@@ -972,8 +974,8 @@ mod tests {
         let scheme_flags = SchemeFlags {
             #[cfg(feature = "legacy")]
             legacy: false,
-            #[cfg(feature = "zdc")]
-            zdc: false,
+            #[cfg(feature = "zfbcx")]
+            zfbcx: false,
             #[cfg(feature = "upc")]
             upc: false,
             #[cfg(feature = "adgs")]
@@ -1012,7 +1014,7 @@ mod tests {
     #[cfg(feature = "mock")]
     fn test_format_spec_conflicts_with_scheme_flag() {
         #[cfg(not(any(
-            feature = "zdc",
+            feature = "zfbcx",
             feature = "upc",
             feature = "adgs",
             feature = "apgs",
@@ -1026,8 +1028,8 @@ mod tests {
         let scheme_flags = SchemeFlags {
             #[cfg(feature = "legacy")]
             legacy: false,
-            #[cfg(feature = "zdc")]
-            zdc: false,
+            #[cfg(feature = "zfbcx")]
+            zfbcx: false,
             #[cfg(feature = "upc")]
             upc: false,
             #[cfg(feature = "adgs")]
@@ -1067,7 +1069,7 @@ mod tests {
     #[test]
     fn test_format_spec_conflicts_with_encoding_flag() {
         #[cfg(not(any(
-            feature = "zdc",
+            feature = "zfbcx",
             feature = "upc",
             feature = "adgs",
             feature = "apgs",
@@ -1081,8 +1083,8 @@ mod tests {
         let scheme_flags = SchemeFlags {
             #[cfg(feature = "legacy")]
             legacy: false,
-            #[cfg(feature = "zdc")]
-            zdc: false,
+            #[cfg(feature = "zfbcx")]
+            zfbcx: false,
             #[cfg(feature = "upc")]
             upc: false,
             #[cfg(feature = "adgs")]
@@ -1129,7 +1131,7 @@ mod tests {
         };
 
         #[cfg(not(any(
-            feature = "zdc",
+            feature = "zfbcx",
             feature = "upc",
             feature = "adgs",
             feature = "apgs",
@@ -1143,8 +1145,8 @@ mod tests {
         let scheme_flags = SchemeFlags {
             #[cfg(feature = "legacy")]
             legacy: false,
-            #[cfg(feature = "zdc")]
-            zdc: false,
+            #[cfg(feature = "zfbcx")]
+            zfbcx: false,
             #[cfg(feature = "upc")]
             upc: false,
             #[cfg(feature = "adgs")]
@@ -1184,7 +1186,7 @@ mod tests {
         };
 
         #[cfg(not(any(
-            feature = "zdc",
+            feature = "zfbcx",
             feature = "upc",
             feature = "adgs",
             feature = "apgs",
@@ -1198,8 +1200,8 @@ mod tests {
         let scheme_flags = SchemeFlags {
             #[cfg(feature = "legacy")]
             legacy: false,
-            #[cfg(feature = "zdc")]
-            zdc: false,
+            #[cfg(feature = "zfbcx")]
+            zfbcx: false,
             #[cfg(feature = "upc")]
             upc: false,
             #[cfg(feature = "adgs")]

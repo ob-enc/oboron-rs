@@ -220,7 +220,7 @@
 //! - Un-authenticated:
 //!   - `Upc`: probabilistic AES-CBC
 //! - Insecure (obfuscation only):
-//!   - `Zdc`: deterministic AES-CBC with constant IV
+//!   - `Zfbcx`: deterministic AES-CBC with constant IV
 //!
 //! Testing/Demo only schemes using no encryption (`mock` feature group):
 //! - `Mock1`: Identity
@@ -296,8 +296,8 @@ pub(crate) use obcrypt::{decrypt_apgs, encrypt_apgs};
 pub(crate) use obcrypt::{decrypt_apsv, encrypt_apsv};
 #[cfg(feature = "upc")]
 pub(crate) use obcrypt::{decrypt_upc, encrypt_upc};
-#[cfg(feature = "zdc")]
-pub(crate) use obcrypt::{decrypt_zdc, encrypt_zdc};
+#[cfg(feature = "zfbcx")]
+pub(crate) use obcrypt::{decrypt_zfbcx, encrypt_zfbcx};
 
 // Testing
 #[cfg(feature = "mock")]
@@ -340,8 +340,8 @@ pub use constants::{APGS_B32, APGS_B64, APGS_C32, APGS_HEX};
 pub use constants::{APSV_B32, APSV_B64, APSV_C32, APSV_HEX};
 #[cfg(feature = "upc")]
 pub use constants::{UPC_B32, UPC_B64, UPC_C32, UPC_HEX};
-#[cfg(feature = "zdc")]
-pub use constants::{ZDC_B32, ZDC_B64, ZDC_C32, ZDC_HEX};
+#[cfg(feature = "zfbcx")]
+pub use constants::{ZFBCX_B32, ZFBCX_B64, ZFBCX_C32, ZFBCX_HEX};
 // Legacy
 #[cfg(feature = "legacy")]
 pub use constants::{LEGACY_B32, LEGACY_B64, LEGACY_C32, LEGACY_HEX};
@@ -362,8 +362,8 @@ pub use codec::{ApgsB32, ApgsB64, ApgsC32, ApgsHex};
 pub use codec::{ApsvB32, ApsvB64, ApsvC32, ApsvHex};
 #[cfg(feature = "upc")]
 pub use codec::{UpcB32, UpcB64, UpcC32, UpcHex};
-#[cfg(feature = "zdc")]
-pub use codec::{ZdcB32, ZdcB64, ZdcC32, ZdcHex};
+#[cfg(feature = "zfbcx")]
+pub use codec::{ZfbcxB32, ZfbcxB64, ZfbcxC32, ZfbcxHex};
 // Legacy
 #[cfg(feature = "legacy")]
 pub use legacy::{LegacyB32, LegacyB64, LegacyC32, LegacyHex};
@@ -374,8 +374,8 @@ pub use codec::{Mock1B32, Mock1B64, Mock1C32, Mock1Hex};
 pub use codec::{Mock2B32, Mock2B64, Mock2C32, Mock2Hex};
 
 // Aliases for default encoding:
-#[cfg(feature = "zdc")]
-pub type Zdc = ZdcC32;
+#[cfg(feature = "zfbcx")]
+pub type Zfbcx = ZfbcxC32;
 #[cfg(feature = "upc")]
 pub type Upc = UpcC32;
 #[cfg(feature = "adgs")]

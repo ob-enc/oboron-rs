@@ -3,14 +3,14 @@ use oboron::Adgs;
 use oboron::ObMulti;
 #[cfg(feature = "upc")]
 use oboron::UpcC32;
-#[cfg(feature = "zdc")]
-use oboron::ZdcC32;
+#[cfg(feature = "zfbcx")]
+use oboron::ZfbcxC32;
 
 #[test]
-#[cfg(feature = "zdc")]
-fn test_zdc_basic() {
+#[cfg(feature = "zfbcx")]
+fn test_zfbcx_basic() {
     let original = "hello world";
-    let ob = ZdcC32::new_keyless().unwrap();
+    let ob = ZfbcxC32::new_keyless().unwrap();
     let ot = ob.enc(original).unwrap();
     let pt2 = ob.dec_strict(&ot).unwrap();
 
@@ -19,18 +19,18 @@ fn test_zdc_basic() {
 }
 
 #[test]
-#[cfg(feature = "zdc")]
+#[cfg(feature = "zfbcx")]
 fn test_empty_string() {
     let original = "";
-    let ob = ZdcC32::new_keyless().unwrap();
+    let ob = ZfbcxC32::new_keyless().unwrap();
     assert!(ob.enc(original).is_err());
 }
 
 #[test]
-#[cfg(feature = "zdc")]
-fn test_zdc_all_printable_ascii() {
+#[cfg(feature = "zfbcx")]
+fn test_zfbcx_all_printable_ascii() {
     let original = (32..127).map(|c| c as u8 as char).collect::<String>();
-    let ob = ZdcC32::new_keyless().unwrap();
+    let ob = ZfbcxC32::new_keyless().unwrap();
     let ot = ob.enc(&original).unwrap();
     let pt2 = ob.dec_strict(&ot).unwrap();
 
@@ -38,16 +38,16 @@ fn test_zdc_all_printable_ascii() {
 }
 
 #[test]
-#[cfg(feature = "zdc")]
+#[cfg(feature = "zfbcx")]
 fn test_convenience_functions() {
     let original = "convenience test";
 
-    let ot_zdc = oboron::enc_keyless(original, "zdc.c32").unwrap();
-    let pt2_zdc = oboron::dec_keyless(&ot_zdc, "zdc.c32").unwrap();
-    assert_eq!(original, pt2_zdc);
+    let ot_zfbcx = oboron::enc_keyless(original, "zfbcx.c32").unwrap();
+    let pt2_zfbcx = oboron::dec_keyless(&ot_zfbcx, "zfbcx.c32").unwrap();
+    assert_eq!(original, pt2_zfbcx);
 
-    let autodecd_zdc = oboron::autodec_keyless(&ot_zdc).unwrap();
-    assert_eq!(original, autodecd_zdc);
+    let autodecd_zfbcx = oboron::autodec_keyless(&ot_zfbcx).unwrap();
+    assert_eq!(original, autodecd_zfbcx);
 }
 
 #[test]
@@ -89,11 +89,11 @@ fn test_autodetect_all_formats() {
     let original = "autodetect all";
     let ob = ObMulti::new_keyless().unwrap();
 
-    #[cfg(feature = "zdc")]
+    #[cfg(feature = "zfbcx")]
     {
-        let ot = ob.enc(original, "zdc.c32").unwrap();
+        let ot = ob.enc(original, "zfbcx.c32").unwrap();
         let pt2 = ob.autodec(&ot).unwrap();
-        assert_eq!(original, pt2, "Failed for format zdc");
+        assert_eq!(original, pt2, "Failed for format zfbcx");
     }
     #[cfg(feature = "upc")]
     {
