@@ -103,7 +103,7 @@ stage offers several supported string encodings.  A combination of a
 scheme and encoding is referred to as an Oboron *format*.  Given an
 encryption key, the format thus uniquely specifies the complete
 transformation from a plaintext string to an encoded "obtext" string.
-Formats are represented by compact identifiers: `{scheme}:{encoding}`,
+Formats are represented by compact identifiers: `{scheme}.{encoding}`,
 for example:
 - `zrbcx.c32` - zrbcx scheme, Crockford base32 encoding
 - `upbc.b32` - upbc scheme, standard RFC 4648 base32 encoding
@@ -131,7 +131,7 @@ including the encryption and encoding stages.
 - `c32` - Crockford base32: Balanced compactness and readability,
   alphanumeric, lowercase; designed to avoid accidental obscenity
 - `b64` - standard URL-safe base64: Most compact, case-sensitive,
-  includes `-` and `\_` characters (RFC 4648 Section 5)
+  includes `-` and `_` characters (RFC 4648 Section 5)
 - `hex` - hexadecimal: Slightly faster performance (~2-3%), longest
   output
 
@@ -168,15 +168,6 @@ scheme:
 - `.r..` - referenceable / prefix-restricted avalanche, deterministic
 - `.d..` - deterministic, no avalanche effect
 - `.p..` - probabilistic (e.g., `apsv`, `apgs`, `upbc`)
-
-Schemes in the `u` and `z` tiers use 3-letter IDs, while `a`-tier schemes
-use 4-letter IDs. This visual distinction reinforces the security
-difference: fully authenticated schemes (`a`-tier) have more descriptive
-names.  Compare:
-- `aasv`, `apgs` - fully secure and authenticated
-- `upbc`, `zrbcx` - some security compromise: either non-authenticated
-  (`upbc` not tamper-evident), or cryptographically broken (`zrbcx` uses
-  constant IV)
 
 The remaining two letters in `a`-tier schemes represent the algorithm
 used:
@@ -247,7 +238,7 @@ important one (see [Scheme Tiers](#scheme-tiers) above):
 
 > FAQ: *Why do schemes not include the traditional 128/256/... bit
 > encryption designations?*
-> Oboron uses the strongest possible encryption with its 512-bit key.
+> Oboron uses the strongest standard encryption with its 512-bit key.
 > Both AES-GCM-SIV and AES-SIV use 256-bit encryption (AES-SIV uses a
 > 512-bit key for two instance layers, but each is 256-bit encryption.)
 > AES-CBC uses 128-bit encryption.
