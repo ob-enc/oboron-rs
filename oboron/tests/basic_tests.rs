@@ -1,16 +1,16 @@
-#[cfg(feature = "adgs")]
-use oboron::Adgs;
+#[cfg(feature = "aags")]
+use oboron::Aags;
 use oboron::ObMulti;
 #[cfg(feature = "upbc")]
 use oboron::UpbcC32;
-#[cfg(feature = "zfbcx")]
-use oboron::ZfbcxC32;
+#[cfg(feature = "zrbcx")]
+use oboron::ZrbcxC32;
 
 #[test]
-#[cfg(feature = "zfbcx")]
-fn test_zfbcx_basic() {
+#[cfg(feature = "zrbcx")]
+fn test_zrbcx_basic() {
     let original = "hello world";
-    let ob = ZfbcxC32::new_keyless().unwrap();
+    let ob = ZrbcxC32::new_keyless().unwrap();
     let ot = ob.enc(original).unwrap();
     let pt2 = ob.dec_strict(&ot).unwrap();
 
@@ -19,18 +19,18 @@ fn test_zfbcx_basic() {
 }
 
 #[test]
-#[cfg(feature = "zfbcx")]
+#[cfg(feature = "zrbcx")]
 fn test_empty_string() {
     let original = "";
-    let ob = ZfbcxC32::new_keyless().unwrap();
+    let ob = ZrbcxC32::new_keyless().unwrap();
     assert!(ob.enc(original).is_err());
 }
 
 #[test]
-#[cfg(feature = "zfbcx")]
-fn test_zfbcx_all_printable_ascii() {
+#[cfg(feature = "zrbcx")]
+fn test_zrbcx_all_printable_ascii() {
     let original = (32..127).map(|c| c as u8 as char).collect::<String>();
-    let ob = ZfbcxC32::new_keyless().unwrap();
+    let ob = ZrbcxC32::new_keyless().unwrap();
     let ot = ob.enc(&original).unwrap();
     let pt2 = ob.dec_strict(&ot).unwrap();
 
@@ -38,28 +38,28 @@ fn test_zfbcx_all_printable_ascii() {
 }
 
 #[test]
-#[cfg(feature = "zfbcx")]
+#[cfg(feature = "zrbcx")]
 fn test_convenience_functions() {
     let original = "convenience test";
 
-    let ot_zfbcx = oboron::enc_keyless(original, "zfbcx.c32").unwrap();
-    let pt2_zfbcx = oboron::dec_keyless(&ot_zfbcx, "zfbcx.c32").unwrap();
-    assert_eq!(original, pt2_zfbcx);
+    let ot_zrbcx = oboron::enc_keyless(original, "zrbcx.c32").unwrap();
+    let pt2_zrbcx = oboron::dec_keyless(&ot_zrbcx, "zrbcx.c32").unwrap();
+    assert_eq!(original, pt2_zrbcx);
 
-    let autodecd_zfbcx = oboron::autodec_keyless(&ot_zfbcx).unwrap();
-    assert_eq!(original, autodecd_zfbcx);
+    let autodecd_zrbcx = oboron::autodec_keyless(&ot_zrbcx).unwrap();
+    assert_eq!(original, autodecd_zrbcx);
 }
 
 #[test]
-#[cfg(feature = "adgs")]
-fn test_adgs_deterministic() {
+#[cfg(feature = "aags")]
+fn test_aags_deterministic() {
     let original = "deterministic test";
-    let ob = Adgs::new_keyless().unwrap();
+    let ob = Aags::new_keyless().unwrap();
 
     let ot1 = ob.enc(original).unwrap();
     let ot2 = ob.enc(original).unwrap();
 
-    // adgs is deterministic - same input produces same output
+    // aags is deterministic - same input produces same output
     assert_eq!(ot1, ot2);
 
     let pt2 = ob.dec_strict(&ot1).unwrap();
@@ -89,11 +89,11 @@ fn test_autodetect_all_formats() {
     let original = "autodetect all";
     let ob = ObMulti::new_keyless().unwrap();
 
-    #[cfg(feature = "zfbcx")]
+    #[cfg(feature = "zrbcx")]
     {
-        let ot = ob.enc(original, "zfbcx.c32").unwrap();
+        let ot = ob.enc(original, "zrbcx.c32").unwrap();
         let pt2 = ob.autodec(&ot).unwrap();
-        assert_eq!(original, pt2, "Failed for format zfbcx");
+        assert_eq!(original, pt2, "Failed for format zrbcx");
     }
     #[cfg(feature = "upbc")]
     {
@@ -101,11 +101,11 @@ fn test_autodetect_all_formats() {
         let pt2 = ob.autodec(&ot).unwrap();
         assert_eq!(original, pt2, "Failed for format upbc");
     }
-    #[cfg(feature = "adgs")]
+    #[cfg(feature = "aags")]
     {
-        let ot = ob.enc(original, "adgs.c32").unwrap();
+        let ot = ob.enc(original, "aags.c32").unwrap();
         let pt2 = ob.autodec(&ot).unwrap();
-        assert_eq!(original, pt2, "Failed for format adgs");
+        assert_eq!(original, pt2, "Failed for format aags");
     }
     #[cfg(feature = "apgs")]
     {
@@ -113,11 +113,11 @@ fn test_autodetect_all_formats() {
         let pt2 = ob.autodec(&ot).unwrap();
         assert_eq!(original, pt2, "Failed for format apgs");
     }
-    #[cfg(feature = "adsv")]
+    #[cfg(feature = "aasv")]
     {
-        let ot = ob.enc(original, "adsv.c32").unwrap();
+        let ot = ob.enc(original, "aasv.c32").unwrap();
         let pt2 = ob.autodec(&ot).unwrap();
-        assert_eq!(original, pt2, "Failed for format adsv");
+        assert_eq!(original, pt2, "Failed for format aasv");
     }
     #[cfg(feature = "apsv")]
     {

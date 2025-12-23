@@ -18,7 +18,7 @@ default = ["std"]
 # Core configurations
 # ===================
 std = ["secure-schemes"]
-secure-min = ["adsv"]  # Minimum secure setup
+secure-min = ["aasv"]  # Minimum secure setup
 full = ["all-schemes", "all-alt-keys", "keyless", "legacy", "mock", "convenience"]
 
 dev = ["full"]  # Development setup
@@ -33,17 +33,17 @@ keyless = []  # Hardcoded key methods (dev/testing only)
 
 # Algorithm family groups (BINARY SIZE OPTIMIZATION)
 # ==================================================
-all-cbc-schemes = ["zfbcx", "upbc"]  # Shares AES+CBC deps
-all-gcm-schemes = ["adgs", "apgs"]  # Shares AES-GCM-SIV deps  
-all-siv-schemes = ["adsv", "apsv"]  # Shares AES-SIV deps
+all-cbc-schemes = ["zrbcx", "upbc"]  # Shares AES+CBC deps
+all-gcm-schemes = ["aags", "apgs"]  # Shares AES-GCM-SIV deps  
+all-siv-schemes = ["aasv", "apsv"]  # Shares AES-SIV deps
 
 # Individual schemes
 # ==================
-zfbcx = ["aes", "cipher", "cbc"]
+zrbcx = ["aes", "cipher", "cbc"]
 upbc = ["aes", "cipher", "cbc"]
-adgs = ["aes-gcm-siv"]
+aags = ["aes-gcm-siv"]
 apgs = ["aes-gcm-siv"]
-adsv = ["aes-siv"]
+aasv = ["aes-siv"]
 apsv = ["aes-siv"]
 # Testing only
 mock = []
@@ -58,15 +58,15 @@ unchecked-utf8 = [] # Unsafe performance enhacement
 
 # Scheme categories
 # =================
-ob0x = ["zfbcx"] # insecure, not authenticated
+ob0x = ["zrbcx"] # insecure, not authenticated
 ob1x = []  # insecure, authenticated
 ob2x = ["upbc"]  # secure, not authenticated
-ob3x = ["adgs", "apgs", "adsv", "apsv"]  # secure, authenticated
+ob3x = ["aags", "apgs", "aasv", "apsv"]  # secure, authenticated
 ob7x = ["mock"]  # testing
 insecure-schemes = ["ob0x", "ob1x"]
 secure-schemes = ["ob2x", "ob3x"]
 authenticated-schemes = ["ob3x"]
-deterministic-schemes = ["zfbcx", "adgs", "adsv"]
+deterministic-schemes = ["zrbcx", "aags", "aasv"]
 probabilistic-schemes = ["upbc", "apgs", "apsv"]
 all-schemes = ["ob0x", "ob1x", "ob2x", "ob3x"]
 
@@ -139,19 +139,19 @@ name = "obmulti"
 harness = false
 
 [[bench]]
-name = "zfbcx_c32"
+name = "zrbcx_c32"
 harness = false
 
 [[bench]]
-name = "zfbcx_b32"
+name = "zrbcx_b32"
 harness = false
 
 [[bench]]
-name = "zfbcx_b64"
+name = "zrbcx_b64"
 harness = false
 
 [[bench]]
-name = "zfbcx_hex"
+name = "zrbcx_hex"
 harness = false
 
 [[bench]]
@@ -171,19 +171,19 @@ name = "upbc_hex"
 harness = false
 
 [[bench]]
-name = "adgs_c32"
+name = "aags_c32"
 harness = false
 
 [[bench]]
-name = "adgs_b32"
+name = "aags_b32"
 harness = false
 
 [[bench]]
-name = "adgs_b64"
+name = "aags_b64"
 harness = false
 
 [[bench]]
-name = "adgs_hex"
+name = "aags_hex"
 harness = false
 
 [[bench]]
@@ -203,19 +203,19 @@ name = "apgs_hex"
 harness = false
 
 [[bench]]
-name = "adsv_c32"
+name = "aasv_c32"
 harness = false
 
 [[bench]]
-name = "adsv_b32"
+name = "aasv_b32"
 harness = false
 
 [[bench]]
-name = "adsv_b64"
+name = "aasv_b64"
 harness = false
 
 [[bench]]
-name = "adsv_hex"
+name = "aasv_hex"
 harness = false
 
 [[bench]]

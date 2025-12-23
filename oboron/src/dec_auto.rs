@@ -5,18 +5,18 @@ use crate::{Format, Scheme};
 // Always available
 use crate::constants::REVERSED_SCHEME_BYTES;
 
-#[cfg(feature = "adgs")]
-use crate::{constants::ADGS_BYTE, decrypt_adgs};
-#[cfg(feature = "adsv")]
-use crate::{constants::ADSV_BYTE, decrypt_adsv};
+#[cfg(feature = "aags")]
+use crate::{constants::AAGS_BYTE, decrypt_aags};
+#[cfg(feature = "aasv")]
+use crate::{constants::AASV_BYTE, decrypt_aasv};
 #[cfg(feature = "apgs")]
 use crate::{constants::APGS_BYTE, decrypt_apgs};
 #[cfg(feature = "apsv")]
 use crate::{constants::APSV_BYTE, decrypt_apsv};
 #[cfg(feature = "upbc")]
 use crate::{constants::UPBC_BYTE, decrypt_upbc};
-#[cfg(feature = "zfbcx")]
-use crate::{constants::ZFBCX_BYTE, decrypt_zfbcx};
+#[cfg(feature = "zrbcx")]
+use crate::{constants::ZRBCX_BYTE, decrypt_zrbcx};
 // Testing
 #[cfg(feature = "mock")]
 use crate::{constants::MOCK1_BYTE, decrypt_mock1};
@@ -36,7 +36,7 @@ pub fn dec_any_scheme(
     let mut buffer = match crate::dec::decode_obtext_to_payload(obtext, encoding) {
         Ok(ct) => ct,
         Err(decode_err) => {
-            // Decoding failed - try legacy (legacy format with reversal applied to final encoding rather than bytes as in zfbcx)
+            // Decoding failed - try legacy (legacy format with reversal applied to final encoding rather than bytes as in zrbcx)
             #[cfg(feature = "legacy")]
             {
                 let format = Format::new(Scheme::Legacy, encoding);
@@ -67,16 +67,16 @@ pub fn dec_any_scheme(
 
     // Step 4: Match scheme byte and decrypt with available schemes
     let plaintext_bytes = match scheme_byte {
-        #[cfg(feature = "zfbcx")]
-        ZFBCX_BYTE => decrypt_zfbcx(keychain, &buffer)?,
+        #[cfg(feature = "zrbcx")]
+        ZRBCX_BYTE => decrypt_zrbcx(keychain, &buffer)?,
         #[cfg(feature = "upbc")]
         UPBC_BYTE => decrypt_upbc(keychain, &buffer)?,
-        #[cfg(feature = "adgs")]
-        ADGS_BYTE => decrypt_adgs(keychain, &buffer)?,
+        #[cfg(feature = "aags")]
+        AAGS_BYTE => decrypt_aags(keychain, &buffer)?,
         #[cfg(feature = "apgs")]
         APGS_BYTE => decrypt_apgs(keychain, &buffer)?,
-        #[cfg(feature = "adsv")]
-        ADSV_BYTE => decrypt_adsv(keychain, &buffer)?,
+        #[cfg(feature = "aasv")]
+        AASV_BYTE => decrypt_aasv(keychain, &buffer)?,
         #[cfg(feature = "apsv")]
         APSV_BYTE => decrypt_apsv(keychain, &buffer)?,
         // Testing

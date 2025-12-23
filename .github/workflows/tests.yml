@@ -38,7 +38,7 @@ jobs:
       - name: Run tests (no default features)
         run: |
           cd oboron
-          cargo test --no-default-features --features adsv
+          cargo test --no-default-features --features aasv
 
   # Test the CLI
   test-cli:

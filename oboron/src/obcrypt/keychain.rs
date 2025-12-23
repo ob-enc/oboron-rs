@@ -54,34 +54,34 @@ impl Keychain {
     // Key derivation ==================================================
 
     // AES-128 key for AES-CBC (first 16 bytes)
-    // Used in legacy, zfbcx, upbc schemes
+    // Used in legacy, zrbcx, upbc schemes
     #[inline]
-    #[cfg(any(feature = "legacy", feature = "zfbcx", feature = "upbc"))]
+    #[cfg(any(feature = "legacy", feature = "zrbcx", feature = "upbc"))]
     pub(crate) fn cbc(&self) -> &[u8; 16] {
         self.key[..16].try_into().unwrap()
     }
 
     // Constant IV for deterministic AES-CBC (second 16 bytes)
-    // Used in legacy and zfbcx schemes
+    // Used in legacy and zrbcx schemes
     #[inline]
-    #[cfg(any(feature = "legacy", feature = "zfbcx"))]
+    #[cfg(any(feature = "legacy", feature = "zrbcx"))]
     pub(crate) fn cbc_iv(&self) -> &[u8; 16] {
         self.key[16..32].try_into().unwrap()
     }
 
     // AES-256 key for AES-GCM-SIV (second 32 bytes)
-    // Used in adgs and apgs schemes
+    // Used in aags and apgs schemes
     #[inline]
-    #[cfg(any(feature = "adgs", feature = "apgs"))]
+    #[cfg(any(feature = "aags", feature = "apgs"))]
     pub(crate) fn gcm_siv(&self) -> &[u8; 32] {
         self.key[32..64].try_into().unwrap()
     }
 
     // Double AES-256 key for AES-SIV (first 64 bytes)
     // (one 256-bit key for CMAC authentication, another for CTR encryption)
-    // Used in adsv and apsv schemes
+    // Used in aasv and apsv schemes
     #[inline]
-    #[cfg(any(feature = "adsv", feature = "apsv"))]
+    #[cfg(any(feature = "aasv", feature = "apsv"))]
     pub(crate) fn siv(&self) -> &[u8; 64] {
         &self.key
     }

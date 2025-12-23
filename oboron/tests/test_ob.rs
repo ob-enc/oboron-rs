@@ -13,16 +13,16 @@ fn test_ob_basic_roundtrip() {
 }
 
 #[test]
-#[cfg(feature = "adsv")]
+#[cfg(feature = "aasv")]
 fn test_ob_deterministic() {
     let key = [0u8; 64];
-    let ob = Ob::from_bytes("adsv.b64", &key).expect("Failed to create Ob with adsv");
+    let ob = Ob::from_bytes("aasv.b64", &key).expect("Failed to create Ob with aasv");
 
     let plaintext = "Deterministic test";
     let encd1 = ob.enc(plaintext).expect("Failed to enc");
     let encd2 = ob.enc(plaintext).expect("Failed to enc");
 
-    // Adsv is deterministic
+    // Aasv is deterministic
     assert_eq!(encd1, encd2);
 }
 
@@ -112,13 +112,13 @@ fn test_ob_immutable_format() {
 }
 
 #[test]
-#[cfg(feature = "adsv")]
+#[cfg(feature = "aasv")]
 fn test_ob_scheme_autodetection() {
     let key = [0u8; 64];
 
-    // Encode with adsv
-    let adsv = Ob::from_bytes("adsv.b64", &key).expect("Failed to create Ob with adsv.b64 format");
-    let encd = adsv.enc("test").expect("Failed to enc");
+    // Encode with aasv
+    let aasv = Ob::from_bytes("aasv.b64", &key).expect("Failed to create Ob with aasv.b64 format");
+    let encd = aasv.enc("test").expect("Failed to enc");
 
     // Decode with mock1 (different scheme, same encoding)
     let mock1 =

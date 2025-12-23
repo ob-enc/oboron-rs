@@ -2,7 +2,7 @@ use crate::{ob_core::ObCore, Encoding, Error, Format, ObtextCodec, Scheme};
 
 /// An ObtextCodec implementation with runtime format selection, fixed at construction.
 ///
-/// Unlike scheme-specific types (`AdsvC32`, `AdsvB64`) which embed the format
+/// Unlike scheme-specific types (`AasvC32`, `AasvB64`) which embed the format
 /// statically, `Ob` allows you to specify any format at runtime via
 /// a constructor parameter.   However, unlike `ObFlex`, the format cannot be
 /// changed after construction - `Ob` is immutable by design.
@@ -14,11 +14,11 @@ use crate::{ob_core::ObCore, Encoding, Error, Format, ObtextCodec, Scheme};
 ///
 /// ```rust
 /// # fn main() -> Result<(), oboron::Error> {
-/// # #[cfg(feature = "adsv")]
+/// # #[cfg(feature = "aasv")]
 /// # {
 /// # use oboron::{Ob, ObtextCodec, generate_key};
 /// # let key = generate_key();
-/// let ob = Ob::new("adsv.b64", &key)?;
+/// let ob = Ob::new("aasv.b64", &key)?;
 /// let ot = ob.enc("hello")?; // obtext
 /// let pt2 = ob.dec(&ot)?; // recovered plaintext
 /// assert_eq!(pt2, "hello");
@@ -31,19 +31,19 @@ use crate::{ob_core::ObCore, Encoding, Error, Format, ObtextCodec, Scheme};
 ///
 /// ```rust
 /// # fn main() -> Result<(), oboron::Error> {
-/// # #[cfg(all(feature = "adsv", feature = "mock"))]
+/// # #[cfg(all(feature = "aasv", feature = "mock"))]
 /// # {
-/// # use oboron::{Ob, AdsvB64, ObFlex, ObtextCodec};
+/// # use oboron::{Ob, AasvB64, ObFlex, ObtextCodec};
 /// # let key = oboron::generate_key();
 /// // Compile-time format (fastest, type-safe)
-/// let adsv = AdsvB64::new(&key)?;
+/// let aasv = AasvB64::new(&key)?;
 ///
 /// // Runtime format, immutable (flexible, still efficient)
-/// let ob = Ob::new("adsv.b64", &key)?;
+/// let ob = Ob::new("aasv.b64", &key)?;
 /// // assert!(ob.set_format("mock1:64").is_err()); // <- doesn't work! - format is locked
 ///
 /// // Runtime format, mutable (maximum flexibility)
-/// let mut flex = ObFlex::new("adsv.b64", &key)?;
+/// let mut flex = ObFlex::new("aasv.b64", &key)?;
 /// flex.set_format("mock1.hex")?; // <- Can change format
 /// # }
 /// # Ok(())
@@ -62,11 +62,11 @@ impl Ob {
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(feature = "adsv")]
+    /// # #[cfg(feature = "aasv")]
     /// # {
     /// # use oboron::Ob;
     /// # let key = oboron::generate_key();
-    /// let ob = Ob::new("adsv.b64", &key)?;
+    /// let ob = Ob::new("aasv.b64", &key)?;
     /// # }
     /// # Ok(())
     /// # }
@@ -83,13 +83,13 @@ impl Ob {
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(feature = "adsv")]
+    /// # #[cfg(feature = "aasv")]
     /// # {
     /// # use oboron::{Ob, Scheme, Encoding};
     /// # let key = oboron::generate_key();
-    /// let ob = Ob::new("adsv.b64", &key)?;
+    /// let ob = Ob::new("aasv.b64", &key)?;
     /// let format = ob.format();
-    /// assert_eq!(format.scheme(), Scheme::Adsv);
+    /// assert_eq!(format.scheme(), Scheme::Aasv);
     /// assert_eq!(format.encoding(), Encoding::B64);
     /// # }
     /// # Ok(())
@@ -111,11 +111,11 @@ impl Ob {
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(all(feature = "adsv", feature="keyless"))]
+    /// # #[cfg(all(feature = "aasv", feature="keyless"))]
     /// # {
     /// # use oboron::{Ob, Format, Scheme, Encoding};
     /// # let key = oboron::generate_key();
-    /// let format = Format::new(Scheme::Adsv, Encoding::B64);
+    /// let format = Format::new(Scheme::Aasv, Encoding::B64);
     /// let ob = Ob::new_with_format(format, &key)?;
     /// # }
     /// # Ok(())
@@ -135,10 +135,10 @@ impl Ob {
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(all(feature = "adsv", feature="keyless"))]
+    /// # #[cfg(all(feature = "aasv", feature="keyless"))]
     /// # {
     /// # use oboron::Ob;
-    /// let ob = Ob::new_keyless("adsv.c32")?;
+    /// let ob = Ob::new_keyless("aasv.c32")?;
     /// # }
     /// # Ok(())
     /// # }
@@ -156,10 +156,10 @@ impl Ob {
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(all(feature = "adsv", feature="keyless"))]
+    /// # #[cfg(all(feature = "aasv", feature="keyless"))]
     /// # {
     /// # use oboron::{Ob, Format, Scheme, Encoding};
-    /// let format = Format::new(Scheme::Adsv, Encoding::C32);
+    /// let format = Format::new(Scheme::Aasv, Encoding::C32);
     /// let ob = Ob::new_keyless_with_format(format)?;
     /// # }
     /// # Ok(())
@@ -182,11 +182,11 @@ impl Ob {
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(all(feature = "adsv", feature="hex-keys"))]
+    /// # #[cfg(all(feature = "aasv", feature="hex-keys"))]
     /// # {
     /// # use oboron::Ob;
     /// let key_hex = oboron::generate_key_hex();
-    /// let ob = Ob::from_hex_key("adsv.b64", &key_hex)?;
+    /// let ob = Ob::from_hex_key("aasv.b64", &key_hex)?;
     /// # }
     /// # Ok(())
     /// # }
@@ -204,11 +204,11 @@ impl Ob {
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(all(feature = "adsv", feature="bytes-keys"))]
+    /// # #[cfg(all(feature = "aasv", feature="bytes-keys"))]
     /// # {
     /// # use oboron::Ob;
     /// let key_bytes = oboron::generate_key_bytes();
-    /// let ob = Ob::from_bytes("adsv.b64", &key_bytes)?;
+    /// let ob = Ob::from_bytes("aasv.b64", &key_bytes)?;
     /// # }
     /// # Ok(())
     /// # }
@@ -228,11 +228,11 @@ impl Ob {
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(all(feature = "adsv", feature="hex-keys"))]
+    /// # #[cfg(all(feature = "aasv", feature="hex-keys"))]
     /// # {
     /// # use oboron::{Ob, Format, Scheme, Encoding};
     /// let key_hex = oboron::generate_key_hex();
-    /// let format = Format::new(Scheme::Adsv, Encoding::B64);
+    /// let format = Format::new(Scheme::Aasv, Encoding::B64);
     /// let ob = Ob::from_hex_key_with_format(format, &key_hex)?;
     /// # }
     /// # Ok(())
@@ -251,11 +251,11 @@ impl Ob {
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(all(feature = "adsv", feature="bytes-keys"))]
+    /// # #[cfg(all(feature = "aasv", feature="bytes-keys"))]
     /// # {
     /// # use oboron::{Ob, Format, Scheme, Encoding};
     /// let key_bytes = oboron::generate_key_bytes();
-    /// let format = Format::new(Scheme::Adsv, Encoding::B64);
+    /// let format = Format::new(Scheme::Aasv, Encoding::B64);
     /// let ob = Ob::from_bytes_with_format(format, &key_bytes)?;
     /// # }
     /// # Ok(())

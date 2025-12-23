@@ -17,9 +17,9 @@ pub const HARDCODED_KEY_BYTES: [u8; 64] = [
 
 // Tier ob0x - Insecure, non-authenticated
 // ---------------------------------------
-// zfbcx:  tier=0 (000), scheme=1 (0001), probabilistic=0 -> 00000010 = 0x02 (decimal: 2)
-#[cfg(feature = "zfbcx")]
-pub const ZFBCX_BYTE: u8 = 0x02;
+// zrbcx:  tier=0 (000), scheme=1 (0001), probabilistic=0 -> 00000010 = 0x02 (decimal: 2)
+#[cfg(feature = "zrbcx")]
+pub const ZRBCX_BYTE: u8 = 0x02;
 
 // Tier ob2x - Secure, non-authenticated
 // -------------------------------------
@@ -29,17 +29,17 @@ pub const UPBC_BYTE: u8 = 0x23;
 
 // Tier ob3x - Secure, authenticated
 // ---------------------------------
-// adgs: tier=3 (011), scheme=1 (0001), probabilistic=0 -> 01100010 = 0x62 (decimal: 98)
-#[cfg(feature = "adgs")]
-pub const ADGS_BYTE: u8 = 0x62;
+// aags: tier=3 (011), scheme=1 (0001), probabilistic=0 -> 01100010 = 0x62 (decimal: 98)
+#[cfg(feature = "aags")]
+pub const AAGS_BYTE: u8 = 0x62;
 
 // apgs: tier=3 (011), scheme=1 (0001), probabilistic=1 -> 01100011 = 0x63 (decimal: 99)
 #[cfg(feature = "apgs")]
 pub const APGS_BYTE: u8 = 0x63;
 
-// adsv: tier=3 (011), scheme=2 (0010), probabilistic=0 -> 01100100 = 0x64 (decimal: 100)
-#[cfg(feature = "adsv")]
-pub const ADSV_BYTE: u8 = 0x64;
+// aasv: tier=3 (011), scheme=2 (0010), probabilistic=0 -> 01100100 = 0x64 (decimal: 100)
+#[cfg(feature = "aasv")]
+pub const AASV_BYTE: u8 = 0x64;
 
 // apsv: tier=3 (011), scheme=2 (0010), probabilistic=1 -> 01100101 = 0x65 (decimal: 101)
 #[cfg(feature = "apsv")]
@@ -58,13 +58,13 @@ pub const MOCK2_BYTE: u8 = 0xE2;
 
 // For efficient resolution in decode logic, list all scheme bytes of reversed schemes
 const fn get_reversed_schemes() -> &'static [u8] {
-    #[cfg(all(feature = "zfbcx", feature = "upbc"))]
-    return &[ZFBCX_BYTE, UPBC_BYTE];
-    #[cfg(all(feature = "zfbcx", not(feature = "upbc")))]
-    return &[ZFBCX_BYTE];
-    #[cfg(all(not(feature = "zfbcx"), feature = "upbc"))]
+    #[cfg(all(feature = "zrbcx", feature = "upbc"))]
+    return &[ZRBCX_BYTE, UPBC_BYTE];
+    #[cfg(all(feature = "zrbcx", not(feature = "upbc")))]
+    return &[ZRBCX_BYTE];
+    #[cfg(all(not(feature = "zrbcx"), feature = "upbc"))]
     return &[UPBC_BYTE];
-    #[cfg(all(not(feature = "zfbcx"), not(feature = "upbc")))]
+    #[cfg(all(not(feature = "zrbcx"), not(feature = "upbc")))]
     return &[];
 }
 pub const REVERSED_SCHEME_BYTES: &[u8] = get_reversed_schemes();
@@ -72,16 +72,16 @@ pub const REVERSED_SCHEME_BYTES: &[u8] = get_reversed_schemes();
 // Format identifiers
 //
 // c32 - Crockford base32 encoding
-#[cfg(feature = "zfbcx")]
-pub const ZFBCX_C32: &str = "zfbcx.c32";
+#[cfg(feature = "zrbcx")]
+pub const ZRBCX_C32: &str = "zrbcx.c32";
 #[cfg(feature = "upbc")]
 pub const UPBC_C32: &str = "upbc.c32";
-#[cfg(feature = "adgs")]
-pub const ADGS_C32: &str = "adgs.c32";
+#[cfg(feature = "aags")]
+pub const AAGS_C32: &str = "aags.c32";
 #[cfg(feature = "apgs")]
 pub const APGS_C32: &str = "apgs.c32";
-#[cfg(feature = "adsv")]
-pub const ADSV_C32: &str = "adsv.c32";
+#[cfg(feature = "aasv")]
+pub const AASV_C32: &str = "aasv.c32";
 #[cfg(feature = "apsv")]
 pub const APSV_C32: &str = "apsv.c32";
 // Tier ob7x - Testing
@@ -94,16 +94,16 @@ pub const MOCK2_C32: &str = "mock2.c32";
 pub const LEGACY_C32: &str = "legacy.c32";
 
 // b32 - RFC 4648 Base32 encoding
-#[cfg(feature = "zfbcx")]
-pub const ZFBCX_B32: &str = "zfbcx.b32";
+#[cfg(feature = "zrbcx")]
+pub const ZRBCX_B32: &str = "zrbcx.b32";
 #[cfg(feature = "upbc")]
 pub const UPBC_B32: &str = "upbc.b32";
-#[cfg(feature = "adgs")]
-pub const ADGS_B32: &str = "adgs.b32";
+#[cfg(feature = "aags")]
+pub const AAGS_B32: &str = "aags.b32";
 #[cfg(feature = "apgs")]
 pub const APGS_B32: &str = "apgs.b32";
-#[cfg(feature = "adsv")]
-pub const ADSV_B32: &str = "adsv.b32";
+#[cfg(feature = "aasv")]
+pub const AASV_B32: &str = "aasv.b32";
 #[cfg(feature = "apsv")]
 pub const APSV_B32: &str = "apsv.b32";
 // Tier ob7x - Testing
@@ -116,16 +116,16 @@ pub const MOCK2_B32: &str = "mock2.b32";
 pub const LEGACY_B32: &str = "legacy.b32";
 
 // b64 - Base64 encoding
-#[cfg(feature = "zfbcx")]
-pub const ZFBCX_B64: &str = "zfbcx.b64";
+#[cfg(feature = "zrbcx")]
+pub const ZRBCX_B64: &str = "zrbcx.b64";
 #[cfg(feature = "upbc")]
 pub const UPBC_B64: &str = "upbc.b64";
-#[cfg(feature = "adgs")]
-pub const ADGS_B64: &str = "adgs.b64";
+#[cfg(feature = "aags")]
+pub const AAGS_B64: &str = "aags.b64";
 #[cfg(feature = "apgs")]
 pub const APGS_B64: &str = "apgs.b64";
-#[cfg(feature = "adsv")]
-pub const ADSV_B64: &str = "adsv.b64";
+#[cfg(feature = "aasv")]
+pub const AASV_B64: &str = "aasv.b64";
 #[cfg(feature = "apsv")]
 pub const APSV_B64: &str = "apsv.b64";
 // Tier ob7x - Testing
@@ -138,16 +138,16 @@ pub const MOCK2_B64: &str = "mock2.b64";
 pub const LEGACY_B64: &str = "legacy.b64";
 
 // hex - Hex encoding
-#[cfg(feature = "zfbcx")]
-pub const ZFBCX_HEX: &str = "zfbcx.hex";
+#[cfg(feature = "zrbcx")]
+pub const ZRBCX_HEX: &str = "zrbcx.hex";
 #[cfg(feature = "upbc")]
 pub const UPBC_HEX: &str = "upbc.hex";
-#[cfg(feature = "adgs")]
-pub const ADGS_HEX: &str = "adgs.hex";
+#[cfg(feature = "aags")]
+pub const AAGS_HEX: &str = "aags.hex";
 #[cfg(feature = "apgs")]
 pub const APGS_HEX: &str = "apgs.hex";
-#[cfg(feature = "adsv")]
-pub const ADSV_HEX: &str = "adsv.hex";
+#[cfg(feature = "aasv")]
+pub const AASV_HEX: &str = "aasv.hex";
 #[cfg(feature = "apsv")]
 pub const APSV_HEX: &str = "apsv.hex";
 // Tier ob7x - Testing

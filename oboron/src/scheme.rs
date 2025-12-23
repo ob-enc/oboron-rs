@@ -5,16 +5,16 @@ use crate::{constants, error::Error};
 /// Scheme identifier for oboron encoding schemes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Scheme {
-    #[cfg(feature = "zfbcx")]
-    Zfbcx,
+    #[cfg(feature = "zrbcx")]
+    Zrbcx,
     #[cfg(feature = "upbc")]
     Upbc,
-    #[cfg(feature = "adgs")]
-    Adgs,
+    #[cfg(feature = "aags")]
+    Aags,
     #[cfg(feature = "apgs")]
     Apgs,
-    #[cfg(feature = "adsv")]
-    Adsv,
+    #[cfg(feature = "aasv")]
+    Aasv,
     #[cfg(feature = "apsv")]
     Apsv,
     // Testing
@@ -31,16 +31,16 @@ impl Scheme {
     /// Convert scheme to string representation.
     pub fn as_str(&self) -> &'static str {
         match self {
-            #[cfg(feature = "zfbcx")]
-            Scheme::Zfbcx => "zfbcx",
+            #[cfg(feature = "zrbcx")]
+            Scheme::Zrbcx => "zrbcx",
             #[cfg(feature = "upbc")]
             Scheme::Upbc => "upbc",
-            #[cfg(feature = "adgs")]
-            Scheme::Adgs => "adgs",
+            #[cfg(feature = "aags")]
+            Scheme::Aags => "aags",
             #[cfg(feature = "apgs")]
             Scheme::Apgs => "apgs",
-            #[cfg(feature = "adsv")]
-            Scheme::Adsv => "adsv",
+            #[cfg(feature = "aasv")]
+            Scheme::Aasv => "aasv",
             #[cfg(feature = "apsv")]
             Scheme::Apsv => "apsv",
             // Testing
@@ -62,16 +62,16 @@ impl Scheme {
     /// Check if this scheme is deterministic (produces the same output for the same input).
     pub fn is_deterministic(&self) -> bool {
         match self {
-            #[cfg(feature = "zfbcx")]
-            Scheme::Zfbcx => true,
+            #[cfg(feature = "zrbcx")]
+            Scheme::Zrbcx => true,
             #[cfg(feature = "upbc")]
             Scheme::Upbc => false,
-            #[cfg(feature = "adgs")]
-            Scheme::Adgs => true,
+            #[cfg(feature = "aags")]
+            Scheme::Aags => true,
             #[cfg(feature = "apgs")]
             Scheme::Apgs => false,
-            #[cfg(feature = "adsv")]
-            Scheme::Adsv => true,
+            #[cfg(feature = "aasv")]
+            Scheme::Aasv => true,
             #[cfg(feature = "apsv")]
             Scheme::Apsv => false,
             // Testing
@@ -98,16 +98,16 @@ impl Scheme {
     /// Get the tail byte for this scheme.
     pub fn byte(&self) -> u8 {
         match self {
-            #[cfg(feature = "zfbcx")]
-            Scheme::Zfbcx => constants::ZFBCX_BYTE,
+            #[cfg(feature = "zrbcx")]
+            Scheme::Zrbcx => constants::ZRBCX_BYTE,
             #[cfg(feature = "upbc")]
             Scheme::Upbc => constants::UPBC_BYTE,
-            #[cfg(feature = "adgs")]
-            Scheme::Adgs => constants::ADGS_BYTE,
+            #[cfg(feature = "aags")]
+            Scheme::Aags => constants::AAGS_BYTE,
             #[cfg(feature = "apgs")]
             Scheme::Apgs => constants::APGS_BYTE,
-            #[cfg(feature = "adsv")]
-            Scheme::Adsv => constants::ADSV_BYTE,
+            #[cfg(feature = "aasv")]
+            Scheme::Aasv => constants::AASV_BYTE,
             #[cfg(feature = "apsv")]
             Scheme::Apsv => constants::APSV_BYTE,
             // Testing
@@ -127,16 +127,16 @@ impl std::str::FromStr for Scheme {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.to_lowercase().as_str() {
-            #[cfg(feature = "zfbcx")]
-            "zfbcx" => Ok(Scheme::Zfbcx),
+            #[cfg(feature = "zrbcx")]
+            "zrbcx" => Ok(Scheme::Zrbcx),
             #[cfg(feature = "upbc")]
             "upbc" => Ok(Scheme::Upbc),
-            #[cfg(feature = "adgs")]
-            "adgs" => Ok(Scheme::Adgs),
+            #[cfg(feature = "aags")]
+            "aags" => Ok(Scheme::Aags),
             #[cfg(feature = "apgs")]
             "apgs" => Ok(Scheme::Apgs),
-            #[cfg(feature = "adsv")]
-            "adsv" => Ok(Scheme::Adsv),
+            #[cfg(feature = "aasv")]
+            "aasv" => Ok(Scheme::Aasv),
             #[cfg(feature = "apsv")]
             "apsv" => Ok(Scheme::Apsv),
             // Testing

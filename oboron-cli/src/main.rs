@@ -25,30 +25,30 @@ struct SchemeFlags {
     #[arg(short = '0', long, alias = "00")]
     legacy: bool,
 
-    /// Use zfbcx scheme (optimized AES-CBC)
-    #[cfg(feature = "zfbcx")]
+    /// Use zrbcx scheme (optimized AES-CBC)
+    #[cfg(feature = "zrbcx")]
     #[arg(short = '1', long, alias = "01")]
-    zfbcx: bool,
+    zrbcx: bool,
 
     /// Use upbc scheme (probabilistic AES-CBC with PKCS#7)
     #[cfg(feature = "upbc")]
     #[arg(short = '2', long, alias = "21p")]
     upbc: bool,
 
-    /// Use adgs scheme (deterministic AES-GCM-SIV)
-    #[cfg(feature = "adgs")]
+    /// Use aags scheme (deterministic AES-GCM-SIV)
+    #[cfg(feature = "aags")]
     #[arg(short = 'g', long, alias = "31")]
-    adgs: bool,
+    aags: bool,
 
     /// Use apgs scheme (probabilistic AES-GCM-SIV)
     #[cfg(feature = "apgs")]
     #[arg(short = 'G', long, alias = "31p")]
     apgs: bool,
 
-    /// Use adsv scheme (deterministic AES-SIV)
-    #[cfg(feature = "adsv")]
+    /// Use aasv scheme (deterministic AES-SIV)
+    #[cfg(feature = "aasv")]
     #[arg(short = 's', long, alias = "32")]
-    adsv: bool,
+    aasv: bool,
 
     /// Use apsv scheme (probabilistic AES-SIV)
     #[cfg(feature = "apsv")]
@@ -69,11 +69,11 @@ struct SchemeFlags {
 impl SchemeFlags {
     /// Convert flags to Option<Scheme>, returning error if multiple are set
     #[cfg(any(
-        feature = "zfbcx",
+        feature = "zrbcx",
         feature = "upbc",
-        feature = "adgs",
+        feature = "aags",
         feature = "apgs",
-        feature = "adsv",
+        feature = "aasv",
         feature = "apsv",
         feature = "mock",
         feature = "mock",
@@ -88,30 +88,30 @@ impl SchemeFlags {
             count += 1;
             scheme = Some(Scheme::Legacy);
         }
-        #[cfg(feature = "zfbcx")]
-        if self.zfbcx {
+        #[cfg(feature = "zrbcx")]
+        if self.zrbcx {
             count += 1;
-            scheme = Some(Scheme::Zfbcx);
+            scheme = Some(Scheme::Zrbcx);
         }
         #[cfg(feature = "upbc")]
         if self.upbc {
             count += 1;
             scheme = Some(Scheme::Upbc);
         }
-        #[cfg(feature = "adgs")]
-        if self.adgs {
+        #[cfg(feature = "aags")]
+        if self.aags {
             count += 1;
-            scheme = Some(Scheme::Adgs);
+            scheme = Some(Scheme::Aags);
         }
         #[cfg(feature = "apgs")]
         if self.apgs {
             count += 1;
             scheme = Some(Scheme::Apgs);
         }
-        #[cfg(feature = "adsv")]
-        if self.adsv {
+        #[cfg(feature = "aasv")]
+        if self.aasv {
             count += 1;
-            scheme = Some(Scheme::Adsv);
+            scheme = Some(Scheme::Aasv);
         }
         #[cfg(feature = "apsv")]
         if self.apsv {
@@ -138,11 +138,11 @@ impl SchemeFlags {
 
     /// Check if any scheme flag is set
     #[cfg(any(
-        feature = "zfbcx",
+        feature = "zrbcx",
         feature = "upbc",
-        feature = "adgs",
+        feature = "aags",
         feature = "apgs",
-        feature = "adsv",
+        feature = "aasv",
         feature = "apsv",
         feature = "mock",
         feature = "mock",
@@ -153,16 +153,16 @@ impl SchemeFlags {
         if self.legacy {
             return true;
         }
-        #[cfg(feature = "zfbcx")]
-        if self.zfbcx {
+        #[cfg(feature = "zrbcx")]
+        if self.zrbcx {
             return true;
         }
-        #[cfg(feature = "adgs")]
-        if self.adgs {
+        #[cfg(feature = "aags")]
+        if self.aags {
             return true;
         }
-        #[cfg(feature = "adsv")]
-        if self.adsv {
+        #[cfg(feature = "aasv")]
+        if self.aasv {
             return true;
         }
         #[cfg(feature = "upbc")]
@@ -264,7 +264,7 @@ impl FormatSpec {
         // Check for conflicts between --format and individual flags
         if format_str.is_some() && scheme_flags.is_set() {
             anyhow::bail!(
-                "Cannot use --format together with scheme flags (--legacy, --zfbcx, etc.)"
+                "Cannot use --format together with scheme flags (--legacy, --zrbcx, etc.)"
             );
         }
         if format_str.is_some() && encoding_flags.is_set() {
@@ -289,7 +289,7 @@ impl FormatSpec {
         Ok(Self { scheme, encoding })
     }
 
-    /// Convert to format string (e.g., "zfbcx.b64")
+    /// Convert to format string (e.g., "zrbcx.b64")
     fn to_string(&self) -> String {
         format!("{}.{}", self.scheme.as_str(), self.encoding.as_str())
     }
@@ -315,7 +315,7 @@ enum Commands {
         #[arg(short = 'z', long)]
         keyless: bool,
 
-        /// Format specification (e.g., "zfbcx.b64", "adgs.b32")
+        /// Format specification (e.g., "zrbcx.b64", "aags.b32")
         /// Cannot be combined with scheme or encoding flags
         #[arg(short, long)]
         format: Option<String>,
@@ -347,7 +347,7 @@ enum Commands {
         #[arg(short = 'z', long)]
         keyless: bool,
 
-        /// Format specification (e.g., "zfbcx.b64", "adgs.b32")
+        /// Format specification (e.g., "zrbcx.b64", "aags.b32")
         /// Cannot be combined with scheme or encoding flags
         #[arg(short, long)]
         format: Option<String>,
@@ -734,7 +734,7 @@ fn get_scheme(scheme_override: Option<Scheme>, config: Option<&Config>) -> Resul
 
     // No override and no config - error
     Err(anyhow::anyhow!(
-        "scheme not specified: run 'ob init' or use a scheme flag (e.g., --adsv) or --format"
+        "scheme not specified: run 'ob init' or use a scheme flag (e.g., --aasv) or --format"
     ))
 }
 
@@ -818,11 +818,11 @@ mod tests {
     #[cfg(feature = "mock")]
     fn test_scheme_flags_to_scheme_single() {
         #[cfg(not(any(
-            feature = "zfbcx",
+            feature = "zrbcx",
             feature = "upbc",
-            feature = "adgs",
+            feature = "aags",
             feature = "apgs",
-            feature = "adsv",
+            feature = "aasv",
             feature = "apsv",
             feature = "mock",
             feature = "mock",
@@ -832,16 +832,16 @@ mod tests {
         let flags = SchemeFlags {
             #[cfg(feature = "legacy")]
             legacy: false,
-            #[cfg(feature = "zfbcx")]
-            zfbcx: false,
+            #[cfg(feature = "zrbcx")]
+            zrbcx: false,
             #[cfg(feature = "upbc")]
             upbc: false,
-            #[cfg(feature = "adgs")]
-            adgs: false,
+            #[cfg(feature = "aags")]
+            aags: false,
             #[cfg(feature = "apgs")]
             apgs: false,
-            #[cfg(feature = "adsv")]
-            adsv: false,
+            #[cfg(feature = "aasv")]
+            aasv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
             #[cfg(feature = "mock")]
@@ -853,15 +853,15 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "adsv")]
+    #[cfg(feature = "aasv")]
     #[cfg(feature = "apsv")]
     fn test_scheme_flags_to_scheme_multiple_errors() {
         #[cfg(not(any(
-            feature = "zfbcx",
+            feature = "zrbcx",
             feature = "upbc",
-            feature = "adgs",
+            feature = "aags",
             feature = "apgs",
-            feature = "adsv",
+            feature = "aasv",
             feature = "apsv",
             feature = "mock",
             feature = "mock",
@@ -871,16 +871,16 @@ mod tests {
         let flags = SchemeFlags {
             #[cfg(feature = "legacy")]
             legacy: false,
-            #[cfg(feature = "zfbcx")]
-            zfbcx: false,
+            #[cfg(feature = "zrbcx")]
+            zrbcx: false,
             #[cfg(feature = "upbc")]
             upbc: false,
-            #[cfg(feature = "adgs")]
-            adgs: false,
+            #[cfg(feature = "aags")]
+            aags: false,
             #[cfg(feature = "apgs")]
             apgs: false,
-            #[cfg(feature = "adsv")]
-            adsv: true,
+            #[cfg(feature = "aasv")]
+            aasv: true,
             #[cfg(feature = "apsv")]
             apsv: true,
             #[cfg(feature = "mock")]
@@ -894,11 +894,11 @@ mod tests {
     #[test]
     fn test_scheme_flags_to_scheme_none() {
         #[cfg(not(any(
-            feature = "zfbcx",
+            feature = "zrbcx",
             feature = "upbc",
-            feature = "adgs",
+            feature = "aags",
             feature = "apgs",
-            feature = "adsv",
+            feature = "aasv",
             feature = "apsv",
             feature = "mock",
             feature = "mock",
@@ -908,16 +908,16 @@ mod tests {
         let flags = SchemeFlags {
             #[cfg(feature = "legacy")]
             legacy: false,
-            #[cfg(feature = "zfbcx")]
-            zfbcx: false,
+            #[cfg(feature = "zrbcx")]
+            zrbcx: false,
             #[cfg(feature = "upbc")]
             upbc: false,
-            #[cfg(feature = "adgs")]
-            adgs: false,
+            #[cfg(feature = "aags")]
+            aags: false,
             #[cfg(feature = "apgs")]
             apgs: false,
-            #[cfg(feature = "adsv")]
-            adsv: false,
+            #[cfg(feature = "aasv")]
+            aasv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
             #[cfg(feature = "mock")]
@@ -960,11 +960,11 @@ mod tests {
         };
 
         #[cfg(not(any(
-            feature = "zfbcx",
+            feature = "zrbcx",
             feature = "upbc",
-            feature = "adgs",
+            feature = "aags",
             feature = "apgs",
-            feature = "adsv",
+            feature = "aasv",
             feature = "apsv",
             feature = "mock",
             feature = "mock",
@@ -974,16 +974,16 @@ mod tests {
         let scheme_flags = SchemeFlags {
             #[cfg(feature = "legacy")]
             legacy: false,
-            #[cfg(feature = "zfbcx")]
-            zfbcx: false,
+            #[cfg(feature = "zrbcx")]
+            zrbcx: false,
             #[cfg(feature = "upbc")]
             upbc: false,
-            #[cfg(feature = "adgs")]
-            adgs: false,
+            #[cfg(feature = "aags")]
+            aags: false,
             #[cfg(feature = "apgs")]
             apgs: false,
-            #[cfg(feature = "adsv")]
-            adsv: false,
+            #[cfg(feature = "aasv")]
+            aasv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
             #[cfg(feature = "mock")]
@@ -1014,11 +1014,11 @@ mod tests {
     #[cfg(feature = "mock")]
     fn test_format_spec_conflicts_with_scheme_flag() {
         #[cfg(not(any(
-            feature = "zfbcx",
+            feature = "zrbcx",
             feature = "upbc",
-            feature = "adgs",
+            feature = "aags",
             feature = "apgs",
-            feature = "adsv",
+            feature = "aasv",
             feature = "apsv",
             feature = "mock",
             feature = "mock",
@@ -1028,16 +1028,16 @@ mod tests {
         let scheme_flags = SchemeFlags {
             #[cfg(feature = "legacy")]
             legacy: false,
-            #[cfg(feature = "zfbcx")]
-            zfbcx: false,
+            #[cfg(feature = "zrbcx")]
+            zrbcx: false,
             #[cfg(feature = "upbc")]
             upbc: false,
-            #[cfg(feature = "adgs")]
-            adgs: false,
+            #[cfg(feature = "aags")]
+            aags: false,
             #[cfg(feature = "apgs")]
             apgs: false,
-            #[cfg(feature = "adsv")]
-            adsv: false,
+            #[cfg(feature = "aasv")]
+            aasv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
             #[cfg(feature = "mock")]
@@ -1069,11 +1069,11 @@ mod tests {
     #[test]
     fn test_format_spec_conflicts_with_encoding_flag() {
         #[cfg(not(any(
-            feature = "zfbcx",
+            feature = "zrbcx",
             feature = "upbc",
-            feature = "adgs",
+            feature = "aags",
             feature = "apgs",
-            feature = "adsv",
+            feature = "aasv",
             feature = "apsv",
             feature = "mock",
             feature = "mock",
@@ -1083,16 +1083,16 @@ mod tests {
         let scheme_flags = SchemeFlags {
             #[cfg(feature = "legacy")]
             legacy: false,
-            #[cfg(feature = "zfbcx")]
-            zfbcx: false,
+            #[cfg(feature = "zrbcx")]
+            zrbcx: false,
             #[cfg(feature = "upbc")]
             upbc: false,
-            #[cfg(feature = "adgs")]
-            adgs: false,
+            #[cfg(feature = "aags")]
+            aags: false,
             #[cfg(feature = "apgs")]
             apgs: false,
-            #[cfg(feature = "adsv")]
-            adsv: false,
+            #[cfg(feature = "aasv")]
+            aasv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
             #[cfg(feature = "mock")]
@@ -1131,11 +1131,11 @@ mod tests {
         };
 
         #[cfg(not(any(
-            feature = "zfbcx",
+            feature = "zrbcx",
             feature = "upbc",
-            feature = "adgs",
+            feature = "aags",
             feature = "apgs",
-            feature = "adsv",
+            feature = "aasv",
             feature = "apsv",
             feature = "mock",
             feature = "mock",
@@ -1145,16 +1145,16 @@ mod tests {
         let scheme_flags = SchemeFlags {
             #[cfg(feature = "legacy")]
             legacy: false,
-            #[cfg(feature = "zfbcx")]
-            zfbcx: false,
+            #[cfg(feature = "zrbcx")]
+            zrbcx: false,
             #[cfg(feature = "upbc")]
             upbc: false,
-            #[cfg(feature = "adgs")]
-            adgs: false,
+            #[cfg(feature = "aags")]
+            aags: false,
             #[cfg(feature = "apgs")]
             apgs: false,
-            #[cfg(feature = "adsv")]
-            adsv: false,
+            #[cfg(feature = "aasv")]
+            aasv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
             #[cfg(feature = "mock")]
@@ -1186,11 +1186,11 @@ mod tests {
         };
 
         #[cfg(not(any(
-            feature = "zfbcx",
+            feature = "zrbcx",
             feature = "upbc",
-            feature = "adgs",
+            feature = "aags",
             feature = "apgs",
-            feature = "adsv",
+            feature = "aasv",
             feature = "apsv",
             feature = "mock",
             feature = "mock",
@@ -1200,16 +1200,16 @@ mod tests {
         let scheme_flags = SchemeFlags {
             #[cfg(feature = "legacy")]
             legacy: false,
-            #[cfg(feature = "zfbcx")]
-            zfbcx: false,
+            #[cfg(feature = "zrbcx")]
+            zrbcx: false,
             #[cfg(feature = "upbc")]
             upbc: false,
-            #[cfg(feature = "adgs")]
-            adgs: false,
+            #[cfg(feature = "aags")]
+            aags: false,
             #[cfg(feature = "apgs")]
             apgs: false,
-            #[cfg(feature = "adsv")]
-            adsv: false,
+            #[cfg(feature = "aasv")]
+            aasv: false,
             #[cfg(feature = "apsv")]
             apsv: false,
             #[cfg(feature = "mock")]
@@ -1277,12 +1277,12 @@ mod tests {
         assert!(validate_base64_key(&key_str).is_err());
     }
     #[test]
-    #[cfg(feature = "adsv")]
+    #[cfg(feature = "aasv")]
     fn test_format_spec_to_string() {
         let spec = FormatSpec {
-            scheme: Scheme::Adsv,
+            scheme: Scheme::Aasv,
             encoding: Encoding::B64,
         };
-        assert_eq!(spec.to_string(), "adsv.b64");
+        assert_eq!(spec.to_string(), "aasv.b64");
     }
 }

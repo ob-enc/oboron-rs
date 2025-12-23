@@ -5,11 +5,11 @@
 //!
 //! ```rust
 //! # fn main() -> Result<(), oboron::Error> {
-//! # #[cfg(feature = "adsv")]
+//! # #[cfg(feature = "aasv")]
 //! # {
-//! use oboron::{AdsvC32, ObtextCodec};
+//! use oboron::{AasvC32, ObtextCodec};
 //! let key = oboron::generate_key(); // get key
-//! let ob = AdsvC32::new(&key)?;     // instantiate ObtextCodec (cipher+encoder)
+//! let ob = AasvC32::new(&key)?;     // instantiate ObtextCodec (cipher+encoder)
 //! let ot = ob.enc("secret data")?;  // get obtext (encoded ciphertext)
 //! # }
 //! # Ok(())
@@ -29,24 +29,24 @@
 //! Examples:
 //! ```rust
 //! # fn main() -> Result<(), oboron::Error> {
-//! # #[cfg(feature = "adsv")]
+//! # #[cfg(feature = "aasv")]
 //! # {
 //! # use oboron;
 //! # let key = oboron::generate_key();
 //! # let obm = oboron::ObMulti::new(&key)?;
 //! // Operations: data, format
-//! let ot = obm.enc("plaintext", "adsv.b64")?;
-//! obm.dec(&ot, "adsv.b64")?;
+//! let ot = obm.enc("plaintext", "aasv.b64")?;
+//! obm.dec(&ot, "aasv.b64")?;
 //!
 //! // Constructors: format, key
-//! oboron::Ob::new("adsv.b64", &key)?;
-//! oboron::ObFlex::new("adsv.b64", &key)?;
+//! oboron::Ob::new("aasv.b64", &key)?;
+//! oboron::ObFlex::new("aasv.b64", &key)?;
 //!
 //! // Convenience functions: data, format, key
 //! # #[cfg(feature = "convenience")]
-//! let ot = oboron::enc("plaintext", "adsv.b64", &key)?;
+//! let ot = oboron::enc("plaintext", "aasv.b64", &key)?;
 //! # #[cfg(feature = "convenience")]
-//! oboron::dec(&ot, "adsv.b64", &key)?;
+//! oboron::dec(&ot, "aasv.b64", &key)?;
 //! # }
 //! # Ok(())
 //! # }
@@ -62,15 +62,15 @@
 //!
 //! ```rust
 //! # fn main() -> Result<(), oboron::Error> {
-//! # #[cfg(feature = "adsv")]
+//! # #[cfg(feature = "aasv")]
 //! # {
-//! # use oboron::{AdsvC32, AdsvB64, ObtextCodec};
+//! # use oboron::{AasvC32, AasvB64, ObtextCodec};
 //! # let key = oboron::generate_key();
-//! let adsv = AdsvC32::new(&key)?;      // adsv.c32 format (Crockford base32)
-//! let adsv_b64 = AdsvB64::new(&key)?;  // adsv.b64 format (base64url)
+//! let aasv = AasvC32::new(&key)?;      // aasv.c32 format (Crockford base32)
+//! let aasv_b64 = AasvB64::new(&key)?;  // aasv.b64 format (base64url)
 //!
-//! let ot = adsv.enc("hello")?;
-//! let pt2 = adsv.dec(&ot)?;
+//! let ot = aasv.enc("hello")?;
+//! let pt2 = aasv.dec(&ot)?;
 //! # }
 //! # Ok(())
 //! # }
@@ -86,12 +86,12 @@
 //!
 //! ```rust
 //! # fn main() -> Result<(), oboron::Error> {
-//! # #[cfg(feature = "adsv")]
+//! # #[cfg(feature = "aasv")]
 //! # {
 //! # use oboron::{Ob, ObtextCodec};
 //! # let key = oboron::generate_key();
 //! // Format chosen at runtime, immutable instance
-//! let ob = Ob::new("adsv.b64", &key)?;
+//! let ob = Ob::new("aasv.b64", &key)?;
 //!
 //! let ot = ob.enc("hello")?;
 //! let pt2 = ob.dec(&ot)?;
@@ -110,20 +110,20 @@
 //!
 //! ```rust
 //! # fn main() -> Result<(), oboron::Error> {
-//! # #[cfg(all(feature = "adsv", feature = "mock"))]
+//! # #[cfg(all(feature = "aasv", feature = "mock"))]
 //! # {
-//! # use oboron::{ObFlex, ObtextCodec, Scheme, Encoding, ADSV_B64};
+//! # use oboron::{ObFlex, ObtextCodec, Scheme, Encoding, AASV_B64};
 //! # let key = oboron::generate_key();
-//! let mut flex = ObFlex::new("adsv.b64", &key)?;
-//! let ot1 = flex.enc("hello")?;    // adsv.b64 format
+//! let mut flex = ObFlex::new("aasv.b64", &key)?;
+//! let ot1 = flex.enc("hello")?;    // aasv.b64 format
 //!
 //! // Change format at runtime
 //! flex.set_scheme(Scheme::Mock1)?; // set_scheme() only with ObFlex
 //! let ot2 = flex.enc("hello")? ;   // mock1.b64 format output
 //! // Also available:
 //! flex.set_encoding(Encoding::Hex)?; // now set as mock1.hex
-//! flex.set_format("adsv.b32")?;    // now adsv.b32
-//! flex.set_format(ADSV_B64)?;      // now adsv.b64 (using constant)
+//! flex.set_format("aasv.b32")?;    // now aasv.b32
+//! flex.set_format(AASV_B64)?;      // now aasv.b64 (using constant)
 //! # }
 //! # Ok(())
 //! # }
@@ -139,16 +139,16 @@
 //!
 //! ```rust
 //! # fn main() -> Result<(), oboron::Error> {
-//! # #[cfg(feature = "adsv")]
+//! # #[cfg(feature = "aasv")]
 //! # {
 //! # use oboron::ObMulti;
 //! # let key = oboron::generate_key();
 //! let obm = ObMulti::new(&key)?;
 //!
 //! // Encode to different formats
-//! let ot_b32 = obm.enc("data", "adsv.c32")?;
-//! let ot_b64 = obm.enc("data", "adsv.b64")?;
-//! let ot_hex = obm.enc("data", "adsv.hex")?;
+//! let ot_b32 = obm.enc("data", "aasv.c32")?;
+//! let ot_b64 = obm.enc("data", "aasv.b64")?;
+//! let ot_hex = obm.enc("data", "aasv.hex")?;
 //!
 //! // Decode with automatic format detection
 //! let pt2 = obm.autodec(&ot_b64)?;
@@ -165,7 +165,7 @@
 //!
 //! | Type            | Format             | Use Case          | Performance         |
 //! |-----------------|--------------------|-------------------|---------------------|
-//! | `AdsvC32`, etc. | Compile-time       | Known format      | Fastest (zero-cost) |
+//! | `AasvC32`, etc. | Compile-time       | Known format      | Fastest (zero-cost) |
 //! | `Ob`            | Runtime, immutable | Config-driven     | Near-zero overhead  |
 //! | `ObFlex`        | Runtime, mutable   | Dynamic switching | Minimal overhead    |
 //! | `ObMulti`       | Per-operation      | Multiple formats  | Small overhead      |
@@ -176,34 +176,34 @@
 //!
 //! ```rust
 //! # fn main() -> Result<(), oboron::Error> {
-//! # #[cfg(all(feature = "adsv", feature = "apgs"))]
+//! # #[cfg(all(feature = "aasv", feature = "apgs"))]
 //! # {
 //! # use oboron::ObtextCodec;
 //! # use oboron;
 //! # let key = oboron::generate_key();
 //! // Fixed format types (best performance for multiple operations with same format)
-//! let adsv = oboron::AdsvC32::new(&key)?;  // "adsv.c32" fixed-format ObtextCodec instance
+//! let aasv = oboron::AasvC32::new(&key)?;  // "aasv.c32" fixed-format ObtextCodec instance
 //! let apgs = oboron::ApgsC32::new(&key)?;  // "apgs.c32" fixed-format ObtextCodec instance
 //!
-//! let ot_adsv = adsv.enc("data1")?;
+//! let ot_aasv = aasv.enc("data1")?;
 //! let ot_apgs = apgs.enc("data2")?;
 //!
 //! // Decoding uses scheme autodetection by default
-//! let pt1 = adsv.dec(&ot_adsv)?;  // Decodes successfully
-//! let pt2 = adsv.dec(&ot_apgs)?;  // Also works (autodetects apgs)
+//! let pt1 = aasv.dec(&ot_aasv)?;  // Decodes successfully
+//! let pt2 = aasv.dec(&ot_apgs)?;  // Also works (autodetects apgs)
 //! assert_eq!(pt1, "data1");
 //! assert_eq!(pt2, "data2");
 //! // Note: The above autodetection works only with shared encodings
-//! // adsv.c32 and apgs.c32 are both Crockford-base32-encoded
+//! // aasv.c32 and apgs.c32 are both Crockford-base32-encoded
 //!
 //! // Use dec_strict to enforce scheme matching
-//! let pt3 = adsv.dec_strict(&ot_adsv)?;         // OK: Matches scheme
-//! assert!(adsv.dec_strict(&ot_apgs).is_err());  // Error: Wrong scheme (adsv != apgs)
+//! let pt3 = aasv.dec_strict(&ot_aasv)?;         // OK: Matches scheme
+//! assert!(aasv.dec_strict(&ot_apgs).is_err());  // Error: Wrong scheme (aasv != apgs)
 //!
 //! // Note: For fixed oborons, string encoding (c32/b32/b64/hex) must match the instance encoding
-//! let adsv_b64 = oboron::AdsvB64::new(&key)?;  // "adsv.b64" fixed-format ObtextCodec
-//! let ot_b64 = adsv_b64.enc("data3")?;
-//! assert!(adsv.dec(&ot_b64).is_err());  // Error: Encoding mismatch (c32 != b64)
+//! let aasv_b64 = oboron::AasvB64::new(&key)?;  // "aasv.b64" fixed-format ObtextCodec
+//! let ot_b64 = aasv_b64.enc("data3")?;
+//! assert!(aasv.dec(&ot_b64).is_err());  // Error: Encoding mismatch (c32 != b64)
 //! // For mixed encodings, use ObMulti instead (see above)
 //! # }
 //! # Ok(())
@@ -213,14 +213,14 @@
 //! # Encryption Schemes
 //!
 //! - Authenticated:
-//!   - `Adgs`: deterministic AES-GCM-SIV
-//!   - `Adsv`: deterministic AES-SIV (nonce-misuse resistant)
+//!   - `Aags`: deterministic AES-GCM-SIV
+//!   - `Aasv`: deterministic AES-SIV (nonce-misuse resistant)
 //!   - `Apgs`: probabilistic AES-GCM-SIV
 //!   - `Apsv`: probabilistic AES-SIV
 //! - Un-authenticated:
 //!   - `Upbc`: probabilistic AES-CBC
 //! - Insecure (obfuscation only):
-//!   - `Zfbcx`: deterministic AES-CBC with constant IV
+//!   - `Zrbcx`: deterministic AES-CBC with constant IV
 //!
 //! Testing/Demo only schemes using no encryption (`mock` feature group):
 //! - `Mock1`: Identity
@@ -234,24 +234,24 @@
 //!
 //! # The `ObtextCodec` Trait
 //!
-//! All types (`AdsvC32`, `Ob`, `ObFlex`, etc.) except `ObMulti` implement the `ObtextCodec` trait,
+//! All types (`AasvC32`, `Ob`, `ObFlex`, etc.) except `ObMulti` implement the `ObtextCodec` trait,
 //! providing a consistent interface:
 //!
 //! ```rust
 //! # fn main() -> Result<(), oboron::Error> {
-//! # #[cfg(feature = "adsv")]
+//! # #[cfg(feature = "aasv")]
 //! # {
-//! # use oboron::{ObtextCodec, AdsvC32, Ob};
+//! # use oboron::{ObtextCodec, AasvC32, Ob};
 //! # let key = oboron::generate_key();
 //! fn process<O: ObtextCodec>(ob: &O, data: &str) -> Result<String, oboron::Error> {
 //!     let ot = ob.enc(data)?;
 //!     ob.dec(&ot)
 //! }
 //!
-//! let adsv = AdsvC32::new(&key)?;
-//! let ob = Ob::new("adsv.c32", &key)?;
+//! let aasv = AasvC32::new(&key)?;
+//! let ob = Ob::new("aasv.c32", &key)?;
 //!
-//! process(&adsv, "hello")?;
+//! process(&aasv, "hello")?;
 //! process(&ob, "hello")?;
 //! # }
 //! # Ok(())
@@ -286,18 +286,18 @@ pub use error::Error;
 // Re-export from obcrypt
 pub(crate) use obcrypt::Keychain;
 
-#[cfg(feature = "adgs")]
-pub(crate) use obcrypt::{decrypt_adgs, encrypt_adgs};
-#[cfg(feature = "adsv")]
-pub(crate) use obcrypt::{decrypt_adsv, encrypt_adsv};
+#[cfg(feature = "aags")]
+pub(crate) use obcrypt::{decrypt_aags, encrypt_aags};
+#[cfg(feature = "aasv")]
+pub(crate) use obcrypt::{decrypt_aasv, encrypt_aasv};
 #[cfg(feature = "apgs")]
 pub(crate) use obcrypt::{decrypt_apgs, encrypt_apgs};
 #[cfg(feature = "apsv")]
 pub(crate) use obcrypt::{decrypt_apsv, encrypt_apsv};
 #[cfg(feature = "upbc")]
 pub(crate) use obcrypt::{decrypt_upbc, encrypt_upbc};
-#[cfg(feature = "zfbcx")]
-pub(crate) use obcrypt::{decrypt_zfbcx, encrypt_zfbcx};
+#[cfg(feature = "zrbcx")]
+pub(crate) use obcrypt::{decrypt_zrbcx, encrypt_zrbcx};
 
 // Testing
 #[cfg(feature = "mock")]
@@ -330,18 +330,18 @@ pub use codec::{new, new_with_format, ObAny, ObtextCodec};
 pub use codec::{new_keyless, new_keyless_with_format};
 
 // Conditionally export format string constants (scheme+encoding combinations)
-#[cfg(feature = "adgs")]
-pub use constants::{ADGS_B32, ADGS_B64, ADGS_C32, ADGS_HEX};
-#[cfg(feature = "adsv")]
-pub use constants::{ADSV_B32, ADSV_B64, ADSV_C32, ADSV_HEX};
+#[cfg(feature = "aags")]
+pub use constants::{AAGS_B32, AAGS_B64, AAGS_C32, AAGS_HEX};
+#[cfg(feature = "aasv")]
+pub use constants::{AASV_B32, AASV_B64, AASV_C32, AASV_HEX};
 #[cfg(feature = "apgs")]
 pub use constants::{APGS_B32, APGS_B64, APGS_C32, APGS_HEX};
 #[cfg(feature = "apsv")]
 pub use constants::{APSV_B32, APSV_B64, APSV_C32, APSV_HEX};
 #[cfg(feature = "upbc")]
 pub use constants::{UPBC_B32, UPBC_B64, UPBC_C32, UPBC_HEX};
-#[cfg(feature = "zfbcx")]
-pub use constants::{ZFBCX_B32, ZFBCX_B64, ZFBCX_C32, ZFBCX_HEX};
+#[cfg(feature = "zrbcx")]
+pub use constants::{ZRBCX_B32, ZRBCX_B64, ZRBCX_C32, ZRBCX_HEX};
 // Legacy
 #[cfg(feature = "legacy")]
 pub use constants::{LEGACY_B32, LEGACY_B64, LEGACY_C32, LEGACY_HEX};
@@ -352,18 +352,18 @@ pub use constants::{MOCK1_B32, MOCK1_B64, MOCK1_C32, MOCK1_HEX};
 pub use constants::{MOCK2_B32, MOCK2_B64, MOCK2_C32, MOCK2_HEX};
 
 // Conditionally export format-specific structs (scheme+encoding combinations)
-#[cfg(feature = "adgs")]
-pub use codec::{AdgsB32, AdgsB64, AdgsC32, AdgsHex};
-#[cfg(feature = "adsv")]
-pub use codec::{AdsvB32, AdsvB64, AdsvC32, AdsvHex};
+#[cfg(feature = "aags")]
+pub use codec::{AagsB32, AagsB64, AagsC32, AagsHex};
+#[cfg(feature = "aasv")]
+pub use codec::{AasvB32, AasvB64, AasvC32, AasvHex};
 #[cfg(feature = "apgs")]
 pub use codec::{ApgsB32, ApgsB64, ApgsC32, ApgsHex};
 #[cfg(feature = "apsv")]
 pub use codec::{ApsvB32, ApsvB64, ApsvC32, ApsvHex};
 #[cfg(feature = "upbc")]
 pub use codec::{UpbcB32, UpbcB64, UpbcC32, UpbcHex};
-#[cfg(feature = "zfbcx")]
-pub use codec::{ZfbcxB32, ZfbcxB64, ZfbcxC32, ZfbcxHex};
+#[cfg(feature = "zrbcx")]
+pub use codec::{ZrbcxB32, ZrbcxB64, ZrbcxC32, ZrbcxHex};
 // Legacy
 #[cfg(feature = "legacy")]
 pub use legacy::{LegacyB32, LegacyB64, LegacyC32, LegacyHex};
@@ -374,16 +374,16 @@ pub use codec::{Mock1B32, Mock1B64, Mock1C32, Mock1Hex};
 pub use codec::{Mock2B32, Mock2B64, Mock2C32, Mock2Hex};
 
 // Aliases for default encoding:
-#[cfg(feature = "zfbcx")]
-pub type Zfbcx = ZfbcxC32;
+#[cfg(feature = "zrbcx")]
+pub type Zrbcx = ZrbcxC32;
 #[cfg(feature = "upbc")]
 pub type Upbc = UpbcC32;
-#[cfg(feature = "adgs")]
-pub type Adgs = AdgsC32;
+#[cfg(feature = "aags")]
+pub type Aags = AagsC32;
 #[cfg(feature = "apgs")]
 pub type Apgs = ApgsC32;
-#[cfg(feature = "adsv")]
-pub type Adsv = AdsvC32;
+#[cfg(feature = "aasv")]
+pub type Aasv = AasvC32;
 #[cfg(feature = "apsv")]
 pub type Apsv = ApsvC32;
 // Legacy
@@ -405,10 +405,10 @@ pub use ob_multi::ObMulti;
 /// use oboron::prelude::*;
 /// ```
 pub mod prelude {
-    #[cfg(feature = "adgs")]
-    pub use crate::{AdgsB32, AdgsB64, AdgsC32, AdgsHex};
-    #[cfg(feature = "adsv")]
-    pub use crate::{AdsvB32, AdsvB64, AdsvC32, AdsvHex};
+    #[cfg(feature = "aags")]
+    pub use crate::{AagsB32, AagsB64, AagsC32, AagsHex};
+    #[cfg(feature = "aasv")]
+    pub use crate::{AasvB32, AasvB64, AasvC32, AasvHex};
     #[cfg(feature = "apgs")]
     pub use crate::{ApgsB32, ApgsB64, ApgsC32, ApgsHex};
     #[cfg(feature = "apsv")]
@@ -442,11 +442,11 @@ pub mod prelude {
 ///
 /// ```rust
 /// # fn main() -> Result<(), oboron::Error> {
-/// # #[cfg(feature = "adsv")]
+/// # #[cfg(feature = "aasv")]
 /// # {
 /// # use oboron;
 /// # let key = oboron::generate_key();
-/// let ot = oboron::enc("secret data", "adsv.b64", &key)?;
+/// let ot = oboron::enc("secret data", "aasv.b64", &key)?;
 /// # }
 /// # Ok(())
 /// # }
@@ -465,10 +465,10 @@ pub fn enc(plaintext: &str, format: &str, key: &str) -> Result<String, Error> {
 ///
 /// ```rust
 /// # fn main() -> Result<(), oboron::Error> {
-/// # #[cfg(feature = "adsv")]
+/// # #[cfg(feature = "aasv")]
 /// # {
 /// # use oboron;
-/// let ot = oboron::enc_keyless("test data", "adsv.b64")?;
+/// let ot = oboron::enc_keyless("test data", "aasv.b64")?;
 /// # }
 /// # Ok(())
 /// # }
@@ -491,12 +491,12 @@ pub fn enc_keyless(plaintext: &str, format: &str) -> Result<String, Error> {
 ///
 /// ```rust
 /// # fn main() -> Result<(), oboron::Error> {
-/// # #[cfg(feature = "adsv")]
+/// # #[cfg(feature = "aasv")]
 /// # use oboron;
 /// # {
 /// # let key = oboron::generate_key();
-/// # let ot = oboron::enc("test123", "adsv.b64", &key)?;
-/// let pt2 = oboron::dec(&ot, "adsv.b64", &key)?;
+/// # let ot = oboron::enc("test123", "aasv.b64", &key)?;
+/// let pt2 = oboron::dec(&ot, "aasv.b64", &key)?;
 /// # assert_eq!(pt2, "test123");
 /// # }
 /// # Ok(())
@@ -516,11 +516,11 @@ pub fn dec(obtext: &str, format: &str, key: &str) -> Result<String, Error> {
 ///
 /// ```rust
 /// # fn main() -> Result<(), oboron::Error> {
-/// # #[cfg(feature = "adsv")]
+/// # #[cfg(feature = "aasv")]
 /// # {
 /// # use oboron;
-/// # let ot = oboron::enc_keyless("test", "adsv.b64")?;
-/// let pt2 = oboron::dec_keyless(&ot, "adsv.b64")?;
+/// # let ot = oboron::enc_keyless("test", "aasv.b64")?;
+/// let pt2 = oboron::dec_keyless(&ot, "aasv.b64")?;
 /// # assert_eq!(pt2, "test");
 /// # }
 /// # Ok(())
@@ -544,11 +544,11 @@ pub fn dec_keyless(obtext: &str, format: &str) -> Result<String, Error> {
 ///
 /// ```rust
 /// # fn main() -> Result<(), oboron::Error> {
-/// # #[cfg(feature = "adsv")]
+/// # #[cfg(feature = "aasv")]
 /// # {
 /// # use oboron;
 /// # let key = oboron::generate_key();
-/// # let ot = oboron::enc("secret", "adsv.b64", &key)?;
+/// # let ot = oboron::enc("secret", "aasv.b64", &key)?;
 /// let pt2 = oboron::autodec(&ot, &key)?;  // Format autodetected, including encoding
 /// # assert_eq!(pt2, "secret");
 /// # }
@@ -569,7 +569,7 @@ pub fn autodec(obtext: &str, key: &str) -> Result<String, Error> {
 ///
 /// ```rust
 /// # fn main() -> Result<(), oboron::Error> {
-/// # #[cfg(feature = "adsv")]
+/// # #[cfg(feature = "aasv")]
 /// # {
 /// # use oboron;
 /// # let ot = oboron::enc_keyless("test", "mock1.b64")?;

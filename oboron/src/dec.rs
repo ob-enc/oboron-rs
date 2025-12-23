@@ -7,18 +7,18 @@ use crate::{
 use data_encoding::{BASE64URL_NOPAD, HEXLOWER};
 
 // Conditionally import decrypt functions based on features
-#[cfg(feature = "adgs")]
-use crate::decrypt_adgs;
-#[cfg(feature = "adsv")]
-use crate::decrypt_adsv;
+#[cfg(feature = "aags")]
+use crate::decrypt_aags;
+#[cfg(feature = "aasv")]
+use crate::decrypt_aasv;
 #[cfg(feature = "apgs")]
 use crate::decrypt_apgs;
 #[cfg(feature = "apsv")]
 use crate::decrypt_apsv;
 #[cfg(feature = "upbc")]
 use crate::decrypt_upbc;
-#[cfg(feature = "zfbcx")]
-use crate::decrypt_zfbcx;
+#[cfg(feature = "zrbcx")]
+use crate::decrypt_zrbcx;
 // Testing
 #[cfg(feature = "mock")]
 use crate::decrypt_mock1;
@@ -63,16 +63,16 @@ pub(crate) fn dec_from_format(
 
     // Step 4: Decrypt using scheme-specific function based on format
     let plaintext_bytes = match format.scheme() {
-        #[cfg(feature = "zfbcx")]
-        Scheme::Zfbcx => decrypt_zfbcx(keychain, &buffer)?,
+        #[cfg(feature = "zrbcx")]
+        Scheme::Zrbcx => decrypt_zrbcx(keychain, &buffer)?,
         #[cfg(feature = "upbc")]
         Scheme::Upbc => decrypt_upbc(keychain, &buffer)?,
-        #[cfg(feature = "adgs")]
-        Scheme::Adgs => decrypt_adgs(keychain, &buffer)?,
+        #[cfg(feature = "aags")]
+        Scheme::Aags => decrypt_aags(keychain, &buffer)?,
         #[cfg(feature = "apgs")]
         Scheme::Apgs => decrypt_apgs(keychain, &buffer)?,
-        #[cfg(feature = "adsv")]
-        Scheme::Adsv => decrypt_adsv(keychain, &buffer)?,
+        #[cfg(feature = "aasv")]
+        Scheme::Aasv => decrypt_aasv(keychain, &buffer)?,
         #[cfg(feature = "apsv")]
         Scheme::Apsv => decrypt_apsv(keychain, &buffer)?,
         // Testing

@@ -1,7 +1,7 @@
 """Format string constants for Oboron. 
 
 All constants follow the pattern:  {SCHEME}_{ENCODING}
-- Schemes: ADGS, ADSV, APGS, APSV, UPBC, ZFBCX, LEGACY, MOCK1, MOCK2
+- Schemes: AAGS, AASV, APGS, APSV, UPBC, ZRBCX, LEGACY, MOCK1, MOCK2
 - Encodings:
   - B32 (RFC 4648 base32),
   - B64 (RFC 4648 base64url),
@@ -12,21 +12,21 @@ Example:
     >>> from oboron import formats
     >>> from oboron import Ob
     >>> 
-    >>> ob = Ob(formats.ADSV_B64, key)
+    >>> ob = Ob(formats.AASV_B64, key)
     >>> ot = ob.enc("secret")
 """
 
-# adgs - deterministic AES-GCM-SIV (secure and authenticated)
-ADGS_B32: str = "adgs.b32"
-ADGS_B64: str = "adgs.b64"
-ADGS_C32: str = "adgs.c32"
-ADGS_HEX: str = "adgs.hex"
+# aags - deterministic AES-GCM-SIV (secure and authenticated)
+AAGS_B32: str = "aags.b32"
+AAGS_B64: str = "aags.b64"
+AAGS_C32: str = "aags.c32"
+AAGS_HEX: str = "aags.hex"
 
-# adsv - deterministic AES-SIV (secure and authenticated, nonce-misuse resistant)
-ADSV_B32: str = "adsv.b32"
-ADSV_B64: str = "adsv.b64"
-ADSV_C32: str = "adsv.c32"
-ADSV_HEX: str = "adsv.hex"
+# aasv - deterministic AES-SIV (secure and authenticated, nonce-misuse resistant)
+AASV_B32: str = "aasv.b32"
+AASV_B64: str = "aasv.b64"
+AASV_C32: str = "aasv.c32"
+AASV_HEX: str = "aasv.hex"
 
 # apgs - probabilistic AES-GCM-SIV (secure and authenticated)
 APGS_B32: str = "apgs.b32"
@@ -46,11 +46,11 @@ UPBC_B64: str = "upbc.b64"
 UPBC_C32: str = "upbc.c32"
 UPBC_HEX: str = "upbc.hex"
 
-# zfbcx - deterministic AES-CBC (insecure - obfuscation only)
-ZFBCX_B32: str = "zfbcx.b32"
-ZFBCX_B64: str = "zfbcx.b64"
-ZFBCX_C32: str = "zfbcx.c32"
-ZFBCX_HEX: str = "zfbcx.hex"
+# zrbcx - deterministic AES-CBC (insecure - obfuscation only)
+ZRBCX_B32: str = "zrbcx.b32"
+ZRBCX_B64: str = "zrbcx.b64"
+ZRBCX_C32: str = "zrbcx.c32"
+ZRBCX_HEX: str = "zrbcx.hex"
 
 # Testing schemes (no encryption)
 MOCK1_B32: str = "mock1.b32"
@@ -63,23 +63,23 @@ MOCK2_B64: str = "mock2.b64"
 MOCK2_C32: str = "mock2.c32"
 MOCK2_HEX: str = "mock2.hex"
 
-# Legacy (legacy - insecure - obfuscation only; backwards compatibility only - use zfbcx instead)
+# Legacy (legacy - insecure - obfuscation only; backwards compatibility only - use zrbcx instead)
 LEGACY_B32: str = "legacy.b32"
 LEGACY_B64: str = "legacy.b64"
 LEGACY_C32: str = "legacy.c32"
 LEGACY_HEX: str = "legacy.hex"
 
 __all__ = [
-    # adgs
-    "ADGS_B32", "ADGS_B64", "ADGS_C32", "ADGS_HEX",
-    # adsv
-    "ADSV_B32", "ADSV_B64", "ADSV_C32", "ADSV_HEX",
+    # aags
+    "AAGS_B32", "AAGS_B64", "AAGS_C32", "AAGS_HEX",
+    # aasv
+    "AASV_B32", "AASV_B64", "AASV_C32", "AASV_HEX",
     # apgs
     "APGS_B32", "APGS_B64", "APGS_C32", "APGS_HEX",
     # apsv
     "APSV_B32", "APSV_B64", "APSV_C32", "APSV_HEX",
-    # zfbcx
-    "ZFBCX_B32", "ZFBCX_B64", "ZFBCX_C32", "ZFBCX_HEX",
+    # zrbcx
+    "ZRBCX_B32", "ZRBCX_B64", "ZRBCX_C32", "ZRBCX_HEX",
     # upbc
     "UPBC_B32", "UPBC_B64", "UPBC_C32", "UPBC_HEX",
     # Legacy

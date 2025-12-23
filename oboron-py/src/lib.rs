@@ -121,7 +121,7 @@ macro_rules! impl_cipher_class {
             /// Get the current format string.
             ///
             /// Returns:
-            ///     Format string like "zfbcx.c32", "zfbcx.b32", "adgs.b64", etc.
+            ///     Format string like "zrbcx.c32", "zrbcx.b32", "aags.b64", etc.
             #[getter]
             fn format(&self) -> String {
                 format!("{}", self.inner.format())
@@ -130,58 +130,58 @@ macro_rules! impl_cipher_class {
     };
 }
 
-// Adgs variants
+// Aags variants
 // -------------
-#[cfg(feature = "adgs")]
+#[cfg(feature = "aags")]
 impl_cipher_class!(
-    AdgsB32,
-    ::oboron::AdgsB32,
-    "Adgs cipher (deterministic AES-GCM-SIV) with B32 encoding "
+    AagsB32,
+    ::oboron::AagsB32,
+    "Aags cipher (deterministic AES-GCM-SIV) with B32 encoding "
 );
-#[cfg(feature = "adgs")]
+#[cfg(feature = "aags")]
 impl_cipher_class!(
-    AdgsB64,
-    ::oboron::AdgsB64,
-    "Adgs cipher (deterministic AES-GCM-SIV) with B64 encoding"
+    AagsB64,
+    ::oboron::AagsB64,
+    "Aags cipher (deterministic AES-GCM-SIV) with B64 encoding"
 );
-#[cfg(feature = "adgs")]
+#[cfg(feature = "aags")]
 impl_cipher_class!(
-    AdgsC32,
-    ::oboron::AdgsC32,
-    "Adgs cipher (deterministic AES-GCM-SIV) with C32 encoding"
+    AagsC32,
+    ::oboron::AagsC32,
+    "Aags cipher (deterministic AES-GCM-SIV) with C32 encoding"
 );
-#[cfg(feature = "adgs")]
+#[cfg(feature = "aags")]
 impl_cipher_class!(
-    AdgsHex,
-    ::oboron::AdgsHex,
-    "Adgs cipher (deterministic AES-GCM-SIV) with Hex encoding"
+    AagsHex,
+    ::oboron::AagsHex,
+    "Aags cipher (deterministic AES-GCM-SIV) with Hex encoding"
 );
 
-// Adsv variants
+// Aasv variants
 // -------------
-#[cfg(feature = "adsv")]
+#[cfg(feature = "aasv")]
 impl_cipher_class!(
-    AdsvB32,
-    ::oboron::AdsvB32,
-    "Adsv cipher (deterministic AES-SIV, nonce-misuse resistant) with B32 encoding"
+    AasvB32,
+    ::oboron::AasvB32,
+    "Aasv cipher (deterministic AES-SIV, nonce-misuse resistant) with B32 encoding"
 );
-#[cfg(feature = "adsv")]
+#[cfg(feature = "aasv")]
 impl_cipher_class!(
-    AdsvB64,
-    ::oboron::AdsvB64,
-    "Adsv cipher (deterministic AES-SIV, nonce-misuse resistant) with B64 encoding"
+    AasvB64,
+    ::oboron::AasvB64,
+    "Aasv cipher (deterministic AES-SIV, nonce-misuse resistant) with B64 encoding"
 );
-#[cfg(feature = "adsv")]
+#[cfg(feature = "aasv")]
 impl_cipher_class!(
-    AdsvC32,
-    ::oboron::AdsvC32,
-    "Adsv cipher (deterministic AES-SIV, nonce-misuse resistant) with C32 encoding"
+    AasvC32,
+    ::oboron::AasvC32,
+    "Aasv cipher (deterministic AES-SIV, nonce-misuse resistant) with C32 encoding"
 );
-#[cfg(feature = "adsv")]
+#[cfg(feature = "aasv")]
 impl_cipher_class!(
-    AdsvHex,
-    ::oboron::AdsvHex,
-    "Adsv cipher (deterministic AES-SIV, nonce-misuse resistant) with Hex encoding"
+    AasvHex,
+    ::oboron::AasvHex,
+    "Aasv cipher (deterministic AES-SIV, nonce-misuse resistant) with Hex encoding"
 );
 
 // Apgs variants
@@ -265,31 +265,31 @@ impl_cipher_class!(
     "Upbc cipher (probabilistic AES-CBC) with Hex encoding"
 );
 
-// Zfbcx variants
+// Zrbcx variants
 // -------------
-#[cfg(feature = "zfbcx")]
+#[cfg(feature = "zrbcx")]
 impl_cipher_class!(
-    ZfbcxB32,
-    ::oboron::ZfbcxB32,
-    "Zfbcx cipher (deterministic AES-CBC, constant IV) with B32 encoding "
+    ZrbcxB32,
+    ::oboron::ZrbcxB32,
+    "Zrbcx cipher (deterministic AES-CBC, constant IV) with B32 encoding "
 );
-#[cfg(feature = "zfbcx")]
+#[cfg(feature = "zrbcx")]
 impl_cipher_class!(
-    ZfbcxB64,
-    ::oboron::ZfbcxB64,
-    "Zfbcx cipher (deterministic AES-CBC, constant IV) with B64 encoding"
+    ZrbcxB64,
+    ::oboron::ZrbcxB64,
+    "Zrbcx cipher (deterministic AES-CBC, constant IV) with B64 encoding"
 );
-#[cfg(feature = "zfbcx")]
+#[cfg(feature = "zrbcx")]
 impl_cipher_class!(
-    ZfbcxC32,
-    ::oboron::ZfbcxC32,
-    "Zfbcx cipher (deterministic AES-CBC, constant IV) with C32 encoding"
+    ZrbcxC32,
+    ::oboron::ZrbcxC32,
+    "Zrbcx cipher (deterministic AES-CBC, constant IV) with C32 encoding"
 );
-#[cfg(feature = "zfbcx")]
+#[cfg(feature = "zrbcx")]
 impl_cipher_class!(
-    ZfbcxHex,
-    ::oboron::ZfbcxHex,
-    "Zfbcx cipher (deterministic AES-CBC, constant IV) with Hex encoding"
+    ZrbcxHex,
+    ::oboron::ZrbcxHex,
+    "Zrbcx cipher (deterministic AES-CBC, constant IV) with Hex encoding"
 );
 
 // --- TESTING CLASSES ---
@@ -348,7 +348,7 @@ impl_cipher_class!(
     ::oboron::LegacyB32,
     "Legacy cipher (deterministic AES-CBC, constant IV, custom padding) with B32 encoding\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
-     For new projects, use Zfbcx or more secure schemes like Adgs/Adsv."
+     For new projects, use Zrbcx or more secure schemes like Aags/Aasv."
 );
 #[cfg(feature = "legacy")]
 impl_cipher_class!(
@@ -356,7 +356,7 @@ impl_cipher_class!(
     ::oboron::LegacyB64,
     "Legacy cipher (deterministic AES-CBC, constant IV, custom padding) with B64 encoding\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
-     For new projects, use Zfbcx or more secure schemes like Adgs/Adsv."
+     For new projects, use Zrbcx or more secure schemes like Aags/Aasv."
 );
 #[cfg(feature = "legacy")]
 impl_cipher_class!(
@@ -364,7 +364,7 @@ impl_cipher_class!(
     ::oboron::LegacyC32,
     "Legacy cipher (deterministic AES-CBC, constant IV, custom padding) with C32 encoding\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
-     For new projects, use Zfbcx or more secure schemes like Adgs/Adsv."
+     For new projects, use Zrbcx or more secure schemes like Aags/Aasv."
 );
 #[cfg(feature = "legacy")]
 impl_cipher_class!(
@@ -372,7 +372,7 @@ impl_cipher_class!(
     ::oboron::LegacyHex,
     "Legacy cipher (deterministic AES-CBC, constant IV, custom padding) with Hex encoding\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
-     For new projects, use Zfbcx or more secure schemes like Adgs/Adsv."
+     For new projects, use Zrbcx or more secure schemes like Aags/Aasv."
 );
 
 /// Ob - Flexible cipher with runtime format selection.   
@@ -392,7 +392,7 @@ impl Ob {
     /// Create a new Ob instance.
     ///
     /// Args:
-    ///     format: Format string like "adgs.b64", "apsv.hex", "zfbcx.c32", "zfbcx.b32", etc.
+    ///     format: Format string like "aags.b64", "apsv.hex", "zrbcx.c32", "zrbcx.b32", etc.
     ///     key:     86-character base64 string key (512 bits). Required if keyless=False.
     ///     keyless: If True, uses the hardcoded key (testing only, NOT SECURE).
     ///
@@ -467,7 +467,7 @@ impl Ob {
     /// Change the format (scheme + encoding).   
     ///
     /// Args:
-    ///     format: Format string like "adgs.b64", "apsv.hex", "zfbcx.c32", "zfbcx.b32", etc.
+    ///     format: Format string like "aags.b64", "apsv.hex", "zrbcx.c32", "zrbcx.b32", etc.
     ///
     /// Raises:
     ///     ValueError: If format is invalid.
@@ -480,7 +480,7 @@ impl Ob {
     /// Change the scheme while keeping the current encoding.
     ///
     /// Args:
-    ///     scheme: Scheme name like "adgs", "apsv", "zfbcx", etc.  
+    ///     scheme: Scheme name like "aags", "apsv", "zrbcx", etc.  
     ///
     /// Raises:
     ///     ValueError: If scheme is invalid.
@@ -511,7 +511,7 @@ impl Ob {
     /// Get the current format string.
     ///
     /// Returns:
-    ///     Format string like "adgs.b64", "zfbcx.c32", "zfbcx.b32", etc.
+    ///     Format string like "aags.b64", "zrbcx.c32", "zrbcx.b32", etc.
     #[getter]
     fn format(&self) -> String {
         format!("{}", self.inner.format())
@@ -596,7 +596,7 @@ impl ObMulti {
     ///
     /// Args:
     ///     plaintext: The plaintext string to encrypt+encode.
-    ///     format: Format string like "adgs.b64", "apsv.hex", "zfbcx.c32", "zfbcx.b32", etc.
+    ///     format: Format string like "aags.b64", "apsv.hex", "zrbcx.c32", "zrbcx.b32", etc.
     ///
     /// Returns:
     ///     The obtext string.
@@ -613,7 +613,7 @@ impl ObMulti {
     ///
     /// Args:
     ///     obtext: The encrypted+encoded string to decode+decrypt.  
-    ///     format: Format string like "adgs.b64", "apsv.hex", "zfbcx.c32", "zfbcx.b32", etc.
+    ///     format: Format string like "aags.b64", "apsv.hex", "zrbcx.c32", "zrbcx.b32", etc.
     ///
     /// Returns:
     ///     The decoded+decrypted plaintext string.
@@ -629,7 +629,7 @@ impl ObMulti {
     /// Decode+decrypt with automatic scheme and encoding detection.
     ///
     /// This is the only decoder that can automatically detect both the scheme
-    /// (adgs, zfbcx, etc.) AND the encoding (b32, b64, c32, hex).
+    /// (aags, zrbcx, etc.) AND the encoding (b32, b64, c32, hex).
     ///
     /// Args:
     ///     obtext: The encrypted+encoded string to decode+decrypt.
@@ -685,7 +685,7 @@ fn generate_key_bytes(py: Python) -> PyResult<Py<PyBytes>> {
 ///
 /// Args:
 ///     plaintext: The plaintext string to encode.
-///     format: Format string like "adgs.b64", "apsv.hex", "zfbcx.b32", etc.
+///     format: Format string like "aags.b64", "apsv.hex", "zrbcx.b32", etc.
 ///     key:     86-character base64 string key (512 bits).
 ///
 /// Returns:
@@ -703,7 +703,7 @@ fn enc(plaintext: &str, format: &str, key: &str) -> PyResult<String> {
 ///
 /// Args:
 ///     plaintext: The plaintext string to encrypt+encode.
-///     format: Format string like "adgs.b64", "apsv.hex", "zfbcx.b32", etc.
+///     format: Format string like "aags.b64", "apsv.hex", "zrbcx.b32", etc.
 ///
 /// Returns:
 ///     The obtext string.
@@ -721,7 +721,7 @@ fn enc_keyless(plaintext: &str, format: &str) -> PyResult<String> {
 ///
 /// Args:
 ///     obtext: The encrypted+encoded string to decode+decrypt  
-///     format: Format string like "zfbcx.b32", "adgs.b64", "apsv.hex", etc.  
+///     format: Format string like "zrbcx.b32", "aags.b64", "apsv.hex", etc.  
 ///     key:    86-character base64 string key (512 bits).
 ///
 /// Returns:
@@ -739,7 +739,7 @@ fn dec(obtext: &str, format: &str, key: &str) -> PyResult<String> {
 ///
 /// Args:
 ///     obtext: The encrypted+encoded string to decode+decrypt.  
-///     format: Format string like "adgs.b64", "apsv.hex", "zfbcx.b32", etc.
+///     format: Format string like "aags.b64", "apsv.hex", "zrbcx.b32", etc.
 ///
 /// Returns:
 ///     The decoded+decrypted plaintext string.
@@ -808,13 +808,13 @@ fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m.add_class::<LegacyHex>()?;
     }
 
-    // Zfbcx variants
-    #[cfg(feature = "zfbcx")]
+    // Zrbcx variants
+    #[cfg(feature = "zrbcx")]
     {
-        m.add_class::<ZfbcxC32>()?;
-        m.add_class::<ZfbcxB32>()?;
-        m.add_class::<ZfbcxB64>()?;
-        m.add_class::<ZfbcxHex>()?;
+        m.add_class::<ZrbcxC32>()?;
+        m.add_class::<ZrbcxB32>()?;
+        m.add_class::<ZrbcxB64>()?;
+        m.add_class::<ZrbcxHex>()?;
     }
 
     // Upbc variants
@@ -826,13 +826,13 @@ fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m.add_class::<UpbcHex>()?;
     }
 
-    // Adgs variants
-    #[cfg(feature = "adgs")]
+    // Aags variants
+    #[cfg(feature = "aags")]
     {
-        m.add_class::<AdgsC32>()?;
-        m.add_class::<AdgsB32>()?;
-        m.add_class::<AdgsB64>()?;
-        m.add_class::<AdgsHex>()?;
+        m.add_class::<AagsC32>()?;
+        m.add_class::<AagsB32>()?;
+        m.add_class::<AagsB64>()?;
+        m.add_class::<AagsHex>()?;
     }
 
     // Apgs variants
@@ -844,13 +844,13 @@ fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m.add_class::<ApgsHex>()?;
     }
 
-    // Adsv variants
-    #[cfg(feature = "adsv")]
+    // Aasv variants
+    #[cfg(feature = "aasv")]
     {
-        m.add_class::<AdsvC32>()?;
-        m.add_class::<AdsvB32>()?;
-        m.add_class::<AdsvB64>()?;
-        m.add_class::<AdsvHex>()?;
+        m.add_class::<AasvC32>()?;
+        m.add_class::<AasvB32>()?;
+        m.add_class::<AasvB64>()?;
+        m.add_class::<AasvHex>()?;
     }
 
     // Apsv variants

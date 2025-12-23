@@ -3,7 +3,7 @@ use crate::constants::HARDCODED_KEY_BYTES;
 use crate::{Error, Format, Keychain};
 
 /// An ObtextCodec implementation that takes format on enc operation and autodetects on dec operation.
-/// Unlike all other implementations (Ob, ObFlex, ZfbcxC32, .. .) it does not have
+/// Unlike all other implementations (Ob, ObFlex, ZrbcxC32, .. .) it does not have
 /// a format stored internally.
 ///
 /// This struct allows specifying the format (scheme + encoding) at enc call time,
@@ -16,14 +16,14 @@ use crate::{Error, Format, Keychain};
 ///
 /// ```rust
 /// # fn main() -> Result<(), oboron::Error> {
-/// # #[cfg(all(feature = "adsv", feature="mock"))]
+/// # #[cfg(all(feature = "aasv", feature="mock"))]
 /// # {
 /// # use oboron::{ObMulti, MOCK1_B64};
 /// # let key = oboron::generate_key();
 /// let obm = ObMulti::new(&key)?;
 ///
 /// // Encode with explicit format
-/// let ot1 = obm.enc("hello", "adsv.c32")?; // using explicit string
+/// let ot1 = obm.enc("hello", "aasv.c32")?; // using explicit string
 /// let ot2 = obm.enc("world", MOCK1_B64)?; // using string constant
 ///
 /// // autodec detects both scheme and encoding
@@ -53,20 +53,20 @@ impl ObMulti {
 
     /// Encrypt+encode with a specific format string.
     ///
-    /// Accepts format strings like "zfbcx.c32", "adgs.b64", etc.
+    /// Accepts format strings like "zrbcx.c32", "aags.b64", etc.
     /// For pre-parsed Format instances, use [`enc_with_format`](Self::enc_with_format).
     ///
     /// # Examples
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(all(feature = "adsv", feature="mock"))]
+    /// # #[cfg(all(feature = "aasv", feature="mock"))]
     /// # {
     /// # use oboron::ObMulti;
     /// let key = oboron::generate_key();
     /// let obm = ObMulti::new(&key)?;
     ///
-    /// let ot = obm.enc("hello", "adsv.c32")?;
+    /// let ot = obm.enc("hello", "aasv.c32")?;
     /// let ot2 = obm.enc("world", "mock1.b64")?;
     /// # }
     /// # Ok(())
@@ -85,12 +85,12 @@ impl ObMulti {
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(feature = "adsv")]
+    /// # #[cfg(feature = "aasv")]
     /// # {
     /// # use oboron::{ObMulti, Format, Scheme, Encoding};
     /// # let key = oboron::generate_key();
     /// # let obm = ObMulti::new(&key)?;
-    /// let format = Format::new(Scheme::Adsv, Encoding::C32);
+    /// let format = Format::new(Scheme::Aasv, Encoding::C32);
     ///
     /// // Reuse format across multiple calls
     /// let ot1 = obm.enc_with_format("hello", format)? ;
@@ -112,13 +112,13 @@ impl ObMulti {
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(feature = "adsv")]
+    /// # #[cfg(feature = "aasv")]
     /// # {
     /// # use oboron::ObMulti;
     /// # let key = oboron::generate_key();
     /// # let obm = ObMulti::new(&key)?;
-    /// let ot = obm.enc("hello", "adsv.b64")?;
-    /// let pt2 = obm.dec(&ot, "adsv.b64")? ;
+    /// let ot = obm.enc("hello", "aasv.b64")?;
+    /// let pt2 = obm.dec(&ot, "aasv.b64")? ;
     /// assert_eq!(pt2, "hello");
     /// # }
     /// # Ok(())
@@ -138,12 +138,12 @@ impl ObMulti {
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(feature = "adsv")]
+    /// # #[cfg(feature = "aasv")]
     /// # {
     /// # use oboron::{ObMulti, Format, Scheme, Encoding};
     /// # let key = oboron::generate_key();
     /// # let obm = ObMulti::new(&key)?;
-    /// let format = Format::new(Scheme::Adsv, Encoding::B64);
+    /// let format = Format::new(Scheme::Aasv, Encoding::B64);
     ///
     /// let ot = obm.enc_with_format("hello", format)?;
     /// let pt2 = obm.dec_with_format(&ot, format)?;
@@ -162,13 +162,13 @@ impl ObMulti {
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(feature = "adsv")]
+    /// # #[cfg(feature = "aasv")]
     /// # {
     /// # use oboron::ObMulti;
     /// # let key = oboron::generate_key();
     /// # let obm = ObMulti::new(&key)?;
-    /// let ot = obm.enc("hello", "adsv.b64")?;
-    /// let pt2 = obm.autodec(&ot)?;  // Autodetects adsv.b64
+    /// let ot = obm.enc("hello", "aasv.b64")?;
+    /// let pt2 = obm.autodec(&ot)?;  // Autodetects aasv.b64
     /// assert_eq!(pt2, "hello");
     /// # }
     /// # Ok(())

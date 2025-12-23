@@ -16,11 +16,11 @@ jobs:
       matrix:
         feature:
           - legacy
-          - zfbcx
+          - zrbcx
           - upbc
-          - adgs
+          - aags
           - apgs
-          - adsv
+          - aasv
           - apsv
     steps:
       - uses: actions/checkout@v4
@@ -81,13 +81,13 @@ jobs:
       matrix:
         include:
           - name: "deterministic only"
-            features: "zfbcx,adgs,adsv"
+            features: "zrbcx,aags,aasv"
           - name: "probabilistic only"
             features: "upbc,apgs,apsv"
           - name: "modern schemes"
-            features: "adgs,adsv"
-          - name: "adsv only"
-            features: "adsv,keyless"
+            features: "aags,aasv"
+          - name: "aasv only"
+            features: "aasv,keyless"
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -98,7 +98,7 @@ jobs:
 
   # Test WASM target with minimal features
   test-wasm-minimal:
-    name: Test WASM build (adsv only)
+    name: Test WASM build (aasv only)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -108,7 +108,7 @@ jobs:
       - name: Build for WASM with minimal features
         run: |
           cd oboron
-          cargo build --target wasm32-unknown-unknown --release --no-default-features --features adsv --lib
+          cargo build --target wasm32-unknown-unknown --release --no-default-features --features aasv --lib
       - name: Check binary size
         run: |
           ls -lh target/wasm32-unknown-unknown/release/

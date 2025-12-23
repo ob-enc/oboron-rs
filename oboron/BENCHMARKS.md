@@ -3,21 +3,21 @@
 Performance metrics for different schemes and input sizes.
 
 All benchmarks were carried out with static format structs using
-Crockford base32 encoding (e.g., `AdgsC32`).
+Crockford base32 encoding (e.g., `AagsC32`).
 
 
 ## Performance for Typical IDs (8-16 bytes)
 
 | Scheme | 8B Enc   | 8B Dec   | 16B Enc  | 16B Dec  |
 |--------|----------|----------|----------|----------|
-| zfbcx   | 131.5 ns | 125.9 ns | 128.3 ns | 122.3 ns |
-| adgs   | 421.8 ns | 434.7 ns | 424.3 ns | 439.7 ns |
-| adsv   | 322.7 ns | 366.4 ns | 321.7 ns | 365.9 ns |
+| zrbcx   | 131.5 ns | 125.9 ns | 128.3 ns | 122.3 ns |
+| aags   | 421.8 ns | 434.7 ns | 424.3 ns | 439.7 ns |
+| aasv   | 322.7 ns | 366.4 ns | 321.7 ns | 365.9 ns |
 | upbc  | 150.7 ns | 142.3 ns | 165.1 ns | 140.5 ns |
 
 ## `enc()` Performance
 
-| Input Size | legacy     | zfbcx     | adgs     | adsv     | upbc    | apgs    | apsv    |
+| Input Size | legacy     | zrbcx     | aags     | aasv     | upbc    | apgs    | apsv    |
 |-----------:|----------|----------|----------|----------|----------|----------|----------|
 | 8B         | 141.1 ns | 131.5 ns | 421.8 ns | 322.7 ns | 150.7 ns | 443.7 ns | 392.1 ns |
 | 12B        | 141.0 ns | 130.2 ns | 432.6 ns | 333.2 ns | 150.0 ns | 446.6 ns | 398.4 ns |
@@ -29,7 +29,7 @@ Crockford base32 encoding (e.g., `AdgsC32`).
 
 ## `dec_strict()` Performance
 
-| Input Size | legacy     | zfbcx     | adgs     | adsv     | upbc    | apgs    | apsv    |
+| Input Size | legacy     | zrbcx     | aags     | aasv     | upbc    | apgs    | apsv    |
 |-----------:|----------|----------|----------|----------|----------|----------|----------|
 | 8B         | 164.1 ns | 125.9 ns | 434.7 ns | 366.4 ns | 142.3 ns | 438.7 ns | 410.1 ns |
 | 12B        | 167.5 ns | 123.6 ns | 448.6 ns | 375.2 ns | 141.5 ns | 448.5 ns | 412.1 ns |

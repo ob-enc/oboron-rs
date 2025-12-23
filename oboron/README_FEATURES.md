@@ -11,13 +11,13 @@ By default, **all secure production-ready schemes are enabled**:
 oboron = "1.0"
 ```
 
-This includes: `upbc`, `adgs`, `apgs`, `adsv`, `apsv`.
+This includes: `upbc`, `aags`, `apgs`, `aasv`, `apsv`.
 
 All encodings (`.c32`-Crockford base32, `.b32`-standard base32, `.b64`-URL-safe base64, and `.hex`-hex) are always included.
 
 ### NOT INCLUDED BY DEFAULT
 
-- `zfbcx` scheme (cryptographically broken)
+- `zrbcx` scheme (cryptographically broken)
 - the `keyless` feature providing Oboron functionality with the hardcoded
   key
 - alternative key input formats `hex-keys`, `bytes-keys`
@@ -31,7 +31,7 @@ To use only what you need:
 
 ```toml
 [dependencies]
-oboron = { version = "1.0", default-features = false, features = ["adsv"] }
+oboron = { version = "1.0", default-features = false, features = ["aasv"] }
 ```
 This minimal configuration includes only base64 key support and excludes
 hex/bytes key interfaces and the keyless testing feature.
@@ -40,11 +40,11 @@ hex/bytes key interfaces and the keyless testing feature.
 
 ### Individual Schemes
 
-- `zfbcx` - AES-CBC (deterministic)
+- `zrbcx` - AES-CBC (deterministic)
 - `upbc` - AES-CBC (probabilistic)
-- `adgs` - AES-GCM-SIV (deterministic)
+- `aags` - AES-GCM-SIV (deterministic)
 - `apgs` - AES-GCM-SIV (probabilistic)
-- `adsv` - AES-SIV (deterministic)
+- `aasv` - AES-SIV (deterministic)
 - `apsv` - AES-SIV (probabilistic)
 
 Testing schemes (non-cryptographic):
@@ -66,7 +66,7 @@ Feature groups:
   deployments
 
 **Note:** `legacy` is a legacy scheme used internally by early adopters.
-New users should use `zfbcx` instead, which provides improved prefix
+New users should use `zrbcx` instead, which provides improved prefix
 entropy and better padding. This feature is only for maintaining
 compatibility with existing encrypted data.
 
@@ -76,19 +76,19 @@ versioning guarantees and may change or be removed in patch releases.
 ### Scheme Groups
 
 By algorithm
-- `all-cbc-schemes` - Includes `zfbcx`, `upbc`
-- `all-gcm-schemes` - Includes `adgs`, `apgs`
-- `all-siv-schemes` - Includes `adsv`, `apsv`
+- `all-cbc-schemes` - Includes `zrbcx`, `upbc`
+- `all-gcm-schemes` - Includes `aags`, `apgs`
+- `all-siv-schemes` - Includes `aasv`, `apsv`
 
 By properties:
-- `deterministic-schemes` - Includes `zfbcx`, `adgs`, `adsv`
+- `deterministic-schemes` - Includes `zrbcx`, `aags`, `aasv`
 - `probabilistic-schemes` - Includes `upbc`, `apgs`, `apsv`
-- `authenticated-schemes` - Includes `adgs`, `apgs`, `adsv`, `apsv`
-- `secure-schemes` - Includes all but `zfbcx`
-- `insecure-schemes` - Includes `zfbcx` only
+- `authenticated-schemes` - Includes `aags`, `apgs`, `aasv`, `apsv`
+- `secure-schemes` - Includes all but `zrbcx`
+- `insecure-schemes` - Includes `zrbcx` only
 
 By tier:
-- `ob0x` - Includes `zfbcx` only
+- `ob0x` - Includes `zrbcx` only
 - `ob1x` - No current members
 - `ob2x` - Includes `upbc` only
 - `ob3x` - Includes all authenticated schemes (= `authenticated-schemes`)
@@ -121,16 +121,16 @@ All disabled by default:
 
 ### Quick Selection Guide
 
-- **General purpose**: `adsv` (deterministic) or `apsv` (probabilistic)
-- **Maximum speed, most compact output**: `zfbcx` (insecure, deterministic
+- **General purpose**: `aasv` (deterministic) or `apsv` (probabilistic)
+- **Maximum speed, most compact output**: `zrbcx` (insecure, deterministic
   only)
-- **Testing/obfuscation**: `zfbcx` with `keyless` feature
+- **Testing/obfuscation**: `zrbcx` with `keyless` feature
 
 ### Binary Size Impact (WASM)
 
 For WebAssembly builds, the biggest size savings come from excluding
 entire algorithm families. For example, if you only need AES-SIV, use
-features = ["all-siv-schemes"] instead of individual adsv/apsv features.
+features = ["all-siv-schemes"] instead of individual aasv/apsv features.
 
 ## Examples
 

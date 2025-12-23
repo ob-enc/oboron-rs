@@ -1,4 +1,4 @@
-#![cfg(feature = "zfbcx")]
+#![cfg(feature = "zrbcx")]
 use super::{
     constants::{AES_BLOCK_SIZE, CBC_PADDING_BYTE},
     keychain::Keychain,
@@ -11,7 +11,7 @@ use cipher::{BlockDecryptMut, BlockEncryptMut, KeyIvInit};
 type Aes128CbcEnc = Encryptor<Aes128>;
 type Aes128CbcDec = Decryptor<Aes128>;
 
-/// Encrypt plaintext bytes using deterministic AES-CBC (zfbcx scheme).
+/// Encrypt plaintext bytes using deterministic AES-CBC (zrbcx scheme).
 /// Returns raw ciphertext bytes.   Not cryptographically secure - for obfuscation only.
 pub fn encrypt(keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
     if plaintext_bytes.is_empty() {
@@ -37,7 +37,7 @@ pub fn encrypt(keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, E
     Ok(buffer)
 }
 
-/// Decrypt ciphertext using deterministic AES-CBC (zfbcx scheme).
+/// Decrypt ciphertext using deterministic AES-CBC (zrbcx scheme).
 /// Returns plaintext bytes with padding removed.
 pub fn decrypt(keychain: &Keychain, data: &[u8]) -> Result<Vec<u8>, Error> {
     // Decrypt with AES-128-CBC

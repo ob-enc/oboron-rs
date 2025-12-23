@@ -82,9 +82,9 @@ pub fn load_config() -> Result<Config> {
     let mut config: Config =
         serde_json::from_str(&content).context("Failed to parse config file")?;
 
-    // Default to adsv if not set
+    // Default to aasv if not set
     if config.scheme.is_empty() {
-        config.scheme = "adsv".to_string();
+        config.scheme = "aasv".to_string();
     }
 
     // Default to Crockford base32 if not set
@@ -200,7 +200,7 @@ pub fn init_command(name: &str) -> Result<()> {
 
     let config = Config {
         profile: name.to_string(),
-        scheme: "adsv".to_string(),  // Default to adsv
+        scheme: "aasv".to_string(),  // Default to aasv
         encoding: "c32".to_string(), // Default to Crockford base32
     };
 
@@ -208,7 +208,7 @@ pub fn init_command(name: &str) -> Result<()> {
 
     println!("✓ Configuration saved to {}", config_path().display());
     println!("\nYour profile '{}':", name);
-    println!("  Default scheme:  adsv");
+    println!("  Default scheme:  aasv");
     println!("  Default encoding: c32");
     println!("  Key: {}", key);
     println!("\n⚠️  Keep these keys secure! Anyone with these keys can decode your data.");
@@ -302,7 +302,7 @@ pub fn profile_activate_command(name: &str) -> Result<()> {
 
     let mut config = load_config().unwrap_or(Config {
         profile: "default".to_string(),
-        scheme: "adsv".to_string(),
+        scheme: "aasv".to_string(),
         encoding: "c32".to_string(),
     });
 
@@ -466,7 +466,7 @@ mod tests {
     fn test_config_serialization() {
         let config = Config {
             profile: "test".to_string(),
-            scheme: "adgs".to_string(),
+            scheme: "aags".to_string(),
             encoding: "base64".to_string(),
         };
 
@@ -497,7 +497,7 @@ mod tests {
 
         // Simulate load_config logic
         if config.scheme.is_empty() {
-            config.scheme = "adsv".to_string();
+            config.scheme = "aasv".to_string();
         }
         if config.encoding.is_empty() {
             config.encoding = "c32".to_string();
@@ -507,7 +507,7 @@ mod tests {
         }
 
         assert_eq!(config.profile, "default");
-        assert_eq!(config.scheme, "adsv");
+        assert_eq!(config.scheme, "aasv");
         assert_eq!(config.encoding, "c32");
     }
 
@@ -528,7 +528,7 @@ mod tests {
 
     #[test]
     fn test_config_with_partial_fields() {
-        let json = r#"{"profile":"custom","scheme":"zfbcx","encoding":""}"#;
+        let json = r#"{"profile":"custom","scheme":"zrbcx","encoding":""}"#;
         let mut config: Config = serde_json::from_str(json).unwrap();
 
         if config.encoding.is_empty() {
@@ -536,7 +536,7 @@ mod tests {
         }
 
         assert_eq!(config.profile, "custom");
-        assert_eq!(config.scheme, "zfbcx");
+        assert_eq!(config.scheme, "zrbcx");
         assert_eq!(config.encoding, "c32");
     }
 }

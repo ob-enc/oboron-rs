@@ -3,18 +3,18 @@
 mod constants;
 mod keychain;
 
-#[cfg(feature = "adgs")]
-mod adgs; //  AES-GCM-SIV (deterministic)
-#[cfg(feature = "adsv")]
-mod adsv; //  AES-SIV (deterministic)
+#[cfg(feature = "aags")]
+mod aags; //  AES-GCM-SIV (deterministic)
+#[cfg(feature = "aasv")]
+mod aasv; //  AES-SIV (deterministic)
 #[cfg(feature = "apgs")]
 mod apgs; // AES-GCM-SIV (probabilistic)
 #[cfg(feature = "apsv")]
 mod apsv;
 #[cfg(feature = "upbc")]
 mod upbc; // AES-CBC (probabilistic)
-#[cfg(feature = "zfbcx")]
-mod zfbcx; //  AES-CBC (deterministic, not cryptographically secure - obfuscation only!) // AES-SIV (probabilistic)
+#[cfg(feature = "zrbcx")]
+mod zrbcx; //  AES-CBC (deterministic, not cryptographically secure - obfuscation only!) // AES-SIV (probabilistic)
 
 // Testing schemes (no encryption - no dependencies)
 #[cfg(feature = "mock")]
@@ -28,18 +28,18 @@ mod legacy; //  Legacy AES-CBC
 
 pub use keychain::Keychain;
 
-#[cfg(feature = "adgs")]
-pub use adgs::{decrypt as decrypt_adgs, encrypt as encrypt_adgs};
-#[cfg(feature = "adsv")]
-pub use adsv::{decrypt as decrypt_adsv, encrypt as encrypt_adsv};
+#[cfg(feature = "aags")]
+pub use aags::{decrypt as decrypt_aags, encrypt as encrypt_aags};
+#[cfg(feature = "aasv")]
+pub use aasv::{decrypt as decrypt_aasv, encrypt as encrypt_aasv};
 #[cfg(feature = "apgs")]
 pub use apgs::{decrypt as decrypt_apgs, encrypt as encrypt_apgs};
 #[cfg(feature = "apsv")]
 pub use apsv::{decrypt as decrypt_apsv, encrypt as encrypt_apsv};
 #[cfg(feature = "upbc")]
 pub use upbc::{decrypt as decrypt_upbc, encrypt as encrypt_upbc};
-#[cfg(feature = "zfbcx")]
-pub use zfbcx::{decrypt as decrypt_zfbcx, encrypt as encrypt_zfbcx};
+#[cfg(feature = "zrbcx")]
+pub use zrbcx::{decrypt as decrypt_zrbcx, encrypt as encrypt_zrbcx};
 
 // Testing
 #[cfg(feature = "mock")]

@@ -6,18 +6,18 @@ use crate::{
 use data_encoding::{BASE64URL_NOPAD, HEXLOWER};
 
 // Conditionally import encrypt functions based on features
-#[cfg(feature = "adgs")]
-use crate::encrypt_adgs;
-#[cfg(feature = "adsv")]
-use crate::encrypt_adsv;
+#[cfg(feature = "aags")]
+use crate::encrypt_aags;
+#[cfg(feature = "aasv")]
+use crate::encrypt_aasv;
 #[cfg(feature = "apgs")]
 use crate::encrypt_apgs;
 #[cfg(feature = "apsv")]
 use crate::encrypt_apsv;
 #[cfg(feature = "upbc")]
 use crate::encrypt_upbc;
-#[cfg(feature = "zfbcx")]
-use crate::encrypt_zfbcx;
+#[cfg(feature = "zrbcx")]
+use crate::encrypt_zrbcx;
 // Testing
 #[cfg(feature = "mock")]
 use crate::encrypt_mock1;
@@ -42,16 +42,16 @@ pub(crate) fn enc_to_format(
 
     // Step 1: Encrypt using scheme-specific function based on format
     let ciphertext = match format.scheme() {
-        #[cfg(feature = "zfbcx")]
-        Scheme::Zfbcx => encrypt_zfbcx(keychain, plaintext.as_bytes())?,
+        #[cfg(feature = "zrbcx")]
+        Scheme::Zrbcx => encrypt_zrbcx(keychain, plaintext.as_bytes())?,
         #[cfg(feature = "upbc")]
         Scheme::Upbc => encrypt_upbc(keychain, plaintext.as_bytes())?,
-        #[cfg(feature = "adgs")]
-        Scheme::Adgs => encrypt_adgs(keychain, plaintext.as_bytes())?,
+        #[cfg(feature = "aags")]
+        Scheme::Aags => encrypt_aags(keychain, plaintext.as_bytes())?,
         #[cfg(feature = "apgs")]
         Scheme::Apgs => encrypt_apgs(keychain, plaintext.as_bytes())?,
-        #[cfg(feature = "adsv")]
-        Scheme::Adsv => encrypt_adsv(keychain, plaintext.as_bytes())?,
+        #[cfg(feature = "aasv")]
+        Scheme::Aasv => encrypt_aasv(keychain, plaintext.as_bytes())?,
         #[cfg(feature = "apsv")]
         Scheme::Apsv => encrypt_apsv(keychain, plaintext.as_bytes())?,
         // Testing

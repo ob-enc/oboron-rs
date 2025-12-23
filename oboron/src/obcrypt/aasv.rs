@@ -1,9 +1,9 @@
-#![cfg(feature = "adsv")]
+#![cfg(feature = "aasv")]
 use super::keychain::Keychain;
 use crate::Error;
 use aes_siv::{aead::KeyInit, siv::Aes256Siv};
 
-/// Encrypt plaintext bytes using deterministic AES-SIV (adsv scheme).
+/// Encrypt plaintext bytes using deterministic AES-SIV (aasv scheme).
 /// Returns raw ciphertext bytes with authentication tag.
 pub fn encrypt(keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
     if plaintext_bytes.is_empty() {
@@ -22,7 +22,7 @@ pub fn encrypt(keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, E
     Ok(ciphertext)
 }
 
-/// Decrypt ciphertext using deterministic AES-SIV (adsv scheme).
+/// Decrypt ciphertext using deterministic AES-SIV (aasv scheme).
 /// Returns plaintext bytes after authentication verification.
 pub fn decrypt(keychain: &Keychain, data: &[u8]) -> Result<Vec<u8>, Error> {
     // Minimum: 1 byte plaintext + 16 byte tag = 17 bytes

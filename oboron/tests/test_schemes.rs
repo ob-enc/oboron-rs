@@ -1,11 +1,11 @@
-#[cfg(feature = "adgs")]
-use oboron::AdgsB64;
+#[cfg(feature = "aags")]
+use oboron::AagsB64;
 #[cfg(feature = "upbc")]
 use oboron::UpbcB64;
-#[cfg(feature = "zfbcx")]
-use oboron::ZfbcxB64;
-#[cfg(feature = "adsv")]
-use oboron::{AdsvB64, AdsvC32, AdsvHex};
+#[cfg(feature = "zrbcx")]
+use oboron::ZrbcxB64;
+#[cfg(feature = "aasv")]
+use oboron::{AasvB64, AasvC32, AasvHex};
 #[cfg(feature = "apgs")]
 use oboron::{Apgs, ApgsB64, ApgsHex};
 #[cfg(feature = "apsv")]
@@ -66,52 +66,52 @@ fn test_apgs_all_encodings() {
 }
 
 #[test]
-#[cfg(feature = "adsv")]
-fn test_adsv_basic() {
+#[cfg(feature = "aasv")]
+fn test_aasv_basic() {
     let key = [0u8; 64];
-    let ob = AdsvC32::from_bytes(&key).expect("Failed to create AdsvC32");
+    let ob = AasvC32::from_bytes(&key).expect("Failed to create AasvC32");
 
-    let plaintext = "Testing AdsvC32";
+    let plaintext = "Testing AasvC32";
     let ot1 = ob.enc(plaintext).expect("Failed to enc");
     let ot2 = ob.enc(plaintext).expect("Failed to enc");
 
-    // AdsvC32 is deterministic, so two encodings should be the same
+    // AasvC32 is deterministic, so two encodings should be the same
     assert_eq!(
         ot1, ot2,
-        "AdsvC32 should produce identical ciphertexts for the same plaintext"
+        "AasvC32 should produce identical ciphertexts for the same plaintext"
     );
 
     let pt2 = ob.dec(&ot1).expect("Failed to dec");
     assert_eq!(pt2, plaintext);
 
-    eprintln!("✓ AdsvC32 basic test passed");
+    eprintln!("✓ AasvC32 basic test passed");
 }
 
 #[test]
-#[cfg(feature = "adsv")]
-fn test_adsv_all_encodings() {
+#[cfg(feature = "aasv")]
+fn test_aasv_all_encodings() {
     let key = [0u8; 64];
-    let plaintext = "Test adsv with different encodings";
+    let plaintext = "Test aasv with different encodings";
 
     // C32 (default)
-    let ob_b32 = AdsvC32::from_bytes(&key).expect("Failed to create AdsvC32");
+    let ob_b32 = AasvC32::from_bytes(&key).expect("Failed to create AasvC32");
     let ot = ob_b32.enc(plaintext).expect("Failed to enc with base32");
     let pt2 = ob_b32.dec(&ot).expect("Failed to dec with base32");
     assert_eq!(pt2, plaintext, "Decoding mismatch for base32");
 
     // B64
-    let ob_b64 = AdsvB64::from_bytes(&key).expect("Failed to create AdsvC32");
+    let ob_b64 = AasvB64::from_bytes(&key).expect("Failed to create AasvC32");
     let ot = ob_b64.enc(plaintext).expect("Failed to enc with base64");
     let pt2 = ob_b64.dec(&ot).expect("Failed to dec with base64");
     assert_eq!(pt2, plaintext, "Decoding mismatch for base64");
 
     // Hex
-    let ob_hex = AdsvHex::from_bytes(&key).expect("Failed to create AdsvC32");
+    let ob_hex = AasvHex::from_bytes(&key).expect("Failed to create AasvC32");
     let ot = ob_hex.enc(plaintext).expect("Failed to enc with hex");
     let pt2 = ob_hex.dec(&ot).expect("Failed to dec with hex");
     assert_eq!(pt2, plaintext, "Decoding mismatch for hex");
 
-    eprintln!("✓ Adsv all encodings test passed");
+    eprintln!("✓ Aasv all encodings test passed");
 }
 
 #[test]
@@ -168,25 +168,25 @@ fn test_apsv_all_encodings() {
 }
 
 #[test]
-#[cfg(feature = "zfbcx")]
+#[cfg(feature = "zrbcx")]
 #[cfg(feature = "upbc")]
-#[cfg(feature = "adgs")]
+#[cfg(feature = "aags")]
 #[cfg(feature = "apgs")]
-#[cfg(feature = "adsv")]
+#[cfg(feature = "aasv")]
 #[cfg(feature = "apsv")]
 fn test_obflex_basic() {
     let key = [0u8; 64];
-    let mut ob = ObFlex::from_bytes("zfbcx.c32", &key).expect("Failed to create ObFlex");
+    let mut ob = ObFlex::from_bytes("zrbcx.c32", &key).expect("Failed to create ObFlex");
 
     let plaintext = "Testing ObFlex";
 
     // Test with different schemes
     for scheme in &[
-        Scheme::Zfbcx,
+        Scheme::Zrbcx,
         Scheme::Upbc,
-        Scheme::Adgs,
+        Scheme::Aags,
         Scheme::Apgs,
-        Scheme::Adsv,
+        Scheme::Aasv,
         Scheme::Apsv,
     ] {
         ob.set_scheme(*scheme)
@@ -206,34 +206,34 @@ fn test_obflex_basic() {
 }
 
 #[test]
-#[cfg(feature = "zfbcx")]
+#[cfg(feature = "zrbcx")]
 #[cfg(feature = "upbc")]
-#[cfg(feature = "adgs")]
+#[cfg(feature = "aags")]
 #[cfg(feature = "apgs")]
-#[cfg(feature = "adsv")]
+#[cfg(feature = "aasv")]
 #[cfg(feature = "apsv")]
 fn test_obflex_all_formats() {
     let key = [0u8; 64];
-    let mut ob = ObFlex::from_bytes("zfbcx.c32", &key).expect("Failed to create ObFlex");
+    let mut ob = ObFlex::from_bytes("zrbcx.c32", &key).expect("Failed to create ObFlex");
 
     let plaintext = "Testing all ObFlex formats";
 
     let formats = [
-        "zfbcx.c32",
-        "zfbcx.b64",
-        "zfbcx.hex",
+        "zrbcx.c32",
+        "zrbcx.b64",
+        "zrbcx.hex",
         "upbc.c32",
         "upbc.b64",
         "upbc.hex",
-        "adgs.c32",
-        "adgs.b64",
-        "adgs.hex",
+        "aags.c32",
+        "aags.b64",
+        "aags.hex",
         "apgs.c32",
         "apgs.b64",
         "apgs.hex",
-        "adsv.c32",
-        "adsv.b64",
-        "adsv.hex",
+        "aasv.c32",
+        "aasv.b64",
+        "aasv.hex",
         "apsv.c32",
         "apsv.b64",
         "apsv.hex",
@@ -257,10 +257,10 @@ fn test_obflex_all_formats() {
 }
 
 #[test]
-#[cfg(feature = "adgs")]
+#[cfg(feature = "aags")]
 fn test_obflex_encoding_changes() {
     let key = [0u8; 64];
-    let mut ob = ObFlex::from_bytes("adgs.c32", &key).expect("Failed to create ObFlex");
+    let mut ob = ObFlex::from_bytes("aags.c32", &key).expect("Failed to create ObFlex");
 
     let plaintext = "Testing encoding changes";
 
@@ -287,7 +287,7 @@ fn test_obflex_encoding_changes() {
 
 #[test]
 #[cfg(feature = "apgs")]
-#[cfg(feature = "adsv")]
+#[cfg(feature = "aasv")]
 #[cfg(feature = "apsv")]
 fn test_all_schemes_special_characters() {
     let key = [0u8; 64];
@@ -302,13 +302,13 @@ fn test_all_schemes_special_characters() {
         "Special characters decoding mismatch for apgs"
     );
 
-    // Test Adsv
-    let adsv = AdsvB64::from_bytes(&key).expect("Failed to create AdsvB64");
-    let ot = adsv.enc(plaintext).expect("Failed to enc with adsv");
-    let pt2 = adsv.dec(&ot).expect("Failed to dec with adsv");
+    // Test Aasv
+    let aasv = AasvB64::from_bytes(&key).expect("Failed to create AasvB64");
+    let ot = aasv.enc(plaintext).expect("Failed to enc with aasv");
+    let pt2 = aasv.dec(&ot).expect("Failed to dec with aasv");
     assert_eq!(
         pt2, plaintext,
-        "Special characters decoding mismatch for adsv"
+        "Special characters decoding mismatch for aasv"
     );
 
     // Test Apsv
@@ -325,7 +325,7 @@ fn test_all_schemes_special_characters() {
 
 #[test]
 #[cfg(feature = "apgs")]
-#[cfg(feature = "adsv")]
+#[cfg(feature = "aasv")]
 #[cfg(feature = "apsv")]
 fn test_all_schemes_empty_string() {
     let key = [0u8; 64];
@@ -339,10 +339,10 @@ fn test_all_schemes_empty_string() {
     let result = apgs.enc(plaintext);
     assert!(result.is_err(), "ApgsB64 should reject empty string");
 
-    // Test Adsv
-    let adsv = AdsvB64::from_bytes(&key).expect("Failed to create AdsvB64");
-    let result = adsv.enc(plaintext);
-    assert!(result.is_err(), "AdsvB64 should reject empty string");
+    // Test Aasv
+    let aasv = AasvB64::from_bytes(&key).expect("Failed to create AasvB64");
+    let result = aasv.enc(plaintext);
+    assert!(result.is_err(), "AasvB64 should reject empty string");
 
     // Test Apsv
     let apsv = ApsvB64::from_bytes(&key).expect("Failed to create ApsvB64");
@@ -354,7 +354,7 @@ fn test_all_schemes_empty_string() {
 
 #[test]
 #[cfg(feature = "apgs")]
-#[cfg(feature = "adsv")]
+#[cfg(feature = "aasv")]
 #[cfg(feature = "apsv")]
 fn test_all_schemes_long_string() {
     let key = [0u8; 64];
@@ -368,13 +368,13 @@ fn test_all_schemes_long_string() {
     let pt2 = apgs.dec(&ot).expect("Failed to dec long string with apgs");
     assert_eq!(pt2, plaintext, "Long string decoding mismatch for apgs");
 
-    // Test Adsv
-    let adsv = AdsvB64::from_bytes(&key).expect("Failed to create AdsvB64");
-    let ot = adsv
+    // Test Aasv
+    let aasv = AasvB64::from_bytes(&key).expect("Failed to create AasvB64");
+    let ot = aasv
         .enc(&plaintext)
-        .expect("Failed to enc long string with adsv");
-    let pt2 = adsv.dec(&ot).expect("Failed to dec long string with adsv");
-    assert_eq!(pt2, plaintext, "Long string decoding mismatch for adsv");
+        .expect("Failed to enc long string with aasv");
+    let pt2 = aasv.dec(&ot).expect("Failed to dec long string with aasv");
+    assert_eq!(pt2, plaintext, "Long string decoding mismatch for aasv");
 
     // Test ApsvB64
     let apsv = ApsvB64::from_bytes(&key).expect("Failed to create ApsvB64");
@@ -388,23 +388,23 @@ fn test_all_schemes_long_string() {
 }
 
 #[test]
-#[cfg(feature = "adgs")]
-#[cfg(feature = "adsv")]
+#[cfg(feature = "aags")]
+#[cfg(feature = "aasv")]
 fn test_cross_scheme_decoding_should_fail() {
     let key = [0u8; 64];
     let plaintext = "Test cross-scheme decoding";
 
-    // Encode with adgs
-    let adgs = AdgsB64::from_bytes(&key).expect("Failed to create adgs");
-    let ot_adgs = adgs.enc(plaintext).expect("Failed to enc with adgs");
+    // Encode with aags
+    let aags = AagsB64::from_bytes(&key).expect("Failed to create aags");
+    let ot_aags = aags.enc(plaintext).expect("Failed to enc with aags");
 
-    // Try to dec with adsv using dec_strict (should fail)
-    let adsv = AdsvB64::from_bytes(&key).expect("Failed to create adsv");
-    let result = adsv.dec_strict(&ot_adgs);
+    // Try to dec with aasv using dec_strict (should fail)
+    let aasv = AasvB64::from_bytes(&key).expect("Failed to create aasv");
+    let result = aasv.dec_strict(&ot_aags);
 
     assert!(
         result.is_err(),
-        "dec_strict should fail when decoding adgs ciphertext with adsv decr"
+        "dec_strict should fail when decoding aags ciphertext with aasv decr"
     );
 
     eprintln!("✓ Cross-scheme decoding failure test passed");
@@ -468,36 +468,36 @@ fn test_probabilistic_schemes_uniqueness() {
 }
 
 #[test]
-#[cfg(feature = "zfbcx")]
-#[cfg(feature = "adgs")]
-#[cfg(feature = "adsv")]
+#[cfg(feature = "zrbcx")]
+#[cfg(feature = "aags")]
+#[cfg(feature = "aasv")]
 fn test_deterministic_schemes_consistency() {
     let key = [0u8; 64];
     let plaintext = "Testing deterministic consistency";
     let iterations = 100;
 
-    // Test Zfbcx
-    let zfbcx = ZfbcxB64::from_bytes(&key).expect("Failed to create zfbcx");
-    let first = zfbcx.enc(plaintext).expect("Failed to enc with zfbcx");
+    // Test Zrbcx
+    let zrbcx = ZrbcxB64::from_bytes(&key).expect("Failed to create zrbcx");
+    let first = zrbcx.enc(plaintext).expect("Failed to enc with zrbcx");
     for _ in 0..iterations {
-        let ot = zfbcx.enc(plaintext).expect("Failed to enc with zfbcx");
-        assert_eq!(ot, first, "ZfbcxB64 should produce identical obtexts");
+        let ot = zrbcx.enc(plaintext).expect("Failed to enc with zrbcx");
+        assert_eq!(ot, first, "ZrbcxB64 should produce identical obtexts");
     }
 
-    // Test Adgs
-    let adgs = AdgsB64::from_bytes(&key).expect("Failed to create adgs");
-    let first = adgs.enc(plaintext).expect("Failed to enc with adgs");
+    // Test Aags
+    let aags = AagsB64::from_bytes(&key).expect("Failed to create aags");
+    let first = aags.enc(plaintext).expect("Failed to enc with aags");
     for _ in 0..iterations {
-        let ot = adgs.enc(plaintext).expect("Failed to enc with adgs");
-        assert_eq!(ot, first, "Adgs should produce identical obtexts");
+        let ot = aags.enc(plaintext).expect("Failed to enc with aags");
+        assert_eq!(ot, first, "Aags should produce identical obtexts");
     }
 
-    // Test Adsv
-    let adsv = AdsvB64::from_bytes(&key).expect("Failed to create adsv");
-    let first = adsv.enc(plaintext).expect("Failed to enc with adsv");
+    // Test Aasv
+    let aasv = AasvB64::from_bytes(&key).expect("Failed to create aasv");
+    let first = aasv.enc(plaintext).expect("Failed to enc with aasv");
     for _ in 0..iterations {
-        let ot = adsv.enc(plaintext).expect("Failed to enc with adsv");
-        assert_eq!(ot, first, "AdsvB64 should produce identical obtexts");
+        let ot = aasv.enc(plaintext).expect("Failed to enc with aasv");
+        assert_eq!(ot, first, "AasvB64 should produce identical obtexts");
     }
 
     eprintln!(

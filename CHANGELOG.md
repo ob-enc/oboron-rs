@@ -40,40 +40,40 @@ but note that pre-1.0 releases may not adhere strictly to all guidelines.
       - "t": testing (ob7x tier)
     - second letter: mode
       - "d": deterministic / no avalanche effect
-      - "h": hash-like (deterministic, change in any one byte changes obtext completely)
-      - "f": front-loaded avalanche effect: like "h" but effect localized in the prefix only
+      - "a": avalanche (deterministic + hash-like - change in any one byte changes obtext completely)
+      - "r": referenceable (avalanche effect restricted to the prefix: like "a" but effect localized in the prefix only)
       - "p": probabilistic
   - "a"-scheme names use last 2 letters for algorithms (instead of numbers):
     - "gs": AES-GCM-SIV
     - "sv": AES-SIV
   - other tiers use a single letter for a 3 letters total
   - renamed schemes:
-    - ob01  -> zdc -> zfbcx // use xor first/last instead of reversing
-    - ob21p -> upbc -> upbc // remove reversing; switch to 256-bit key
-    - ob31  -> adgs -> ahgs
-    - ob31p -> apgs -> apgs
-    - ob32  -> adsv -> ahsv
-    - ob32p -> apsv -> apsv
+    - ob01  -> zrbcx // use xor first/last instead of reversing
+    - ob21p -> upbc // remove reversing; switch to 256-bit key
+    - ob31  -> aags
+    - ob31p -> apgs
+    - ob32  -> aasv
+    - ob32p -> apsv
     - ob70  -> mock1
     - ob71  -> mock2
     - ob00  -> legacy
   - new format uses "." as separator instead of colon
   - renamed formats:
-    - ob01:c32  -> zfbcx.c32
-    - ob01:b32  -> zfbcx.b32
+    - ob01:c32  -> zrbcx.c32
+    - ob01:b32  -> zrbcx.b32
     - ob21p:b64 -> upbc.b64
-    - ob31:hex  -> ahgs.hex
-    - ob32p:c32 -> ahsv.c32
+    - ob31:hex  -> aags.hex
+    - ob32p:c32 -> aasv.c32
     - etc.
   - renamed structs:
-    - Ob01, Ob01Base32Crockford  -> ZdbcxC32
-    - Ob01Base32Rfc              -> ZdbcxB32
-    - Ob01Base64                 -> ZdbcxB64
-    - Ob01Hex                    -> ZdbcxHex
-    - Ob31, Ob31Base32Crockford  -> AhgsC32
-    - Ob31Base32Rfc              -> AhgsB32
-    - Ob31Base64                 -> AhgsB64
-    - Ob31Hex                    -> AhgsHex
+    - Ob01, Ob01Base32Crockford  -> ZrbcxC32
+    - Ob01Base32Rfc              -> ZrbcxB32
+    - Ob01Base64                 -> ZrbcxB64
+    - Ob01Hex                    -> ZrbcxHex
+    - Ob31, Ob31Base32Crockford  -> AagsC32
+    - Ob31Base32Rfc              -> AagsB32
+    - Ob31Base64                 -> AagsB64
+    - Ob31Hex                    -> AagsHex
     - Ob31p, Ob31pBase32Crockford-> ApgsC32
     - Ob31pBase32Rfc             -> ApgsB32
     - Ob31pBase64                -> ApgsB64

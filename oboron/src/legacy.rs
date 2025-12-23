@@ -1,9 +1,9 @@
 //! Legacy AES-CBC scheme (legacy)
 //!
 //! **Deprecated**: This scheme exists only for compatibility with
-//! existing deployments. New code should use `zfbcx` instead.
+//! existing deployments. New code should use `zrbcx` instead.
 //!
-//! Differences from `zfbcx`:
+//! Differences from `zrbcx`:
 //! - Reverses obtext characters rather than payload bytes
 //! - Uses different padding scheme
 //! - Less optimal prefix entropy distribution
@@ -128,7 +128,7 @@ macro_rules! impl_legacy_codec {
         #[doc = concat!("Legacy ObtextCodec implementation for ", $format_str, " format.\n\n")]
         #[doc = "**LEGACY**: This scheme is maintained for backward compatibility only.\n"]
         #[doc = "The legacy scheme uses legacy AES-CBC encryption with custom padding.\n"]
-        #[doc = "For new projects, consider using zfbcx or more secure schemes like adgs/adsv.\n"]
+        #[doc = "For new projects, consider using zrbcx or more secure schemes like aags/aasv.\n"]
         #[doc = concat!("\nCorresponds to format string: `\"", $format_str, "\"`")]
         #[allow(non_camel_case_types)]
         pub struct $name {

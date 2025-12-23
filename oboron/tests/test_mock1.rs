@@ -118,20 +118,20 @@ fn test_mock1_dec_strict() {
 }
 
 #[test]
-#[cfg(feature = "adsv")]
+#[cfg(feature = "aasv")]
 fn test_mock1_cannot_dec_other_schemes_strict() {
     let key = oboron::generate_key();
     let mock1 = oboron::Mock1C32::new(&key).unwrap();
-    let adsv = oboron::AdsvC32::new(&key).unwrap();
+    let aasv = oboron::AasvC32::new(&key).unwrap();
 
     let plaintext = "cross-scheme test";
-    let encd_adsv = adsv.enc(plaintext).unwrap();
+    let encd_aasv = aasv.enc(plaintext).unwrap();
 
     // Strict dec should fail when scheme doesn't match
-    assert!(mock1.dec_strict(&encd_adsv).is_err());
+    assert!(mock1.dec_strict(&encd_aasv).is_err());
 
     // But regular dec (with autodetection) should work
-    assert_eq!(mock1.dec(&encd_adsv).unwrap(), plaintext);
+    assert_eq!(mock1.dec(&encd_aasv).unwrap(), plaintext);
 }
 
 #[test]

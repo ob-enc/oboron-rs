@@ -62,14 +62,14 @@ key = oboron.generate_key()
 ```
 then save the key as an environment variable.
 
-Use AdsvC32 (a secure scheme, 256-bit encrypted with AES-SIV, encoded using
+Use AasvC32 (a secure scheme, 256-bit encrypted with AES-SIV, encoded using
 Crockford's base32 variant) for enc/dec:
 ```python
 import os
-from oboron import AdsvC32
+from oboron import AasvC32
 
 key = os.getenv("OBORON_KEY")  # get the key
-ob = AdsvC32(key)                 # instantiate Oboron (cipher+encoder)
+ob = AasvC32(key)                 # instantiate Oboron (cipher+encoder)
 ot = ob.enc("hello, world")    # get obtext (encrypted+encoded)
 pt2 = ob.dec(ot)               # get plaintext back (decode+decrypt obtext)
 
@@ -97,9 +97,9 @@ encryption key, the format thus uniquely specifies the complete
 transformation from a plaintext string to an encoded "obtext" string.
 Formats are represented by compact identifiers: `{scheme}:{encoding}`,
 for example:
-- `zfbcx.c32` - zfbcx scheme, Crockford base32 encoding
+- `zrbcx.c32` - zrbcx scheme, Crockford base32 encoding
 - `upbc.b32` - upbc scheme, standard RFC 4648 base32 encoding
-- `adgs.hex` - adgs scheme, hex encoding
+- `aags.hex` - aags scheme, hex encoding
 - `apsv.b64` - apsv scheme (`p`=probabilistic), base64 encoding
 
 A format thus defines the complete transformation, specifying not just
@@ -153,11 +153,11 @@ odd = authenticated.
 
 | Scheme  | Algorithm   | Deterministic? | Authenticated? | Notes |
 | :------ | :---------- | :------------- | :------------- | :---- |
-| `zfbcx`  | AES-CBC     | Yes            | No             | Legacy; uses constant IV. Prioritizes determinism and performance over security. |
+| `zrbcx`  | AES-CBC     | Yes            | No             | Legacy; uses constant IV. Prioritizes determinism and performance over security. |
 | `upbc` | AES-CBC     | No             | No             |       |
-| `adgs`  | AES-GCM-SIV | Yes            | Yes            |       |
+| `aags`  | AES-GCM-SIV | Yes            | Yes            |       |
 | `apgs` | AES-GCM-SIV | No             | Yes            |       |
-| `adsv`  | AES-SIV     | Yes            | Yes            |       |
+| `aasv`  | AES-SIV     | Yes            | Yes            |       |
 | `apsv` | AES-SIV     | No             | Yes            |       |
 
 **Key Concepts:**
@@ -175,18 +175,18 @@ odd = authenticated.
 All schemes use well-regarded cryptographic primitives. However, note
 the following:
 
-* **`zfbcx` and `upbc` are not authenticated** and vulnerable to
+* **`zrbcx` and `upbc` are not authenticated** and vulnerable to
   tampering.
-* **SECURITY WARNING:** **`zfbcx` is cryptographically broken** due to
+* **SECURITY WARNING:** **`zrbcx` is cryptographically broken** due to
   its use of a constant IV (by design, in order to achieve deterministic
   output).  This scheme leaks equality and prefix structure and is
   vulnerable to chosen-plaintext attacks.  
-  **Do not use `zfbcx` for encrypting sensitive data** or any application
+  **Do not use `zrbcx` for encrypting sensitive data** or any application
   where confidentiality or integrity matters.
-  **Use `zfbcx` only for** maximum compactness and strong prefix entropy
+  **Use `zrbcx` only for** maximum compactness and strong prefix entropy
   in non-security-critical contexts (e.g., development or obfuscation).
   For sensitive data, **always use authenticated schemes** (ob3x tier:
-  adgs or adsv).
+  aags or aasv).
 
 We reiterate that the first digit in the scheme is a critically important
 one (see [Scheme Tiers](#scheme-tiers) above):
@@ -201,10 +201,10 @@ one (see [Scheme Tiers](#scheme-tiers) above):
 > domain extend beyond encryption.  For applications such as obfuscation
 > or hashing alternative (see Application section below), ob0x schemes
 > are sufficient, while outperforming ob2x and ob3x schemes by 2x to 4x.
-> In our benchmarks, `zfbcx` shows ~40% lower latency than SHA256 for
+> In our benchmarks, `zrbcx` shows ~40% lower latency than SHA256 for
 > short inputs on modern x86 CPUs.
 
-> **FAQ:** *Why use numeric identifiers (e.g., `zfbcx`) instead of
+> **FAQ:** *Why use numeric identifiers (e.g., `zrbcx`) instead of
 > algorithm names (e.g., `AES-CBC`)?*
 >
 > Oboron's main target audience is developers who are not cryptography
@@ -214,7 +214,7 @@ one (see [Scheme Tiers](#scheme-tiers) above):
 > (`p` = probabilistic), while relegating actual algorithm names to the
 > documentation.  Besides, each algorithm is used in two different
 > variants: deterministic and probabilistic, so to identify a scheme one
-> would have to speak of "deterministic AES-CBC", as opposed to "zfbcx",
+> would have to speak of "deterministic AES-CBC", as opposed to "zrbcx",
 > or "probabilistic AES-CBC" as opposed to "upbc", which is a mouthful.
 
 
@@ -273,7 +273,7 @@ two goals achieved with the payload structure are:
    decoding
 
 The first step gives a transformed ciphertext:
-- `[ciphertext'] = [reverse(ciphertext)]` for reversed schemes (`zfbcx`,
+- `[ciphertext'] = [reverse(ciphertext)]` for reversed schemes (`zrbcx`,
   `upbc`),
 - `[ciphertext'] = [ciphertext]` for all other schemes (no change).
 
@@ -283,19 +283,19 @@ payload prior to encoding.
 - `[payload] = [ciphertext'][marker]`
 
 This marker byte is the result of an XOR operation on a constant byte
-identifier for the scheme (e.g., `oboron::constants::ZFBCX_BYTE = 0x02`),
+identifier for the scheme (e.g., `oboron::constants::ZRBCX_BYTE = 0x02`),
 and the first byte of the transformed ciphertext (`ciphertext'[0]`).
 
 - `marker = ciphertext'[0] XOR scheme-byte`
 
 The purpose of this XOR is entropy mix-in: by using the constant scheme
-byte directly, all `zfbcx` obtexts would have a constant suffix.
+byte directly, all `zrbcx` obtexts would have a constant suffix.
 
 
 > **FAQ:** *Why do some schemes reverse the ciphertext, while others
 > don't?*
 >
-> The reversal step in `zfbcx` and `upbc` schemes moves the final AES
+> The reversal step in `zrbcx` and `upbc` schemes moves the final AES
 > block to the beginning of the output, ensuring maximal entropy in the
 > encoded prefix.  Both of these schemes use AES-CBC, a block-chaining
 > algorithm: each 16-byte block's ciphertext becomes the IV for the next.
@@ -337,7 +337,7 @@ increase per-operation latency by several multiples and dominate runtime
 for the intended workloads.
 
 Subkeys are fixed, non-adaptive slices of the master key. With the
-exception of `adsv` / `apsv` (AES-SIV schemes), which intentionally use
+exception of `aasv` / `apsv` (AES-SIV schemes), which intentionally use
 the full 512-bit key, subkeys do not overlap.
 
 This implies related-key structure by construction. Oboron does not claim
@@ -351,10 +351,10 @@ for Oboron’s threat model.
 
 The master-key is partitioned into algorithm-specific keys in the
 following way:
-- `zfbcx`, `upbc`: use the first 16 bytes (128 bits) for AES key
-- `zfbcx`: uses the second 16 bytes for IV
-- `adgs`, `apgs`: use the last 32 bytes (256 bits) for AES-GCM-SIV key
-- `adsv`, `apsv`: use the full 64 bytes (512 bits) for AES-SIV key
+- `zrbcx`, `upbc`: use the first 16 bytes (128 bits) for AES key
+- `zrbcx`: uses the second 16 bytes for IV
+- `aags`, `apgs`: use the last 32 bytes (256 bits) for AES-GCM-SIV key
+- `aasv`, `apsv`: use the full 64 bytes (512 bits) for AES-SIV key
 
 The master key never leaves your application. Algorithm-specific keys
 are extracted on-the-fly and never cached or stored.
@@ -461,8 +461,8 @@ both SHA256 and JWT performance while providing reversible encryption.
 
 | Scheme | 8B Encode | 8B Decode | Security      | Use Case                        |
 |--------|----------:|-----------|---------------|---------------------------------|
-| zfbcx   | 132 ns    | 126 ns    | Insecure      | Maximum speed + compactness     |
-| adsv   | 334 ns    | 364 ns    | Secure + Auth | Balanced performance + security |
+| zrbcx   | 132 ns    | 126 ns    | Insecure      | Maximum speed + compactness     |
+| aasv   | 334 ns    | 364 ns    | Secure + Auth | Balanced performance + security |
 | JWT    | 550 ns    | 846 ns    | Auth only`*`  | Signature without encryption    |
 | SHA256 | 191 ns    | N/A       | One-way       | Hashing only                    |
 
@@ -479,17 +479,17 @@ performed on the same machine is available here:
 - [BASELINE_BENCHMARKS.md](../oboron/BASELINE_BENCHMARKS.md)
 
 **Performance advantages:**
-- zfbcx encoding is 4.1x faster than JWT with 4.5x smaller output
+- zrbcx encoding is 4.1x faster than JWT with 4.5x smaller output
 - All Oboron schemes outperform JWT for both encoding and decoding
-- zfbcx shows lower latency than SHA256+hex for short strings while
+- zrbcx shows lower latency than SHA256+hex for short strings while
   providing reversible (cryptographically insecure) encryption
 
 ### Output Length Comparison
 
 | Method        | Small string output length |
 |---------------|----------------------------|
-| Oboron zfbcx:  | 28 characters              |
-| Oboron adsv:  | 34-47 characters           |
+| Oboron zrbcx:  | 28 characters              |
+| Oboron aasv:  | 34-47 characters           |
 | Oboron apsv: | 60-72 characters           |
 | SHA256:       | 64 characters              |
 | JWT:          | 150+ characters            |
@@ -499,18 +499,18 @@ A more complete output length comparison is given in the
 
 ### Scheme Selection Guidelines
 
-- **zfbcx**: Non-security-critical applications prioritizing speed and
+- **zrbcx**: Non-security-critical applications prioritizing speed and
   compactness
-- **adsv**: General-purpose secure encryption with deterministic output
+- **aasv**: General-purpose secure encryption with deterministic output
   and compact size
 - **apsv**: Maximum privacy protection with probabilistic output
   (larger size due to nonce)
 
-**Choose zfbcx when:**
+**Choose zrbcx when:**
 - Performance and compactness are primary requirements (~28 chars)
 - Security requirements are minimal (obfuscation contexts)
 
-**Choose adsv when:**  
+**Choose aasv when:**  
 - Cryptographic security with compact output is needed (~34-47 chars)
 - Deterministic behavior is beneficial (lookup keys, caching)
 
@@ -546,8 +546,8 @@ prefix entropy and compactness—enables specialized applications:
 
 | Use Case            | Traditional Solution | Oboron Approach                    |
 |---------------------|----------------------|------------------------------------|
-| Short unique IDs    | UUIDv4 (36 chars)    | zfbcx.c32 (28 chars, reversible)    |
-| URL parameters      | JWT (150+ chars)     | adsv.b64 (4.5x smaller, 4x faster) |
+| Short unique IDs    | UUIDv4 (36 chars)    | zrbcx.c32 (28 chars, reversible)    |
+| URL parameters      | JWT (150+ chars)     | aasv.b64 (4.5x smaller, 4x faster) |
 | Database ID masking | Hashids (not secure) | Proper encryption                  |
 | Simple encryption   | Libsodium (complex)  | String in, string out API          |
 
@@ -599,13 +599,13 @@ print(f"Decrypted: {decrypted_str}")
 
 **After (Oboron - simplified, string-oriented):**
 ```python
-from oboron import AdsvC32, generate_key
+from oboron import AasvC32, generate_key
 
 # --- KEY ---
 
 # Generate key in base64 (ready for storing as environment variable)
 key = generate_key()
-ob = AdsvC32(key)
+ob = AasvC32(key)
 
 # --- ENCRYPT+ENCODE ---
 # Direct string in, string out
@@ -662,10 +662,10 @@ Problems:
 **After (Oboron - encrypted, reversible, secure):**
 ```python
 import os
-from oboron import AdsvC32
+from oboron import AasvC32
 
 key = os.environ.get("OBORON_KEY")
-ob = AdsvC32(key)
+ob = AasvC32(key)
 
 obtext = ob.enc("123")  # "waz7vh42v1jqwtavafwnxqy2anhn12w6"
 
@@ -727,14 +727,14 @@ jwt.encode(claims, 'a', algorithm="HS256")  # works fine
 import os
 import json
 import datetime
-from oboron import AdgsB64  # Deterministic, authenticated scheme
+from oboron import AagsB64  # Deterministic, authenticated scheme
 
 # Same 86 base64 characters format used for all agorithms
 # Each algorithm gets proper length cryptographic key
 # (e.g. 256-bit key for AES-GCM-SIV)
 key = os.environ.get("OBORON_KEY")
 
-ob = AdgsB64(key)
+ob = AagsB64(key)
 
 claims = {
     "user_id": 123,
@@ -784,13 +784,13 @@ Token size comparison:
 Oboron provides efficient alternatives to UUIDs and SHA256 for
 generating unique, referenceable identifiers.
 
-The examples in this section use `zfbcx` and `keyless` features, which are
+The examples in this section use `zrbcx` and `keyless` features, which are
 not included by default as cryptographically insecure.  Enable
 the required features explicitly in your `Cargo.toml`.
 
 ##### Approach 1: Full Oboron Output (Reversible)
 ```python
-ob = ZfbcxC32(keyless=True)  # Obfuscaton context
+ob = ZrbcxC32(keyless=True)  # Obfuscaton context
 full_id = ob.enc(f"user:alice")
 # "mdwsx9rdwkntyqcf806r9jhsp6gg" (28 base32 chars, reversible)
 ```
@@ -798,7 +798,7 @@ full_id = ob.enc(f"user:alice")
 - Pros:
   - *Reversible* (decodes to "user:alice"),
   - *Opaque structure:* When decoded with base32, the obtext produces a binary blob, revealing no input patterns.
-  - *Automatic handling:* Oboron detects the scheme (`zfbcx`), and can decrypt with its hardcoded key
+  - *Automatic handling:* Oboron detects the scheme (`zrbcx`), and can decrypt with its hardcoded key
 - Cons:
   - Using hardcoded key: Given the context (keyless Oboron), anyone can
     decode
@@ -807,15 +807,15 @@ full_id = ob.enc(f"user:alice")
   - Strong obfuscation where attackers have no context of Oboron use
 
 Possible security tightening if reversibility is needed:
-- Use `adgs` or `adsv` for strong 256-bit tamper-proof encryption.
-  (Trade-off: longer output: 44 chars; 2-3x slower than `zfbcx` but still
+- Use `aags` or `aasv` for strong 256-bit tamper-proof encryption.
+  (Trade-off: longer output: 44 chars; 2-3x slower than `zrbcx` but still
   comparable performance to SHA256)
 - Keep the payload securely encrypted by having a shared secret:
   `env::var("OBORON_KEY")` (Trade-off: shared secret management)
 
 ##### Approach 2: Trimmed Prefix (Hash-like, Non-reversible)
 ```rust
-ob = ZfbcxC32(keyless=True)
+ob = ZrbcxC32(keyless=True)
 full = ob.enc("user:alice")
 short_id = full[:20]
 shorter_id = full[:6]  # "mdwsx9" ~ Git 7 char hex commit reference
@@ -843,8 +843,8 @@ SHA256 in this context may have drawbacks:
 
 **Performance considerations:**
 - SHA256 + hex: ~190 ns, 64 hex characters (128-bit collision resistance)
-- Oboron zfbcx (one block): ~130 ns, 28 base32/34 hex chars (37% faster)
-- Oboron zfbcx (two blocks): ~147 ns, 53 base32/66 hex chars (27% faster,
+- Oboron zrbcx (one block): ~130 ns, 28 base32/34 hex chars (37% faster)
+- Oboron zrbcx (two blocks): ~147 ns, 53 base32/66 hex chars (27% faster,
   stronger than SHA256)
 (Times from benchmarks run on an Intel i5 laptop.)
 
@@ -891,7 +891,7 @@ clarity.
 ### 1. Fixed Format Selection (Recommended for Production)
 
 When your encryption format is fixed, instantiate the specific scheme class
-(like `AdsvC32`) directly for optimal performance and type safety:
+(like `AasvC32`) directly for optimal performance and type safety:
 
 ```python
 from oboron import ApgsB64
@@ -902,13 +902,13 @@ assert pt2 == "hello"
 ```
 
 Available types include all combinations of scheme variants (e.g.,
-`Zfbcx`, `Upbc`, `Adgs`, `Apgs`, `Adsv`, `Apsv`) with encoding
+`Zrbcx`, `Upbc`, `Aags`, `Apgs`, `Aasv`, `Apsv`) with encoding
 specifications (`B64`, `Hex`, `B32`, or `C32`),
 and concatenates the two in class names, for example:
-- `ZfbcxB32` - encoder for `zfbcx.b32` format
+- `ZrbcxB32` - encoder for `zrbcx.b32` format
 - `UpbcHex` - encoder for `upbc.hex` format
-- `AdgsB64` - encoder for `adgs.b64` format
-- `AdsvC32` - encoder for `adsv.c32` format.
+- `AagsB64` - encoder for `aags.b64` format
+- `AasvC32` - encoder for `aasv.c32` format.
 
 ### 2. Runtime Format Selection (`Ob`)
 
@@ -916,16 +916,16 @@ When format specification at runtime is required, use `Ob`:
 
 ```python
 from oboron import Ob
-ob = Ob("adsv.b64", key)
-ot = ob.enc("hello")  # adsv.b64 format obtext
+ob = Ob("aasv.b64", key)
+ot = ob.enc("hello")  # aasv.b64 format obtext
 pt2 = ob.dec(ot)
 assert pt2 == "hello"
 
-ob.set_encoding("c32")  # switch format to adsv.c32
-ob.enc("hello")  # now adsv.c32-encoded obtext
+ob.set_encoding("c32")  # switch format to aasv.c32
+ob.enc("hello")  # now aasv.c32-encoded obtext
 
-ob.set_scheme("adgs")  # switch wormat to adgs.c32
-ob.enc("hello")  # now adgs.c32-encoded obtext
+ob.set_scheme("aags")  # switch wormat to aags.c32
+ob.enc("hello")  # now aags.c32-encoded obtext
 
 ob.set_format("upbc.b64")
 ob.enc("hello")  # now upbc.b64-encoded obtext
@@ -948,7 +948,7 @@ obm = ObMulti(key)
 # Format specification per operation
 ot = obm.enc("test", "apsv.b64")
 pt2 = obm.dec(ot, "apsv.b64")
-pt_other = obm.dec(other, "zfbcx.c32")
+pt_other = obm.dec(other, "zrbcx.c32")
 ```
 
 **Autodecode:** While other interfaces perform *scheme* autodetection in
@@ -965,7 +965,7 @@ encodings, with worst-case performance ~3x slower than known-format
 dec operations. (However, the heuristic encoding detection makes the average
 performace much closer to that of normal `dec()` operations than the worst case.)
 Meanwhile, scheme autodetection in other interfaces (e.g., `Ob.dec()`,
-`AdsvB64.dec()`) has zero overhead, as the scheme is detected based
+`AasvB64.dec()`) has zero overhead, as the scheme is detected based
 on the scheme byte in the payload, and the logic follows a direct path
 with no retries.
 
@@ -978,20 +978,20 @@ instead of string literals:
 from oboron import Ob, ObMulti, formats
 
 # With Ob (runtime format selection)
-ob = Ob(formats.ADSV_B64, key)
+ob = Ob(formats.AASV_B64, key)
 
 # With ObMulti (multi-format operations)
 obm = ObMulti(key)
-ot_b64 = obm.enc("data", formats.ADSV_B64)
-ot_hex = obm.enc("data", formats.ADSV_HEX)
+ot_b64 = obm.enc("data", formats.AASV_B64)
+ot_hex = obm.enc("data", formats.AASV_HEX)
 ```
 
 Available constants:
-- `ZFBCX_C32`, `ZFBCX_B32`, `ZFBCX_B64`, `ZFBCX_HEX`
+- `ZRBCX_C32`, `ZRBCX_B32`, `ZRBCX_B64`, `ZRBCX_HEX`
 - `UPBC_C32`, `UPBC_B32`, `UPBC_B64`, `UPBC_HEX`
-- `ADGS_C32`, `ADGS_B32`, `ADGS_B64`, `ADGS_HEX`
+- `AAGS_C32`, `AAGS_B32`, `AAGS_B64`, `AAGS_HEX`
 - `APGS_C32`, `APGS_B32`, `APGS_B64`, `APGS_HEX`
-- `ADSV_C32`, `ADSV_B32`, `ADSV_B64`, `ADSV_HEX`
+- `AASV_C32`, `AASV_B32`, `AASV_B64`, `AASV_HEX`
 - `APSV_C32`, `APSV_B32`, `APSV_B64`, `APSV_HEX`
 - Testing:  `MOCK1_*`, `MOCK2_*`
 - Legacy: `LEGACY_*`
@@ -1002,8 +1002,8 @@ For compile-time known schemes and encodings, however, static types
 provide optimal performance, concise syntax, and strongest type
 guarantees:
 ```python
-from oboron import AdsvB64
-ob = AdsvB64(key)
+from oboron import AasvB64
+ob = AasvB64(key)
 ot = ob.enc("secret")
 ```
 The format is built into the class, no format strings or constants, are
@@ -1029,7 +1029,7 @@ Properties:
 ### Working with Keys
 
 ```python
-ob = AdgsB64(os.environ.get("OBORON_KEY")) # base64 key
+ob = AagsB64(os.environ.get("OBORON_KEY")) # base64 key
 ```
 
 **Warning**: `new_keyless()` uses the publicly available hardcoded key
@@ -1037,7 +1037,7 @@ providing no security. Use only for testing or obfuscation contexts where
 encryption is not required.
 
 ```python
-ob = AdgsB64(keyless=True)  # hardcoded key
+ob = AagsB64(keyless=True)  # hardcoded key
 ```
 
 
@@ -1046,7 +1046,7 @@ ob = AdgsB64(keyless=True)  # hardcoded key
 - **Key errors**: Ensure keys are exactly 86 base64 characters characters
   properly encoded from 512 bits (see note about
   [valid base64 keys](#valid-base64-keys))
-- **Format strings**: Must match exactly, e.g., "adsv.b64" not "adsv-b64"
+- **Format strings**: Must match exactly, e.g., "aasv.b64" not "aasv-b64"
 - **Decoding errors**: Use `autodec()` when format is unknown
 
 ## Compatibility
@@ -1084,9 +1084,9 @@ group.)
 | Scheme | Encoding | 4B  | 8B  | 12B | 16B | 24B | 32B | 64B  | 128B |
 |--------|----------|----:|----:|----:|----:|----:|----:|-----:|-----:|
 | mock1   | b32/c32  | 8   | 15  | 21  | 28  | 40  | 53  | 104  | 207  |
-| zfbcx   | b32/c32  | 28  | 28  | 28  | 28  | 53  | 53  | 104  | 207  |
-| adgs   | b32/c32  | 34  | 40  | 47  | 53  | 66  | 79  | 130  | 232  |
-| adsv   | b32/c32  | 34  | 40  | 47  | 53  | 66  | 79  | 130  | 232  |
+| zrbcx   | b32/c32  | 28  | 28  | 28  | 28  | 53  | 53  | 104  | 207  |
+| aags   | b32/c32  | 34  | 40  | 47  | 53  | 66  | 79  | 130  | 232  |
+| aasv   | b32/c32  | 34  | 40  | 47  | 53  | 66  | 79  | 130  | 232  |
 | upbc  | b32/c32  | 53  | 53  | 53  | 53  | 79  | 79  | 130  | 232  |
 | apgs  | b32/c32  | 53  | 60  | 66  | 72  | 85  | 98  | 149  | 252  |
 | apsv  | b32/c32  | 60  | 66  | 72  | 79  | 92  | 104 | 156  | 258  |
@@ -1096,9 +1096,9 @@ group.)
 | Scheme | Encoding | 4B  | 8B  | 12B | 16B | 24B | 32B | 64B  | 128B |
 |--------|----------|----:|----:|----:|----:|----:|----:|-----:|-----:|
 | mock1   | b64      | 7   | 12  | 18  | 23  | 34  | 44  | 87   | 172  |
-| zfbcx   | b64      | 23  | 23  | 23  | 23  | 44  | 44  | 87   | 172  |
-| adgs   | b64      | 28  | 34  | 39  | 44  | 55  | 66  | 108  | 194  |
-| adsv   | b64      | 28  | 34  | 39  | 44  | 55  | 66  | 108  | 194  |
+| zrbcx   | b64      | 23  | 23  | 23  | 23  | 44  | 44  | 87   | 172  |
+| aags   | b64      | 28  | 34  | 39  | 44  | 55  | 66  | 108  | 194  |
+| aasv   | b64      | 28  | 34  | 39  | 44  | 55  | 66  | 108  | 194  |
 | upbc  | b64      | 44  | 44  | 44  | 44  | 66  | 66  | 108  | 215  |
 | apgs  | b64      | 40  | 50  | 55  | 60  | 71  | 82  | 124  | 210  |
 | apsv  | b64      | 46  | 55  | 60  | 66  | 76  | 87  | 130  | 215  |
@@ -1108,9 +1108,9 @@ group.)
 | Scheme | Encoding | 4B  | 8B  | 12B | 16B | 24B | 32B | 64B  | 128B |
 |--------|---------:|----:|----:|----:|----:|----:|----:|-----:|-----:|
 | mock1   | hex      | 10  | 18  | 26  | 34  | 50  | 66  | 130  | 258  |
-| zfbcx   | hex      | 34  | 34  | 34  | 34  | 66  | 66  | 130  | 258  |
-| adgs   | hex      | 42  | 50  | 58  | 66  | 82  | 98  | 162  | 290  |
-| adsv   | hex      | 42  | 50  | 58  | 66  | 82  | 98  | 162  | 290  |
+| zrbcx   | hex      | 34  | 34  | 34  | 34  | 66  | 66  | 130  | 258  |
+| aags   | hex      | 42  | 50  | 58  | 66  | 82  | 98  | 162  | 290  |
+| aasv   | hex      | 42  | 50  | 58  | 66  | 82  | 98  | 162  | 290  |
 | upbc  | hex      | 66  | 66  | 66  | 66  | 98  | 98  | 162  | 290  |
 | apgs  | hex      | 66  | 74  | 82  | 90  | 106 | 122 | 186  | 314  |
 | apsv  | hex      | 74  | 82  | 90  | 98  | 114 | 130 | 194  | 322  |

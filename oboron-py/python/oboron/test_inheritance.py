@@ -7,14 +7,14 @@ def test_isinstance_checks():
     key = oboron.generate_key()
     
     # Test specific cipher classes
-    adsv = oboron.AdsvC32(key=key)
-    assert isinstance(adsv, oboron.OboronBase)
+    aasv = oboron.AasvC32(key=key)
+    assert isinstance(aasv, oboron.OboronBase)
     
-    zfbcx = oboron.ZfbcxB64(key=key)
-    assert isinstance(zfbcx, oboron.OboronBase)
+    zrbcx = oboron.ZrbcxB64(key=key)
+    assert isinstance(zrbcx, oboron.OboronBase)
     
     # Test flexible interfaces
-    ob = oboron.Ob("adsv.b64", key=key)
+    ob = oboron.Ob("aasv.b64", key=key)
     assert isinstance(ob, oboron.OboronBase)
     
     ob_multi = oboron.ObMulti(key=key)
@@ -27,8 +27,8 @@ def test_protocol_checks():
     """Test that Protocol duck typing works."""
     key = oboron.generate_key()
     
-    adsv = oboron.AdsvC32(key=key)
-    assert isinstance(adsv, oboron. OboronBase)
+    aasv = oboron.AasvC32(key=key)
+    assert isinstance(aasv, oboron. OboronBase)
     
     print("✓ Protocol checks passed!")
 
@@ -43,14 +43,14 @@ def test_polymorphic_function():
     plaintext = "Hello, World!"
     
     # Test with different cipher types
-    adsv = oboron.AdsvC32(key=key)
-    zfbcx = oboron.ZfbcxC32(key=key)
+    aasv = oboron.AasvC32(key=key)
+    zrbcx = oboron.ZrbcxC32(key=key)
     
-    ot1 = encrypt_with_cipher(adsv, plaintext)
-    ot2 = encrypt_with_cipher(zfbcx, plaintext)
+    ot1 = encrypt_with_cipher(aasv, plaintext)
+    ot2 = encrypt_with_cipher(zrbcx, plaintext)
     
-    assert adsv.dec(ot1) == plaintext
-    assert zfbcx.dec(ot2) == plaintext
+    assert aasv.dec(ot1) == plaintext
+    assert zrbcx.dec(ot2) == plaintext
     
     print("✓ Polymorphic function test passed!")
 

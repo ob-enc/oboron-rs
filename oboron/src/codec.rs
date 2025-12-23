@@ -5,7 +5,7 @@ use crate::{error::Error, Encoding, Format, Keychain, Scheme};
 
 /// Core trait for ObtextCodec encryption+encoding/decoding+decryption implementations.
 ///
-/// Each scheme+encoding combination (ZfbcxC32, ZfbcxB64, etc.) implements this trait
+/// Each scheme+encoding combination (ZrbcxC32, ZrbcxB64, etc.) implements this trait
 /// to provide a consistent interface for encoding and decoding operations.
 ///
 /// Note: Construction methods (`new`, `from_bytes`, `new_keyless`) are not part of
@@ -54,10 +54,10 @@ use crate::legacy::{LegacyB32, LegacyB64, LegacyC32, LegacyHex};
 /// - All constants baked in at compile time
 macro_rules! impl_codec {
     (
-        $name:ident,           // Type name (e.g., ZfbcxC32)
-        $scheme:expr,          // Scheme constant (e.g., Scheme::Zfbcx)
+        $name:ident,           // Type name (e.g., ZrbcxC32)
+        $scheme:expr,          // Scheme constant (e.g., Scheme::Zrbcx)
         $encoding:expr,        // Encoding constant (e.g., Encoding::C32)
-        $format_str:expr       // Format string for docs (e.g., "zfbcx.c32")
+        $format_str:expr       // Format string for docs (e.g., "zrbcx.c32")
     ) => {
         #[doc = concat!("ObtextCodec implementation for ", $format_str, " format.\n\n")]
         #[doc = concat!("Corresponds to format string: `\"", $format_str, "\"`")]
@@ -226,25 +226,25 @@ macro_rules! impl_codec {
 
 // Generate all scheme+encoding combinations using the optimized macro
 
-// adgs variants
-#[cfg(feature = "adgs")]
-impl_codec!(AdgsB32, Scheme::Adgs, Encoding::B32, "adgs.b32");
-#[cfg(feature = "adgs")]
-impl_codec!(AdgsC32, Scheme::Adgs, Encoding::C32, "adgs.c32");
-#[cfg(feature = "adgs")]
-impl_codec!(AdgsB64, Scheme::Adgs, Encoding::B64, "adgs.b64");
-#[cfg(feature = "adgs")]
-impl_codec!(AdgsHex, Scheme::Adgs, Encoding::Hex, "adgs.hex");
+// aags variants
+#[cfg(feature = "aags")]
+impl_codec!(AagsB32, Scheme::Aags, Encoding::B32, "aags.b32");
+#[cfg(feature = "aags")]
+impl_codec!(AagsC32, Scheme::Aags, Encoding::C32, "aags.c32");
+#[cfg(feature = "aags")]
+impl_codec!(AagsB64, Scheme::Aags, Encoding::B64, "aags.b64");
+#[cfg(feature = "aags")]
+impl_codec!(AagsHex, Scheme::Aags, Encoding::Hex, "aags.hex");
 
-// adsv variants
-#[cfg(feature = "adsv")]
-impl_codec!(AdsvB32, Scheme::Adsv, Encoding::B32, "adsv.b32");
-#[cfg(feature = "adsv")]
-impl_codec!(AdsvC32, Scheme::Adsv, Encoding::C32, "adsv.c32");
-#[cfg(feature = "adsv")]
-impl_codec!(AdsvB64, Scheme::Adsv, Encoding::B64, "adsv.b64");
-#[cfg(feature = "adsv")]
-impl_codec!(AdsvHex, Scheme::Adsv, Encoding::Hex, "adsv.hex");
+// aasv variants
+#[cfg(feature = "aasv")]
+impl_codec!(AasvB32, Scheme::Aasv, Encoding::B32, "aasv.b32");
+#[cfg(feature = "aasv")]
+impl_codec!(AasvC32, Scheme::Aasv, Encoding::C32, "aasv.c32");
+#[cfg(feature = "aasv")]
+impl_codec!(AasvB64, Scheme::Aasv, Encoding::B64, "aasv.b64");
+#[cfg(feature = "aasv")]
+impl_codec!(AasvHex, Scheme::Aasv, Encoding::Hex, "aasv.hex");
 
 // apgs variants
 #[cfg(feature = "apgs")]
@@ -276,15 +276,15 @@ impl_codec!(UpbcB64, Scheme::Upbc, Encoding::B64, "upbc.b64");
 #[cfg(feature = "upbc")]
 impl_codec!(UpbcHex, Scheme::Upbc, Encoding::Hex, "upbc.hex");
 
-// zfbcx variants
-#[cfg(feature = "zfbcx")]
-impl_codec!(ZfbcxB32, Scheme::Zfbcx, Encoding::B32, "zfbcx.b32");
-#[cfg(feature = "zfbcx")]
-impl_codec!(ZfbcxC32, Scheme::Zfbcx, Encoding::C32, "zfbcx.c32");
-#[cfg(feature = "zfbcx")]
-impl_codec!(ZfbcxB64, Scheme::Zfbcx, Encoding::B64, "zfbcx.b64");
-#[cfg(feature = "zfbcx")]
-impl_codec!(ZfbcxHex, Scheme::Zfbcx, Encoding::Hex, "zfbcx.hex");
+// zrbcx variants
+#[cfg(feature = "zrbcx")]
+impl_codec!(ZrbcxB32, Scheme::Zrbcx, Encoding::B32, "zrbcx.b32");
+#[cfg(feature = "zrbcx")]
+impl_codec!(ZrbcxC32, Scheme::Zrbcx, Encoding::C32, "zrbcx.c32");
+#[cfg(feature = "zrbcx")]
+impl_codec!(ZrbcxB64, Scheme::Zrbcx, Encoding::B64, "zrbcx.b64");
+#[cfg(feature = "zrbcx")]
+impl_codec!(ZrbcxHex, Scheme::Zrbcx, Encoding::Hex, "zrbcx.hex");
 
 // Testing
 
@@ -314,14 +314,14 @@ impl_codec!(Mock2Hex, Scheme::Mock2, Encoding::Hex, "mock2.hex");
 /// It's returned by the `oboron::new()` factory function.
 #[allow(non_camel_case_types)]
 pub enum ObAny {
-    #[cfg(feature = "zfbcx")]
-    ZfbcxC32(ZfbcxC32),
-    #[cfg(feature = "zfbcx")]
-    ZfbcxB32(ZfbcxB32),
-    #[cfg(feature = "zfbcx")]
-    ZfbcxB64(ZfbcxB64),
-    #[cfg(feature = "zfbcx")]
-    ZfbcxHex(ZfbcxHex),
+    #[cfg(feature = "zrbcx")]
+    ZrbcxC32(ZrbcxC32),
+    #[cfg(feature = "zrbcx")]
+    ZrbcxB32(ZrbcxB32),
+    #[cfg(feature = "zrbcx")]
+    ZrbcxB64(ZrbcxB64),
+    #[cfg(feature = "zrbcx")]
+    ZrbcxHex(ZrbcxHex),
     #[cfg(feature = "upbc")]
     UpbcC32(UpbcC32),
     #[cfg(feature = "upbc")]
@@ -330,14 +330,14 @@ pub enum ObAny {
     UpbcB64(UpbcB64),
     #[cfg(feature = "upbc")]
     UpbcHex(UpbcHex),
-    #[cfg(feature = "adgs")]
-    AdgsC32(AdgsC32),
-    #[cfg(feature = "adgs")]
-    AdgsB32(AdgsB32),
-    #[cfg(feature = "adgs")]
-    AdgsB64(AdgsB64),
-    #[cfg(feature = "adgs")]
-    AdgsHex(AdgsHex),
+    #[cfg(feature = "aags")]
+    AagsC32(AagsC32),
+    #[cfg(feature = "aags")]
+    AagsB32(AagsB32),
+    #[cfg(feature = "aags")]
+    AagsB64(AagsB64),
+    #[cfg(feature = "aags")]
+    AagsHex(AagsHex),
     #[cfg(feature = "apgs")]
     ApgsC32(ApgsC32),
     #[cfg(feature = "apgs")]
@@ -346,14 +346,14 @@ pub enum ObAny {
     ApgsB64(ApgsB64),
     #[cfg(feature = "apgs")]
     ApgsHex(ApgsHex),
-    #[cfg(feature = "adsv")]
-    AdsvC32(AdsvC32),
-    #[cfg(feature = "adsv")]
-    AdsvB32(AdsvB32),
-    #[cfg(feature = "adsv")]
-    AdsvB64(AdsvB64),
-    #[cfg(feature = "adsv")]
-    AdsvHex(AdsvHex),
+    #[cfg(feature = "aasv")]
+    AasvC32(AasvC32),
+    #[cfg(feature = "aasv")]
+    AasvB32(AasvB32),
+    #[cfg(feature = "aasv")]
+    AasvB64(AasvB64),
+    #[cfg(feature = "aasv")]
+    AasvHex(AasvHex),
     #[cfg(feature = "apsv")]
     ApsvC32(ApsvC32),
     #[cfg(feature = "apsv")]
@@ -395,14 +395,14 @@ macro_rules! delegate_to_inner {
     (fn $method:ident(&self $(, $arg:ident: $argty:ty)*) -> $ret:ty) => {
         fn $method(&self $(, $arg: $argty)*) -> $ret {
             match self {
-                #[cfg(feature = "zfbcx")]
-                ObAny::ZfbcxC32(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "zfbcx")]
-                ObAny::ZfbcxB32(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "zfbcx")]
-                ObAny::ZfbcxB64(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "zfbcx")]
-                ObAny::ZfbcxHex(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "zrbcx")]
+                ObAny::ZrbcxC32(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "zrbcx")]
+                ObAny::ZrbcxB32(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "zrbcx")]
+                ObAny::ZrbcxB64(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "zrbcx")]
+                ObAny::ZrbcxHex(ob) => ob.$method($($arg),*),
                 #[cfg(feature = "upbc")]
                 ObAny::UpbcC32(ob) => ob.$method($($arg),*),
                 #[cfg(feature = "upbc")]
@@ -411,14 +411,14 @@ macro_rules! delegate_to_inner {
                 ObAny::UpbcB64(ob) => ob.$method($($arg),*),
                 #[cfg(feature = "upbc")]
                 ObAny::UpbcHex(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "adgs")]
-                ObAny::AdgsC32(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "adgs")]
-                ObAny::AdgsB32(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "adgs")]
-                ObAny::AdgsB64(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "adgs")]
-                ObAny::AdgsHex(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "aags")]
+                ObAny::AagsC32(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "aags")]
+                ObAny::AagsB32(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "aags")]
+                ObAny::AagsB64(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "aags")]
+                ObAny::AagsHex(ob) => ob.$method($($arg),*),
                 #[cfg(feature = "apgs")]
                 ObAny::ApgsC32(ob) => ob.$method($($arg),*),
                 #[cfg(feature = "apgs")]
@@ -427,14 +427,14 @@ macro_rules! delegate_to_inner {
                 ObAny::ApgsB64(ob) => ob.$method($($arg),*),
                 #[cfg(feature = "apgs")]
                 ObAny::ApgsHex(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "adsv")]
-                ObAny::AdsvC32(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "adsv")]
-                ObAny::AdsvB32(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "adsv")]
-                ObAny::AdsvB64(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "adsv")]
-                ObAny::AdsvHex(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "aasv")]
+                ObAny::AasvC32(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "aasv")]
+                ObAny::AasvB32(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "aasv")]
+                ObAny::AasvB64(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "aasv")]
+                ObAny::AasvHex(ob) => ob.$method($($arg),*),
                 #[cfg(feature = "apsv")]
                 ObAny::ApsvC32(ob) => ob.$method($($arg),*),
                 #[cfg(feature = "apsv")]
@@ -496,60 +496,60 @@ impl ObAny {
     pub fn new(key: &str) -> Result<Self, Error> {
         #[cfg(feature = "mock")]
         return Ok(ObAny::Mock1C32(Mock1C32::new(key)?));
-        #[cfg(feature = "zfbcx")]
+        #[cfg(feature = "zrbcx")]
         #[cfg(not(feature = "mock"))]
-        return Ok(ObAny::ZfbcxC32(ZfbcxC32::new(key)?));
+        return Ok(ObAny::ZrbcxC32(ZrbcxC32::new(key)?));
         #[cfg(feature = "upbc")]
-        #[cfg(not(any(feature = "mock", feature = "zfbcx")))]
+        #[cfg(not(any(feature = "mock", feature = "zrbcx")))]
         return Ok(ObAny::UpbcC32(UpbcC32::new(key)?));
-        #[cfg(feature = "adgs")]
-        #[cfg(not(any(feature = "mock", feature = "zfbcx", feature = "upbc")))]
-        return Ok(ObAny::AdgsC32(AdgsC32::new(key)?));
+        #[cfg(feature = "aags")]
+        #[cfg(not(any(feature = "mock", feature = "zrbcx", feature = "upbc")))]
+        return Ok(ObAny::AagsC32(AagsC32::new(key)?));
         #[cfg(feature = "apgs")]
         #[cfg(not(any(
             feature = "mock",
-            feature = "zfbcx",
+            feature = "zrbcx",
             feature = "upbc",
-            feature = "adgs"
+            feature = "aags"
         )))]
         return Ok(ObAny::ApgsC32(ApgsC32::new(key)?));
-        #[cfg(feature = "adsv")]
+        #[cfg(feature = "aasv")]
         #[cfg(not(any(
             feature = "mock",
-            feature = "zfbcx",
+            feature = "zrbcx",
             feature = "upbc",
-            feature = "adgs",
+            feature = "aags",
             feature = "apgs"
         )))]
-        return Ok(ObAny::AdsvC32(AdsvC32::new(key)?));
+        return Ok(ObAny::AasvC32(AasvC32::new(key)?));
         #[cfg(feature = "apsv")]
         #[cfg(not(any(
             feature = "mock",
-            feature = "zfbcx",
+            feature = "zrbcx",
             feature = "upbc",
-            feature = "adgs",
+            feature = "aags",
             feature = "apgs",
-            feature = "adsv"
+            feature = "aasv"
         )))]
         return Ok(ObAny::ApsvC32(ApsvC32::new(key)?));
         #[cfg(feature = "legacy")]
         #[cfg(not(any(
             feature = "mock",
-            feature = "zfbcx",
+            feature = "zrbcx",
             feature = "upbc",
-            feature = "adgs",
+            feature = "aags",
             feature = "apgs",
-            feature = "adsv",
+            feature = "aasv",
             feature = "apsv"
         )))]
         return Ok(ObAny::LegacyC32(LegacyC32::new(key)?));
         #[cfg(not(any(
             feature = "mock",
-            feature = "zfbcx",
+            feature = "zrbcx",
             feature = "upbc",
-            feature = "adgs",
+            feature = "aags",
             feature = "apgs",
-            feature = "adsv",
+            feature = "aasv",
             feature = "apsv",
             feature = "legacy"
         )))]
@@ -566,50 +566,50 @@ impl ObAny {
         return Ok(ObAny::Mock1C32(Mock1C32 {
             keychain: Keychain::from_bytes(key_bytes)?,
         }));
-        #[cfg(feature = "zfbcx")]
+        #[cfg(feature = "zrbcx")]
         #[cfg(not(feature = "mock"))]
-        return Ok(ObAny::ZfbcxC32(ZfbcxC32 {
+        return Ok(ObAny::ZrbcxC32(ZrbcxC32 {
             keychain: Keychain::from_bytes(key_bytes)?,
         }));
         #[cfg(feature = "upbc")]
-        #[cfg(not(any(feature = "mock", feature = "zfbcx")))]
+        #[cfg(not(any(feature = "mock", feature = "zrbcx")))]
         return Ok(ObAny::UpbcC32(UpbcC32 {
             keychain: Keychain::from_bytes(key_bytes)?,
         }));
-        #[cfg(feature = "adgs")]
-        #[cfg(not(any(feature = "mock", feature = "zfbcx", feature = "upbc")))]
-        return Ok(ObAny::AdgsC32(AdgsC32 {
+        #[cfg(feature = "aags")]
+        #[cfg(not(any(feature = "mock", feature = "zrbcx", feature = "upbc")))]
+        return Ok(ObAny::AagsC32(AagsC32 {
             keychain: Keychain::from_bytes(key_bytes)?,
         }));
         #[cfg(feature = "apgs")]
         #[cfg(not(any(
             feature = "mock",
-            feature = "zfbcx",
+            feature = "zrbcx",
             feature = "upbc",
-            feature = "adgs"
+            feature = "aags"
         )))]
         return Ok(ObAny::ApgsC32(ApgsC32 {
             keychain: Keychain::from_bytes(key_bytes)?,
         }));
-        #[cfg(feature = "adsv")]
+        #[cfg(feature = "aasv")]
         #[cfg(not(any(
             feature = "mock",
-            feature = "zfbcx",
+            feature = "zrbcx",
             feature = "upbc",
-            feature = "adgs",
+            feature = "aags",
             feature = "apgs"
         )))]
-        return Ok(ObAny::AdsvC32(AdsvC32 {
+        return Ok(ObAny::AasvC32(AasvC32 {
             keychain: Keychain::from_bytes(key_bytes)?,
         }));
         #[cfg(feature = "apsv")]
         #[cfg(not(any(
             feature = "mock",
-            feature = "zfbcx",
+            feature = "zrbcx",
             feature = "upbc",
-            feature = "adgs",
+            feature = "aags",
             feature = "apgs",
-            feature = "adsv"
+            feature = "aasv"
         )))]
         return Ok(ObAny::ApsvC32(ApsvC32 {
             keychain: Keychain::from_bytes(key_bytes)?,
@@ -617,11 +617,11 @@ impl ObAny {
         #[cfg(feature = "legacy")]
         #[cfg(not(any(
             feature = "mock",
-            feature = "zfbcx",
+            feature = "zrbcx",
             feature = "upbc",
-            feature = "adgs",
+            feature = "aags",
             feature = "apgs",
-            feature = "adsv",
+            feature = "aasv",
             feature = "apsv"
         )))]
         return Ok(ObAny::LegacyC32(LegacyC32 {
@@ -629,11 +629,11 @@ impl ObAny {
         }));
         #[cfg(not(any(
             feature = "mock",
-            feature = "zfbcx",
+            feature = "zrbcx",
             feature = "upbc",
-            feature = "adgs",
+            feature = "aags",
             feature = "apgs",
-            feature = "adsv",
+            feature = "aasv",
             feature = "apsv",
             feature = "legacy"
         )))]
@@ -644,60 +644,60 @@ impl ObAny {
     pub fn from_hex_key(key_hex: &str) -> Result<Self, Error> {
         #[cfg(feature = "mock")]
         return Ok(ObAny::Mock1C32(Mock1C32::from_hex_key(key_hex)?));
-        #[cfg(feature = "zfbcx")]
+        #[cfg(feature = "zrbcx")]
         #[cfg(not(feature = "mock"))]
-        return Ok(ObAny::ZfbcxC32(ZfbcxC32::from_hex_key(key_hex)?));
+        return Ok(ObAny::ZrbcxC32(ZrbcxC32::from_hex_key(key_hex)?));
         #[cfg(feature = "upbc")]
-        #[cfg(not(any(feature = "mock", feature = "zfbcx")))]
+        #[cfg(not(any(feature = "mock", feature = "zrbcx")))]
         return Ok(ObAny::UpbcC32(UpbcC32::from_hex_key(key_hex)?));
-        #[cfg(feature = "adgs")]
-        #[cfg(not(any(feature = "mock", feature = "zfbcx", feature = "upbc")))]
-        return Ok(ObAny::AdgsC32(AdgsC32::from_hex_key(key_hex)?));
+        #[cfg(feature = "aags")]
+        #[cfg(not(any(feature = "mock", feature = "zrbcx", feature = "upbc")))]
+        return Ok(ObAny::AagsC32(AagsC32::from_hex_key(key_hex)?));
         #[cfg(feature = "apgs")]
         #[cfg(not(any(
             feature = "mock",
-            feature = "zfbcx",
+            feature = "zrbcx",
             feature = "upbc",
-            feature = "adgs"
+            feature = "aags"
         )))]
         return Ok(ObAny::ApgsC32(ApgsC32::from_hex_key(key_hex)?));
-        #[cfg(feature = "adsv")]
+        #[cfg(feature = "aasv")]
         #[cfg(not(any(
             feature = "mock",
-            feature = "zfbcx",
+            feature = "zrbcx",
             feature = "upbc",
-            feature = "adgs",
+            feature = "aags",
             feature = "apgs"
         )))]
-        return Ok(ObAny::AdsvC32(AdsvC32::from_hex_key(key_hex)?));
+        return Ok(ObAny::AasvC32(AasvC32::from_hex_key(key_hex)?));
         #[cfg(feature = "apsv")]
         #[cfg(not(any(
             feature = "mock",
-            feature = "zfbcx",
+            feature = "zrbcx",
             feature = "upbc",
-            feature = "adgs",
+            feature = "aags",
             feature = "apgs",
-            feature = "adsv"
+            feature = "aasv"
         )))]
         return Ok(ObAny::ApsvC32(ApsvC32::from_hex_key(key_hex)?));
         #[cfg(feature = "legacy")]
         #[cfg(not(any(
             feature = "mock",
-            feature = "zfbcx",
+            feature = "zrbcx",
             feature = "upbc",
-            feature = "adgs",
+            feature = "aags",
             feature = "apgs",
-            feature = "adsv",
+            feature = "aasv",
             feature = "apsv"
         )))]
         return Ok(ObAny::LegacyC32(LegacyC32::from_hex_key(key_hex)?));
         #[cfg(not(any(
             feature = "mock",
-            feature = "zfbcx",
+            feature = "zrbcx",
             feature = "upbc",
-            feature = "adgs",
+            feature = "aags",
             feature = "apgs",
-            feature = "adsv",
+            feature = "aasv",
             feature = "apsv",
             feature = "legacy"
         )))]
@@ -713,50 +713,50 @@ impl ObAny {
         return Ok(ObAny::Mock1C32(Mock1C32 {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
         }));
-        #[cfg(feature = "zfbcx")]
+        #[cfg(feature = "zrbcx")]
         #[cfg(not(feature = "mock"))]
-        return Ok(ObAny::ZfbcxC32(ZfbcxC32 {
+        return Ok(ObAny::ZrbcxC32(ZrbcxC32 {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
         }));
         #[cfg(feature = "upbc")]
-        #[cfg(not(any(feature = "mock", feature = "zfbcx")))]
+        #[cfg(not(any(feature = "mock", feature = "zrbcx")))]
         return Ok(ObAny::UpbcC32(UpbcC32 {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
         }));
-        #[cfg(feature = "adgs")]
-        #[cfg(not(any(feature = "mock", feature = "zfbcx", feature = "upbc")))]
-        return Ok(ObAny::AdgsC32(AdgsC32 {
+        #[cfg(feature = "aags")]
+        #[cfg(not(any(feature = "mock", feature = "zrbcx", feature = "upbc")))]
+        return Ok(ObAny::AagsC32(AagsC32 {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
         }));
         #[cfg(feature = "apgs")]
         #[cfg(not(any(
             feature = "mock",
-            feature = "zfbcx",
+            feature = "zrbcx",
             feature = "upbc",
-            feature = "adgs"
+            feature = "aags"
         )))]
         return Ok(ObAny::ApgsC32(ApgsC32 {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
         }));
-        #[cfg(feature = "adsv")]
+        #[cfg(feature = "aasv")]
         #[cfg(not(any(
             feature = "mock",
-            feature = "zfbcx",
+            feature = "zrbcx",
             feature = "upbc",
-            feature = "adgs",
+            feature = "aags",
             feature = "apgs"
         )))]
-        return Ok(ObAny::AdsvC32(AdsvC32 {
+        return Ok(ObAny::AasvC32(AasvC32 {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
         }));
         #[cfg(feature = "apsv")]
         #[cfg(not(any(
             feature = "mock",
-            feature = "zfbcx",
+            feature = "zrbcx",
             feature = "upbc",
-            feature = "adgs",
+            feature = "aags",
             feature = "apgs",
-            feature = "adsv"
+            feature = "aasv"
         )))]
         return Ok(ObAny::ApsvC32(ApsvC32 {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
@@ -764,11 +764,11 @@ impl ObAny {
         #[cfg(feature = "legacy")]
         #[cfg(not(any(
             feature = "mock",
-            feature = "zfbcx",
+            feature = "zrbcx",
             feature = "upbc",
-            feature = "adgs",
+            feature = "aags",
             feature = "apgs",
-            feature = "adsv",
+            feature = "aasv",
             feature = "apsv"
         )))]
         return Ok(ObAny::LegacyC32(LegacyC32 {
@@ -776,11 +776,11 @@ impl ObAny {
         }));
         #[cfg(not(any(
             feature = "mock",
-            feature = "zfbcx",
+            feature = "zrbcx",
             feature = "upbc",
-            feature = "adgs",
+            feature = "aags",
             feature = "apgs",
-            feature = "adsv",
+            feature = "aasv",
             feature = "apsv",
             feature = "legacy"
         )))]
@@ -797,14 +797,14 @@ pub fn new(fmt: &str, key: &str) -> Result<ObAny, Error> {
 /// Create an encoder from a pre-parsed Format and base64 key.
 pub fn new_with_format(format: Format, key: &str) -> Result<ObAny, Error> {
     match (format.scheme(), format.encoding()) {
-        #[cfg(feature = "zfbcx")]
-        (Scheme::Zfbcx, Encoding::C32) => Ok(ObAny::ZfbcxC32(ZfbcxC32::new(key)?)),
-        #[cfg(feature = "zfbcx")]
-        (Scheme::Zfbcx, Encoding::B32) => Ok(ObAny::ZfbcxB32(ZfbcxB32::new(key)?)),
-        #[cfg(feature = "zfbcx")]
-        (Scheme::Zfbcx, Encoding::B64) => Ok(ObAny::ZfbcxB64(ZfbcxB64::new(key)?)),
-        #[cfg(feature = "zfbcx")]
-        (Scheme::Zfbcx, Encoding::Hex) => Ok(ObAny::ZfbcxHex(ZfbcxHex::new(key)?)),
+        #[cfg(feature = "zrbcx")]
+        (Scheme::Zrbcx, Encoding::C32) => Ok(ObAny::ZrbcxC32(ZrbcxC32::new(key)?)),
+        #[cfg(feature = "zrbcx")]
+        (Scheme::Zrbcx, Encoding::B32) => Ok(ObAny::ZrbcxB32(ZrbcxB32::new(key)?)),
+        #[cfg(feature = "zrbcx")]
+        (Scheme::Zrbcx, Encoding::B64) => Ok(ObAny::ZrbcxB64(ZrbcxB64::new(key)?)),
+        #[cfg(feature = "zrbcx")]
+        (Scheme::Zrbcx, Encoding::Hex) => Ok(ObAny::ZrbcxHex(ZrbcxHex::new(key)?)),
         #[cfg(feature = "upbc")]
         (Scheme::Upbc, Encoding::C32) => Ok(ObAny::UpbcC32(UpbcC32::new(key)?)),
         #[cfg(feature = "upbc")]
@@ -813,14 +813,14 @@ pub fn new_with_format(format: Format, key: &str) -> Result<ObAny, Error> {
         (Scheme::Upbc, Encoding::B64) => Ok(ObAny::UpbcB64(UpbcB64::new(key)?)),
         #[cfg(feature = "upbc")]
         (Scheme::Upbc, Encoding::Hex) => Ok(ObAny::UpbcHex(UpbcHex::new(key)?)),
-        #[cfg(feature = "adgs")]
-        (Scheme::Adgs, Encoding::C32) => Ok(ObAny::AdgsC32(AdgsC32::new(key)?)),
-        #[cfg(feature = "adgs")]
-        (Scheme::Adgs, Encoding::B32) => Ok(ObAny::AdgsB32(AdgsB32::new(key)?)),
-        #[cfg(feature = "adgs")]
-        (Scheme::Adgs, Encoding::B64) => Ok(ObAny::AdgsB64(AdgsB64::new(key)?)),
-        #[cfg(feature = "adgs")]
-        (Scheme::Adgs, Encoding::Hex) => Ok(ObAny::AdgsHex(AdgsHex::new(key)?)),
+        #[cfg(feature = "aags")]
+        (Scheme::Aags, Encoding::C32) => Ok(ObAny::AagsC32(AagsC32::new(key)?)),
+        #[cfg(feature = "aags")]
+        (Scheme::Aags, Encoding::B32) => Ok(ObAny::AagsB32(AagsB32::new(key)?)),
+        #[cfg(feature = "aags")]
+        (Scheme::Aags, Encoding::B64) => Ok(ObAny::AagsB64(AagsB64::new(key)?)),
+        #[cfg(feature = "aags")]
+        (Scheme::Aags, Encoding::Hex) => Ok(ObAny::AagsHex(AagsHex::new(key)?)),
         #[cfg(feature = "apgs")]
         (Scheme::Apgs, Encoding::C32) => Ok(ObAny::ApgsC32(ApgsC32::new(key)?)),
         #[cfg(feature = "apgs")]
@@ -829,14 +829,14 @@ pub fn new_with_format(format: Format, key: &str) -> Result<ObAny, Error> {
         (Scheme::Apgs, Encoding::B64) => Ok(ObAny::ApgsB64(ApgsB64::new(key)?)),
         #[cfg(feature = "apgs")]
         (Scheme::Apgs, Encoding::Hex) => Ok(ObAny::ApgsHex(ApgsHex::new(key)?)),
-        #[cfg(feature = "adsv")]
-        (Scheme::Adsv, Encoding::C32) => Ok(ObAny::AdsvC32(AdsvC32::new(key)?)),
-        #[cfg(feature = "adsv")]
-        (Scheme::Adsv, Encoding::B32) => Ok(ObAny::AdsvB32(AdsvB32::new(key)?)),
-        #[cfg(feature = "adsv")]
-        (Scheme::Adsv, Encoding::B64) => Ok(ObAny::AdsvB64(AdsvB64::new(key)?)),
-        #[cfg(feature = "adsv")]
-        (Scheme::Adsv, Encoding::Hex) => Ok(ObAny::AdsvHex(AdsvHex::new(key)?)),
+        #[cfg(feature = "aasv")]
+        (Scheme::Aasv, Encoding::C32) => Ok(ObAny::AasvC32(AasvC32::new(key)?)),
+        #[cfg(feature = "aasv")]
+        (Scheme::Aasv, Encoding::B32) => Ok(ObAny::AasvB32(AasvB32::new(key)?)),
+        #[cfg(feature = "aasv")]
+        (Scheme::Aasv, Encoding::B64) => Ok(ObAny::AasvB64(AasvB64::new(key)?)),
+        #[cfg(feature = "aasv")]
+        (Scheme::Aasv, Encoding::Hex) => Ok(ObAny::AasvHex(AasvHex::new(key)?)),
         #[cfg(feature = "apsv")]
         (Scheme::Apsv, Encoding::C32) => Ok(ObAny::ApsvC32(ApsvC32::new(key)?)),
         #[cfg(feature = "apsv")]
@@ -879,21 +879,21 @@ pub fn new_with_format(format: Format, key: &str) -> Result<ObAny, Error> {
 #[cfg(any(feature = "keyless", feature = "bytes-keys", feature = "hex-keys"))]
 fn from_bytes_with_format_internal(format: Format, key_bytes: &[u8; 64]) -> Result<ObAny, Error> {
     match (format.scheme(), format.encoding()) {
-        #[cfg(feature = "zfbcx")]
-        (Scheme::Zfbcx, Encoding::C32) => {
-            Ok(ObAny::ZfbcxC32(ZfbcxC32::from_bytes_internal(key_bytes)?))
+        #[cfg(feature = "zrbcx")]
+        (Scheme::Zrbcx, Encoding::C32) => {
+            Ok(ObAny::ZrbcxC32(ZrbcxC32::from_bytes_internal(key_bytes)?))
         }
-        #[cfg(feature = "zfbcx")]
-        (Scheme::Zfbcx, Encoding::B32) => {
-            Ok(ObAny::ZfbcxB32(ZfbcxB32::from_bytes_internal(key_bytes)?))
+        #[cfg(feature = "zrbcx")]
+        (Scheme::Zrbcx, Encoding::B32) => {
+            Ok(ObAny::ZrbcxB32(ZrbcxB32::from_bytes_internal(key_bytes)?))
         }
-        #[cfg(feature = "zfbcx")]
-        (Scheme::Zfbcx, Encoding::B64) => {
-            Ok(ObAny::ZfbcxB64(ZfbcxB64::from_bytes_internal(key_bytes)?))
+        #[cfg(feature = "zrbcx")]
+        (Scheme::Zrbcx, Encoding::B64) => {
+            Ok(ObAny::ZrbcxB64(ZrbcxB64::from_bytes_internal(key_bytes)?))
         }
-        #[cfg(feature = "zfbcx")]
-        (Scheme::Zfbcx, Encoding::Hex) => {
-            Ok(ObAny::ZfbcxHex(ZfbcxHex::from_bytes_internal(key_bytes)?))
+        #[cfg(feature = "zrbcx")]
+        (Scheme::Zrbcx, Encoding::Hex) => {
+            Ok(ObAny::ZrbcxHex(ZrbcxHex::from_bytes_internal(key_bytes)?))
         }
         #[cfg(feature = "upbc")]
         (Scheme::Upbc, Encoding::C32) => {
@@ -911,21 +911,21 @@ fn from_bytes_with_format_internal(format: Format, key_bytes: &[u8; 64]) -> Resu
         (Scheme::Upbc, Encoding::Hex) => {
             Ok(ObAny::UpbcHex(UpbcHex::from_bytes_internal(key_bytes)?))
         }
-        #[cfg(feature = "adgs")]
-        (Scheme::Adgs, Encoding::C32) => {
-            Ok(ObAny::AdgsC32(AdgsC32::from_bytes_internal(key_bytes)?))
+        #[cfg(feature = "aags")]
+        (Scheme::Aags, Encoding::C32) => {
+            Ok(ObAny::AagsC32(AagsC32::from_bytes_internal(key_bytes)?))
         }
-        #[cfg(feature = "adgs")]
-        (Scheme::Adgs, Encoding::B32) => {
-            Ok(ObAny::AdgsB32(AdgsB32::from_bytes_internal(key_bytes)?))
+        #[cfg(feature = "aags")]
+        (Scheme::Aags, Encoding::B32) => {
+            Ok(ObAny::AagsB32(AagsB32::from_bytes_internal(key_bytes)?))
         }
-        #[cfg(feature = "adgs")]
-        (Scheme::Adgs, Encoding::B64) => {
-            Ok(ObAny::AdgsB64(AdgsB64::from_bytes_internal(key_bytes)?))
+        #[cfg(feature = "aags")]
+        (Scheme::Aags, Encoding::B64) => {
+            Ok(ObAny::AagsB64(AagsB64::from_bytes_internal(key_bytes)?))
         }
-        #[cfg(feature = "adgs")]
-        (Scheme::Adgs, Encoding::Hex) => {
-            Ok(ObAny::AdgsHex(AdgsHex::from_bytes_internal(key_bytes)?))
+        #[cfg(feature = "aags")]
+        (Scheme::Aags, Encoding::Hex) => {
+            Ok(ObAny::AagsHex(AagsHex::from_bytes_internal(key_bytes)?))
         }
         #[cfg(feature = "apgs")]
         (Scheme::Apgs, Encoding::C32) => {
@@ -943,21 +943,21 @@ fn from_bytes_with_format_internal(format: Format, key_bytes: &[u8; 64]) -> Resu
         (Scheme::Apgs, Encoding::Hex) => {
             Ok(ObAny::ApgsHex(ApgsHex::from_bytes_internal(key_bytes)?))
         }
-        #[cfg(feature = "adsv")]
-        (Scheme::Adsv, Encoding::C32) => {
-            Ok(ObAny::AdsvC32(AdsvC32::from_bytes_internal(key_bytes)?))
+        #[cfg(feature = "aasv")]
+        (Scheme::Aasv, Encoding::C32) => {
+            Ok(ObAny::AasvC32(AasvC32::from_bytes_internal(key_bytes)?))
         }
-        #[cfg(feature = "adsv")]
-        (Scheme::Adsv, Encoding::B32) => {
-            Ok(ObAny::AdsvB32(AdsvB32::from_bytes_internal(key_bytes)?))
+        #[cfg(feature = "aasv")]
+        (Scheme::Aasv, Encoding::B32) => {
+            Ok(ObAny::AasvB32(AasvB32::from_bytes_internal(key_bytes)?))
         }
-        #[cfg(feature = "adsv")]
-        (Scheme::Adsv, Encoding::B64) => {
-            Ok(ObAny::AdsvB64(AdsvB64::from_bytes_internal(key_bytes)?))
+        #[cfg(feature = "aasv")]
+        (Scheme::Aasv, Encoding::B64) => {
+            Ok(ObAny::AasvB64(AasvB64::from_bytes_internal(key_bytes)?))
         }
-        #[cfg(feature = "adsv")]
-        (Scheme::Adsv, Encoding::Hex) => {
-            Ok(ObAny::AdsvHex(AdsvHex::from_bytes_internal(key_bytes)?))
+        #[cfg(feature = "aasv")]
+        (Scheme::Aasv, Encoding::Hex) => {
+            Ok(ObAny::AasvHex(AasvHex::from_bytes_internal(key_bytes)?))
         }
         #[cfg(feature = "apsv")]
         (Scheme::Apsv, Encoding::C32) => {
@@ -1087,16 +1087,16 @@ mod tests {
 
         // Define all schemes
         let schemes = vec![
-            #[cfg(feature = "zfbcx")]
-            Scheme::Zfbcx,
+            #[cfg(feature = "zrbcx")]
+            Scheme::Zrbcx,
             #[cfg(feature = "upbc")]
             Scheme::Upbc,
-            #[cfg(feature = "adgs")]
-            Scheme::Adgs,
+            #[cfg(feature = "aags")]
+            Scheme::Aags,
             #[cfg(feature = "apgs")]
             Scheme::Apgs,
-            #[cfg(feature = "adsv")]
-            Scheme::Adsv,
+            #[cfg(feature = "aasv")]
+            Scheme::Aasv,
             #[cfg(feature = "apsv")]
             Scheme::Apsv,
             // Testing
@@ -1153,16 +1153,16 @@ mod tests {
             Scheme::Mock1,
             #[cfg(feature = "legacy")]
             Scheme::Legacy,
-            #[cfg(feature = "zfbcx")]
-            Scheme::Zfbcx,
+            #[cfg(feature = "zrbcx")]
+            Scheme::Zrbcx,
             #[cfg(feature = "upbc")]
             Scheme::Upbc,
-            #[cfg(feature = "adgs")]
-            Scheme::Adgs,
+            #[cfg(feature = "aags")]
+            Scheme::Aags,
             #[cfg(feature = "apgs")]
             Scheme::Apgs,
-            #[cfg(feature = "adsv")]
-            Scheme::Adsv,
+            #[cfg(feature = "aasv")]
+            Scheme::Aasv,
             #[cfg(feature = "apsv")]
             Scheme::Apsv,
         ];
@@ -1207,12 +1207,12 @@ mod tests {
         let schemes = vec![
             Scheme::Mock2,
             Scheme::Mock1,
-            #[cfg(feature = "zfbcx")]
-            Scheme::Zfbcx,
-            #[cfg(feature = "adgs")]
-            Scheme::Adgs,
-            #[cfg(feature = "adsv")]
-            Scheme::Adsv,
+            #[cfg(feature = "zrbcx")]
+            Scheme::Zrbcx,
+            #[cfg(feature = "aags")]
+            Scheme::Aags,
+            #[cfg(feature = "aasv")]
+            Scheme::Aasv,
         ];
 
         // Define all encodings

@@ -1,5 +1,5 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use oboron::{AdgsC32, ObtextCodec};
+use oboron::{AasvHex, ObtextCodec};
 use serde::Deserialize;
 use std::fs;
 use std::path::PathBuf;
@@ -28,39 +28,39 @@ struct PrecomputeSpec {
 
 fn load_benchmark_specs() -> Vec<BenchmarkSpec> {
     let possible_paths = vec![
-        PathBuf::from("benches/benchmarks_adgs_c32.jsonl"),
-        PathBuf::from("oboron/benches/benchmarks_adgs_c32.jsonl"),
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("benches/benchmarks_adgs_c32.jsonl"),
+        PathBuf::from("benches/benchmarks_aasv_hex.jsonl"),
+        PathBuf::from("oboron/benches/benchmarks_aasv_hex.jsonl"),
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("benches/benchmarks_aasv_hex.jsonl"),
     ];
 
     for path in &possible_paths {
         if path.exists() {
-            eprintln!("Found adgs.c32 benchmarks at: {:?}", path);
+            eprintln!("Found aasv.hex benchmarks at: {:?}", path);
             let data = fs::read_to_string(path).expect("Failed to read benchmarks");
             let specs: Vec<BenchmarkSpec> = data
                 .lines()
                 .filter(|line| !line.trim().is_empty())
                 .map(|line| serde_json::from_str(line).expect("Failed to parse"))
                 .collect();
-            eprintln!("Loaded {} adgs.c32 benchmark specifications", specs.len());
+            eprintln!("Loaded {} aasv.hex benchmark specifications", specs.len());
             return specs;
         }
     }
 
-    eprintln!("Warning: benchmarks_adgs_c32.jsonl not found");
+    eprintln!("Warning: benchmarks_aasv_hex.jsonl not found");
     vec![]
 }
 
-fn run_adgs_c32_benchmarks(c: &mut Criterion) {
+fn run_aasv_hex_benchmarks(c: &mut Criterion) {
     let specs = load_benchmark_specs();
 
     if specs.is_empty() {
-        eprintln!("No adgs.c32 specs loaded");
+        eprintln!("No aasv.hex specs loaded");
         return;
     }
 
     // Create ob once, OUTSIDE the timed loop
-    let ob = AdgsC32::new_keyless().unwrap();
+    let ob = AasvHex::new_keyless().unwrap();
 
     let mut bench_count = 0;
     for spec in specs {
@@ -103,8 +103,8 @@ fn run_adgs_c32_benchmarks(c: &mut Criterion) {
             }
         }
     }
-    eprintln!("Registered {} adgs.c32 benchmarks", bench_count);
+    eprintln!("Registered {} aasv.hex benchmarks", bench_count);
 }
 
-criterion_group!(benches, run_adgs_c32_benchmarks);
+criterion_group!(benches, run_aasv_hex_benchmarks);
 criterion_main!(benches);

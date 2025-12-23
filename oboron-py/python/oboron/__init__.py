@@ -18,11 +18,11 @@ class OboronBase(ABC):
     """
     Abstract base class for all Oboron cipher implementations.
 
-    All cipher classes (AdsvB32, ZfbcxB64, etc.) are registered as virtual
+    All cipher classes (AasvB32, ZrbcxB64, etc.) are registered as virtual
     subclasses, enabling isinstance() and issubclass() checks.
 
     Example:
-        >>> cipher = AdsvC32(hex_key=key)
+        >>> cipher = AasvC32(hex_key=key)
         >>> isinstance(cipher, OboronBase)
         True
 
@@ -43,13 +43,13 @@ class OboronBase(ABC):
     @property
     @abstractmethod
     def format(self) -> str:
-        """Get the format identifier (e.g., 'adsv.b64')."""
+        """Get the format identifier (e.g., 'aasv.b64')."""
         ...
 
     @property
     @abstractmethod
     def scheme(self) -> str:
-        """Get the scheme identifier (e.g., 'adsv')."""
+        """Get the scheme identifier (e.g., 'aasv')."""
         ...
 
     @property
@@ -75,17 +75,17 @@ class OboronBase(ABC):
 # Register all Rust classes as virtual subclasses
 # ============================================================================
 
-# Adgs variants
-OboronBase.register(_oboron.AdgsC32)
-OboronBase.register(_oboron.AdgsB32)
-OboronBase.register(_oboron.AdgsB64)
-OboronBase.register(_oboron.AdgsHex)
+# Aags variants
+OboronBase.register(_oboron.AagsC32)
+OboronBase.register(_oboron.AagsB32)
+OboronBase.register(_oboron.AagsB64)
+OboronBase.register(_oboron.AagsHex)
 
-# Adsv variants
-OboronBase.register(_oboron.AdsvC32)
-OboronBase.register(_oboron.AdsvB32)
-OboronBase.register(_oboron.AdsvB64)
-OboronBase.register(_oboron.AdsvHex)
+# Aasv variants
+OboronBase.register(_oboron.AasvC32)
+OboronBase.register(_oboron.AasvB32)
+OboronBase.register(_oboron.AasvB64)
+OboronBase.register(_oboron.AasvHex)
 
 # Apgs variants
 OboronBase.register(_oboron.ApgsC32)
@@ -105,11 +105,11 @@ OboronBase.register(_oboron.UpbcB32)
 OboronBase.register(_oboron.UpbcB64)
 OboronBase.register(_oboron.UpbcHex)
 
-# Zfbcx variants
-OboronBase.register(_oboron.ZfbcxC32)
-OboronBase.register(_oboron.ZfbcxB32)
-OboronBase.register(_oboron.ZfbcxB64)
-OboronBase.register(_oboron.ZfbcxHex)
+# Zrbcx variants
+OboronBase.register(_oboron.ZrbcxC32)
+OboronBase.register(_oboron.ZrbcxB32)
+OboronBase.register(_oboron.ZrbcxB64)
+OboronBase.register(_oboron.ZrbcxHex)
 
 # Legacy variants
 OboronBase.register(_oboron.LegacyC32)
@@ -139,17 +139,17 @@ OboronBase.register(_oboron.Ob)
 # Main flexible interface
 Ob = _oboron.Ob
 
-# Adgs variants
-AdgsC32 = _oboron.AdgsC32
-AdgsB32 = _oboron.AdgsB32
-AdgsB64 = _oboron.AdgsB64
-AdgsHex = _oboron.AdgsHex
+# Aags variants
+AagsC32 = _oboron.AagsC32
+AagsB32 = _oboron.AagsB32
+AagsB64 = _oboron.AagsB64
+AagsHex = _oboron.AagsHex
 
-# Adsv variants
-AdsvC32 = _oboron.AdsvC32
-AdsvB32 = _oboron.AdsvB32
-AdsvB64 = _oboron.AdsvB64
-AdsvHex = _oboron.AdsvHex
+# Aasv variants
+AasvC32 = _oboron.AasvC32
+AasvB32 = _oboron.AasvB32
+AasvB64 = _oboron.AasvB64
+AasvHex = _oboron.AasvHex
 
 # Apgs variants
 ApgsC32 = _oboron.ApgsC32
@@ -169,11 +169,11 @@ UpbcB32 = _oboron.UpbcB32
 UpbcB64 = _oboron.UpbcB64
 UpbcHex = _oboron.UpbcHex
 
-# Zfbcx variants
-ZfbcxC32 = _oboron.ZfbcxC32
-ZfbcxB32 = _oboron.ZfbcxB32
-ZfbcxB64 = _oboron.ZfbcxB64
-ZfbcxHex = _oboron.ZfbcxHex
+# Zrbcx variants
+ZrbcxC32 = _oboron.ZrbcxC32
+ZrbcxB32 = _oboron.ZrbcxB32
+ZrbcxB64 = _oboron.ZrbcxB64
+ZrbcxHex = _oboron.ZrbcxHex
 
 # Legacy variants (LEGACY)
 LegacyC32 = _oboron.LegacyC32
@@ -216,17 +216,17 @@ __all__ = [
     # Main interfaces
     'Ob',
 
-    # Adgs
-    'AdgsC32',
-    'AdgsB32',
-    'AdgsB64',
-    'AdgsHex',
+    # Aags
+    'AagsC32',
+    'AagsB32',
+    'AagsB64',
+    'AagsHex',
 
-    # Adsv
-    'AdsvC32',
-    'AdsvB32',
-    'AdsvB64',
-    'AdsvHex',
+    # Aasv
+    'AasvC32',
+    'AasvB32',
+    'AasvB64',
+    'AasvHex',
 
     # Apgs
     'ApgsC32',
@@ -246,11 +246,11 @@ __all__ = [
     'UpbcB64',
     'UpbcHex',
 
-    # Zfbcx
-    'ZfbcxC32',
-    'ZfbcxB32',
-    'ZfbcxB64',
-    'ZfbcxHex',
+    # Zrbcx
+    'ZrbcxC32',
+    'ZrbcxB32',
+    'ZrbcxB64',
+    'ZrbcxHex',
 
     # Legacy
     'LegacyC32',

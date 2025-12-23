@@ -32,7 +32,7 @@ fn test_enc_keyless() {
     cmd.env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("-z")
-        .arg("--adsv")
+        .arg("--aasv")
         .arg("--b32")
         .arg("test123")
         .assert()
@@ -107,7 +107,7 @@ fn test_enc_with_explicit_key() {
         .arg("enc")
         .arg("--key")
         .arg(TEST_KEY_B64)
-        .arg("--adsv")
+        .arg("--aasv")
         .arg("--b32")
         .arg("test_data")
         .assert()
@@ -141,14 +141,14 @@ fn test_enc_with_explicit_key_apsv() {
 fn test_enc_dec_with_explicit_key() {
     let test_home = test_home_dir();
 
-    // Encode with adgs
+    // Encode with aags
     let mut enc_cmd = Command::cargo_bin("ob").unwrap();
     let enc_output = enc_cmd
         .env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("--key")
         .arg(TEST_KEY_B64_ALT)
-        .arg("--adsv")
+        .arg("--aasv")
         .arg("--b32")
         .arg("sensitive_data")
         .output()
@@ -167,7 +167,7 @@ fn test_enc_dec_with_explicit_key() {
         .arg("dec")
         .arg("--key")
         .arg(TEST_KEY_B64_ALT)
-        .arg("--adsv") // Use same scheme as enc
+        .arg("--aasv") // Use same scheme as enc
         .arg("--b32")
         .arg(&encd)
         .assert()
@@ -177,19 +177,19 @@ fn test_enc_dec_with_explicit_key() {
     cleanup_test_home(&test_home);
 }
 
-#[cfg(feature = "adgs")]
+#[cfg(feature = "aags")]
 #[test]
-fn test_enc_dec_with_explicit_key_adgs() {
+fn test_enc_dec_with_explicit_key_aags() {
     let test_home = test_home_dir();
 
-    // Encode with adgs
+    // Encode with aags
     let mut enc_cmd = Command::cargo_bin("ob").unwrap();
     let enc_output = enc_cmd
         .env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("--key")
         .arg(TEST_KEY_B64_ALT)
-        .arg("--adgs")
+        .arg("--aags")
         .arg("--b32")
         .arg("sensitive_data")
         .output()
@@ -208,7 +208,7 @@ fn test_enc_dec_with_explicit_key_adgs() {
         .arg("dec")
         .arg("--key")
         .arg(TEST_KEY_B64_ALT)
-        .arg("--adgs") // Use same scheme as enc
+        .arg("--aags") // Use same scheme as enc
         .arg("--b32")
         .arg(&encd)
         .assert()
@@ -218,16 +218,16 @@ fn test_enc_dec_with_explicit_key_adgs() {
     cleanup_test_home(&test_home);
 }
 
-#[cfg(feature = "zfbcx")]
-#[cfg(feature = "adgs")]
-#[cfg(feature = "adsv")]
+#[cfg(feature = "zrbcx")]
+#[cfg(feature = "aags")]
+#[cfg(feature = "aasv")]
 #[cfg(feature = "upbc")]
 #[cfg(feature = "apgs")]
 #[cfg(feature = "apsv")]
 #[test]
 fn test_enc_different_schemes() {
     let test_home = test_home_dir();
-    let schemes = vec!["--zfbcx", "--adgs", "--adsv", "--upbc", "--apgs", "--apsv"];
+    let schemes = vec!["--zrbcx", "--aags", "--aasv", "--upbc", "--apgs", "--apsv"];
 
     for scheme in schemes {
         let mut cmd = Command::cargo_bin("ob").unwrap();
@@ -244,7 +244,7 @@ fn test_enc_different_schemes() {
     cleanup_test_home(&test_home);
 }
 
-#[cfg(feature = "zfbcx")]
+#[cfg(feature = "zrbcx")]
 #[test]
 fn test_enc_different_encodings() {
     let test_home = test_home_dir();
@@ -255,7 +255,7 @@ fn test_enc_different_encodings() {
         cmd.env("HOME", test_home.as_os_str())
             .arg("enc")
             .arg("-z")
-            .arg("--zfbcx")
+            .arg("--zrbcx")
             .arg(encoding)
             .arg("test")
             .assert()
@@ -265,13 +265,13 @@ fn test_enc_different_encodings() {
     cleanup_test_home(&test_home);
 }
 
-#[cfg(feature = "zfbcx")]
-#[cfg(feature = "adgs")]
-#[cfg(feature = "adsv")]
+#[cfg(feature = "zrbcx")]
+#[cfg(feature = "aags")]
+#[cfg(feature = "aasv")]
 #[test]
 fn test_enc_with_format_string() {
     let test_home = test_home_dir();
-    let formats = vec!["zfbcx.b32", "adgs.b64", "adsv.hex"];
+    let formats = vec!["zrbcx.b32", "aags.b64", "aasv.hex"];
 
     for format in formats {
         let mut cmd = Command::cargo_bin("ob").unwrap();
