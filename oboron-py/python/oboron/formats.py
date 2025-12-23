@@ -1,7 +1,7 @@
 """Format string constants for Oboron. 
 
 All constants follow the pattern:  {SCHEME}_{ENCODING}
-- Schemes: ADGS, ADSV, APGS, APSV, UPC, ZFBCX, LEGACY, MOCK1, MOCK2
+- Schemes: ADGS, ADSV, APGS, APSV, UPBC, ZFBCX, LEGACY, MOCK1, MOCK2
 - Encodings:
   - B32 (RFC 4648 base32),
   - B64 (RFC 4648 base64url),
@@ -40,11 +40,11 @@ APSV_B64: str = "apsv.b64"
 APSV_C32: str = "apsv.c32"
 APSV_HEX: str = "apsv.hex"
 
-# upc - probabilistic AES-CBC (secure but not authenticated)
-UPC_B32: str = "upc.b32"
-UPC_B64: str = "upc.b64"
-UPC_C32: str = "upc.c32"
-UPC_HEX: str = "upc.hex"
+# upbc - probabilistic AES-CBC (secure but not authenticated)
+UPBC_B32: str = "upbc.b32"
+UPBC_B64: str = "upbc.b64"
+UPBC_C32: str = "upbc.c32"
+UPBC_HEX: str = "upbc.hex"
 
 # zfbcx - deterministic AES-CBC (insecure - obfuscation only)
 ZFBCX_B32: str = "zfbcx.b32"
@@ -80,8 +80,8 @@ __all__ = [
     "APSV_B32", "APSV_B64", "APSV_C32", "APSV_HEX",
     # zfbcx
     "ZFBCX_B32", "ZFBCX_B64", "ZFBCX_C32", "ZFBCX_HEX",
-    # upc
-    "UPC_B32", "UPC_B64", "UPC_C32", "UPC_HEX",
+    # upbc
+    "UPBC_B32", "UPBC_B64", "UPBC_C32", "UPBC_HEX",
     # Legacy
     "LEGACY_B32", "LEGACY_B64", "LEGACY_C32", "LEGACY_HEX",
     # Testing

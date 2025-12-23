@@ -221,13 +221,13 @@ fn test_enc_dec_with_explicit_key_adgs() {
 #[cfg(feature = "zfbcx")]
 #[cfg(feature = "adgs")]
 #[cfg(feature = "adsv")]
-#[cfg(feature = "upc")]
+#[cfg(feature = "upbc")]
 #[cfg(feature = "apgs")]
 #[cfg(feature = "apsv")]
 #[test]
 fn test_enc_different_schemes() {
     let test_home = test_home_dir();
-    let schemes = vec!["--zfbcx", "--adgs", "--adsv", "--upc", "--apgs", "--apsv"];
+    let schemes = vec!["--zfbcx", "--adgs", "--adsv", "--upbc", "--apgs", "--apsv"];
 
     for scheme in schemes {
         let mut cmd = Command::cargo_bin("ob").unwrap();

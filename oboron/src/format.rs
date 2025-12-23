@@ -45,14 +45,14 @@ impl Format {
             #[cfg(feature = "zfbcx")]
             constants::ZFBCX_HEX => Format::new(Scheme::Zfbcx, Encoding::Hex),
 
-            #[cfg(feature = "upc")]
-            constants::UPC_C32 => Format::new(Scheme::Upc, Encoding::C32),
-            #[cfg(feature = "upc")]
-            constants::UPC_B32 => Format::new(Scheme::Upc, Encoding::B32),
-            #[cfg(feature = "upc")]
-            constants::UPC_B64 => Format::new(Scheme::Upc, Encoding::B64),
-            #[cfg(feature = "upc")]
-            constants::UPC_HEX => Format::new(Scheme::Upc, Encoding::Hex),
+            #[cfg(feature = "upbc")]
+            constants::UPBC_C32 => Format::new(Scheme::Upbc, Encoding::C32),
+            #[cfg(feature = "upbc")]
+            constants::UPBC_B32 => Format::new(Scheme::Upbc, Encoding::B32),
+            #[cfg(feature = "upbc")]
+            constants::UPBC_B64 => Format::new(Scheme::Upbc, Encoding::B64),
+            #[cfg(feature = "upbc")]
+            constants::UPBC_HEX => Format::new(Scheme::Upbc, Encoding::Hex),
 
             #[cfg(feature = "adgs")]
             constants::ADGS_C32 => Format::new(Scheme::Adgs, Encoding::C32),
@@ -153,8 +153,8 @@ mod tests {
         let schemes = vec![
             #[cfg(feature = "zfbcx")]
             Scheme::Zfbcx,
-            #[cfg(feature = "upc")]
-            Scheme::Upc,
+            #[cfg(feature = "upbc")]
+            Scheme::Upbc,
             #[cfg(feature = "adgs")]
             Scheme::Adgs,
             #[cfg(feature = "apgs")]
@@ -240,12 +240,12 @@ mod tests {
             (Scheme::Zfbcx, Encoding::Hex, "zfbcx.hex"),
         ]);
 
-        #[cfg(feature = "upc")]
+        #[cfg(feature = "upbc")]
         test_cases.extend(vec![
-            (Scheme::Upc, Encoding::C32, "upc.c32"),
-            (Scheme::Upc, Encoding::B32, "upc.b32"),
-            (Scheme::Upc, Encoding::B64, "upc.b64"),
-            (Scheme::Upc, Encoding::Hex, "upc.hex"),
+            (Scheme::Upbc, Encoding::C32, "upbc.c32"),
+            (Scheme::Upbc, Encoding::B32, "upbc.b32"),
+            (Scheme::Upbc, Encoding::B64, "upbc.b64"),
+            (Scheme::Upbc, Encoding::Hex, "upbc.hex"),
         ]);
 
         #[cfg(feature = "adgs")]
@@ -325,7 +325,7 @@ mod tests {
     fn test_all_schemes_support_both_base32_variants() {
         // All schemes should support both RFC 4648 base32 (b32) and Crockford base32 (c32)
         let schemes = vec![
-            "zfbcx", "upc", "adgs", "apgs", "adsv", "apsv", "mock1", "mock2",
+            "zfbcx", "upbc", "adgs", "apgs", "adsv", "apsv", "mock1", "mock2",
         ];
 
         for scheme_str in schemes {

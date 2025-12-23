@@ -13,8 +13,8 @@ use crate::{constants::ADSV_BYTE, decrypt_adsv};
 use crate::{constants::APGS_BYTE, decrypt_apgs};
 #[cfg(feature = "apsv")]
 use crate::{constants::APSV_BYTE, decrypt_apsv};
-#[cfg(feature = "upc")]
-use crate::{constants::UPC_BYTE, decrypt_upc};
+#[cfg(feature = "upbc")]
+use crate::{constants::UPBC_BYTE, decrypt_upbc};
 #[cfg(feature = "zfbcx")]
 use crate::{constants::ZFBCX_BYTE, decrypt_zfbcx};
 // Testing
@@ -69,8 +69,8 @@ pub fn dec_any_scheme(
     let plaintext_bytes = match scheme_byte {
         #[cfg(feature = "zfbcx")]
         ZFBCX_BYTE => decrypt_zfbcx(keychain, &buffer)?,
-        #[cfg(feature = "upc")]
-        UPC_BYTE => decrypt_upc(keychain, &buffer)?,
+        #[cfg(feature = "upbc")]
+        UPBC_BYTE => decrypt_upbc(keychain, &buffer)?,
         #[cfg(feature = "adgs")]
         ADGS_BYTE => decrypt_adgs(keychain, &buffer)?,
         #[cfg(feature = "apgs")]

@@ -54,9 +54,9 @@ impl Keychain {
     // Key derivation ==================================================
 
     // AES-128 key for AES-CBC (first 16 bytes)
-    // Used in legacy, zfbcx, upc schemes
+    // Used in legacy, zfbcx, upbc schemes
     #[inline]
-    #[cfg(any(feature = "legacy", feature = "zfbcx", feature = "upc"))]
+    #[cfg(any(feature = "legacy", feature = "zfbcx", feature = "upbc"))]
     pub(crate) fn cbc(&self) -> &[u8; 16] {
         self.key[..16].try_into().unwrap()
     }

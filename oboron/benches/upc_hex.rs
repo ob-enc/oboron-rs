@@ -1,5 +1,5 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use oboron::{ObtextCodec, UpcHex};
+use oboron::{ObtextCodec, UpbcHex};
 use serde::Deserialize;
 use std::fs;
 use std::path::PathBuf;
@@ -28,39 +28,39 @@ struct PrecomputeSpec {
 
 fn load_benchmark_specs() -> Vec<BenchmarkSpec> {
     let possible_paths = vec![
-        PathBuf::from("benches/benchmarks_upc_hex.jsonl"),
-        PathBuf::from("oboron/benches/benchmarks_upc_hex.jsonl"),
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("benches/benchmarks_upc_hex.jsonl"),
+        PathBuf::from("benches/benchmarks_upbc_hex.jsonl"),
+        PathBuf::from("oboron/benches/benchmarks_upbc_hex.jsonl"),
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("benches/benchmarks_upbc_hex.jsonl"),
     ];
 
     for path in &possible_paths {
         if path.exists() {
-            eprintln!("Found upc_hex benchmarks at: {:?}", path);
+            eprintln!("Found upbc_hex benchmarks at: {:?}", path);
             let data = fs::read_to_string(path).expect("Failed to read benchmarks");
             let specs: Vec<BenchmarkSpec> = data
                 .lines()
                 .filter(|line| !line.trim().is_empty())
                 .map(|line| serde_json::from_str(line).expect("Failed to parse"))
                 .collect();
-            eprintln!("Loaded {} upc_hex benchmark specifications", specs.len());
+            eprintln!("Loaded {} upbc_hex benchmark specifications", specs.len());
             return specs;
         }
     }
 
-    eprintln!("Warning: benchmarks_upc_hex.jsonl not found");
+    eprintln!("Warning: benchmarks_upbc_hex.jsonl not found");
     vec![]
 }
 
-fn run_upc_hex_benchmarks(c: &mut Criterion) {
+fn run_upbc_hex_benchmarks(c: &mut Criterion) {
     let specs = load_benchmark_specs();
 
     if specs.is_empty() {
-        eprintln!("No upc_hex specs loaded");
+        eprintln!("No upbc_hex specs loaded");
         return;
     }
 
     // Create ob once, OUTSIDE the timed loop
-    let ob = UpcHex::new_keyless().unwrap();
+    let ob = UpbcHex::new_keyless().unwrap();
 
     let mut bench_count = 0;
     for spec in specs {
@@ -103,8 +103,8 @@ fn run_upc_hex_benchmarks(c: &mut Criterion) {
             }
         }
     }
-    eprintln!("Registered {} upc_hex benchmarks", bench_count);
+    eprintln!("Registered {} upbc_hex benchmarks", bench_count);
 }
 
-criterion_group!(benches, run_upc_hex_benchmarks);
+criterion_group!(benches, run_upbc_hex_benchmarks);
 criterion_main!(benches);

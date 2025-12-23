@@ -238,31 +238,31 @@ impl_cipher_class!(
     "Apsv cipher (probabilistic AES-SIV) with Hex encoding"
 );
 
-// Upc variants
+// Upbc variants
 // ------------
-#[cfg(feature = "upc")]
+#[cfg(feature = "upbc")]
 impl_cipher_class!(
-    UpcB32,
-    ::oboron::UpcB32,
-    "Upc cipher (probabilistic AES-CBC) with B32 encoding"
+    UpbcB32,
+    ::oboron::UpbcB32,
+    "Upbc cipher (probabilistic AES-CBC) with B32 encoding"
 );
-#[cfg(feature = "upc")]
+#[cfg(feature = "upbc")]
 impl_cipher_class!(
-    UpcB64,
-    ::oboron::UpcB64,
-    "Upc cipher (probabilistic AES-CBC) with B64 encoding"
+    UpbcB64,
+    ::oboron::UpbcB64,
+    "Upbc cipher (probabilistic AES-CBC) with B64 encoding"
 );
-#[cfg(feature = "upc")]
+#[cfg(feature = "upbc")]
 impl_cipher_class!(
-    UpcC32,
-    ::oboron::UpcC32,
-    "Upc cipher (probabilistic AES-CBC) with C32 encoding"
+    UpbcC32,
+    ::oboron::UpbcC32,
+    "Upbc cipher (probabilistic AES-CBC) with C32 encoding"
 );
-#[cfg(feature = "upc")]
+#[cfg(feature = "upbc")]
 impl_cipher_class!(
-    UpcHex,
-    ::oboron::UpcHex,
-    "Upc cipher (probabilistic AES-CBC) with Hex encoding"
+    UpbcHex,
+    ::oboron::UpbcHex,
+    "Upbc cipher (probabilistic AES-CBC) with Hex encoding"
 );
 
 // Zfbcx variants
@@ -817,13 +817,13 @@ fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m.add_class::<ZfbcxHex>()?;
     }
 
-    // Upc variants
-    #[cfg(feature = "upc")]
+    // Upbc variants
+    #[cfg(feature = "upbc")]
     {
-        m.add_class::<UpcC32>()?;
-        m.add_class::<UpcB32>()?;
-        m.add_class::<UpcB64>()?;
-        m.add_class::<UpcHex>()?;
+        m.add_class::<UpbcC32>()?;
+        m.add_class::<UpbcB32>()?;
+        m.add_class::<UpbcB64>()?;
+        m.add_class::<UpbcHex>()?;
     }
 
     // Adgs variants

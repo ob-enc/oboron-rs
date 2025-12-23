@@ -9,7 +9,7 @@ use crate::{Error, Format, Keychain};
 /// This struct allows specifying the format (scheme + encoding) at enc call time,
 /// and automatically detects both scheme and encoding on dec calls.
 /// It is the only ObtextCodec implementation that does full format autodetection,
-/// all other implementations can only autodetect the scheme (e.g., upc),
+/// all other implementations can only autodetect the scheme (e.g., upbc),
 /// but not the encoding (e.g., base32 or base64).
 ///
 /// # Examples

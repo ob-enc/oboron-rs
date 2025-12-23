@@ -17,7 +17,7 @@ jobs:
         feature:
           - legacy
           - zfbcx
-          - upc
+          - upbc
           - adgs
           - apgs
           - adsv
@@ -83,7 +83,7 @@ jobs:
           - name: "deterministic only"
             features: "zfbcx,adgs,adsv"
           - name: "probabilistic only"
-            features: "upc,apgs,apsv"
+            features: "upbc,apgs,apsv"
           - name: "modern schemes"
             features: "adgs,adsv"
           - name: "adsv only"

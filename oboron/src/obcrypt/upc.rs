@@ -1,4 +1,4 @@
-#![cfg(feature = "upc")]
+#![cfg(feature = "upbc")]
 use super::{
     constants::{AES_BLOCK_SIZE, CBC_PADDING_BYTE},
     keychain::Keychain,
@@ -14,7 +14,7 @@ type Aes128CbcDec = Decryptor<Aes128>;
 
 const IV_SIZE: usize = 16;
 
-/// Encrypt plaintext bytes using probabilistic AES-CBC (upc scheme).
+/// Encrypt plaintext bytes using probabilistic AES-CBC (upbc scheme).
 /// Returns raw ciphertext bytes with appended IV.  Structure: [IV][ciphertext].
 pub fn encrypt(keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
     if plaintext_bytes.is_empty() {
@@ -48,7 +48,7 @@ pub fn encrypt(keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, E
     Ok(buffer)
 }
 
-/// Decrypt ciphertext using probabilistic AES-CBC (upc scheme).
+/// Decrypt ciphertext using probabilistic AES-CBC (upbc scheme).
 /// Expects data structure: [IV][ciphertext].  Returns plaintext bytes with padding removed.
 pub fn decrypt(keychain: &Keychain, data: &[u8]) -> Result<Vec<u8>, Error> {
     // Minimum: 16 bytes ciphertext + 16 bytes IV = 32 bytes

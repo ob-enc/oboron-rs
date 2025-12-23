@@ -48,8 +48,8 @@ but note that pre-1.0 releases may not adhere strictly to all guidelines.
     - "sv": AES-SIV
   - other tiers use a single letter for a 3 letters total
   - renamed schemes:
-    - ob01  -> zfbcx -> zfbcx // use xor first/last instead of reversing
-    - ob21p -> upc -> upbc // remove reversing; switch to 256-bit key
+    - ob01  -> zdc -> zfbcx // use xor first/last instead of reversing
+    - ob21p -> upbc -> upbc // remove reversing; switch to 256-bit key
     - ob31  -> adgs -> ahgs
     - ob31p -> apgs -> apgs
     - ob32  -> adsv -> ahsv

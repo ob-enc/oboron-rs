@@ -18,7 +18,7 @@ legacy = ["oboron/legacy"]
 zfbcx = ["oboron/zfbcx"]
 adgs = ["oboron/adgs"]
 adsv = ["oboron/adsv"]
-upc = ["oboron/upc"]
+upbc = ["oboron/upbc"]
 apgs = ["oboron/apgs"]
 apsv = ["oboron/apsv"]
 mock = ["oboron/mock"]
@@ -27,14 +27,14 @@ mock = ["oboron/mock"]
 # =================
 ob0x = ["zfbcx"] # insecure, not authenticated
 ob1x = []  # insecure, authenticated
-ob2x = ["upc"]  # secure, not authenticated
+ob2x = ["upbc"]  # secure, not authenticated
 ob3x = ["adgs", "apgs", "adsv", "apsv"]  # secure, authenticated
 ob7x = ["mock"]  # testing
 insecure-schemes = ["ob0x", "ob1x"]
 secure-schemes = ["ob2x", "ob3x"]
 authenticated-schemes = ["ob3x"]
 deterministic-schemes = ["zfbcx", "adgs", "adsv"]
-probabilistic-schemes = ["upc", "apgs", "apsv"]
+probabilistic-schemes = ["upbc", "apgs", "apsv"]
 all-schemes = ["ob0x", "ob1x", "ob2x", "ob3x"]
 
 [[bin]]

@@ -218,7 +218,7 @@
 //!   - `Apgs`: probabilistic AES-GCM-SIV
 //!   - `Apsv`: probabilistic AES-SIV
 //! - Un-authenticated:
-//!   - `Upc`: probabilistic AES-CBC
+//!   - `Upbc`: probabilistic AES-CBC
 //! - Insecure (obfuscation only):
 //!   - `Zfbcx`: deterministic AES-CBC with constant IV
 //!
@@ -294,8 +294,8 @@ pub(crate) use obcrypt::{decrypt_adsv, encrypt_adsv};
 pub(crate) use obcrypt::{decrypt_apgs, encrypt_apgs};
 #[cfg(feature = "apsv")]
 pub(crate) use obcrypt::{decrypt_apsv, encrypt_apsv};
-#[cfg(feature = "upc")]
-pub(crate) use obcrypt::{decrypt_upc, encrypt_upc};
+#[cfg(feature = "upbc")]
+pub(crate) use obcrypt::{decrypt_upbc, encrypt_upbc};
 #[cfg(feature = "zfbcx")]
 pub(crate) use obcrypt::{decrypt_zfbcx, encrypt_zfbcx};
 
@@ -338,8 +338,8 @@ pub use constants::{ADSV_B32, ADSV_B64, ADSV_C32, ADSV_HEX};
 pub use constants::{APGS_B32, APGS_B64, APGS_C32, APGS_HEX};
 #[cfg(feature = "apsv")]
 pub use constants::{APSV_B32, APSV_B64, APSV_C32, APSV_HEX};
-#[cfg(feature = "upc")]
-pub use constants::{UPC_B32, UPC_B64, UPC_C32, UPC_HEX};
+#[cfg(feature = "upbc")]
+pub use constants::{UPBC_B32, UPBC_B64, UPBC_C32, UPBC_HEX};
 #[cfg(feature = "zfbcx")]
 pub use constants::{ZFBCX_B32, ZFBCX_B64, ZFBCX_C32, ZFBCX_HEX};
 // Legacy
@@ -360,8 +360,8 @@ pub use codec::{AdsvB32, AdsvB64, AdsvC32, AdsvHex};
 pub use codec::{ApgsB32, ApgsB64, ApgsC32, ApgsHex};
 #[cfg(feature = "apsv")]
 pub use codec::{ApsvB32, ApsvB64, ApsvC32, ApsvHex};
-#[cfg(feature = "upc")]
-pub use codec::{UpcB32, UpcB64, UpcC32, UpcHex};
+#[cfg(feature = "upbc")]
+pub use codec::{UpbcB32, UpbcB64, UpbcC32, UpbcHex};
 #[cfg(feature = "zfbcx")]
 pub use codec::{ZfbcxB32, ZfbcxB64, ZfbcxC32, ZfbcxHex};
 // Legacy
@@ -376,8 +376,8 @@ pub use codec::{Mock2B32, Mock2B64, Mock2C32, Mock2Hex};
 // Aliases for default encoding:
 #[cfg(feature = "zfbcx")]
 pub type Zfbcx = ZfbcxC32;
-#[cfg(feature = "upc")]
-pub type Upc = UpcC32;
+#[cfg(feature = "upbc")]
+pub type Upbc = UpbcC32;
 #[cfg(feature = "adgs")]
 pub type Adgs = AdgsC32;
 #[cfg(feature = "apgs")]

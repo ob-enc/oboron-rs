@@ -23,9 +23,9 @@ pub const ZFBCX_BYTE: u8 = 0x02;
 
 // Tier ob2x - Secure, non-authenticated
 // -------------------------------------
-// upc: tier=2 (010), scheme=2 (0001), probabilistic=1 -> 01000011 = 0x23 (decimal: 35)
-#[cfg(feature = "upc")]
-pub const UPC_BYTE: u8 = 0x23;
+// upbc: tier=2 (010), scheme=2 (0001), probabilistic=1 -> 01000011 = 0x23 (decimal: 35)
+#[cfg(feature = "upbc")]
+pub const UPBC_BYTE: u8 = 0x23;
 
 // Tier ob3x - Secure, authenticated
 // ---------------------------------
@@ -58,13 +58,13 @@ pub const MOCK2_BYTE: u8 = 0xE2;
 
 // For efficient resolution in decode logic, list all scheme bytes of reversed schemes
 const fn get_reversed_schemes() -> &'static [u8] {
-    #[cfg(all(feature = "zfbcx", feature = "upc"))]
-    return &[ZFBCX_BYTE, UPC_BYTE];
-    #[cfg(all(feature = "zfbcx", not(feature = "upc")))]
+    #[cfg(all(feature = "zfbcx", feature = "upbc"))]
+    return &[ZFBCX_BYTE, UPBC_BYTE];
+    #[cfg(all(feature = "zfbcx", not(feature = "upbc")))]
     return &[ZFBCX_BYTE];
-    #[cfg(all(not(feature = "zfbcx"), feature = "upc"))]
-    return &[UPC_BYTE];
-    #[cfg(all(not(feature = "zfbcx"), not(feature = "upc")))]
+    #[cfg(all(not(feature = "zfbcx"), feature = "upbc"))]
+    return &[UPBC_BYTE];
+    #[cfg(all(not(feature = "zfbcx"), not(feature = "upbc")))]
     return &[];
 }
 pub const REVERSED_SCHEME_BYTES: &[u8] = get_reversed_schemes();
@@ -74,8 +74,8 @@ pub const REVERSED_SCHEME_BYTES: &[u8] = get_reversed_schemes();
 // c32 - Crockford base32 encoding
 #[cfg(feature = "zfbcx")]
 pub const ZFBCX_C32: &str = "zfbcx.c32";
-#[cfg(feature = "upc")]
-pub const UPC_C32: &str = "upc.c32";
+#[cfg(feature = "upbc")]
+pub const UPBC_C32: &str = "upbc.c32";
 #[cfg(feature = "adgs")]
 pub const ADGS_C32: &str = "adgs.c32";
 #[cfg(feature = "apgs")]
@@ -96,8 +96,8 @@ pub const LEGACY_C32: &str = "legacy.c32";
 // b32 - RFC 4648 Base32 encoding
 #[cfg(feature = "zfbcx")]
 pub const ZFBCX_B32: &str = "zfbcx.b32";
-#[cfg(feature = "upc")]
-pub const UPC_B32: &str = "upc.b32";
+#[cfg(feature = "upbc")]
+pub const UPBC_B32: &str = "upbc.b32";
 #[cfg(feature = "adgs")]
 pub const ADGS_B32: &str = "adgs.b32";
 #[cfg(feature = "apgs")]
@@ -118,8 +118,8 @@ pub const LEGACY_B32: &str = "legacy.b32";
 // b64 - Base64 encoding
 #[cfg(feature = "zfbcx")]
 pub const ZFBCX_B64: &str = "zfbcx.b64";
-#[cfg(feature = "upc")]
-pub const UPC_B64: &str = "upc.b64";
+#[cfg(feature = "upbc")]
+pub const UPBC_B64: &str = "upbc.b64";
 #[cfg(feature = "adgs")]
 pub const ADGS_B64: &str = "adgs.b64";
 #[cfg(feature = "apgs")]
@@ -140,8 +140,8 @@ pub const LEGACY_B64: &str = "legacy.b64";
 // hex - Hex encoding
 #[cfg(feature = "zfbcx")]
 pub const ZFBCX_HEX: &str = "zfbcx.hex";
-#[cfg(feature = "upc")]
-pub const UPC_HEX: &str = "upc.hex";
+#[cfg(feature = "upbc")]
+pub const UPBC_HEX: &str = "upbc.hex";
 #[cfg(feature = "adgs")]
 pub const ADGS_HEX: &str = "adgs.hex";
 #[cfg(feature = "apgs")]

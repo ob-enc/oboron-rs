@@ -14,8 +14,8 @@ use crate::encrypt_adsv;
 use crate::encrypt_apgs;
 #[cfg(feature = "apsv")]
 use crate::encrypt_apsv;
-#[cfg(feature = "upc")]
-use crate::encrypt_upc;
+#[cfg(feature = "upbc")]
+use crate::encrypt_upbc;
 #[cfg(feature = "zfbcx")]
 use crate::encrypt_zfbcx;
 // Testing
@@ -44,8 +44,8 @@ pub(crate) fn enc_to_format(
     let ciphertext = match format.scheme() {
         #[cfg(feature = "zfbcx")]
         Scheme::Zfbcx => encrypt_zfbcx(keychain, plaintext.as_bytes())?,
-        #[cfg(feature = "upc")]
-        Scheme::Upc => encrypt_upc(keychain, plaintext.as_bytes())?,
+        #[cfg(feature = "upbc")]
+        Scheme::Upbc => encrypt_upbc(keychain, plaintext.as_bytes())?,
         #[cfg(feature = "adgs")]
         Scheme::Adgs => encrypt_adgs(keychain, plaintext.as_bytes())?,
         #[cfg(feature = "apgs")]

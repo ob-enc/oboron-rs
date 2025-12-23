@@ -106,7 +106,7 @@ transformation from a plaintext string to an encoded "obtext" string.
 Formats are represented by compact identifiers: `{scheme}:{encoding}`,
 for example:
 - `zfbcx.c32` - zfbcx scheme, Crockford base32 encoding
-- `upc.b32` - upc scheme, standard RFC 4648 base32 encoding
+- `upbc.b32` - upbc scheme, standard RFC 4648 base32 encoding
 - `adgs.hex` - adgs scheme, hex encoding
 - `apsv.b64` - apsv scheme (`p`=probabilistic), base64 encoding
 
@@ -158,28 +158,28 @@ custom post-processing (optional byte reversal for prefix entropy).
 Schemes are classified into *tiers*, which are encapsulated in the scheme
 ID prefix:
 - `a` - authenticated (e.g., `adsv`, `apgs`)
-- `u` - unauthenticated (e.g., `upc`)
+- `u` - unauthenticated (e.g., `upbc`)
 - `z` - insecure, obfuscation only (e.g., `zfbcx`)
 
 The second letter of the scheme ID further describe the properties of the
 scheme by specifying one of two modes: deterministic and probabilistic:
 - `.d..` - deterministic (e.g. `adsv`, `adgs`, `zfbcx`)
-- `.p..` - probabilistic (e.g. `apsv`, `apgs`, `upc`)
+- `.p..` - probabilistic (e.g. `apsv`, `apgs`, `upbc`)
 
 Schemes in the `u` and `z` tiers use 3-letter IDs, while `a`-tier schemes
 use 4-letter IDs. This visual distinction reinforces the security
 difference: fully authenticated schemes (`a`-tier) have more descriptive
 names.  Compare:
 - `adsv`, `apgs` - fully secure and authenticated
-- `upc`, `zfbcx` - some security compromise: either non-authenticated
-  (`upc` not tamper-evident), or cryptographically broken (`zfbcx` uses
+- `upbc`, `zfbcx` - some security compromise: either non-authenticated
+  (`upbc` not tamper-evident), or cryptographically broken (`zfbcx` uses
   constant IV)
 
 The remaining two letters in `a`-tier schemes represent the algorithm used:
 - `gs` = GCM-SIV (AES-GCM-SIV)
 - `sv` = SIV (AES-SIV)
 
-The `c` in `upc` and `zfbcx` stands for CBC (AES-CBC).
+The `c` in `upbc` and `zfbcx` stands for CBC (AES-CBC).
 
 Summary table:
 
@@ -189,7 +189,7 @@ Summary table:
 | `adsv` | AES-SIV     | Yes            | Yes            |       |
 | `apgs` | AES-GCM-SIV | No             | Yes            |       |
 | `apsv` | AES-SIV     | No             | Yes            |       |
-| `upc`  | AES-CBC     | No             | No             |       |
+| `upbc`  | AES-CBC     | No             | No             |       |
 | `zfbcx`  | AES-CBC     | Yes            | No             | INSECURE, uses constant IV. Prioritizes determinism and performance over security. |
 
 Key Concepts:
@@ -212,7 +212,7 @@ special-purpose schemes:
 All schemes use well-regarded cryptographic primitives. However, note
 the following:
 
-* **`zfbcx` and `upc` are not authenticated** and vulnerable to
+* **`zfbcx` and `upbc` are not authenticated** and vulnerable to
   tampering.
 * **SECURITY WARNING:** **`zfbcx` is cryptographically broken** due to
   its use of a constant IV (by design, in order to achieve deterministic
@@ -306,7 +306,7 @@ two goals achieved with the payload structure are:
 
 The first step gives a transformed ciphertext:
 - `[ciphertext'] = [reverse(ciphertext)]` for reversed schemes (`zfbcx`,
-  `upc`),
+  `upbc`),
 - `[ciphertext'] = [ciphertext]` for all other schemes (no change).
 
 The second step is achieved by appending a single byte marker to the
@@ -327,7 +327,7 @@ byte directly, all `zfbcx` obtexts would have a constant suffix.
 > **FAQ:** *Why do some schemes reverse the ciphertext, while others
 > don't?*
 >
-> The reversal step in `zfbcx` and `upc` schemes moves the final AES
+> The reversal step in `zfbcx` and `upbc` schemes moves the final AES
 > block to the beginning of the output, ensuring maximal entropy in the
 > encoded prefix.  Both of these schemes use AES-CBC, a block-chaining
 > algorithm: each 16-byte block's ciphertext becomes the IV for the next.
@@ -383,7 +383,7 @@ for Oboron’s threat model.
 
 The master-key is partitioned into algorithm-specific keys in the
 following way:
-- `zfbcx`, `upc`: use the first 16 bytes (128 bits) for AES key
+- `zfbcx`, `upbc`: use the first 16 bytes (128 bits) for AES key
 - `zfbcx`: uses the second 16 bytes for IV
 - `adgs`, `apgs`: use the last 32 bytes (256 bits) for AES-GCM-SIV key
 - `adsv`, `apsv`: use the full 64 bytes (512 bits) for AES-SIV key
@@ -823,11 +823,11 @@ assert_eq!(pt2, "hello");
 ```
 
 Available types include all combinations of scheme variants (e.g.,
-`Zfbcx`, `Upc`, `Adgs`, `Apgs`, `Adsv`, `Apsv`) with encoding
+`Zfbcx`, `Upbc`, `Adgs`, `Apgs`, `Adsv`, `Apsv`) with encoding
 specifications (`B64`, `Hex`, `B32`, or `C32`),
 and concatenates the two in struct names, for example:
 - `ZfbcxB32` - encoder for `zfbcx.b32` format
-- `UpcHex` - encoder for `upc.hex` format
+- `UpbcHex` - encoder for `upbc.hex` format
 - `AdgsB64` - encoder for `adgs.b64` format
 - `AdsvC32` - encoder for `adsv.c32` format.
 
@@ -925,7 +925,7 @@ let ot_hex = obm.enc("data", ADSV_HEX)?;
 
 Available constants:
 - `ZFBCX_C32`, `ZFBCX_B32`, `ZFBCX_B64`, `ZFBCX_HEX`
-- `UPC_C32`, `UPC_B32`, `UPC_B64`, `UPC_HEX`
+- `UPBC_C32`, `UPBC_B32`, `UPBC_B64`, `UPBC_HEX`
 - `ADGS_C32`, `ADGS_B32`, `ADGS_B64`, `ADGS_HEX`
 - `APGS_C32`, `APGS_B32`, `APGS_B64`, `APGS_HEX`
 - `ADSV_C32`, `ADSV_B32`, `ADSV_B64`, `ADSV_HEX`
@@ -1046,7 +1046,7 @@ group.)
 | zfbcx   | b32/c32  | 28  | 28  | 28  | 28  | 53  | 53  | 104  | 207  |
 | adgs   | b32/c32  | 34  | 40  | 47  | 53  | 66  | 79  | 130  | 232  |
 | adsv   | b32/c32  | 34  | 40  | 47  | 53  | 66  | 79  | 130  | 232  |
-| upc  | b32/c32  | 53  | 53  | 53  | 53  | 79  | 79  | 130  | 232  |
+| upbc  | b32/c32  | 53  | 53  | 53  | 53  | 79  | 79  | 130  | 232  |
 | apgs  | b32/c32  | 53  | 60  | 66  | 72  | 85  | 98  | 149  | 252  |
 | apsv  | b32/c32  | 60  | 66  | 72  | 79  | 92  | 104 | 156  | 258  |
 
@@ -1058,7 +1058,7 @@ group.)
 | zfbcx   | b64      | 23  | 23  | 23  | 23  | 44  | 44  | 87   | 172  |
 | adgs   | b64      | 28  | 34  | 39  | 44  | 55  | 66  | 108  | 194  |
 | adsv   | b64      | 28  | 34  | 39  | 44  | 55  | 66  | 108  | 194  |
-| upc  | b64      | 44  | 44  | 44  | 44  | 66  | 66  | 108  | 215  |
+| upbc  | b64      | 44  | 44  | 44  | 44  | 66  | 66  | 108  | 215  |
 | apgs  | b64      | 40  | 50  | 55  | 60  | 71  | 82  | 124  | 210  |
 | apsv  | b64      | 46  | 55  | 60  | 66  | 76  | 87  | 130  | 215  |
 
@@ -1070,7 +1070,7 @@ group.)
 | zfbcx   | hex      | 34  | 34  | 34  | 34  | 66  | 66  | 130  | 258  |
 | adgs   | hex      | 42  | 50  | 58  | 66  | 82  | 98  | 162  | 290  |
 | adsv   | hex      | 42  | 50  | 58  | 66  | 82  | 98  | 162  | 290  |
-| upc  | hex      | 66  | 66  | 66  | 66  | 98  | 98  | 162  | 290  |
+| upbc  | hex      | 66  | 66  | 66  | 66  | 98  | 98  | 162  | 290  |
 | apgs  | hex      | 66  | 74  | 82  | 90  | 106 | 122 | 186  | 314  |
 | apsv  | hex      | 74  | 82  | 90  | 98  | 114 | 130 | 194  | 322  |
 

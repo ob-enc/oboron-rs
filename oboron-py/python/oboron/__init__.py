@@ -99,11 +99,11 @@ OboronBase.register(_oboron.ApsvB32)
 OboronBase.register(_oboron.ApsvB64)
 OboronBase.register(_oboron.ApsvHex)
 
-# Upc variants
-OboronBase.register(_oboron.UpcC32)
-OboronBase.register(_oboron.UpcB32)
-OboronBase.register(_oboron.UpcB64)
-OboronBase.register(_oboron.UpcHex)
+# Upbc variants
+OboronBase.register(_oboron.UpbcC32)
+OboronBase.register(_oboron.UpbcB32)
+OboronBase.register(_oboron.UpbcB64)
+OboronBase.register(_oboron.UpbcHex)
 
 # Zfbcx variants
 OboronBase.register(_oboron.ZfbcxC32)
@@ -163,11 +163,11 @@ ApsvB32 = _oboron.ApsvB32
 ApsvB64 = _oboron.ApsvB64
 ApsvHex = _oboron.ApsvHex
 
-# Upc variants
-UpcC32 = _oboron.UpcC32
-UpcB32 = _oboron.UpcB32
-UpcB64 = _oboron.UpcB64
-UpcHex = _oboron.UpcHex
+# Upbc variants
+UpbcC32 = _oboron.UpbcC32
+UpbcB32 = _oboron.UpbcB32
+UpbcB64 = _oboron.UpbcB64
+UpbcHex = _oboron.UpbcHex
 
 # Zfbcx variants
 ZfbcxC32 = _oboron.ZfbcxC32
@@ -240,11 +240,11 @@ __all__ = [
     'ApsvB64',
     'ApsvHex',
 
-    # Upc
-    'UpcC32',
-    'UpcB32',
-    'UpcB64',
-    'UpcHex',
+    # Upbc
+    'UpbcC32',
+    'UpbcB32',
+    'UpbcB64',
+    'UpbcHex',
 
     # Zfbcx
     'ZfbcxC32',

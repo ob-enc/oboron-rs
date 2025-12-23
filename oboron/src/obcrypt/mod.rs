@@ -11,8 +11,8 @@ mod adsv; //  AES-SIV (deterministic)
 mod apgs; // AES-GCM-SIV (probabilistic)
 #[cfg(feature = "apsv")]
 mod apsv;
-#[cfg(feature = "upc")]
-mod upc; // AES-CBC (probabilistic)
+#[cfg(feature = "upbc")]
+mod upbc; // AES-CBC (probabilistic)
 #[cfg(feature = "zfbcx")]
 mod zfbcx; //  AES-CBC (deterministic, not cryptographically secure - obfuscation only!) // AES-SIV (probabilistic)
 
@@ -36,8 +36,8 @@ pub use adsv::{decrypt as decrypt_adsv, encrypt as encrypt_adsv};
 pub use apgs::{decrypt as decrypt_apgs, encrypt as encrypt_apgs};
 #[cfg(feature = "apsv")]
 pub use apsv::{decrypt as decrypt_apsv, encrypt as encrypt_apsv};
-#[cfg(feature = "upc")]
-pub use upc::{decrypt as decrypt_upc, encrypt as encrypt_upc};
+#[cfg(feature = "upbc")]
+pub use upbc::{decrypt as decrypt_upbc, encrypt as encrypt_upbc};
 #[cfg(feature = "zfbcx")]
 pub use zfbcx::{decrypt as decrypt_zfbcx, encrypt as encrypt_zfbcx};
 

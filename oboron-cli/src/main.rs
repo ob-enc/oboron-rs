@@ -30,10 +30,10 @@ struct SchemeFlags {
     #[arg(short = '1', long, alias = "01")]
     zfbcx: bool,
 
-    /// Use upc scheme (probabilistic AES-CBC with PKCS#7)
-    #[cfg(feature = "upc")]
+    /// Use upbc scheme (probabilistic AES-CBC with PKCS#7)
+    #[cfg(feature = "upbc")]
     #[arg(short = '2', long, alias = "21p")]
-    upc: bool,
+    upbc: bool,
 
     /// Use adgs scheme (deterministic AES-GCM-SIV)
     #[cfg(feature = "adgs")]
@@ -70,7 +70,7 @@ impl SchemeFlags {
     /// Convert flags to Option<Scheme>, returning error if multiple are set
     #[cfg(any(
         feature = "zfbcx",
-        feature = "upc",
+        feature = "upbc",
         feature = "adgs",
         feature = "apgs",
         feature = "adsv",
@@ -93,10 +93,10 @@ impl SchemeFlags {
             count += 1;
             scheme = Some(Scheme::Zfbcx);
         }
-        #[cfg(feature = "upc")]
-        if self.upc {
+        #[cfg(feature = "upbc")]
+        if self.upbc {
             count += 1;
-            scheme = Some(Scheme::Upc);
+            scheme = Some(Scheme::Upbc);
         }
         #[cfg(feature = "adgs")]
         if self.adgs {
@@ -139,7 +139,7 @@ impl SchemeFlags {
     /// Check if any scheme flag is set
     #[cfg(any(
         feature = "zfbcx",
-        feature = "upc",
+        feature = "upbc",
         feature = "adgs",
         feature = "apgs",
         feature = "adsv",
@@ -165,8 +165,8 @@ impl SchemeFlags {
         if self.adsv {
             return true;
         }
-        #[cfg(feature = "upc")]
-        if self.upc {
+        #[cfg(feature = "upbc")]
+        if self.upbc {
             return true;
         }
         #[cfg(feature = "apgs")]
@@ -819,7 +819,7 @@ mod tests {
     fn test_scheme_flags_to_scheme_single() {
         #[cfg(not(any(
             feature = "zfbcx",
-            feature = "upc",
+            feature = "upbc",
             feature = "adgs",
             feature = "apgs",
             feature = "adsv",
@@ -834,8 +834,8 @@ mod tests {
             legacy: false,
             #[cfg(feature = "zfbcx")]
             zfbcx: false,
-            #[cfg(feature = "upc")]
-            upc: false,
+            #[cfg(feature = "upbc")]
+            upbc: false,
             #[cfg(feature = "adgs")]
             adgs: false,
             #[cfg(feature = "apgs")]
@@ -858,7 +858,7 @@ mod tests {
     fn test_scheme_flags_to_scheme_multiple_errors() {
         #[cfg(not(any(
             feature = "zfbcx",
-            feature = "upc",
+            feature = "upbc",
             feature = "adgs",
             feature = "apgs",
             feature = "adsv",
@@ -873,8 +873,8 @@ mod tests {
             legacy: false,
             #[cfg(feature = "zfbcx")]
             zfbcx: false,
-            #[cfg(feature = "upc")]
-            upc: false,
+            #[cfg(feature = "upbc")]
+            upbc: false,
             #[cfg(feature = "adgs")]
             adgs: false,
             #[cfg(feature = "apgs")]
@@ -895,7 +895,7 @@ mod tests {
     fn test_scheme_flags_to_scheme_none() {
         #[cfg(not(any(
             feature = "zfbcx",
-            feature = "upc",
+            feature = "upbc",
             feature = "adgs",
             feature = "apgs",
             feature = "adsv",
@@ -910,8 +910,8 @@ mod tests {
             legacy: false,
             #[cfg(feature = "zfbcx")]
             zfbcx: false,
-            #[cfg(feature = "upc")]
-            upc: false,
+            #[cfg(feature = "upbc")]
+            upbc: false,
             #[cfg(feature = "adgs")]
             adgs: false,
             #[cfg(feature = "apgs")]
@@ -961,7 +961,7 @@ mod tests {
 
         #[cfg(not(any(
             feature = "zfbcx",
-            feature = "upc",
+            feature = "upbc",
             feature = "adgs",
             feature = "apgs",
             feature = "adsv",
@@ -976,8 +976,8 @@ mod tests {
             legacy: false,
             #[cfg(feature = "zfbcx")]
             zfbcx: false,
-            #[cfg(feature = "upc")]
-            upc: false,
+            #[cfg(feature = "upbc")]
+            upbc: false,
             #[cfg(feature = "adgs")]
             adgs: false,
             #[cfg(feature = "apgs")]
@@ -1015,7 +1015,7 @@ mod tests {
     fn test_format_spec_conflicts_with_scheme_flag() {
         #[cfg(not(any(
             feature = "zfbcx",
-            feature = "upc",
+            feature = "upbc",
             feature = "adgs",
             feature = "apgs",
             feature = "adsv",
@@ -1030,8 +1030,8 @@ mod tests {
             legacy: false,
             #[cfg(feature = "zfbcx")]
             zfbcx: false,
-            #[cfg(feature = "upc")]
-            upc: false,
+            #[cfg(feature = "upbc")]
+            upbc: false,
             #[cfg(feature = "adgs")]
             adgs: false,
             #[cfg(feature = "apgs")]
@@ -1070,7 +1070,7 @@ mod tests {
     fn test_format_spec_conflicts_with_encoding_flag() {
         #[cfg(not(any(
             feature = "zfbcx",
-            feature = "upc",
+            feature = "upbc",
             feature = "adgs",
             feature = "apgs",
             feature = "adsv",
@@ -1085,8 +1085,8 @@ mod tests {
             legacy: false,
             #[cfg(feature = "zfbcx")]
             zfbcx: false,
-            #[cfg(feature = "upc")]
-            upc: false,
+            #[cfg(feature = "upbc")]
+            upbc: false,
             #[cfg(feature = "adgs")]
             adgs: false,
             #[cfg(feature = "apgs")]
@@ -1132,7 +1132,7 @@ mod tests {
 
         #[cfg(not(any(
             feature = "zfbcx",
-            feature = "upc",
+            feature = "upbc",
             feature = "adgs",
             feature = "apgs",
             feature = "adsv",
@@ -1147,8 +1147,8 @@ mod tests {
             legacy: false,
             #[cfg(feature = "zfbcx")]
             zfbcx: false,
-            #[cfg(feature = "upc")]
-            upc: false,
+            #[cfg(feature = "upbc")]
+            upbc: false,
             #[cfg(feature = "adgs")]
             adgs: false,
             #[cfg(feature = "apgs")]
@@ -1187,7 +1187,7 @@ mod tests {
 
         #[cfg(not(any(
             feature = "zfbcx",
-            feature = "upc",
+            feature = "upbc",
             feature = "adgs",
             feature = "apgs",
             feature = "adsv",
@@ -1202,8 +1202,8 @@ mod tests {
             legacy: false,
             #[cfg(feature = "zfbcx")]
             zfbcx: false,
-            #[cfg(feature = "upc")]
-            upc: false,
+            #[cfg(feature = "upbc")]
+            upbc: false,
             #[cfg(feature = "adgs")]
             adgs: false,
             #[cfg(feature = "apgs")]

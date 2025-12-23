@@ -1,7 +1,7 @@
 #[cfg(feature = "adgs")]
 use oboron::AdgsB64;
-#[cfg(feature = "upc")]
-use oboron::UpcB64;
+#[cfg(feature = "upbc")]
+use oboron::UpbcB64;
 #[cfg(feature = "zfbcx")]
 use oboron::ZfbcxB64;
 #[cfg(feature = "adsv")]
@@ -169,7 +169,7 @@ fn test_apsv_all_encodings() {
 
 #[test]
 #[cfg(feature = "zfbcx")]
-#[cfg(feature = "upc")]
+#[cfg(feature = "upbc")]
 #[cfg(feature = "adgs")]
 #[cfg(feature = "apgs")]
 #[cfg(feature = "adsv")]
@@ -183,7 +183,7 @@ fn test_obflex_basic() {
     // Test with different schemes
     for scheme in &[
         Scheme::Zfbcx,
-        Scheme::Upc,
+        Scheme::Upbc,
         Scheme::Adgs,
         Scheme::Apgs,
         Scheme::Adsv,
@@ -207,7 +207,7 @@ fn test_obflex_basic() {
 
 #[test]
 #[cfg(feature = "zfbcx")]
-#[cfg(feature = "upc")]
+#[cfg(feature = "upbc")]
 #[cfg(feature = "adgs")]
 #[cfg(feature = "apgs")]
 #[cfg(feature = "adsv")]
@@ -222,9 +222,9 @@ fn test_obflex_all_formats() {
         "zfbcx.c32",
         "zfbcx.b64",
         "zfbcx.hex",
-        "upc.c32",
-        "upc.b64",
-        "upc.hex",
+        "upbc.c32",
+        "upbc.b64",
+        "upbc.hex",
         "adgs.c32",
         "adgs.b64",
         "adgs.hex",
@@ -411,7 +411,7 @@ fn test_cross_scheme_decoding_should_fail() {
 }
 
 #[test]
-#[cfg(feature = "upc")]
+#[cfg(feature = "upbc")]
 #[cfg(feature = "apgs")]
 #[cfg(feature = "apsv")]
 fn test_probabilistic_schemes_uniqueness() {
@@ -419,17 +419,17 @@ fn test_probabilistic_schemes_uniqueness() {
     let plaintext = "Testing probabilistic uniqueness";
     let iterations = 100;
 
-    // Test Upc
-    let upc = UpcB64::from_bytes(&key).expect("Failed to create upc");
+    // Test Upbc
+    let upbc = UpbcB64::from_bytes(&key).expect("Failed to create upbc");
     let mut encodings = std::collections::HashSet::new();
     for _ in 0..iterations {
-        let ot = upc.enc(plaintext).expect("Failed to enc with upc");
+        let ot = upbc.enc(plaintext).expect("Failed to enc with upbc");
         encodings.insert(ot);
     }
     assert_eq!(
         encodings.len(),
         iterations,
-        "UpcB64 should produce {} unique obtexts",
+        "UpbcB64 should produce {} unique obtexts",
         iterations
     );
 

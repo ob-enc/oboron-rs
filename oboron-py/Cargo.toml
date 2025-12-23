@@ -14,11 +14,11 @@ legacy = ["oboron/legacy"]
 zfbcx = ["oboron/zfbcx"]
 adgs = ["oboron/adgs"]
 adsv = ["oboron/adsv"]
-upc = ["oboron/upc"]
+upbc = ["oboron/upbc"]
 apgs = ["oboron/apgs"]
 apsv = ["oboron/apsv"]
 mock = ["oboron/mock"]
-all-schemes = ["zfbcx", "upc", "adgs", "apgs", "adsv", "apsv"]
+all-schemes = ["zfbcx", "upbc", "adgs", "apgs", "adsv", "apsv"]
 
 keyless = ["oboron/keyless"]
 

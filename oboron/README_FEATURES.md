@@ -11,7 +11,7 @@ By default, **all secure production-ready schemes are enabled**:
 oboron = "1.0"
 ```
 
-This includes: `upc`, `adgs`, `apgs`, `adsv`, `apsv`.
+This includes: `upbc`, `adgs`, `apgs`, `adsv`, `apsv`.
 
 All encodings (`.c32`-Crockford base32, `.b32`-standard base32, `.b64`-URL-safe base64, and `.hex`-hex) are always included.
 
@@ -41,7 +41,7 @@ hex/bytes key interfaces and the keyless testing feature.
 ### Individual Schemes
 
 - `zfbcx` - AES-CBC (deterministic)
-- `upc` - AES-CBC (probabilistic)
+- `upbc` - AES-CBC (probabilistic)
 - `adgs` - AES-GCM-SIV (deterministic)
 - `apgs` - AES-GCM-SIV (probabilistic)
 - `adsv` - AES-SIV (deterministic)
@@ -76,13 +76,13 @@ versioning guarantees and may change or be removed in patch releases.
 ### Scheme Groups
 
 By algorithm
-- `all-cbc-schemes` - Includes `zfbcx`, `upc`
+- `all-cbc-schemes` - Includes `zfbcx`, `upbc`
 - `all-gcm-schemes` - Includes `adgs`, `apgs`
 - `all-siv-schemes` - Includes `adsv`, `apsv`
 
 By properties:
 - `deterministic-schemes` - Includes `zfbcx`, `adgs`, `adsv`
-- `probabilistic-schemes` - Includes `upc`, `apgs`, `apsv`
+- `probabilistic-schemes` - Includes `upbc`, `apgs`, `apsv`
 - `authenticated-schemes` - Includes `adgs`, `apgs`, `adsv`, `apsv`
 - `secure-schemes` - Includes all but `zfbcx`
 - `insecure-schemes` - Includes `zfbcx` only
@@ -90,7 +90,7 @@ By properties:
 By tier:
 - `ob0x` - Includes `zfbcx` only
 - `ob1x` - No current members
-- `ob2x` - Includes `upc` only
+- `ob2x` - Includes `upbc` only
 - `ob3x` - Includes all authenticated schemes (= `authenticated-schemes`)
 
 Testing:

@@ -7,8 +7,8 @@ use crate::{constants, error::Error};
 pub enum Scheme {
     #[cfg(feature = "zfbcx")]
     Zfbcx,
-    #[cfg(feature = "upc")]
-    Upc,
+    #[cfg(feature = "upbc")]
+    Upbc,
     #[cfg(feature = "adgs")]
     Adgs,
     #[cfg(feature = "apgs")]
@@ -33,8 +33,8 @@ impl Scheme {
         match self {
             #[cfg(feature = "zfbcx")]
             Scheme::Zfbcx => "zfbcx",
-            #[cfg(feature = "upc")]
-            Scheme::Upc => "upc",
+            #[cfg(feature = "upbc")]
+            Scheme::Upbc => "upbc",
             #[cfg(feature = "adgs")]
             Scheme::Adgs => "adgs",
             #[cfg(feature = "apgs")]
@@ -64,8 +64,8 @@ impl Scheme {
         match self {
             #[cfg(feature = "zfbcx")]
             Scheme::Zfbcx => true,
-            #[cfg(feature = "upc")]
-            Scheme::Upc => false,
+            #[cfg(feature = "upbc")]
+            Scheme::Upbc => false,
             #[cfg(feature = "adgs")]
             Scheme::Adgs => true,
             #[cfg(feature = "apgs")]
@@ -100,8 +100,8 @@ impl Scheme {
         match self {
             #[cfg(feature = "zfbcx")]
             Scheme::Zfbcx => constants::ZFBCX_BYTE,
-            #[cfg(feature = "upc")]
-            Scheme::Upc => constants::UPC_BYTE,
+            #[cfg(feature = "upbc")]
+            Scheme::Upbc => constants::UPBC_BYTE,
             #[cfg(feature = "adgs")]
             Scheme::Adgs => constants::ADGS_BYTE,
             #[cfg(feature = "apgs")]
@@ -129,8 +129,8 @@ impl std::str::FromStr for Scheme {
         match s.to_lowercase().as_str() {
             #[cfg(feature = "zfbcx")]
             "zfbcx" => Ok(Scheme::Zfbcx),
-            #[cfg(feature = "upc")]
-            "upc" => Ok(Scheme::Upc),
+            #[cfg(feature = "upbc")]
+            "upbc" => Ok(Scheme::Upbc),
             #[cfg(feature = "adgs")]
             "adgs" => Ok(Scheme::Adgs),
             #[cfg(feature = "apgs")]
