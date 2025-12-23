@@ -7,14 +7,14 @@
 
 Oboron is a general-purpose encryption library focused on developer
 ergonomics:
-- **String in, string out**: Encryption and encoding are bundled into
+- *String in, string out*: Encryption and encoding are bundled into
   one seamless process
-- **Standardized interface**: Multiple encryption algorithms accessible
+- *Standardized interface*: Multiple encryption algorithms accessible
   through the same API
-- **[Unified key management](#key-management)**: A single 512-bit key
+- *[Unified key management](#key-management)*: A single 512-bit key
   works across all schemes with internal extraction to algorithm-specific
   keys
-- **[Prefix-focused entropy](#referenceable-prefixes)**: Maximizes
+- *[Prefix-focused entropy](#referenceable-prefixes)*: Maximizes
   entropy in initial characters for referenceable short prefixes (similar
   to Git commit hashes)
 
@@ -24,13 +24,13 @@ with careful attention to output characteristics.  By reversing
 ciphertext in select schemes, entropy is concentrated in the output's
 prefix, enabling short, unique references.
 
-**Key Advantages:**
-- **Referenceable prefixes**: High initial entropy enables Git-like short
+Key Advantages:
+- *Referenceable prefixes*: High initial entropy enables Git-like short
   IDs
-- **Simplified workflow**: No manual encoding/decoding between encryption
+- *Simplified workflow*: No manual encoding/decoding between encryption
   stages
-- **Performance optimized** for short-string use cases
-- **Compact outputs**
+- *Performance optimized* for short-string use cases
+- *Compact outputs*
 
 ## Contents
 
@@ -66,8 +66,8 @@ let key = oboron::generate_key();
 ```
 then save the key as an environment variable.
 
-Use AasvC32 (a secure scheme, 256-bit encrypted with AES-SIV, encoded using
-Crockford's base32 variant) for enc/dec:
+Use AasvC32 (a secure scheme, 256-bit encrypted with AES-SIV, encoded
+using Crockford's base32 variant) for enc/dec:
 ```rust
 use oboron::{AasvC32, ObtextCodec};
 
@@ -126,13 +126,14 @@ including the encryption and encoding stages.
 
 ### Encodings
 
-- **base32crockford** (default): Balanced compactness and readability,
+- `b32` - standard base32: Balanced compactness and readability,
+  alphanumeric, uppercase (RFC 4648 Section 6)
+- `c32` - Crockford base32: Balanced compactness and readability,
   alphanumeric, lowercase; designed to avoid accidental obscenity
-- **base32rfc**: Balanced compactness and readability, alphanumeric,
-  uppercase; standard base32 (RFC 4648 Section 6)
-- **base64**: Most compact, case-sensitive, includes `-` and `\_`
-  characters; standard URL-safe base64 (RFC 4648 Section 5)
-- **hexadecimal**: Slightly faster performance (~2-3%), longest output
+- `b64` - standard URL-safe base64: Most compact, case-sensitive,
+  includes `-` and `\_` characters (RFC 4648 Section 5)
+- `hex` - hexadecimal: Slightly faster performance (~2-3%), longest
+  output
 
 > **FAQ:** *Why does Oboron use Crockford's base32?*
 >
@@ -162,9 +163,11 @@ ID prefix:
 - `z` - insecure, obfuscation only (e.g., `zrbcx`)
 
 The second letter of the scheme ID further describe the properties of the
-scheme by specifying one of two modes: deterministic and probabilistic:
-- `.d..` - deterministic (e.g. `aasv`, `aags`, `zrbcx`)
-- `.p..` - probabilistic (e.g. `apsv`, `apgs`, `upbc`)
+scheme:
+- `.a..` - avalanche, deterministic (e.g., `aasv`, `aags`)
+- `.r..` - referenceable / prefix-restricted avalanche, deterministic
+- `.d..` - deterministic, no avalanche effect
+- `.p..` - probabilistic (e.g., `apsv`, `apgs`, `upbc`)
 
 Schemes in the `u` and `z` tiers use 3-letter IDs, while `a`-tier schemes
 use 4-letter IDs. This visual distinction reinforces the security
@@ -175,22 +178,22 @@ names.  Compare:
   (`upbc` not tamper-evident), or cryptographically broken (`zrbcx` uses
   constant IV)
 
-The remaining two letters in `a`-tier schemes represent the algorithm used:
+The remaining two letters in `a`-tier schemes represent the algorithm
+used:
 - `gs` = GCM-SIV (AES-GCM-SIV)
 - `sv` = SIV (AES-SIV)
-
-The `c` in `upbc` and `zrbcx` stands for CBC (AES-CBC).
+- `bc` = CBC (AES-CBC)
 
 Summary table:
 
-| Scheme | Algorithm   | Deterministic? | Authenticated? | Notes |
-| :----- | :---------- | :------------- | :------------- | :---- |
-| `aags` | AES-GCM-SIV | Yes            | Yes            |       |
-| `aasv` | AES-SIV     | Yes            | Yes            |       |
-| `apgs` | AES-GCM-SIV | No             | Yes            |       |
-| `apsv` | AES-SIV     | No             | Yes            |       |
+| Scheme  | Algorithm   | Deterministic? | Authenticated? | Notes |
+| :------ | :---------- | :------------- | :------------- | :---- |
+| `aags`  | AES-GCM-SIV | Yes            | Yes            |       |
+| `aasv`  | AES-SIV     | Yes            | Yes            |       |
+| `apgs`  | AES-GCM-SIV | No             | Yes            |       |
+| `apsv`  | AES-SIV     | No             | Yes            |       |
 | `upbc`  | AES-CBC     | No             | No             |       |
-| `zrbcx`  | AES-CBC     | Yes            | No             | INSECURE, uses constant IV. Prioritizes determinism and performance over security. |
+| `zrbcx` | AES-CBC     | Yes            | No             | INSECURE, uses constant IV. Prioritizes determinism and performance over security. |
 
 Key Concepts:
 * *Deterministic:* Same input (key + plaintext) always produces same
@@ -239,8 +242,8 @@ important one (see [Scheme Tiers](#scheme-tiers) above):
 > domain extend beyond encryption.  For applications such as obfuscation
 > or hashing alternative (see Application section below), `z`-schemes
 > are sufficient, while outperforming `a`-schemes by 2x to 4x.  In our
-> benchmarks, `zrbcx` shows ~40% lower latency than SHA256 for short inputs
-> on modern x86 CPUs.
+> benchmarks, `zrbcx` shows ~40% lower latency than SHA256 for short
+> inputs on modern x86 CPUs.
 
 > FAQ: *Why do schemes not include the traditional 128/256/... bit
 > encryption designations?*
@@ -427,6 +430,7 @@ While base64 keys are used in the primary interface, Oboron also provides
 full support for working with keys in hexadecimal or raw bytes formats
 via `*from_bytes*` and `*from_hex_key*` method and function variants.
 
+
 ## Properties
 
 ### Referenceable Prefixes
@@ -489,7 +493,7 @@ both SHA256 and JWT performance while providing reversible encryption.
 
 | Scheme | 8B Encode | 8B Decode | Security      | Use Case                        |
 |--------|----------:|-----------|---------------|---------------------------------|
-| zrbcx   | 132 ns    | 126 ns    | Insecure      | Maximum speed + compactness     |
+| zrbcx  | 132 ns    | 126 ns    | Insecure      | Maximum speed + compactness     |
 | aasv   | 334 ns    | 364 ns    | Secure + Auth | Balanced performance + security |
 | JWT    | 550 ns    | 846 ns    | Auth only`*`  | Signature without encryption    |
 | SHA256 | 191 ns    | N/A       | One-way       | Hashing only                    |
@@ -515,9 +519,9 @@ performed on the same machine is available here:
 
 | Method        | Small string output length |
 |---------------|----------------------------|
-| Oboron zrbcx:  | 28 characters              |
+| Oboron zrbcx: | 28 characters              |
 | Oboron aasv:  | 34-47 characters           |
-| Oboron apsv: | 60-72 characters           |
+| Oboron apsv:  | 60-72 characters           |
 | SHA256:       | 64 characters              |
 | JWT:          | 150+ characters            |
 
@@ -526,25 +530,24 @@ A more complete output length comparison is given in the
 
 ### Scheme Selection Guidelines
 
-- **zrbcx**: Non-security-critical applications prioritizing speed and
+- `zrbcx`: Non-security-critical applications prioritizing speed and
   compactness
-- **aasv**: General-purpose secure encryption with deterministic output
+- `aasv`: General-purpose secure encryption with deterministic output
   and compact size
-- **apsv**: Maximum privacy protection with probabilistic output
+- `apsv`: Maximum privacy protection with probabilistic output
   (larger size due to nonce)
 
-**Choose zrbcx when:**
+Choose zrbcx when:
 - Performance and compactness are primary requirements (~28 chars)
 - Security requirements are minimal (obfuscation contexts)
 
-**Choose aasv when:**  
+Choose aasv when:
 - Cryptographic security with compact output is needed (~34-47 chars)
 - Deterministic behavior is beneficial (lookup keys, caching)
 
-**Choose apsv when:**
+Choose apsv when:
 - Cryptographic security with maximum privacy is required (~60-72 chars)
 - Hiding plaintext relationships is critical
-
 
 ### Feature Flags
 
@@ -570,11 +573,11 @@ oboron = { version = "1.0", default-features = false, features = ["authenticated
 oboron = { version = "1.0", default-features = false, features = ["all-siv-schemes"] }
 ```
 
-
 ### Versioning
 
 This crate follows semantic versioning.  Version 1.0 signifies a stable,
-production-ready API with no anticipated breaking changes.
+production-ready API with no anticipated breaking changes.  API stability
+guarantees do not apply to pre-1.0 versions.
 
 
 ## Applications
@@ -597,12 +600,11 @@ prefix entropy and compactness—enables specialized applications:
 
 ### Comparison with Alternatives
 
-| Use Case            | Traditional Solution | Oboron Approach |
-|---------------------|----------------------|------------------|
-| Short unique IDs    | UUIDv4 (36 chars)    | zrbcx.c32 (28 chars, reversible) |
+| Use Case            | Traditional Solution | Oboron Approach                    |
+|---------------------|----------------------|------------------------------------|
+| Short unique IDs    | UUIDv4 (36 chars)    | zrbcx.c32 (28 chars, reversible)   |
 | URL parameters      | JWT (150+ chars)     | aasv.b64 (4.5x smaller, 4x faster) |
-| Database ID masking | Hashids (not secure) | Proper encryption |
-| Simple encryption   | Libsodium (complex)  | String in, string out API |
+| Database ID masking | Hashids (not secure) | Proper encryption                  |
 
 ### API Simplification
 
@@ -702,9 +704,9 @@ let token = ob.enc(&state)?; // ~50 characters
 Oboron provides efficient alternatives to UUIDs and SHA256 for
 generating unique, referenceable identifiers.
 
-The examples in this section use `zrbcx` and `keyless` features, which are
-not included by default as cryptographically insecure.  Enable
-the required features explicitly in your `Cargo.toml`.
+The examples in this section use `zrbcx` and `keyless` features, which
+are not included by default as cryptographically insecure.  Enable the
+required features explicitly in your `Cargo.toml`.
 
 ##### Approach 1: Full Oboron Output (Reversible)
 ```rust
@@ -715,7 +717,8 @@ let full_id = ob.enc("user:alice")?;
 
 - Pros:
   - Reversible (decodes to "user:alice"),
-  - Opaque structure: When decoded with base32, the obtext produces a binary blob, revealing no input patterns.
+  - Opaque structure: When decoded with base32, the obtext produces a
+    binary blob, revealing no input patterns.
   - Oboron detects scheme, can decrypt with hardcoded key
 - Cons:
   - Using hardcoded key: Given the context (keyless Oboron), anyone can
@@ -746,7 +749,8 @@ let short_id = &full[0..20];
 - Cons:
   - Not reversible
 - Best for:
-  - Public-facing identifiers requiring opacity and referenceable short IDs.
+  - Public-facing identifiers requiring opacity and referenceable short
+    IDs.
 
 #### Oboron for Hash-like Identifier Generation
 
@@ -899,10 +903,10 @@ let pt2 = obm.autodec(&ot);
 
 Note performance implications: autodetection uses trial-and-error across
 encodings, with worst-case performance ~3x slower than known-format
-dec operations. Meanwhile, scheme autodetection in other interfaces (e.g.,
-`Ob.dec()`, `ObFlex.dec()`, `AasvB64.dec()`) has zero overhead, as the
-scheme is detected based on the scheme byte in the payload, and the logic
-follows a direct path with no retries.
+dec operations. Meanwhile, scheme autodetection in other interfaces
+(e.g., `Ob.dec()`, `ObFlex.dec()`, `AasvB64.dec()`) has zero overhead, as
+the scheme is detected based on the scheme byte in the payload, and the
+logic follows a direct path with no retries.
 
 ### Using Format Constants
 
@@ -1034,43 +1038,41 @@ Licensed under the MIT license ([LICENSE](LICENSE)).
 is equal to the plaintext bytes (identity transformation). It is
 included in the tables below as baseline.
 
-(Note: the `mock1` scheme is feature gated: use it by enabling the `mock1`
-feature, or the `ob7x` testing feature group, or the `mock` feature
-group.)
+(Note: the `mock1` scheme is feature gated: use it by enabling the `mock`
+feature)
 
 ## Base32 encoding (b32/c32)
 
 | Scheme | Encoding | 4B  | 8B  | 12B | 16B | 24B | 32B | 64B  | 128B |
 |--------|----------|----:|----:|----:|----:|----:|----:|-----:|-----:|
-| mock1   | b32/c32  | 8   | 15  | 21  | 28  | 40  | 53  | 104  | 207  |
-| zrbcx   | b32/c32  | 28  | 28  | 28  | 28  | 53  | 53  | 104  | 207  |
+| mock1  | b32/c32  | 8   | 15  | 21  | 28  | 40  | 53  | 104  | 207  |
+| zrbcx  | b32/c32  | 28  | 28  | 28  | 28  | 53  | 53  | 104  | 207  |
 | aags   | b32/c32  | 34  | 40  | 47  | 53  | 66  | 79  | 130  | 232  |
 | aasv   | b32/c32  | 34  | 40  | 47  | 53  | 66  | 79  | 130  | 232  |
-| upbc  | b32/c32  | 53  | 53  | 53  | 53  | 79  | 79  | 130  | 232  |
-| apgs  | b32/c32  | 53  | 60  | 66  | 72  | 85  | 98  | 149  | 252  |
-| apsv  | b32/c32  | 60  | 66  | 72  | 79  | 92  | 104 | 156  | 258  |
+| upbc   | b32/c32  | 53  | 53  | 53  | 53  | 79  | 79  | 130  | 232  |
+| apgs   | b32/c32  | 53  | 60  | 66  | 72  | 85  | 98  | 149  | 252  |
+| apsv   | b32/c32  | 60  | 66  | 72  | 79  | 92  | 104 | 156  | 258  |
 
 ## Base64 Encoding (b64)
 
 | Scheme | Encoding | 4B  | 8B  | 12B | 16B | 24B | 32B | 64B  | 128B |
 |--------|----------|----:|----:|----:|----:|----:|----:|-----:|-----:|
-| mock1   | b64      | 7   | 12  | 18  | 23  | 34  | 44  | 87   | 172  |
-| zrbcx   | b64      | 23  | 23  | 23  | 23  | 44  | 44  | 87   | 172  |
+| mock1  | b64      | 7   | 12  | 18  | 23  | 34  | 44  | 87   | 172  |
+| zrbcx  | b64      | 23  | 23  | 23  | 23  | 44  | 44  | 87   | 172  |
 | aags   | b64      | 28  | 34  | 39  | 44  | 55  | 66  | 108  | 194  |
 | aasv   | b64      | 28  | 34  | 39  | 44  | 55  | 66  | 108  | 194  |
-| upbc  | b64      | 44  | 44  | 44  | 44  | 66  | 66  | 108  | 215  |
-| apgs  | b64      | 40  | 50  | 55  | 60  | 71  | 82  | 124  | 210  |
-| apsv  | b64      | 46  | 55  | 60  | 66  | 76  | 87  | 130  | 215  |
+| upbc   | b64      | 44  | 44  | 44  | 44  | 66  | 66  | 108  | 215  |
+| apgs   | b64      | 40  | 50  | 55  | 60  | 71  | 82  | 124  | 210  |
+| apsv   | b64      | 46  | 55  | 60  | 66  | 76  | 87  | 130  | 215  |
 
 ## Hex Encoding (hex)
 
 | Scheme | Encoding | 4B  | 8B  | 12B | 16B | 24B | 32B | 64B  | 128B |
 |--------|---------:|----:|----:|----:|----:|----:|----:|-----:|-----:|
-| mock1   | hex      | 10  | 18  | 26  | 34  | 50  | 66  | 130  | 258  |
-| zrbcx   | hex      | 34  | 34  | 34  | 34  | 66  | 66  | 130  | 258  |
+| mock1  | hex      | 10  | 18  | 26  | 34  | 50  | 66  | 130  | 258  |
+| zrbcx  | hex      | 34  | 34  | 34  | 34  | 66  | 66  | 130  | 258  |
 | aags   | hex      | 42  | 50  | 58  | 66  | 82  | 98  | 162  | 290  |
 | aasv   | hex      | 42  | 50  | 58  | 66  | 82  | 98  | 162  | 290  |
-| upbc  | hex      | 66  | 66  | 66  | 66  | 98  | 98  | 162  | 290  |
-| apgs  | hex      | 66  | 74  | 82  | 90  | 106 | 122 | 186  | 314  |
-| apsv  | hex      | 74  | 82  | 90  | 98  | 114 | 130 | 194  | 322  |
-
+| upbc   | hex      | 66  | 66  | 66  | 66  | 98  | 98  | 162  | 290  |
+| apgs   | hex      | 66  | 74  | 82  | 90  | 106 | 122 | 186  | 314  |
+| apsv   | hex      | 74  | 82  | 90  | 98  | 114 | 130 | 194  | 322  |

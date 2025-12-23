@@ -27,12 +27,12 @@ struct SchemeFlags {
 
     /// Use zrbcx scheme (optimized AES-CBC)
     #[cfg(feature = "zrbcx")]
-    #[arg(short = '1', long, alias = "01")]
+    #[arg(short = 'b', long, alias = "01")]
     zrbcx: bool,
 
-    /// Use upbc scheme (probabilistic AES-CBC with PKCS#7)
+    /// Use upbc scheme (probabilistic AES-CBC)
     #[cfg(feature = "upbc")]
-    #[arg(short = '2', long, alias = "21p")]
+    #[arg(short = 'B', long, alias = "21p")]
     upbc: bool,
 
     /// Use aags scheme (deterministic AES-GCM-SIV)
