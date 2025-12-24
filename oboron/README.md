@@ -90,25 +90,44 @@ Oboron provides various formats for encrypted text (obtext).  Each format
 combines a cryptographic scheme with a string encoding.
 
 More specifically, obtext construciton is a multi-stage process:
-1. **Encryption**: Plaintext UTF-8 string encrypted to ciphertext bytes
-2. **Byte Reversal** (select schemes only): Ciphertext bytes are reversed
-   to maximize entropy in output prefixes
-3. **Scheme byte**: A byte identifying the encryption scheme is appended
+1. *Encryption*: Plaintext UTF-8 string encrypted to ciphertext bytes
+2. *Prefix restructuring* (select schemes only)
+3. *Scheme byte*: A byte identifying the encryption scheme is appended
    (enabling scheme auto-detection on decoding)
-4. **Encoding**: The binary payload is encoded to a string
+4. *Encoding*: The binary payload is encoded to a string
 
-The encryption stage is implemented using standard cryptographic
-algorithms, each variant termed an Oboron *scheme*.  The *encoding*
-stage offers several supported string encodings.  A combination of a
-scheme and encoding is referred to as an Oboron *format*.  Given an
-encryption key, the format thus uniquely specifies the complete
-transformation from a plaintext string to an encoded "obtext" string.
-Formats are represented by compact identifiers: `{scheme}.{encoding}`,
-for example:
-- `zrbcx.c32` - zrbcx scheme, Crockford base32 encoding
-- `upbc.b32` - upbc scheme, standard RFC 4648 base32 encoding
-- `aags.hex` - aags scheme, hex encoding
-- `apsv.b64` - apsv scheme (`p`=probabilistic), base64 encoding
+*The encryption stage* is implemented using standard cryptographic
+algorithms, each variant providing the basis for an Oboron *scheme*.
+
+*Prefix restucturing* is a customization of the standard ciphertext
+in order to achieve the prefix refenrenceability property we are used to
+from using short Git references.  This stage is only applied to
+cryptographic algorithms that do not inherently exhibit the avalanche
+property.  Bytes are adjusted to to maximize entropy in output prefixes,
+creating a prefix-localized avalanche effect for prefix entropy. This may
+be achieved by byte reversal and/or an XOR operation.  Schemes that
+customize the cryptographic primitive's ciphertext in this way are
+designated with an `x` suffix (e.g., `ob:zrbcx`)
+
+*The encoding stage* offers several supported string encodings: base32
+(two variants: standard and Crockford), base64, and hexadecimal.
+
+A combination of a scheme and encoding is referred to as an Oboron
+*format*.  Given an encryption key, the format thus uniquely specifies
+the complete transformation from a plaintext string to an encoded
+"obtext" string.
+
+Formats are represented by compact identifiers, either:
+- `ob:{scheme}.{encoding}`, prefixed by the namespace-prefixed identifier
+  `ob:` (URI-like syntax), or
+- `{scheme}.{encoding}`, when the context is clear and the namespace
+  prefix is not necessary.
+
+For example:
+- `ob:zrbcx.c32` - `ob:zrbcx` scheme, Crockford base32 encoding
+- `ob:upbc.b32` - `ob:upbc` scheme, standard RFC 4648 base32 encoding
+- `ob:aags.hex` - `ob:aags` scheme, hexadecimal encoding
+- `ob:apsv.b64` - `ob:apsv` scheme (`p`=probabilistic), base64 encoding
 
 A format thus defines the complete transformation, specifying not just
 the output encoding but also the encryption algorithm and payload byte
@@ -135,7 +154,7 @@ including the encryption and encoding stages.
 - `hex` - hexadecimal: Slightly faster performance (~2-3%), longest
   output
 
-> **FAQ:** *Why does Oboron use Crockford's base32?*
+> **FAQ:** *Why use Crockford's base32 instead of the RFC standard one?*
 >
 > Crockford's base32 alphabet minimizes the probability of accidental
 > obscenity words.  Whereas accidental obscenity is not an issue when
@@ -158,16 +177,25 @@ custom post-processing (optional byte reversal for prefix entropy).
 
 Schemes are classified into *tiers*, which are encapsulated in the scheme
 ID prefix:
-- `a` - authenticated (e.g., `aasv`, `apgs`)
-- `u` - unauthenticated (e.g., `upbc`)
-- `z` - insecure, obfuscation only (e.g., `zrbcx`)
+- `a` - authenticated (e.g., `ob:aasv`, `ob:apgs`)
+- `u` - unauthenticated (e.g., `ob:upbc`)
+- `z` - insecure, obfuscation only (e.g., `ob:zrbcx`)
 
 The second letter of the scheme ID further describe the properties of the
 scheme:
-- `.a..` - avalanche, deterministic (e.g., `aasv`, `aags`)
+- `.a..` - avalanche, deterministic (e.g., `ob:aasv`, `ob:aags`)
 - `.r..` - referenceable / prefix-restricted avalanche, deterministic
-- `.d..` - deterministic, no avalanche effect
-- `.p..` - probabilistic (e.g., `apsv`, `apgs`, `upbc`)
+  (e.g., `zrbcx`)
+- `.d..` - deterministic without avalanche effect (uniform or localized),
+  not suitable for prefix-referencing
+- `.p..` - probabilistic: (e.g.,
+  `ob:apsv`, `ob:apgs`, `ob:upbc`)
+
+The probabilistic schemes produce a different output in each encryption
+pass.  Thus, they are not suitable for referencing unless using lookup
+tables.  The referenceability property Oboron is aiming to achieve is a
+hash-like inherent property of the plaintext deterministically revealed
+by the algorithm.
 
 The remaining two letters in `a`-tier schemes represent the algorithm
 used:
@@ -177,14 +205,14 @@ used:
 
 Summary table:
 
-| Scheme  | Algorithm   | Deterministic? | Authenticated? | Notes |
-| :------ | :---------- | :------------- | :------------- | :---- |
-| `aags`  | AES-GCM-SIV | Yes            | Yes            |       |
-| `aasv`  | AES-SIV     | Yes            | Yes            |       |
-| `apgs`  | AES-GCM-SIV | No             | Yes            |       |
-| `apsv`  | AES-SIV     | No             | Yes            |       |
-| `upbc`  | AES-CBC     | No             | No             |       |
-| `zrbcx` | AES-CBC     | Yes            | No             | INSECURE, uses constant IV. Prioritizes determinism and performance over security. |
+| Scheme     | Algorithm   | Deterministic? | Authenticated? | Notes |
+| :--------- | :---------- | :------------- | :------------- | :---- |
+| `ob:aags`  | AES-GCM-SIV | Yes            | Yes            |       |
+| `ob:aasv`  | AES-SIV     | Yes            | Yes            |       |
+| `ob:apgs`  | AES-GCM-SIV | No             | Yes            |       |
+| `ob:apsv`  | AES-SIV     | No             | Yes            |       |
+| `ob:upbc`  | AES-CBC     | No             | No             |       |
+| `ob:zrbcx` | AES-CBC     | Yes            | No             | INSECURE, uses constant IV. Prioritizes determinism and performance over security. |
 
 Key Concepts:
 * *Deterministic:* Same input (key + plaintext) always produces same
@@ -198,26 +226,27 @@ Key Concepts:
 
 Other than `a`-, `u`-, and `z`-schemes, you may also encounter these
 special-purpose schemes:
-- `mock1`, `mock2` - testing/identity transforms (non-cryptographic)
-- `legacy`- legacy scheme for backwards compatibility
+- `ob:mock1`, `ob:mock2` - testing/identity transforms
+  (non-cryptographic)
+- `ob:legacy`- legacy scheme for backwards compatibility
 
 #### Important Scheme Security Notes
 
 All schemes use well-regarded cryptographic primitives. However, note
 the following:
 
-* **`zrbcx` and `upbc` are not authenticated** and vulnerable to
+* `ob:zrbcx` and `ob:upbc` *are not authenticated* and vulnerable to
   tampering.
-* **SECURITY WARNING:** **`zrbcx` is cryptographically broken** due to
+* **SECURITY WARNING:** **`ob:zrbcx` is cryptographically broken** due to
   its use of a constant IV (by design, in order to achieve deterministic
   output).  This scheme leaks equality and prefix structure and is
   vulnerable to chosen-plaintext attacks.  
-  **Do not use `zrbcx` for encrypting sensitive data** or any application
-  where confidentiality or integrity matters.
+  **Do not use `ob:zrbcx` for encrypting sensitive data** or any
+  application where confidentiality or integrity matters.
   **Use `zrbcx` only for** maximum compactness and strong prefix entropy
   in non-security-critical contexts (e.g., development or obfuscation).
   For sensitive data, **always use authenticated schemes** (`a`-tier:
-  `aags` or `aasv`).
+  `ob:aags` or `ob:aasv`).
 
 We reiterate that the first letter in the scheme ID is a critically
 important one (see [Scheme Tiers](#scheme-tiers) above):
@@ -233,7 +262,7 @@ important one (see [Scheme Tiers](#scheme-tiers) above):
 > domain extend beyond encryption.  For applications such as obfuscation
 > or hashing alternative (see Application section below), `z`-schemes
 > are sufficient, while outperforming `a`-schemes by 2x to 4x.  In our
-> benchmarks, `zrbcx` shows ~40% lower latency than SHA256 for short
+> benchmarks, `ob:zrbcx` shows ~40% lower latency than SHA256 for short
 > inputs on modern x86 CPUs.
 
 > FAQ: *Why do schemes not include the traditional 128/256/... bit
@@ -293,14 +322,14 @@ dec operation:
 
 The payload construction is what gives the obtext its Oboron flavor. The
 two goals achieved with the payload structure are:
-1. Reversing the ciphertext for schemes in which this improves the
+1. Prefix-restructured ciphertext in schemes in which this improves the
    prefix entropy
 2. Including a scheme marker which allows scheme autodetection in
    decoding
 
 The first step gives a transformed ciphertext:
-- `[ciphertext'] = [reverse(ciphertext)]` for reversed schemes (`zrbcx`,
-  `upbc`),
+- `[ciphertext'] = [prefix_restr(ciphertext)]` for schemes with `x`
+  suffix (`zrbcx`),
 - `[ciphertext'] = [ciphertext]` for all other schemes (no change).
 
 The second step is achieved by appending a single byte marker to the
@@ -321,13 +350,15 @@ byte directly, all `zrbcx` obtexts would have a constant suffix.
 > **FAQ:** *Why do some schemes reverse the ciphertext, while others
 > don't?*
 >
-> The reversal step in `zrbcx` and `upbc` schemes moves the final AES
-> block to the beginning of the output, ensuring maximal entropy in the
-> encoded prefix.  Both of these schemes use AES-CBC, a block-chaining
-> algorithm: each 16-byte block's ciphertext becomes the IV for the next.
-> Thus, while the first ciphertext block contains only the entropy from
-> the first plaintext block, the final block accumulates entropy from the
-> entire message.
+> The prefix restructuring step in `zrbcx` scheme XORs the first AES
+> block with the final one, ensuring maximal entropy in the encoded
+> prefix.  This scheme use AES-CBC, a block-chaining algorithm: each
+> 16-byte block's ciphertext becomes the IV for the next.  Thus, while
+> the first ciphertext block contains only the entropy from the first
+> plaintext block, the final block accumulates entropy from the entire
+> message.  XOR-ing the first plaintext block with the last one brings
+> this entropy to the front, creating a prefix-localized avalanche
+> effect.
 
 ### Padding Design
 
@@ -363,8 +394,8 @@ increase per-operation latency by several multiples and dominate runtime
 for the intended workloads.
 
 Subkeys are fixed, non-adaptive slices of the master key. With the
-exception of `aasv` / `apsv` (AES-SIV schemes), which intentionally use
-the full 512-bit key, subkeys do not overlap.
+exception of `ob:aasv` / `ob:apsv` (AES-SIV schemes), which intentionally
+use the full 512-bit key, subkeys do not overlap.
 
 This implies related-key structure by construction. Oboron does not claim
 formal related-key security. The design assumes:
@@ -377,10 +408,10 @@ for Oboron’s threat model.
 
 The master-key is partitioned into algorithm-specific keys in the
 following way:
-- `zrbcx`, `upbc`: use the first 16 bytes (128 bits) for AES key
-- `zrbcx`: uses the second 16 bytes for IV
-- `aags`, `apgs`: use the last 32 bytes (256 bits) for AES-GCM-SIV key
-- `aasv`, `apsv`: use the full 64 bytes (512 bits) for AES-SIV key
+- `ob:zrbcx`, `ob:upbc`: use the first 16 bytes (128 bits) for AES key
+- `ob:zrbcx`: uses the second 16 bytes for IV
+- `ob:aags`, `ob:apgs`: use the last 32 bytes (256 bits) for AES-GCM-SIV key
+- `ob:aasv`, `ob:apsv`: use the full 64 bytes (512 bits) for AES-SIV key
 
 The master key never leaves your application. Algorithm-specific keys
 are extracted on-the-fly and never cached or stored.
@@ -414,12 +445,20 @@ selectable, and to avoid any human visual parsing due to underscores.
 valid 512-bit key.  Since 512 bits requires 85.3 bytes when
 base64-encoded, the final character is constrained by padding
 requirements. For correct encoding, the last character must be one of
-`A`, `Q`, `g`, or `w`.  Always use `oboron::generate_key()` to create
-valid keys rather than attempting to construct them manually.
+`A`, `Q`, `g`, or `w`.  When generating keys, it is recommended to use
+one of the following methods:
+1. use Oboron's key generator (`oboron::generate_key()` or
+  `cargo run --bin keygen`)
+2. generate random 64 bytes, then encode as base64
+3. generate random 128 hex characters, then convert hexadecimal to base64
 
-While base64 keys are used in the primary interface, Oboron also provides
-full support for working with keys in hexadecimal or raw bytes formats
-via `*from_bytes*` and `*from_hex_key*` method and function variants.
+There is also a way avoid the encoding/conversion to base64 in options 2
+and 3 above: While base64 keys are used in the primary interface, Oboron
+also provides support for working with keys in hexadecimal or raw bytes
+formats via `*from_bytes*` and `*from_hex_key*` method and function
+variants, but these interfaces are feature-gated:
+- to use the hex keys interface, enable the `hex-keys` feature,
+- to use the bytes heys interface, enable the `bytes-keys` feature.
 
 
 ## Properties
@@ -482,12 +521,12 @@ both SHA256 and JWT performance while providing reversible encryption.
 > However, as we show in the [Applications](#applications) section below,
 > overlaps in applications with JWT and SHA256 are possible.
 
-| Scheme | 8B Encode | 8B Decode | Security      | Use Case                        |
-|--------|----------:|-----------|---------------|---------------------------------|
-| zrbcx  | 132 ns    | 126 ns    | Insecure      | Maximum speed + compactness     |
-| aasv   | 334 ns    | 364 ns    | Secure + Auth | Balanced performance + security |
-| JWT    | 550 ns    | 846 ns    | Auth only`*`  | Signature without encryption    |
-| SHA256 | 191 ns    | N/A       | One-way       | Hashing only                    |
+| Scheme     | 8B Encode | 8B Decode | Security      | Use Case                        |
+|------------|----------:|-----------|---------------|---------------------------------|
+| `ob:zrbcx` | 132 ns    | 126 ns    | Insecure      | Maximum speed + compactness     |
+| `ob:aasv`  | 334 ns    | 364 ns    | Secure + Auth | Balanced performance + security |
+| JWT        | 550 ns    | 846 ns    | Auth only`*`  | Signature without encryption    |
+| SHA256     | 191 ns    | N/A       | One-way       | Hashing only                    |
 
 `*` **Note**: JWT baseline (HMAC-SHA256) provides authentication without
 encryption.  Despite comparing against our stronger **`a`-tier** (secure
@@ -501,42 +540,42 @@ performed on the same machine is available here:
 - [BASELINE_BENCHMARKS.md](BASELINE_BENCHMARKS.md)
 
 **Performance advantages:**
-- zrbcx encoding is 4.1x faster than JWT with 4.5x smaller output
+- `ob:zrbcx` encoding is 4.1x faster than JWT with 4.5x smaller output
 - All Oboron schemes outperform JWT for both encoding and decoding
-- zrbcx shows lower latency than SHA256+hex for short strings while
+- `ob:zrbcx` shows lower latency than SHA256+hex for short strings while
   providing reversible (cryptographically insecure) encryption
 
 ### Output Length Comparison
 
 | Method        | Small string output length |
 |---------------|----------------------------|
-| Oboron zrbcx: | 28 characters              |
-| Oboron aasv:  | 34-47 characters           |
-| Oboron apsv:  | 60-72 characters           |
-| SHA256:       | 64 characters              |
-| JWT:          | 150+ characters            |
+| `ob:zrbcx`    | 28 characters              |
+| `ob:aasv`     | 34-47 characters           |
+| `ob:apsv`     | 60-72 characters           |
+| SHA256        | 64 characters              |
+| JWT           | 150+ characters            |
 
 A more complete output length comparison is given in the
 [Appendix](#appendix-obtext-lengths).
 
 ### Scheme Selection Guidelines
 
-- `zrbcx`: Non-security-critical applications prioritizing speed and
+- `ob:zrbcx`: Non-security-critical applications prioritizing speed and
   compactness
-- `aasv`: General-purpose secure encryption with deterministic output
+- `ob:aasv`: General-purpose secure encryption with deterministic output
   and compact size
-- `apsv`: Maximum privacy protection with probabilistic output
+- `ob:apsv`: Maximum privacy protection with probabilistic output
   (larger size due to nonce)
 
-Choose zrbcx when:
+Choose `ob:zrbcx` when:
 - Performance and compactness are primary requirements (~28 chars)
 - Security requirements are minimal (obfuscation contexts)
 
-Choose aasv when:
+Choose `ob:aasv` when:
 - Cryptographic security with compact output is needed (~34-47 chars)
 - Deterministic behavior is beneficial (lookup keys, caching)
 
-Choose apsv when:
+Choose ob:apsv` when:
 - Cryptographic security with maximum privacy is required (~60-72 chars)
 - Hiding plaintext relationships is critical
 
@@ -546,8 +585,8 @@ Oboron supports optional feature flags to reduce binary size by including
 only necessary encryption schemes. This is especially useful for
 WebAssembly builds where bundle size matters.
 
-**Default:** All secure production-ready schemes are enabled; `zrbcx` is
-not-it has to be enabled explicitly in your application.
+**Default:** All secure production-ready schemes are enabled; `ob:zrbcx`
+is not-it has to be enabled explicitly in your application.
 
 For details on available features, scheme groups, and optimization
 guidance, see [README_FEATURES.md](README_FEATURES.md).
@@ -577,25 +616,26 @@ While Oboron serves as a general-purpose encryption library with its
 "string in, string out" API, its combination of properties—particularly
 prefix entropy and compactness—enables specialized applications:
 
-- **Git-like short IDs** - High-entropy prefixes for unique references
-- **URL-friendly state tokens** - Encrypt web application state into
+- *Git-like short IDs* - High-entropy prefixes for unique references
+- *URL-friendly state tokens* - Encrypt web application state into
   compact URLs
-- **No-lookup captcha systems** - Server issues encrypted challenge,
+- *No-lookup captcha systems* - Server issues encrypted challenge,
   verifies without database lookup
-- **Database ID obfuscation** - Hide sequential IDs while maintaining
+- *Database ID obfuscation* - Hide sequential IDs while maintaining
   reversibility
-- **Compact authentication tokens** - Efficient alternative to JWT for
+- *Compact authentication tokens* - Efficient alternative to JWT for
   simple use cases where JWT may be overkill
-- **General-purpose symmetric encryption** - Straightforward string-based
+- *General-purpose symmetric encryption* - Straightforward string-based
   API
 
 ### Comparison with Alternatives
 
-| Use Case            | Traditional Solution | Oboron Approach                    |
-|---------------------|----------------------|------------------------------------|
-| Short unique IDs    | UUIDv4 (36 chars)    | zrbcx.c32 (28 chars, reversible)   |
-| URL parameters      | JWT (150+ chars)     | aasv.b64 (4.5x smaller, 4x faster) |
-| Database ID masking | Hashids (not secure) | Proper encryption                  |
+| Use Case            | Traditional Solution | Oboron Approach                         |
+|---------------------|----------------------|-----------------------------------------|
+| Short unique IDs    | UUIDv4 (36 chars)    | `ob:zrbcx.c32` (28 chars, reversible)   |
+| URL parameters      | JWT (150+ chars)     | `ob:aasv.b64` (4.5x smaller, 4x faster) |
+| Database ID masking | Hashids (not secure) | Proper encryption                       |
+| Simple encryption   | Libsodium (complex)  | String in, string out API               |
 
 ### API Simplification
 
@@ -801,11 +841,10 @@ most production applications, **compile-time format selection** (option 1
 below) offers the best combination of performance, type safety, and
 clarity.
 
-### 1. **Compile-time Format Selection** (Recommended for Production)
+### 1. Compile-time Format Selection (Recommended for Production)
 
-Use scheme-specific types when formats are known at compile time for
-optimal performance and type safety:
-
+Use fixed-format types when formats are known at compile time for optimal
+performance and type safety:
 ```rust
 use oboron::{ApgsB64, ObtextCodec};
 
@@ -821,21 +860,20 @@ Available types include all combinations of scheme variants (e.g.,
 `Zrbcx`, `Upbc`, `Aags`, `Apgs`, `Aasv`, `Apsv`) with encoding
 specifications (`B64`, `Hex`, `B32`, or `C32`),
 and concatenates the two in struct names, for example:
-- `ZrbcxB32` - encoder for `zrbcx.b32` format
-- `UpbcHex` - encoder for `upbc.hex` format
-- `AagsB64` - encoder for `aags.b64` format
-- `AasvC32` - encoder for `aasv.c32` format.
+- `ZrbcxB32` - encoder for `ob:zrbcx.b32` format
+- `UpbcHex` - encoder for `ob:upbc.hex` format
+- `AagsB64` - encoder for `ob:aags.b64` format
+- `AasvC32` - encoder for `ob:aasv.c32` format.
 
-Note that the `zrbcx` scheme is not included by default as
+Note that the `ob:zrbcx` scheme is not included by default as
 cryptographically insecure.  In order to use the associated structs
 `ZrbcxC32`, `ZrbcxB32`, `ZrbcxB64`, or `ZrbcxHex`,
 you need to enable the `zrbcx` feature in your `Cargo.toml`
 
-### 2. **Runtime Format Selection** (`Ob`)
+### 2. Runtime Format Selection (`Ob`)
 
 When format specification at runtime is required but format changes are
-unnecessary, use `Ob`:
-
+unnecessary, use the immutable `Ob`:
 ```rust
 use oboron::{Ob, ObtextCodec};
 
@@ -847,13 +885,13 @@ let pt2 = ob.dec(&ot)?;
 assert_eq!(pt2, "hello");
 ```
 
-Format is fixed at construction, providing intermediate flexibility
-between compile-time selection and full mutability.
+The type `Ob` supports all formats, but the format is fixed at
+construction, providing intermediate flexibility between compile-time
+selection and full mutability.
 
-### 3. **Mutable Runtime Format** (`ObFlex`)
+### 3. Mutable Runtime Format (`ObFlex`)
 
 Similar to `Ob` but with mutable format specification:
-
 ```rust
 use oboron::{ObFlex, ObtextCodec};
 
@@ -865,7 +903,7 @@ ob.set_format("apsv.hex")?;
 let ot_hex = ob.enc("world")?; // apsv.hex obtext
 ```
 
-### 4. **Multiple Format Support** (`ObMulti`)
+### 4. Multiple Format Support (`ObMulti`)
 
 `ObMulti` differs in format management and provides comprehensive
 `autodec()` functionality.
@@ -885,8 +923,8 @@ let pt_other = obm.dec(&other, "zrbcx.c32");
 
 **Autodecode:** While other interfaces perform *scheme* autodetection in
 `dec()` methods, only `ObMulti` provides full format autodetection
-including encoding (base32rfc, base32crockford, base64, or hex).  Other
-structs decode only encodings matching their format.
+including encoding (`b32`, `c32`, `b64`, or `hex`).  Other structs decode
+only encodings matching their format.
 ```rust
 // Autodecode when format is unknown
 let pt2 = obm.autodec(&ot);
@@ -925,14 +963,13 @@ Available constants:
 - `APGS_C32`, `APGS_B32`, `APGS_B64`, `APGS_HEX`
 - `AASV_C32`, `AASV_B32`, `AASV_B64`, `AASV_HEX`
 - `APSV_C32`, `APSV_B32`, `APSV_B64`, `APSV_HEX`
-- Testing:  `MOCK1_*`, `MOCK2_*`
-- Legacy: `LEGACY_*`
+- Testing:  `MOCK1_C32`, `MOCK2_B32`, etc.
+- Legacy: `LEGACY_B32`, `LEGACY_C32`, etc.
 
 ### Advanced: `Format` Objects
 
 `Format` structs provide a more fine-grained type safety than format
 string constants:
-
 ```rust
 use oboron::{Ob, Format, Scheme, Encoding};
 
@@ -950,8 +987,8 @@ use oboron::{AasvB64, ObtextCodec};
 let ob = AasvB64::new(&key)?;
 let ot = ob.enc("secret")?;
 ```
-The format is built into the struct, no format strings, constants,
-or Format structs are needed.
+The format is built into the struct, no format strings, constants, or
+Format structs are needed.
 
 ### The `ObtextCodec` Trait
 
@@ -993,11 +1030,12 @@ the hardcoded key.
 
 ### Common Issues
 
-- **Key errors**: Ensure keys are exactly 86 base64 characters characters
+- *Key errors*: Ensure keys are exactly 86 base64 characters characters
   properly encoded from 512 bits (see note about
   [valid base64 keys](#valid-base64-keys))
-- **Format strings**: Must match exactly, e.g., "aasv.b64" not "aasv-b64"
-- **Decoding errors**: Use `autodec()` when format is unknown
+- *Format strings*: Must match exactly, e.g., "aasv.b64" not "aasv-b64".
+  Do not use the `ob:` namespace prefix in this context.
+- *Decoding errors*: Use `autodec()` when format is unknown
 
 ### Minimum Supported Rust Version (MSRV)
 
