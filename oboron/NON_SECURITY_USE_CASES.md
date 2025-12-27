@@ -1,12 +1,15 @@
-# Non-Security Use Cases for Oboron z-tier
+# Non-Security Use Cases for Oboron `z`-tier
 
-This document outlines appropriate applications for Oboron's z-tier
+This document outlines appropriate applications for Oboron's `z`-tier
 schemes (`ob:zrbcx`), which provide deterministic obfuscation rather than
 cryptographically secure encryption.
 
-**Reminder:** z-tier schemes are **not suitable for sensitive data** or
+**Reminder:** `z`-tier schemes are **not suitable for sensitive data** or
 security-critical applications. Use only when confidentiality and
 integrity are not required.
+
+For actual encryption, see the [main README](README.md) and use
+`aasv`, `apsv`, `aags`, or `apgs` schemes.
 
 ## Primary Use Cases
 
@@ -140,7 +143,7 @@ let analytics_id = ob.enc(&format!("analytics:{}", user_fingerprint))?;
 
 ## Comparison with Alternatives
 
-| Use Case            | Traditional Solution | Oboron z-tier                         | When to Choose Oboron                 |
+| Use Case            | Traditional Solution | Oboron `z`-tier                         | When to Choose Oboron                 |
 |---------------------|----------------------|---------------------------------------|---------------------------------------|
 | Short unique IDs    | UUIDv4 (36 chars)    | `ob:zrbcx.c32` (28 chars, reversible) | Need reversibility or better prefixes |
 | Database ID masking | Hashids (insecure)   | `ob:zrbcx` (more secure than Hashids) | Want actual transformation, not encoding |
@@ -259,7 +262,7 @@ fn main() -> Result<()> {
 
 ## When to Upgrade to a-tier
 
-Migrate from z-tier to a-tier (`ob:aasv` or `ob:aags`) when:
+Migrate from `z`-tier to a-tier (`ob:aasv` or `ob:aags`) when:
 
 1. **Data becomes sensitive** - Any PII or confidential information
 2. **System goes to production** - Better safe than sorry
@@ -270,7 +273,7 @@ Migrate from z-tier to a-tier (`ob:aasv` or `ob:aags`) when:
 The migration is straightforward since both use the same API:
 
 ```rust
-// Old: z-tier for development
+// Old: `z`-tier for development
 let dev_ob = ZrbcxC32::new_keyless();
 
 // New: a-tier for production
@@ -280,7 +283,7 @@ let prod_ob = AasvC32::new(&env::var("OBORON_KEY")?);
 let token = prod_ob.enc("user:12345")?;
 ```
 
-**Remember:** z-tier is for convenience and performance in non-security
+**Remember:** `z`-tier is for convenience and performance in non-security
 contexts. When in doubt, use a-tier.
 
 ## Appendix: Hash-like Applications

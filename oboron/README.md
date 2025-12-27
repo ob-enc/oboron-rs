@@ -274,9 +274,9 @@ security guarantees. However, note the following:
 ### Secure Defaults
 
 Oboron presets (default features) only include secure authenticated
-schemes (`a`-tier).  To use `u`-tier schemes (secure but
-unauthenticated) or `z`-tier schemes (insecure; obfuscation only), you
-need to enable them explicitly in your `Cargo.toml`.
+schemes (`a`-tier).  Schemes that lack authentication (`u`-tier) or
+IND-CPA-level security standard (`z`-tier) must be explicitly enabled via
+Cargo features.
 
 The same holds for the `keyless` feature: while it is handy for
 development and quick obfuscation (using a hard-coded key), this feature

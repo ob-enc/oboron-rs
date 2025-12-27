@@ -1,11 +1,14 @@
-# Specialized Obfuscation Schemes (z-tier)
+# Specialized Obfuscation Schemes (`z`-tier)
 
-**⚠️ IMPORTANT**: z-tier schemes provide deterministic obfuscation, not cryptographically secure encryption.
-**DO NOT use z-tier for sensitive data or security-critical applications.**
+**IMPORTANT**: `z`-tier schemes provide deterministic obfuscation, not cryptographically secure encryption.
+**DO NOT use `z`-tier for sensitive data or security-critical applications.**
+
+If you're looking for IND-CPA standard encryption, refer to the
+[main README](README.md) instead.
 
 ## Overview
 
-z-tier schemes are specialized transformations designed for non-security use cases where deterministic output and high performance are prioritized over cryptographic security. These schemes are **not enabled by default** and must be explicitly enabled via feature flags.
+`z`-tier schemes are specialized transformations designed for non-security use cases where deterministic output and high performance are prioritized over cryptographic security. These schemes are **not enabled by default** and must be explicitly enabled via feature flags.
 
 ## Available Scheme
 
@@ -104,7 +107,7 @@ let short_ref = &full[0..7]; // 7 chars = ~35 bits entropy
 // Use short_ref for Git-like abbreviated references
 ```
 
-## Making z-tier Applications More Secure
+## Making `z`-tier Applications More Secure
 
 While `ob:zrbcx` alone doesn't provide cryptographic security, you can build more robust applications:
 
@@ -153,7 +156,7 @@ let plaintext = format!("{}:{}:{}", context, entity_type, id);
 
 **Note:** `ob:zrbcx` shows ~40% lower latency than SHA256 for short inputs while providing reversibility.
 
-## Enabling z-tier
+## Enabling `z`-tier
 
 ### Cargo.toml Configuration
 
@@ -164,7 +167,7 @@ oboron = { version = "1.0", features = ["zrbcx"] }
 # zrbcx with keyless mode support
 oboron = { version = "1.0", features = ["zrbcx", "keyless"] }
 
-# All schemes including z-tier (not recommended for production)
+# All schemes including `z`-tier (not recommended for production)
 oboron = { version = "1.0", features = ["full"] }
 ```
 
@@ -231,7 +234,7 @@ let migrated = new_ob.enc(&old_ob.dec(&old_ot)?)?;
 ## Related Documentation
 
 - [Main README](../README.md) - Overview and secure schemes
-- [NON_SECURITY_USE_CASES.md](./NON_SECURITY_USE_CASES.md) - Detailed examples of appropriate z-tier usage
+- [NON_SECURITY_USE_CASES.md](./NON_SECURITY_USE_CASES.md) - Detailed examples of appropriate `z`-tier usage
 - [BENCHMARKS.md](./BENCHMARKS.md) - Performance comparisons
 - [API Reference](https://docs.rs/oboron) - Complete Rust API documentation
 
