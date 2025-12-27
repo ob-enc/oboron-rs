@@ -1,5 +1,5 @@
 #[cfg(feature = "aags")]
-use oboron::Aags;
+use oboron::AagsC32;
 use oboron::ObMulti;
 #[cfg(feature = "upbc")]
 use oboron::UpbcC32;
@@ -54,7 +54,7 @@ fn test_convenience_functions() {
 #[cfg(feature = "aags")]
 fn test_aags_deterministic() {
     let original = "deterministic test";
-    let ob = Aags::new_keyless().unwrap();
+    let ob = AagsC32::new_keyless().unwrap();
 
     let ot1 = ob.enc(original).unwrap();
     let ot2 = ob.enc(original).unwrap();

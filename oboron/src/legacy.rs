@@ -124,7 +124,10 @@ pub(crate) fn dec_legacy(
 
 /// Macro to implement legacy ObtextCodec variants with different encodings.
 macro_rules! impl_legacy_codec {
-    ($name:ident, $encoding:expr, $format_str:expr) => {
+    ($name:ident,         // Type name (e.g., LegacyC32)
+     $encoding:expr,      // Encoding constant (e.g., Encoding::C32)
+     $format_str:expr     // Format string for docs (e.g., "legacy.c32")
+     ) => {
         #[doc = concat!("Legacy ObtextCodec implementation for ", $format_str, " format.\n\n")]
         #[doc = "**LEGACY**: This scheme is maintained for backward compatibility only.\n"]
         #[doc = "The legacy scheme uses legacy AES-CBC encryption with custom padding.\n"]
@@ -281,6 +284,63 @@ macro_rules! impl_legacy_codec {
                 Self::from_bytes_internal(&HARDCODED_KEY_BYTES)
             }
         }
+
+        // Add inherent methods that delegate to trait methods
+        impl $name {
+            /// Encrypt and encode plaintext
+            #[inline]
+            pub fn enc(&self, plaintext: &str) -> Result<String, Error> {
+                <Self as ObtextCodec>::enc(self, plaintext)
+            }
+
+            /// Decode and decrypt obtext (with scheme autodetection)
+            #[inline]
+            pub fn dec(&self, obtext: &str) -> Result<String, Error> {
+                <Self as ObtextCodec>::dec(self, obtext)
+            }
+
+            /// Decode and decrypt obtext (strict - no autodetection)
+            #[inline]
+            pub fn dec_strict(&self, obtext: &str) -> Result<String, Error> {
+                <Self as ObtextCodec>::dec_strict(self, obtext)
+            }
+
+            /// Get the format
+            #[inline]
+            pub fn format(&self) -> Format {
+                <Self as ObtextCodec>::format(self)
+            }
+
+            /// Get the scheme
+            #[inline]
+            pub fn scheme(&self) -> Scheme {
+                <Self as ObtextCodec>::scheme(self)
+            }
+
+            /// Get the encoding
+            #[inline]
+            pub fn encoding(&self) -> Encoding {
+                <Self as ObtextCodec>::encoding(self)
+            }
+
+            /// Get the key as base64
+            #[inline]
+            pub fn key(&self) -> String {
+                <Self as ObtextCodec>::key(self)
+            }
+
+            #[cfg(feature = "hex-keys")]
+            #[inline]
+            pub fn key_hex(&self) -> String {
+                <Self as ObtextCodec>::key_hex(self)
+            }
+
+            #[cfg(feature = "bytes-keys")]
+            #[inline]
+            pub fn key_bytes(&self) -> &[u8; 64] {
+                <Self as ObtextCodec>::key_bytes(self)
+            }
+        }
     };
 }
 
@@ -293,7 +353,6 @@ impl_legacy_codec!(LegacyHex, Encoding::Hex, "legacy.hex");
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ObtextCodec;
 
     #[test]
     #[cfg(feature = "keyless")]

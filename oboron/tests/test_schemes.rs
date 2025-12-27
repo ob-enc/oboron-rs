@@ -7,7 +7,7 @@ use oboron::ZrbcxB64;
 #[cfg(feature = "aasv")]
 use oboron::{AasvB64, AasvC32, AasvHex};
 #[cfg(feature = "apgs")]
-use oboron::{Apgs, ApgsB64, ApgsHex};
+use oboron::{ApgsB64, ApgsC32, ApgsHex};
 #[cfg(feature = "apsv")]
 use oboron::{ApsvB64, ApsvC32, ApsvHex};
 use oboron::{Encoding, ObFlex, ObtextCodec, Scheme};
@@ -16,16 +16,16 @@ use oboron::{Encoding, ObFlex, ObtextCodec, Scheme};
 #[cfg(feature = "apgs")]
 fn test_apgs_basic() {
     let key = [0u8; 64];
-    let ob = Apgs::from_bytes(&key).expect("Failed to create Apgs");
+    let ob = ApgsC32::from_bytes(&key).expect("Failed to create ApgsC32");
 
     let plaintext = "Hello, World!";
     let ot1 = ob.enc(plaintext).expect("Failed to enc");
     let ot2 = ob.enc(plaintext).expect("Failed to enc");
 
-    // Apgs is probabilistic, so two encodings should be different
+    // ApgsC32 is probabilistic, so two encodings should be different
     assert_ne!(
         ot1, ot2,
-        "Apgs should produce different ciphertexts for the same plaintext"
+        "ApgsC32 should produce different ciphertexts for the same plaintext"
     );
 
     // But both should dec to the same plaintext
@@ -35,7 +35,7 @@ fn test_apgs_basic() {
     assert_eq!(pt21, plaintext);
     assert_eq!(pt22, plaintext);
 
-    eprintln!("✓ Apgs basic test passed");
+    eprintln!("✓ ApgsC32 basic test passed");
 }
 
 #[test]
@@ -45,19 +45,19 @@ fn test_apgs_all_encodings() {
     let plaintext = "Test apgs with different encodings";
 
     // C32 (default)
-    let ob_b32 = Apgs::from_bytes(&key).expect("Failed to create Apgs with base32");
+    let ob_b32 = ApgsC32::from_bytes(&key).expect("Failed to create ApgsC32");
     let ot = ob_b32.enc(plaintext).expect("Failed to enc with base32");
     let pt2 = ob_b32.dec(&ot).expect("Failed to dec with base32");
     assert_eq!(pt2, plaintext, "Decoding mismatch for base32");
 
     // B64
-    let ob_b64 = ApgsB64::from_bytes(&key).expect("Failed to create Apgs with base64");
+    let ob_b64 = ApgsB64::from_bytes(&key).expect("Failed to create ApgsC32");
     let ot = ob_b64.enc(plaintext).expect("Failed to enc with base64");
     let pt2 = ob_b64.dec(&ot).expect("Failed to dec with base64");
     assert_eq!(pt2, plaintext, "Decoding mismatch for base64");
 
     // Hex
-    let ob_hex = ApgsHex::from_bytes(&key).expect("Failed to create Apgs with hex");
+    let ob_hex = ApgsHex::from_bytes(&key).expect("Failed to create ApgsHex");
     let ot = ob_hex.enc(plaintext).expect("Failed to enc with hex");
     let pt2 = ob_hex.dec(&ot).expect("Failed to dec with hex");
     assert_eq!(pt2, plaintext, "Decoding mismatch for hex");
@@ -164,7 +164,7 @@ fn test_apsv_all_encodings() {
     let pt2 = ob_hex.dec(&ot).expect("Failed to dec with hex");
     assert_eq!(pt2, plaintext, "Decoding mismatch for hex");
 
-    eprintln!("✓ ApsvC32 all encodings test passed");
+    eprintln!("✓ Apsv all encodings test passed");
 }
 
 #[test]

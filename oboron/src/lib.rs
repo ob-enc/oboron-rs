@@ -373,28 +373,6 @@ pub use codec::{Mock1B32, Mock1B64, Mock1C32, Mock1Hex};
 #[cfg(feature = "mock")]
 pub use codec::{Mock2B32, Mock2B64, Mock2C32, Mock2Hex};
 
-// Aliases for default encoding:
-#[cfg(feature = "zrbcx")]
-pub type Zrbcx = ZrbcxC32;
-#[cfg(feature = "upbc")]
-pub type Upbc = UpbcC32;
-#[cfg(feature = "aags")]
-pub type Aags = AagsC32;
-#[cfg(feature = "apgs")]
-pub type Apgs = ApgsC32;
-#[cfg(feature = "aasv")]
-pub type Aasv = AasvC32;
-#[cfg(feature = "apsv")]
-pub type Apsv = ApsvC32;
-// Legacy
-#[cfg(feature = "legacy")]
-pub type Legacy = LegacyB32;
-// Testing
-#[cfg(feature = "mock")]
-pub type Mock1 = Mock1C32;
-#[cfg(feature = "mock")]
-pub type Mock2 = Mock2C32;
-
 // Re-export multi-format Oboron implementation
 pub use ob_multi::ObMulti;
 
