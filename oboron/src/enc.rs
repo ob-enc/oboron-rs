@@ -43,22 +43,22 @@ pub(crate) fn enc_to_format(
     // Step 1: Encrypt using scheme-specific function based on format
     let ciphertext = match format.scheme() {
         #[cfg(feature = "zrbcx")]
-        Scheme::Zrbcx => encrypt_zrbcx(keychain, plaintext.as_bytes())?,
+        Scheme::Zrbcx => encrypt_zrbcx(keychain.zrbcx(), plaintext.as_bytes())?,
         #[cfg(feature = "upbc")]
-        Scheme::Upbc => encrypt_upbc(keychain, plaintext.as_bytes())?,
+        Scheme::Upbc => encrypt_upbc(keychain.upbc(), plaintext.as_bytes())?,
         #[cfg(feature = "aags")]
-        Scheme::Aags => encrypt_aags(keychain, plaintext.as_bytes())?,
+        Scheme::Aags => encrypt_aags(keychain.aags(), plaintext.as_bytes())?,
         #[cfg(feature = "apgs")]
-        Scheme::Apgs => encrypt_apgs(keychain, plaintext.as_bytes())?,
+        Scheme::Apgs => encrypt_apgs(keychain.apgs(), plaintext.as_bytes())?,
         #[cfg(feature = "aasv")]
-        Scheme::Aasv => encrypt_aasv(keychain, plaintext.as_bytes())?,
+        Scheme::Aasv => encrypt_aasv(keychain.aasv(), plaintext.as_bytes())?,
         #[cfg(feature = "apsv")]
-        Scheme::Apsv => encrypt_apsv(keychain, plaintext.as_bytes())?,
+        Scheme::Apsv => encrypt_apsv(keychain.apsv(), plaintext.as_bytes())?,
         // Testing
         #[cfg(feature = "mock")]
-        Scheme::Mock1 => encrypt_mock1(keychain, plaintext.as_bytes())?,
+        Scheme::Mock1 => encrypt_mock1(keychain.mock1(), plaintext.as_bytes())?,
         #[cfg(feature = "mock")]
-        Scheme::Mock2 => encrypt_mock2(keychain, plaintext.as_bytes())?,
+        Scheme::Mock2 => encrypt_mock2(keychain.mock2(), plaintext.as_bytes())?,
         // Legacy - legacy does not use this call path
         #[cfg(feature = "legacy")]
         Scheme::Legacy => unreachable!("called generic dec function for legacy"),

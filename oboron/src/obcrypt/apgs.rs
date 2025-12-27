@@ -1,5 +1,4 @@
 #![cfg(feature = "apgs")]
-use super::keychain::Keychain;
 use crate::Error;
 use aes_gcm_siv::{
     aead::{Aead, KeyInit},
@@ -13,7 +12,7 @@ const TAG_SIZE: usize = 16;
 /// Encrypt plaintext bytes using probabilistic AES-GCM-SIV (apgs scheme).
 /// Returns raw ciphertext bytes with nonce prepended and authentication tag appended.
 /// Structure: [nonce][ciphertext+tag]
-pub fn encrypt(keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
+pub fn encrypt(key: &[u8; 32], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
     if plaintext_bytes.is_empty() {
         return Err(Error::EmptyPlaintext);
     }
@@ -25,7 +24,7 @@ pub fn encrypt(keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, E
     rand::thread_rng().fill_bytes(&mut buffer[..NONCE_SIZE]);
 
     // Create AES-GCM-SIV cipher
-    let cipher = Aes256GcmSiv::new(keychain.gcm_siv().into());
+    let cipher = Aes256GcmSiv::new(key.into());
     let nonce = Nonce::from(*<&[u8; NONCE_SIZE]>::try_from(&buffer[..NONCE_SIZE]).unwrap());
 
     // Encrypt (produces ciphertext + 16-byte authentication tag)
@@ -41,7 +40,7 @@ pub fn encrypt(keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, E
 
 /// Decrypt ciphertext using probabilistic AES-GCM-SIV (apgs scheme).
 /// Expects data structure: [nonce][ciphertext+tag].  Returns plaintext bytes after authentication verification.
-pub fn decrypt(keychain: &Keychain, data: &[u8]) -> Result<Vec<u8>, Error> {
+pub fn decrypt(key: &[u8; 32], data: &[u8]) -> Result<Vec<u8>, Error> {
     // Minimum: 12 byte nonce + 1 byte plaintext + 16 byte tag = 29 bytes
     if data.len() < 29 {
         return Err(Error::PayloadTooShort);
@@ -52,7 +51,7 @@ pub fn decrypt(keychain: &Keychain, data: &[u8]) -> Result<Vec<u8>, Error> {
     let ciphertext_with_tag = &data[NONCE_SIZE..];
 
     // Create AES-GCM-SIV cipher
-    let cipher = Aes256GcmSiv::new(keychain.gcm_siv().into());
+    let cipher = Aes256GcmSiv::new(key.into());
 
     // Convert nonce slice to array
     let nonce = Nonce::from(*<&[u8; NONCE_SIZE]>::try_from(nonce_bytes).unwrap());

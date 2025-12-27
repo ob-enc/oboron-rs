@@ -4,12 +4,11 @@
 //! This scheme performs no encryption and is available by default.
 //! It exists for testing and as a no-op baseline.
 
-use super::keychain::Keychain;
 use crate::Error;
 
 /// "Encrypt" plaintext bytes using identity scheme (mock1).
 /// Returns the input unchanged (no actual encryption).
-pub fn encrypt(_keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
+pub fn encrypt(_key: &[u8; 32], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
     if plaintext_bytes.is_empty() {
         return Err(Error::EmptyPlaintext);
     }
@@ -19,7 +18,7 @@ pub fn encrypt(_keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, 
 
 /// "Decrypt" ciphertext bytes using identity scheme (mock1).
 /// Returns the input unchanged (no actual decryption).
-pub fn decrypt(_keychain: &Keychain, data: &[u8]) -> Result<Vec<u8>, Error> {
+pub fn decrypt(_key: &[u8; 32], data: &[u8]) -> Result<Vec<u8>, Error> {
     if data.is_empty() {
         return Err(Error::EmptyPayload);
     }
@@ -33,12 +32,11 @@ mod tests {
 
     #[test]
     fn test_mock1_roundtrip() {
-        let key = [0u8; 64];
-        let keychain = Keychain::from_bytes(&key).unwrap();
+        let key = [0u8; 32];
 
         let plaintext = b"hello world";
-        let ciphertext = encrypt(&keychain, plaintext).unwrap();
-        let decrypted = decrypt(&keychain, &ciphertext).unwrap();
+        let ciphertext = encrypt(&key, plaintext).unwrap();
+        let decrypted = decrypt(&key, &ciphertext).unwrap();
 
         // Identity: everything should be the same
         assert_eq!(ciphertext, plaintext);

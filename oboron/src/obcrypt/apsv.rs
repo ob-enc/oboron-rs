@@ -1,5 +1,4 @@
 #![cfg(feature = "apsv")]
-use super::keychain::Keychain;
 use crate::Error;
 use aes_siv::{aead::KeyInit, siv::Aes256Siv};
 use rand::RngCore;
@@ -9,7 +8,7 @@ const TAG_SIZE: usize = 16;
 
 /// Encrypt plaintext bytes using probabilistic AES-SIV (apsv scheme).
 /// Returns raw ciphertext bytes with nonce prepended and authentication tag included.  Structure: [nonce][ciphertext+tag].
-pub fn encrypt(keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
+pub fn encrypt(key: &[u8; 64], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
     if plaintext_bytes.is_empty() {
         return Err(Error::EmptyPlaintext);
     }
@@ -21,7 +20,7 @@ pub fn encrypt(keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, E
     rand::thread_rng().fill_bytes(&mut buffer[..NONCE_SIZE]);
 
     // Create AES-SIV cipher
-    let mut cipher = Aes256Siv::new(keychain.siv().into());
+    let mut cipher = Aes256Siv::new(key.into());
 
     // Use nonce as header (additional authenticated data) for probabilistic encryption
     let ciphertext_with_tag = cipher
@@ -36,7 +35,7 @@ pub fn encrypt(keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, E
 
 /// Decrypt ciphertext using probabilistic AES-SIV (apsv scheme).
 /// Expects data structure: [nonce][ciphertext+tag].  Returns plaintext bytes after authentication verification.
-pub fn decrypt(keychain: &Keychain, data: &[u8]) -> Result<Vec<u8>, Error> {
+pub fn decrypt(key: &[u8; 64], data: &[u8]) -> Result<Vec<u8>, Error> {
     // Minimum: 16 byte nonce + 1 byte plaintext + 16 byte tag = 33 bytes
     if data.len() < 33 {
         return Err(Error::PayloadTooShort);
@@ -47,7 +46,7 @@ pub fn decrypt(keychain: &Keychain, data: &[u8]) -> Result<Vec<u8>, Error> {
     let ciphertext_with_tag = &data[NONCE_SIZE..];
 
     // Create AES-SIV cipher
-    let mut cipher = Aes256Siv::new(keychain.siv().into());
+    let mut cipher = Aes256Siv::new(key.into());
 
     // Use nonce as header (same as encryption)
     let plaintext = cipher

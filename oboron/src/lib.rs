@@ -269,6 +269,7 @@ mod enc;
 mod encoding;
 mod error;
 mod format;
+mod keychain;
 mod keygen;
 #[cfg(feature = "legacy")]
 mod legacy;
@@ -283,8 +284,9 @@ mod scheme;
 pub use constants::{HARDCODED_KEY_BASE64, HARDCODED_KEY_BYTES};
 pub use error::Error;
 
+pub(crate) use keychain::Keychain;
+
 // Re-export from obcrypt
-pub(crate) use obcrypt::Keychain;
 
 #[cfg(feature = "aags")]
 pub(crate) use obcrypt::{decrypt_aags, encrypt_aags};

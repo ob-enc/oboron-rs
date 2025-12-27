@@ -1,7 +1,6 @@
 //! This library provides cryptographic library wrappings for oboron
 
 mod constants;
-mod keychain;
 
 #[cfg(feature = "aags")]
 mod aags; //  AES-GCM-SIV (deterministic)
@@ -25,8 +24,6 @@ mod mock2; // Identity // String reversal
 // Legacy
 #[cfg(feature = "legacy")]
 mod legacy; //  Legacy AES-CBC
-
-pub use keychain::Keychain;
 
 #[cfg(feature = "aags")]
 pub use aags::{decrypt as decrypt_aags, encrypt as encrypt_aags};

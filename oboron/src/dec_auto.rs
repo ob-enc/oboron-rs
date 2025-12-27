@@ -68,22 +68,22 @@ pub fn dec_any_scheme(
     // Step 4: Match scheme byte and decrypt with available schemes
     let plaintext_bytes = match scheme_byte {
         #[cfg(feature = "zrbcx")]
-        ZRBCX_BYTE => decrypt_zrbcx(keychain, &buffer)?,
+        ZRBCX_BYTE => decrypt_zrbcx(keychain.zrbcx(), &buffer)?,
         #[cfg(feature = "upbc")]
-        UPBC_BYTE => decrypt_upbc(keychain, &buffer)?,
+        UPBC_BYTE => decrypt_upbc(keychain.upbc(), &buffer)?,
         #[cfg(feature = "aags")]
-        AAGS_BYTE => decrypt_aags(keychain, &buffer)?,
+        AAGS_BYTE => decrypt_aags(keychain.aags(), &buffer)?,
         #[cfg(feature = "apgs")]
-        APGS_BYTE => decrypt_apgs(keychain, &buffer)?,
+        APGS_BYTE => decrypt_apgs(keychain.apgs(), &buffer)?,
         #[cfg(feature = "aasv")]
-        AASV_BYTE => decrypt_aasv(keychain, &buffer)?,
+        AASV_BYTE => decrypt_aasv(keychain.aasv(), &buffer)?,
         #[cfg(feature = "apsv")]
-        APSV_BYTE => decrypt_apsv(keychain, &buffer)?,
+        APSV_BYTE => decrypt_apsv(keychain.apsv(), &buffer)?,
         // Testing
         #[cfg(feature = "mock")]
-        MOCK1_BYTE => decrypt_mock1(keychain, &buffer)?,
+        MOCK1_BYTE => decrypt_mock1(keychain.mock1(), &buffer)?,
         #[cfg(feature = "mock")]
-        MOCK2_BYTE => decrypt_mock2(keychain, &buffer)?,
+        MOCK2_BYTE => decrypt_mock2(keychain.mock2(), &buffer)?,
         _ => {
             // Unknown scheme byte - try legacy as fallback
             #[cfg(feature = "legacy")]

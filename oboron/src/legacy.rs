@@ -115,7 +115,7 @@ pub(crate) fn dec_legacy(
     assert_eq!(format.scheme(), Scheme::Legacy);
     let ciphertext = decode_obtext_to_ciphertext(format.encoding(), obtext)?;
     // SAFETY: Plaintext was originally valid UTF-8, and encryption preserves byte sequences
-    Ok(unsafe { String::from_utf8_unchecked(decrypt_legacy(keychain, &ciphertext)?) })
+    Ok(unsafe { String::from_utf8_unchecked(decrypt_legacy(keychain.legacy(), &ciphertext)?) })
 }
 
 // ============================================================================
@@ -141,7 +141,7 @@ macro_rules! impl_legacy_codec {
 
         impl ObtextCodec for $name {
             fn enc(&self, plaintext: &str) -> Result<String, Error> {
-                let ciphertext = encrypt_legacy(&self.keychain, plaintext.as_bytes())?;
+                let ciphertext = encrypt_legacy(&self.keychain.legacy(), plaintext.as_bytes())?;
                 Ok(encode_ciphertext_to_obtext(
                     self.format.encoding(),
                     &ciphertext,
@@ -158,7 +158,10 @@ macro_rules! impl_legacy_codec {
                 let ciphertext = decode_obtext_to_ciphertext(self.format.encoding(), obtext)?;
                 Ok(unsafe {
                     // SAFETY: Plaintext was originally valid UTF-8, and encryption preserves byte sequences
-                    String::from_utf8_unchecked(decrypt_legacy(&self.keychain, &ciphertext)?)
+                    String::from_utf8_unchecked(decrypt_legacy(
+                        &self.keychain.legacy(),
+                        &ciphertext,
+                    )?)
                 })
             }
 

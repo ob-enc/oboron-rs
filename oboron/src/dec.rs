@@ -64,22 +64,22 @@ pub(crate) fn dec_from_format(
     // Step 4: Decrypt using scheme-specific function based on format
     let plaintext_bytes = match format.scheme() {
         #[cfg(feature = "zrbcx")]
-        Scheme::Zrbcx => decrypt_zrbcx(keychain, &buffer)?,
+        Scheme::Zrbcx => decrypt_zrbcx(keychain.zrbcx(), &buffer)?,
         #[cfg(feature = "upbc")]
-        Scheme::Upbc => decrypt_upbc(keychain, &buffer)?,
+        Scheme::Upbc => decrypt_upbc(keychain.upbc(), &buffer)?,
         #[cfg(feature = "aags")]
-        Scheme::Aags => decrypt_aags(keychain, &buffer)?,
+        Scheme::Aags => decrypt_aags(keychain.aags(), &buffer)?,
         #[cfg(feature = "apgs")]
-        Scheme::Apgs => decrypt_apgs(keychain, &buffer)?,
+        Scheme::Apgs => decrypt_apgs(keychain.apgs(), &buffer)?,
         #[cfg(feature = "aasv")]
-        Scheme::Aasv => decrypt_aasv(keychain, &buffer)?,
+        Scheme::Aasv => decrypt_aasv(keychain.aasv(), &buffer)?,
         #[cfg(feature = "apsv")]
-        Scheme::Apsv => decrypt_apsv(keychain, &buffer)?,
+        Scheme::Apsv => decrypt_apsv(keychain.apsv(), &buffer)?,
         // Testing
         #[cfg(feature = "mock")]
-        Scheme::Mock1 => decrypt_mock1(keychain, &buffer)?,
+        Scheme::Mock1 => decrypt_mock1(keychain.mock1(), &buffer)?,
         #[cfg(feature = "mock")]
-        Scheme::Mock2 => decrypt_mock2(keychain, &buffer)?,
+        Scheme::Mock2 => decrypt_mock2(keychain.mock2(), &buffer)?,
         // Legacy - legacy does not use this call path
         #[cfg(feature = "legacy")]
         Scheme::Legacy => unreachable!("called generic dec function for legacy"),

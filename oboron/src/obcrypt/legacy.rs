@@ -1,5 +1,5 @@
 #![cfg(feature = "legacy")]
-use super::{constants::AES_BLOCK_SIZE, keychain::Keychain};
+use super::constants::AES_BLOCK_SIZE;
 use crate::Error;
 use aes::Aes128;
 use cbc::{Decryptor, Encryptor};
@@ -12,7 +12,7 @@ const LEGACY_PADDING_BYTE: u8 = b'='; // legacy - legacy only
 
 /// Encrypt plaintext bytes using legacy AES-CBC (legacy scheme).
 /// Returns raw ciphertext bytes with custom padding.
-pub fn encrypt(keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
+pub fn encrypt(secret: &[u8; 32], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
     if plaintext_bytes.is_empty() {
         return Err(Error::EmptyPlaintext);
     }
@@ -28,7 +28,7 @@ pub fn encrypt(keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, E
     buffer.resize(total_len, LEGACY_PADDING_BYTE);
 
     // Encrypt in-place
-    let cipher = Aes128CbcEnc::new(keychain.cbc().into(), keychain.cbc_iv().into());
+    let cipher = Aes128CbcEnc::new(secret[0..16].into(), secret[16..32].into());
     cipher
         .encrypt_padded_mut::<cipher::block_padding::NoPadding>(&mut buffer, total_len)
         .map_err(|_| Error::EncryptionFailed)?;
@@ -38,13 +38,13 @@ pub fn encrypt(keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, E
 
 /// Decrypt ciphertext using legacy AES-CBC (legacy scheme).
 /// Returns plaintext bytes with custom padding removed.
-pub fn decrypt(keychain: &Keychain, data: &[u8]) -> Result<Vec<u8>, Error> {
+pub fn decrypt(secret: &[u8; 32], data: &[u8]) -> Result<Vec<u8>, Error> {
     // Decrypt with AES-128-CBC
     if data.len() % AES_BLOCK_SIZE != 0 {
         return Err(Error::InvalidBlockLength);
     }
 
-    let cipher = Aes128CbcDec::new(keychain.cbc().into(), keychain.cbc_iv().into());
+    let cipher = Aes128CbcDec::new(secret[0..16].into(), secret[16..32].into());
     let mut buffer = data.to_vec();
 
     cipher

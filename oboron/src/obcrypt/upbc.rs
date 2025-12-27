@@ -1,8 +1,5 @@
 #![cfg(feature = "upbc")]
-use super::{
-    constants::{AES_BLOCK_SIZE, CBC_PADDING_BYTE},
-    keychain::Keychain,
-};
+use super::constants::{AES_BLOCK_SIZE, CBC_PADDING_BYTE};
 use crate::Error;
 use aes::Aes128;
 use cbc::{Decryptor, Encryptor};
@@ -16,7 +13,7 @@ const IV_SIZE: usize = 16;
 
 /// Encrypt plaintext bytes using probabilistic AES-CBC (upbc scheme).
 /// Returns raw ciphertext bytes with appended IV.  Structure: [IV][ciphertext].
-pub fn encrypt(keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
+pub fn encrypt(key: &[u8; 16], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
     if plaintext_bytes.is_empty() {
         return Err(Error::EmptyPlaintext);
     }
@@ -38,7 +35,7 @@ pub fn encrypt(keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, E
     // buffer: [iv][plaintext]
 
     // Encrypt in-place (only the plaintext, not the IV)
-    let cipher = Aes128CbcEnc::new(keychain.cbc().into(), buffer[..IV_SIZE].into());
+    let cipher = Aes128CbcEnc::new(key.into(), buffer[..IV_SIZE].into());
     cipher
         .encrypt_padded_mut::<cipher::block_padding::NoPadding>(&mut buffer[IV_SIZE..], total_len)
         .map_err(|_| Error::EncryptionFailed)?;
@@ -50,7 +47,7 @@ pub fn encrypt(keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, E
 
 /// Decrypt ciphertext using probabilistic AES-CBC (upbc scheme).
 /// Expects data structure: [IV][ciphertext].  Returns plaintext bytes with padding removed.
-pub fn decrypt(keychain: &Keychain, data: &[u8]) -> Result<Vec<u8>, Error> {
+pub fn decrypt(key: &[u8; 16], data: &[u8]) -> Result<Vec<u8>, Error> {
     // Minimum: 16 bytes ciphertext + 16 bytes IV = 32 bytes
     if data.len() < 32 {
         return Err(Error::PayloadTooShort);
@@ -65,7 +62,7 @@ pub fn decrypt(keychain: &Keychain, data: &[u8]) -> Result<Vec<u8>, Error> {
         return Err(Error::InvalidBlockLength);
     }
 
-    let cipher = Aes128CbcDec::new(keychain.cbc().into(), iv.into());
+    let cipher = Aes128CbcDec::new(key.into(), iv.into());
     let mut plaintext = ciphertext.to_vec();
 
     cipher

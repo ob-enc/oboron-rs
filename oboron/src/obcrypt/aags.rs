@@ -1,5 +1,4 @@
 #![cfg(feature = "aags")]
-use super::keychain::Keychain;
 use crate::Error;
 use aes_gcm_siv::{
     aead::{Aead, KeyInit},
@@ -10,13 +9,13 @@ const NONCE_SIZE: usize = 12;
 
 /// Encrypt plaintext bytes using deterministic AES-GCM-SIV (aags scheme).
 /// Returns raw ciphertext bytes with authentication tag (deterministic with zero nonce).
-pub fn encrypt(keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
+pub fn encrypt(key: &[u8; 32], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
     if plaintext_bytes.is_empty() {
         return Err(Error::EmptyPlaintext);
     }
 
     // Create AES-GCM-SIV cipher
-    let cipher = Aes256GcmSiv::new(keychain.gcm_siv().into());
+    let cipher = Aes256GcmSiv::new(key.into());
 
     // Use zero nonce for deterministic encryption
     let nonce = Nonce::from([0u8; NONCE_SIZE]);
@@ -31,14 +30,14 @@ pub fn encrypt(keychain: &Keychain, plaintext_bytes: &[u8]) -> Result<Vec<u8>, E
 
 /// Decrypt ciphertext using deterministic AES-GCM-SIV (aags scheme).
 /// Returns plaintext bytes after authentication verification.
-pub fn decrypt(keychain: &Keychain, data: &[u8]) -> Result<Vec<u8>, Error> {
+pub fn decrypt(key: &[u8; 32], data: &[u8]) -> Result<Vec<u8>, Error> {
     // Minimum: 1 byte plaintext + 16 byte tag = 17 bytes
     if data.len() < 17 {
         return Err(Error::PayloadTooShort);
     }
 
     // Create AES-GCM-SIV cipher
-    let cipher = Aes256GcmSiv::new(keychain.gcm_siv().into());
+    let cipher = Aes256GcmSiv::new(key.into());
 
     // Use zero nonce (same as encryption)
     let nonce = Nonce::from([0u8; NONCE_SIZE]);
