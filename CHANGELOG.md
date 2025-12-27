@@ -24,8 +24,33 @@ but note that pre-1.0 releases may not adhere strictly to all guidelines.
     - `[properties]` (4 bits): `h`, `f`, `p`
     - `[algorithm]`: 11 bits
 
+- `upbc` to use 256-bit encryption (was 128-bit)
 
-[0.4.0] - 2025-12-19
+- `zrbcx` to not use Oboron master key any more; two constructors possible:
+  - ::new_keyless() - keyless feature always enabled with zrbcx
+  - ::new_with_secret(&secret) - takes a 256-bit secret that is used as key + IV for CBC
+    - secret <> cryptographic key, does not suggest cryptographic safe
+    - is not extracted from master key => no related key safety issues with unsafe schemes
+
+- API BREAKING CHANGE: ObtextCodec API change:
+  - dec_strict() -> dec()
+  - remove former scheme-autodetecting dec() method
+  - no more autodetection on static types
+
+- API BREAKING CHANGE: Ob/ObFlex API change
+  - former scheme-autodetecting dec() -> dec_auto_scheme()
+  - only Ob/ObFlex have such a method now.
+
+- API BREAKING CHANGE: New ObMulti API
+  - dec() -> dec_with_format_and_key(obtext, format, key) - format given
+  - NEW: dec_with_encoding_and_key(obtext, encoding, key) - encoding given
+  - autodec() -> autodec_with_key(obtext, key) - full autodecode
+
+- API BREAKING CHANGE: Format constans from str to &Format:
+  - AASV_C32: &str "aasv.c32" -> &Format{Scheme::Aasv, Encoding::C32}
+
+
+[1.0.0-rc.1] - 2025-12-19
 --------------------
 
 ### Changed
@@ -81,6 +106,8 @@ but note that pre-1.0 releases may not adhere strictly to all guidelines.
     - etc.
 
 - Feature-gated convenience functions ("convenience" feature)
+
+- Moved Keychain from obcrypt up to root lib level
 
 - Python crate README.md - rewrite parallel to oboron crate, adapted
 
