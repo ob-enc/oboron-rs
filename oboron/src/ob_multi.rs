@@ -23,8 +23,8 @@ use crate::{Error, Format, Keychain};
 /// let obm = ObMulti::new(&key)?;
 ///
 /// // Encode with explicit format
-/// let ot1 = obm.enc("hello", "aasv.c32")?; // using explicit string
-/// let ot2 = obm.enc("world", MOCK1_B64)?; // using string constant
+/// let ot1 = obm.enc_with_format_str("hello", "aasv.c32")?; // using explicit string
+/// let ot2 = obm.enc_with_format("world", MOCK1_B64)?; // using format constant
 ///
 /// // autodec detects both scheme and encoding
 /// let pt1 = obm.autodec(&ot1)?;
@@ -66,13 +66,13 @@ impl ObMulti {
     /// let key = oboron::generate_key();
     /// let obm = ObMulti::new(&key)?;
     ///
-    /// let ot = obm.enc("hello", "aasv.c32")?;
-    /// let ot2 = obm.enc("world", "mock1.b64")?;
+    /// let ot = obm.enc_with_format_str("hello", "aasv.c32")?;
+    /// let ot2 = obm.enc_with_format_str("world", "mock1.b64")?;
     /// # }
     /// # Ok(())
     /// # }
     /// ```
-    pub fn enc(&self, plaintext: &str, fmt: &str) -> Result<String, Error> {
+    pub fn enc_with_format_str(&self, plaintext: &str, fmt: &str) -> Result<String, Error> {
         let format = Format::from_str(fmt)?;
         crate::enc::enc_to_format(plaintext, format, &self.keychain)
     }
@@ -117,14 +117,14 @@ impl ObMulti {
     /// # use oboron::ObMulti;
     /// # let key = oboron::generate_key();
     /// # let obm = ObMulti::new(&key)?;
-    /// let ot = obm.enc("hello", "aasv.b64")?;
-    /// let pt2 = obm.dec(&ot, "aasv.b64")? ;
+    /// let ot = obm.enc_with_format_str("hello", "aasv.b64")?;
+    /// let pt2 = obm.dec_with_format_str(&ot, "aasv.b64")? ;
     /// assert_eq!(pt2, "hello");
     /// # }
     /// # Ok(())
     /// # }
     /// ```
-    pub fn dec(&self, obtext: &str, fmt: &str) -> Result<String, Error> {
+    pub fn dec_with_format_str(&self, obtext: &str, fmt: &str) -> Result<String, Error> {
         let format = Format::from_str(fmt)?;
         crate::dec::dec_from_format(obtext, format, &self.keychain)
     }
@@ -167,7 +167,7 @@ impl ObMulti {
     /// # use oboron::ObMulti;
     /// # let key = oboron::generate_key();
     /// # let obm = ObMulti::new(&key)?;
-    /// let ot = obm.enc("hello", "aasv.b64")?;
+    /// let ot = obm.enc_with_format_str("hello", "aasv.b64")?;
     /// let pt2 = obm.autodec(&ot)?;  // Autodetects aasv.b64
     /// assert_eq!(pt2, "hello");
     /// # }

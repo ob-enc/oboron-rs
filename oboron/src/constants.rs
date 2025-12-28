@@ -71,93 +71,73 @@ pub const REVERSED_SCHEME_BYTES: &[u8] = get_reversed_schemes();
 
 // Format identifiers
 //
-// c32 - Crockford base32 encoding
-#[cfg(feature = "zrbcx")]
-pub const ZRBCX_C32: &str = "zrbcx.c32";
-#[cfg(feature = "upbc")]
-pub const UPBC_C32: &str = "upbc.c32";
 #[cfg(feature = "aags")]
-pub const AAGS_C32: &str = "aags.c32";
-#[cfg(feature = "apgs")]
-pub const APGS_C32: &str = "apgs.c32";
-#[cfg(feature = "aasv")]
-pub const AASV_C32: &str = "aasv.c32";
-#[cfg(feature = "apsv")]
-pub const APSV_C32: &str = "apsv.c32";
-// Tier ob7x - Testing
-#[cfg(feature = "mock")]
-pub const MOCK1_C32: &str = "mock1.c32";
-#[cfg(feature = "mock")]
-pub const MOCK2_C32: &str = "mock2.c32";
-// Legacy
-#[cfg(feature = "legacy")]
-pub const LEGACY_C32: &str = "legacy.c32";
+pub(crate) mod aags_constants {
+    pub const AAGS_C32_STR: &str = "aags.c32";
+    pub const AAGS_B32_STR: &str = "aags.b32";
+    pub const AAGS_B64_STR: &str = "aags.b64";
+    pub const AAGS_HEX_STR: &str = "aags.hex";
+}
 
-// b32 - RFC 4648 Base32 encoding
-#[cfg(feature = "zrbcx")]
-pub const ZRBCX_B32: &str = "zrbcx.b32";
-#[cfg(feature = "upbc")]
-pub const UPBC_B32: &str = "upbc.b32";
-#[cfg(feature = "aags")]
-pub const AAGS_B32: &str = "aags.b32";
 #[cfg(feature = "apgs")]
-pub const APGS_B32: &str = "apgs.b32";
-#[cfg(feature = "aasv")]
-pub const AASV_B32: &str = "aasv.b32";
-#[cfg(feature = "apsv")]
-pub const APSV_B32: &str = "apsv.b32";
-// Tier ob7x - Testing
-#[cfg(feature = "mock")]
-pub const MOCK1_B32: &str = "mock1.b32";
-#[cfg(feature = "mock")]
-pub const MOCK2_B32: &str = "mock2.b32";
-// Legacy
-#[cfg(feature = "legacy")]
-pub const LEGACY_B32: &str = "legacy.b32";
+pub(crate) mod apgs_constants {
+    pub const APGS_C32_STR: &str = "apgs.c32";
+    pub const APGS_B32_STR: &str = "apgs.b32";
+    pub const APGS_B64_STR: &str = "apgs.b64";
+    pub const APGS_HEX_STR: &str = "apgs.hex";
+}
 
-// b64 - Base64 encoding
-#[cfg(feature = "zrbcx")]
-pub const ZRBCX_B64: &str = "zrbcx.b64";
-#[cfg(feature = "upbc")]
-pub const UPBC_B64: &str = "upbc.b64";
-#[cfg(feature = "aags")]
-pub const AAGS_B64: &str = "aags.b64";
-#[cfg(feature = "apgs")]
-pub const APGS_B64: &str = "apgs.b64";
 #[cfg(feature = "aasv")]
-pub const AASV_B64: &str = "aasv.b64";
-#[cfg(feature = "apsv")]
-pub const APSV_B64: &str = "apsv.b64";
-// Tier ob7x - Testing
-#[cfg(feature = "mock")]
-pub const MOCK1_B64: &str = "mock1.b64";
-#[cfg(feature = "mock")]
-pub const MOCK2_B64: &str = "mock2.b64";
-// Legacy
-#[cfg(feature = "legacy")]
-pub const LEGACY_B64: &str = "legacy.b64";
+pub(crate) mod aasv_constants {
+    pub const AASV_C32_STR: &str = "aasv.c32";
+    pub const AASV_B32_STR: &str = "aasv.b32";
+    pub const AASV_B64_STR: &str = "aasv.b64";
+    pub const AASV_HEX_STR: &str = "aasv.hex";
+}
 
-// hex - Hex encoding
-#[cfg(feature = "zrbcx")]
-pub const ZRBCX_HEX: &str = "zrbcx.hex";
-#[cfg(feature = "upbc")]
-pub const UPBC_HEX: &str = "upbc.hex";
-#[cfg(feature = "aags")]
-pub const AAGS_HEX: &str = "aags.hex";
-#[cfg(feature = "apgs")]
-pub const APGS_HEX: &str = "apgs.hex";
-#[cfg(feature = "aasv")]
-pub const AASV_HEX: &str = "aasv.hex";
 #[cfg(feature = "apsv")]
-pub const APSV_HEX: &str = "apsv.hex";
-// Tier ob7x - Testing
+pub(crate) mod apsv_constants {
+    pub const APSV_C32_STR: &str = "apsv.c32";
+    pub const APSV_B32_STR: &str = "apsv.b32";
+    pub const APSV_B64_STR: &str = "apsv.b64";
+    pub const APSV_HEX_STR: &str = "apsv.hex";
+}
+
+#[cfg(feature = "upbc")]
+pub(crate) mod upbc_constants {
+    pub const UPBC_C32_STR: &str = "upbc.c32";
+    pub const UPBC_B32_STR: &str = "upbc.b32";
+    pub const UPBC_B64_STR: &str = "upbc.b64";
+    pub const UPBC_HEX_STR: &str = "upbc.hex";
+}
+
+#[cfg(feature = "zrbcx")]
+pub(crate) mod zrbcx_constants {
+    pub const ZRBCX_C32_STR: &str = "zrbcx.c32";
+    pub const ZRBCX_B32_STR: &str = "zrbcx.b32";
+    pub const ZRBCX_B64_STR: &str = "zrbcx.b64";
+    pub const ZRBCX_HEX_STR: &str = "zrbcx.hex";
+}
+
 #[cfg(feature = "mock")]
-pub const MOCK1_HEX: &str = "mock1.hex";
-#[cfg(feature = "mock")]
-pub const MOCK2_HEX: &str = "mock2.hex";
-// Legacy
+pub(crate) mod mock_constants {
+    pub const MOCK1_B32_STR: &str = "mock1.b32";
+    pub const MOCK1_B64_STR: &str = "mock1.b64";
+    pub const MOCK1_C32_STR: &str = "mock1.c32";
+    pub const MOCK1_HEX_STR: &str = "mock1.hex";
+    pub const MOCK2_B32_STR: &str = "mock2.b32";
+    pub const MOCK2_B64_STR: &str = "mock2.b64";
+    pub const MOCK2_C32_STR: &str = "mock2.c32";
+    pub const MOCK2_HEX_STR: &str = "mock2.hex";
+}
+
 #[cfg(feature = "legacy")]
-pub const LEGACY_HEX: &str = "legacy.hex";
+pub(crate) mod legacy_constants {
+    pub const LEGACY_C32_STR: &str = "legacy.c32";
+    pub const LEGACY_B32_STR: &str = "legacy.b32";
+    pub const LEGACY_HEX_STR: &str = "legacy.hex";
+    pub const LEGACY_B64_STR: &str = "legacy.b64";
+}
 
 #[cfg(test)]
 mod tests {

@@ -35,8 +35,8 @@
 //! # let key = oboron::generate_key();
 //! # let obm = oboron::ObMulti::new(&key)?;
 //! // Operations: data, format
-//! let ot = obm.enc("plaintext", "aasv.b64")?;
-//! obm.dec(&ot, "aasv.b64")?;
+//! let ot = obm.enc_with_format_str("plaintext", "aasv.b64")?;
+//! obm.dec_with_format_str(&ot, "aasv.b64")?;
 //!
 //! // Constructors: format, key
 //! oboron::Ob::new("aasv.b64", &key)?;
@@ -112,7 +112,7 @@
 //! # fn main() -> Result<(), oboron::Error> {
 //! # #[cfg(all(feature = "aasv", feature = "mock"))]
 //! # {
-//! # use oboron::{ObFlex, ObtextCodec, Scheme, Encoding, AASV_B64};
+//! # use oboron::{ObFlex, Scheme, Encoding, AASV_B64};
 //! # let key = oboron::generate_key();
 //! let mut flex = ObFlex::new("aasv.b64", &key)?;
 //! let ot1 = flex.enc("hello")?;    // aasv.b64 format
@@ -146,9 +146,9 @@
 //! let obm = ObMulti::new(&key)?;
 //!
 //! // Encode to different formats
-//! let ot_b32 = obm.enc("data", "aasv.c32")?;
-//! let ot_b64 = obm.enc("data", "aasv.b64")?;
-//! let ot_hex = obm.enc("data", "aasv.hex")?;
+//! let ot_b32 = obm.enc_with_format_str("data", "aasv.c32")?;
+//! let ot_b64 = obm.enc_with_format_str("data", "aasv.b64")?;
+//! let ot_hex = obm.enc_with_format_str("data", "aasv.hex")?;
 //!
 //! // Decode with automatic format detection
 //! let pt2 = obm.autodec(&ot_b64)?;
@@ -333,25 +333,42 @@ pub use codec::{new_keyless, new_keyless_with_format};
 
 // Conditionally export format string constants (scheme+encoding combinations)
 #[cfg(feature = "aags")]
-pub use constants::{AAGS_B32, AAGS_B64, AAGS_C32, AAGS_HEX};
+pub use constants::aags_constants::*;
 #[cfg(feature = "aasv")]
-pub use constants::{AASV_B32, AASV_B64, AASV_C32, AASV_HEX};
+pub use constants::aasv_constants::*;
 #[cfg(feature = "apgs")]
-pub use constants::{APGS_B32, APGS_B64, APGS_C32, APGS_HEX};
+pub use constants::apgs_constants::*;
 #[cfg(feature = "apsv")]
-pub use constants::{APSV_B32, APSV_B64, APSV_C32, APSV_HEX};
+pub use constants::apsv_constants::*;
 #[cfg(feature = "upbc")]
-pub use constants::{UPBC_B32, UPBC_B64, UPBC_C32, UPBC_HEX};
+pub use constants::upbc_constants::*;
 #[cfg(feature = "zrbcx")]
-pub use constants::{ZRBCX_B32, ZRBCX_B64, ZRBCX_C32, ZRBCX_HEX};
+pub use constants::zrbcx_constants::*;
 // Legacy
 #[cfg(feature = "legacy")]
-pub use constants::{LEGACY_B32, LEGACY_B64, LEGACY_C32, LEGACY_HEX};
+pub use constants::legacy_constants::*;
 // Testing
 #[cfg(feature = "mock")]
-pub use constants::{MOCK1_B32, MOCK1_B64, MOCK1_C32, MOCK1_HEX};
+pub use constants::mock_constants::*;
+
+#[cfg(feature = "aags")]
+pub use format::aags_formats::*;
+#[cfg(feature = "aasv")]
+pub use format::aasv_formats::*;
+#[cfg(feature = "apgs")]
+pub use format::apgs_formats::*;
+#[cfg(feature = "apsv")]
+pub use format::apsv_formats::*;
+#[cfg(feature = "upbc")]
+pub use format::upbc_formats::*;
+#[cfg(feature = "zrbcx")]
+pub use format::zrbcx_formats::*;
+// Legacy
+#[cfg(feature = "legacy")]
+pub use format::legacy_formats::*;
+// Testing
 #[cfg(feature = "mock")]
-pub use constants::{MOCK2_B32, MOCK2_B64, MOCK2_C32, MOCK2_HEX};
+pub use format::mock_formats::*;
 
 // Conditionally export format-specific structs (scheme+encoding combinations)
 #[cfg(feature = "aags")]
@@ -433,7 +450,7 @@ pub mod prelude {
 /// ```
 #[cfg(feature = "convenience")]
 pub fn enc(plaintext: &str, format: &str, key: &str) -> Result<String, Error> {
-    ObMulti::new(key)?.enc(plaintext, format)
+    ObMulti::new(key)?.enc_with_format_str(plaintext, format)
 }
 
 /// Encrypt+encode plaintext with a specified format using the hardcoded key (testing only).
@@ -456,7 +473,7 @@ pub fn enc(plaintext: &str, format: &str, key: &str) -> Result<String, Error> {
 #[cfg(feature = "convenience")]
 #[cfg(feature = "keyless")]
 pub fn enc_keyless(plaintext: &str, format: &str) -> Result<String, Error> {
-    ObMulti::new_keyless()?.enc(plaintext, format)
+    ObMulti::new_keyless()?.enc_with_format_str(plaintext, format)
 }
 
 /// Decode+decrypt obtext with a specified format.
@@ -484,7 +501,7 @@ pub fn enc_keyless(plaintext: &str, format: &str) -> Result<String, Error> {
 /// ```
 #[cfg(feature = "convenience")]
 pub fn dec(obtext: &str, format: &str, key: &str) -> Result<String, Error> {
-    ObMulti::new(key)?.dec(obtext, format)
+    ObMulti::new(key)?.dec_with_format_str(obtext, format)
 }
 
 /// Decode+decrypt obtext with a specified format using the hardcoded key (testing only).
@@ -509,7 +526,7 @@ pub fn dec(obtext: &str, format: &str, key: &str) -> Result<String, Error> {
 #[cfg(feature = "convenience")]
 #[cfg(feature = "keyless")]
 pub fn dec_keyless(obtext: &str, format: &str) -> Result<String, Error> {
-    ObMulti::new_keyless()?.dec(obtext, format)
+    ObMulti::new_keyless()?.dec_with_format_str(obtext, format)
 }
 
 /// Decode+decrypt obtext with automatic format detection.

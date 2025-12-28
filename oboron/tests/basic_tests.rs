@@ -87,42 +87,42 @@ fn test_upbc_probabilistic() {
 #[test]
 fn test_autodetect_all_formats() {
     let original = "autodetect all";
-    let ob = ObMulti::new_keyless().unwrap();
+    let obm = ObMulti::new_keyless().unwrap();
 
     #[cfg(feature = "zrbcx")]
     {
-        let ot = ob.enc(original, "zrbcx.c32").unwrap();
-        let pt2 = ob.autodec(&ot).unwrap();
+        let ot = obm.enc_with_format_str(original, "zrbcx.c32").unwrap();
+        let pt2 = obm.autodec(&ot).unwrap();
         assert_eq!(original, pt2, "Failed for format zrbcx");
     }
     #[cfg(feature = "upbc")]
     {
-        let ot = ob.enc(original, "upbc.c32").unwrap();
-        let pt2 = ob.autodec(&ot).unwrap();
+        let ot = obm.enc_with_format_str(original, "upbc.c32").unwrap();
+        let pt2 = obm.autodec(&ot).unwrap();
         assert_eq!(original, pt2, "Failed for format upbc");
     }
     #[cfg(feature = "aags")]
     {
-        let ot = ob.enc(original, "aags.c32").unwrap();
-        let pt2 = ob.autodec(&ot).unwrap();
+        let ot = obm.enc_with_format_str(original, "aags.c32").unwrap();
+        let pt2 = obm.autodec(&ot).unwrap();
         assert_eq!(original, pt2, "Failed for format aags");
     }
     #[cfg(feature = "apgs")]
     {
-        let ot = ob.enc(original, "apgs.c32").unwrap();
-        let pt2 = ob.autodec(&ot).unwrap();
+        let ot = obm.enc_with_format_str(original, "apgs.c32").unwrap();
+        let pt2 = obm.autodec(&ot).unwrap();
         assert_eq!(original, pt2, "Failed for format apgs");
     }
     #[cfg(feature = "aasv")]
     {
-        let ot = ob.enc(original, "aasv.c32").unwrap();
-        let pt2 = ob.autodec(&ot).unwrap();
+        let ot = obm.enc_with_format_str(original, "aasv.c32").unwrap();
+        let pt2 = obm.autodec(&ot).unwrap();
         assert_eq!(original, pt2, "Failed for format aasv");
     }
     #[cfg(feature = "apsv")]
     {
-        let ot = ob.enc(original, "apsv.c32").unwrap();
-        let pt2 = ob.autodec(&ot).unwrap();
+        let ot = obm.enc_with_format_str(original, "apsv.c32").unwrap();
+        let pt2 = obm.autodec(&ot).unwrap();
         assert_eq!(original, pt2, "Failed for format apsv");
     }
 }

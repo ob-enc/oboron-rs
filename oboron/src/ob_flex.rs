@@ -287,6 +287,57 @@ impl ObtextCodec for ObFlex {
     }
 }
 
+// Add inherent methods that delegate to trait methods
+impl ObFlex {
+    /// Encrypt and encode plaintext
+    #[inline]
+    pub fn enc(&self, plaintext: &str) -> Result<String, Error> {
+        <Self as ObtextCodec>::enc(self, plaintext)
+    }
+
+    /// Decode and decrypt obtext (with scheme autodetection)
+    #[inline]
+    pub fn dec(&self, obtext: &str) -> Result<String, Error> {
+        <Self as ObtextCodec>::dec(self, obtext)
+    }
+
+    /// Decode and decrypt obtext (strict - no autodetection)
+    #[inline]
+    pub fn dec_strict(&self, obtext: &str) -> Result<String, Error> {
+        <Self as ObtextCodec>::dec_strict(self, obtext)
+    }
+
+    /// Get the scheme
+    #[inline]
+    pub fn scheme(&self) -> Scheme {
+        <Self as ObtextCodec>::scheme(self)
+    }
+
+    /// Get the encoding
+    #[inline]
+    pub fn encoding(&self) -> Encoding {
+        <Self as ObtextCodec>::encoding(self)
+    }
+
+    /// Get the key as base64
+    #[inline]
+    pub fn key(&self) -> String {
+        <Self as ObtextCodec>::key(self)
+    }
+
+    #[cfg(feature = "hex-keys")]
+    #[inline]
+    pub fn key_hex(&self) -> String {
+        <Self as ObtextCodec>::key_hex(self)
+    }
+
+    #[cfg(feature = "bytes-keys")]
+    #[inline]
+    pub fn key_bytes(&self) -> &[u8; 64] {
+        <Self as ObtextCodec>::key_bytes(self)
+    }
+}
+
 /// Trait for types that can be converted into a Format.
 ///
 /// This trait is sealed and only implemented for `&str`, `Format`, and `&Format`.

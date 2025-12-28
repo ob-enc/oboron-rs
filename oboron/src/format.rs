@@ -1,6 +1,5 @@
 //! Format combines a scheme (encryption method) with an encoding (text representation).  
 
-use crate::constants;
 use crate::{encoding::Encoding, error::Error, scheme::Scheme};
 
 /// Format combines a scheme (encryption method) with an encoding (text representation).
@@ -12,13 +11,8 @@ pub struct Format {
 
 impl Format {
     /// Create a new format with the specified scheme and encoding.
-    pub fn new(scheme: Scheme, encoding: Encoding) -> Self {
+    pub const fn new(scheme: Scheme, encoding: Encoding) -> Self {
         Self { scheme, encoding }
-    }
-
-    /// Create a format with the specified scheme and default Base32 encoding.
-    pub fn with_scheme(scheme: Scheme) -> Self {
-        Self::new(scheme, Encoding::C32)
     }
 
     /// Get the scheme.
@@ -30,99 +24,177 @@ impl Format {
     pub fn encoding(&self) -> Encoding {
         self.encoding
     }
+}
 
+#[cfg(feature = "zrbcx")]
+pub(crate) mod zrbcx_formats {
+    use super::{Encoding, Format, Scheme};
+    pub const ZRBCX_C32: Format = Format::new(Scheme::Zrbcx, Encoding::C32);
+    pub const ZRBCX_B32: Format = Format::new(Scheme::Zrbcx, Encoding::B32);
+    pub const ZRBCX_B64: Format = Format::new(Scheme::Zrbcx, Encoding::B64);
+    pub const ZRBCX_HEX: Format = Format::new(Scheme::Zrbcx, Encoding::Hex);
+}
+
+#[cfg(feature = "upbc")]
+pub(crate) mod upbc_formats {
+    use super::{Encoding, Format, Scheme};
+    pub const UPBC_C32: Format = Format::new(Scheme::Upbc, Encoding::C32);
+    pub const UPBC_B32: Format = Format::new(Scheme::Upbc, Encoding::B32);
+    pub const UPBC_B64: Format = Format::new(Scheme::Upbc, Encoding::B64);
+    pub const UPBC_HEX: Format = Format::new(Scheme::Upbc, Encoding::Hex);
+}
+
+#[cfg(feature = "aags")]
+pub(crate) mod aags_formats {
+    use super::{Encoding, Format, Scheme};
+    pub const AAGS_C32: Format = Format::new(Scheme::Aags, Encoding::C32);
+    pub const AAGS_B32: Format = Format::new(Scheme::Aags, Encoding::B32);
+    pub const AAGS_B64: Format = Format::new(Scheme::Aags, Encoding::B64);
+    pub const AAGS_HEX: Format = Format::new(Scheme::Aags, Encoding::Hex);
+}
+
+#[cfg(feature = "apgs")]
+pub(crate) mod apgs_formats {
+    use super::{Encoding, Format, Scheme};
+    pub const APGS_C32: Format = Format::new(Scheme::Apgs, Encoding::C32);
+    pub const APGS_B32: Format = Format::new(Scheme::Apgs, Encoding::B32);
+    pub const APGS_B64: Format = Format::new(Scheme::Apgs, Encoding::B64);
+    pub const APGS_HEX: Format = Format::new(Scheme::Apgs, Encoding::Hex);
+}
+
+#[cfg(feature = "aasv")]
+pub(crate) mod aasv_formats {
+    use super::{Encoding, Format, Scheme};
+    pub const AASV_C32: Format = Format::new(Scheme::Aasv, Encoding::C32);
+    pub const AASV_B32: Format = Format::new(Scheme::Aasv, Encoding::B32);
+    pub const AASV_B64: Format = Format::new(Scheme::Aasv, Encoding::B64);
+    pub const AASV_HEX: Format = Format::new(Scheme::Aasv, Encoding::Hex);
+}
+
+#[cfg(feature = "apsv")]
+pub(crate) mod apsv_formats {
+    use super::{Encoding, Format, Scheme};
+    pub const APSV_C32: Format = Format::new(Scheme::Apsv, Encoding::C32);
+    pub const APSV_B32: Format = Format::new(Scheme::Apsv, Encoding::B32);
+    pub const APSV_B64: Format = Format::new(Scheme::Apsv, Encoding::B64);
+    pub const APSV_HEX: Format = Format::new(Scheme::Apsv, Encoding::Hex);
+}
+
+#[cfg(feature = "legacy")]
+pub(crate) mod legacy_formats {
+    use super::{Encoding, Format, Scheme};
+    pub const LEGACY_C32: Format = Format::new(Scheme::Legacy, Encoding::C32);
+    pub const LEGACY_B32: Format = Format::new(Scheme::Legacy, Encoding::B32);
+    pub const LEGACY_B64: Format = Format::new(Scheme::Legacy, Encoding::B64);
+    pub const LEGACY_HEX: Format = Format::new(Scheme::Legacy, Encoding::Hex);
+}
+
+#[cfg(feature = "mock")]
+pub(crate) mod mock_formats {
+    use super::{Encoding, Format, Scheme};
+    pub const MOCK1_C32: Format = Format::new(Scheme::Mock1, Encoding::C32);
+    pub const MOCK1_B32: Format = Format::new(Scheme::Mock1, Encoding::B32);
+    pub const MOCK1_B64: Format = Format::new(Scheme::Mock1, Encoding::B64);
+    pub const MOCK1_HEX: Format = Format::new(Scheme::Mock1, Encoding::Hex);
+    pub const MOCK2_C32: Format = Format::new(Scheme::Mock2, Encoding::C32);
+    pub const MOCK2_B32: Format = Format::new(Scheme::Mock2, Encoding::B32);
+    pub const MOCK2_B64: Format = Format::new(Scheme::Mock2, Encoding::B64);
+    pub const MOCK2_HEX: Format = Format::new(Scheme::Mock2, Encoding::Hex);
+}
+
+impl Format {
     /// Parse format from compact string representation (e.g., "zrbcx.c32", "aags.b64")
     ///
     /// This uses fast match-based parsing for maximum performance.
     pub fn from_str(s: &str) -> Result<Self, Error> {
         Ok(match s {
             #[cfg(feature = "zrbcx")]
-            constants::ZRBCX_C32 => Format::new(Scheme::Zrbcx, Encoding::C32),
+            crate::ZRBCX_C32_STR => zrbcx_formats::ZRBCX_C32,
             #[cfg(feature = "zrbcx")]
-            constants::ZRBCX_B32 => Format::new(Scheme::Zrbcx, Encoding::B32),
+            crate::ZRBCX_B32_STR => zrbcx_formats::ZRBCX_B32,
             #[cfg(feature = "zrbcx")]
-            constants::ZRBCX_B64 => Format::new(Scheme::Zrbcx, Encoding::B64),
+            crate::ZRBCX_B64_STR => zrbcx_formats::ZRBCX_B64,
             #[cfg(feature = "zrbcx")]
-            constants::ZRBCX_HEX => Format::new(Scheme::Zrbcx, Encoding::Hex),
+            crate::ZRBCX_HEX_STR => zrbcx_formats::ZRBCX_HEX,
 
             #[cfg(feature = "upbc")]
-            constants::UPBC_C32 => Format::new(Scheme::Upbc, Encoding::C32),
+            crate::UPBC_C32_STR => upbc_formats::UPBC_C32,
             #[cfg(feature = "upbc")]
-            constants::UPBC_B32 => Format::new(Scheme::Upbc, Encoding::B32),
+            crate::UPBC_B32_STR => upbc_formats::UPBC_B32,
             #[cfg(feature = "upbc")]
-            constants::UPBC_B64 => Format::new(Scheme::Upbc, Encoding::B64),
+            crate::UPBC_B64_STR => upbc_formats::UPBC_B64,
             #[cfg(feature = "upbc")]
-            constants::UPBC_HEX => Format::new(Scheme::Upbc, Encoding::Hex),
+            crate::UPBC_HEX_STR => upbc_formats::UPBC_HEX,
 
             #[cfg(feature = "aags")]
-            constants::AAGS_C32 => Format::new(Scheme::Aags, Encoding::C32),
+            crate::AAGS_C32_STR => aags_formats::AAGS_C32,
             #[cfg(feature = "aags")]
-            constants::AAGS_B32 => Format::new(Scheme::Aags, Encoding::B32),
+            crate::AAGS_B32_STR => aags_formats::AAGS_B32,
             #[cfg(feature = "aags")]
-            constants::AAGS_B64 => Format::new(Scheme::Aags, Encoding::B64),
+            crate::AAGS_B64_STR => aags_formats::AAGS_B64,
             #[cfg(feature = "aags")]
-            constants::AAGS_HEX => Format::new(Scheme::Aags, Encoding::Hex),
+            crate::AAGS_HEX_STR => aags_formats::AAGS_HEX,
 
             #[cfg(feature = "apgs")]
-            constants::APGS_C32 => Format::new(Scheme::Apgs, Encoding::C32),
+            crate::APGS_C32_STR => apgs_formats::APGS_C32,
             #[cfg(feature = "apgs")]
-            constants::APGS_B32 => Format::new(Scheme::Apgs, Encoding::B32),
+            crate::APGS_B32_STR => apgs_formats::APGS_B32,
             #[cfg(feature = "apgs")]
-            constants::APGS_B64 => Format::new(Scheme::Apgs, Encoding::B64),
+            crate::APGS_B64_STR => apgs_formats::APGS_B64,
             #[cfg(feature = "apgs")]
-            constants::APGS_HEX => Format::new(Scheme::Apgs, Encoding::Hex),
+            crate::APGS_HEX_STR => apgs_formats::APGS_HEX,
 
             #[cfg(feature = "aasv")]
-            constants::AASV_C32 => Format::new(Scheme::Aasv, Encoding::C32),
+            crate::AASV_C32_STR => aasv_formats::AASV_C32,
             #[cfg(feature = "aasv")]
-            constants::AASV_B32 => Format::new(Scheme::Aasv, Encoding::B32),
+            crate::AASV_B32_STR => aasv_formats::AASV_B32,
             #[cfg(feature = "aasv")]
-            constants::AASV_B64 => Format::new(Scheme::Aasv, Encoding::B64),
+            crate::AASV_B64_STR => aasv_formats::AASV_B64,
             #[cfg(feature = "aasv")]
-            constants::AASV_HEX => Format::new(Scheme::Aasv, Encoding::Hex),
+            crate::AASV_HEX_STR => aasv_formats::AASV_HEX,
 
             #[cfg(feature = "apsv")]
-            constants::APSV_C32 => Format::new(Scheme::Apsv, Encoding::C32),
+            crate::APSV_C32_STR => apsv_formats::APSV_C32,
             #[cfg(feature = "apsv")]
-            constants::APSV_B32 => Format::new(Scheme::Apsv, Encoding::B32),
+            crate::APSV_B32_STR => apsv_formats::APSV_B32,
             #[cfg(feature = "apsv")]
-            constants::APSV_B64 => Format::new(Scheme::Apsv, Encoding::B64),
+            crate::APSV_B64_STR => apsv_formats::APSV_B64,
             #[cfg(feature = "apsv")]
-            constants::APSV_HEX => Format::new(Scheme::Apsv, Encoding::Hex),
+            crate::APSV_HEX_STR => apsv_formats::APSV_HEX,
 
             // Testing
 
             // mock1 variants
             #[cfg(feature = "mock")]
-            constants::MOCK1_C32 => Format::new(Scheme::Mock1, Encoding::C32),
+            crate::MOCK1_C32_STR => mock_formats::MOCK1_C32,
             #[cfg(feature = "mock")]
-            constants::MOCK1_B32 => Format::new(Scheme::Mock1, Encoding::B32),
+            crate::MOCK1_B32_STR => mock_formats::MOCK1_B32,
             #[cfg(feature = "mock")]
-            constants::MOCK1_B64 => Format::new(Scheme::Mock1, Encoding::B64),
+            crate::MOCK1_B64_STR => mock_formats::MOCK1_B64,
             #[cfg(feature = "mock")]
-            constants::MOCK1_HEX => Format::new(Scheme::Mock1, Encoding::Hex),
+            crate::MOCK1_HEX_STR => mock_formats::MOCK1_HEX,
 
             // mock2 variants
             #[cfg(feature = "mock")]
-            constants::MOCK2_C32 => Format::new(Scheme::Mock2, Encoding::C32),
+            crate::MOCK2_C32_STR => mock_formats::MOCK2_C32,
             #[cfg(feature = "mock")]
-            constants::MOCK2_B32 => Format::new(Scheme::Mock2, Encoding::B32),
+            crate::MOCK2_B32_STR => mock_formats::MOCK2_B32,
             #[cfg(feature = "mock")]
-            constants::MOCK2_B64 => Format::new(Scheme::Mock2, Encoding::B64),
+            crate::MOCK2_B64_STR => mock_formats::MOCK2_B64,
             #[cfg(feature = "mock")]
-            constants::MOCK2_HEX => Format::new(Scheme::Mock2, Encoding::Hex),
+            crate::MOCK2_HEX_STR => mock_formats::MOCK2_HEX,
 
             // Legacy
 
             // legacy variants
             #[cfg(feature = "legacy")]
-            constants::LEGACY_C32 => Format::new(Scheme::Legacy, Encoding::C32),
+            crate::LEGACY_C32_STR => legacy_formats::LEGACY_C32,
             #[cfg(feature = "legacy")]
-            constants::LEGACY_B32 => Format::new(Scheme::Legacy, Encoding::B32),
+            crate::LEGACY_B32_STR => legacy_formats::LEGACY_B32,
             #[cfg(feature = "legacy")]
-            constants::LEGACY_B64 => Format::new(Scheme::Legacy, Encoding::B64),
+            crate::LEGACY_B64_STR => legacy_formats::LEGACY_B64,
             #[cfg(feature = "legacy")]
-            constants::LEGACY_HEX => Format::new(Scheme::Legacy, Encoding::Hex),
+            crate::LEGACY_HEX_STR => legacy_formats::LEGACY_HEX,
 
             _ => return Err(Error::InvalidFormat),
         })
