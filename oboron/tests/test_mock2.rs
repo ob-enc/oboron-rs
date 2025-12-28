@@ -70,8 +70,8 @@ fn test_mock2_deterministic() {
 #[test]
 fn test_mock2_cross_scheme_with_mock1() {
     let key = oboron::generate_key();
-    let mock2 = oboron::Mock2C32::new(&key).unwrap();
-    let mock1 = oboron::Mock1C32::new(&key).unwrap();
+    let mock2 = oboron::Ob::new("mock2.c32", &key).unwrap();
+    let mock1 = oboron::Ob::new("mock1.c32", &key).unwrap();
 
     let plaintext = "cross-scheme test";
     let ot71 = mock2.enc(plaintext).unwrap();

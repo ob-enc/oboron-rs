@@ -84,8 +84,8 @@ fn test_ob_any_default() {
 #[test]
 fn test_cross_scheme_decoding() {
     let key = oboron::generate_key();
-    let aags = oboron::AagsC32::new(&key).unwrap();
-    let aasv = oboron::AasvC32::new(&key).unwrap();
+    let aags = oboron::Ob::new("aags.c32", &key).unwrap();
+    let aasv = oboron::Ob::new("aasv.c32", &key).unwrap();
 
     let enc31 = aags.enc("hello").unwrap();
     let enc32 = aasv.enc("world").unwrap();

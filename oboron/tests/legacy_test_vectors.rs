@@ -1,6 +1,6 @@
 #![cfg(feature = "legacy")]
 
-use oboron::{LegacyB32, LegacyB64, LegacyC32, LegacyHex, ObtextCodec};
+use oboron::{LegacyB32, LegacyB64, LegacyC32, LegacyHex, Ob, ObtextCodec};
 use serde::Deserialize;
 use std::fs;
 use std::path::PathBuf;
@@ -100,10 +100,13 @@ fn test_legacy_vectors() {
             continue;
         }
 
+        // Change the code to use Ob instead of Box<dyn ObtextCodec>
         // Test autodetection
-        let autodetected = match ob.dec_auto_scheme(&vector.obtext) {
-            Ok(a) => a,
+        let ob1 = Ob::new_keyless(&format!("{}", ob.format())).unwrap();
+        let autodetected = match ob1.dec_auto_scheme(&vector.obtext) {
+            Ok(pt) => pt,
             Err(e) => {
+                eprintln!("Autodetection failed:  {}", e);
                 println!("Failed to autodetect at vector {}: {}", index, e);
                 println!("Obtext was: '{}'", vector.obtext);
                 continue;

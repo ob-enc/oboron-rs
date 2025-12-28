@@ -121,8 +121,8 @@ fn test_mock1_dec() {
 #[cfg(feature = "aasv")]
 fn test_mock1_cannot_dec_other_schemes_strict() {
     let key = oboron::generate_key();
-    let mock1 = oboron::Mock1C32::new(&key).unwrap();
-    let aasv = oboron::AasvC32::new(&key).unwrap();
+    let mock1 = oboron::Ob::new("mock1.c32", &key).unwrap();
+    let aasv = oboron::Ob::new("aasv.c32", &key).unwrap();
 
     let plaintext = "cross-scheme test";
     let encd_aasv = aasv.enc(plaintext).unwrap();
@@ -290,8 +290,8 @@ fn test_mock1_key_getter() {
 fn test_mock1_encoding_mismatch() {
     let key = oboron::generate_key();
 
-    let ob_b32 = oboron::Mock1C32::new(&key).unwrap();
-    let ob_b64 = oboron::Mock1B64::new(&key).unwrap();
+    let ob_b32 = oboron::Ob::new("mock1.c32", &key).unwrap();
+    let ob_b64 = oboron::Ob::new("mock1.b64", &key).unwrap();
 
     let plaintext = "encoding mismatch";
     let enc_b32 = ob_b32.enc(plaintext).unwrap();

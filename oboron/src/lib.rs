@@ -188,23 +188,11 @@
 //! let ot_aasv = aasv.enc("data1")?;
 //! let ot_apgs = apgs.enc("data2")?;
 //!
-//! // Decoding with scheme autodetection
-//! let pt1 = aasv.dec_auto_scheme(&ot_aasv)?;  // Decodes successfully
-//! let pt2 = aasv.dec_auto_scheme(&ot_apgs)?;  // Also works (autodetects apgs)
+//! // Decoding
+//! let pt1 = aasv.dec(&ot_aasv)?;  // Decodes successfully
+//! let pt2 = apgs.dec(&ot_apgs)?;
 //! assert_eq!(pt1, "data1");
 //! assert_eq!(pt2, "data2");
-//! // Note: The above autodetection works only with shared encodings
-//! // aasv.c32 and apgs.c32 are both Crockford-base32-encoded
-//!
-//! // Use dec to enforce scheme matching
-//! let pt3 = aasv.dec(&ot_aasv)?;         // OK: Matches scheme
-//! assert!(aasv.dec(&ot_apgs).is_err());  // Error: Wrong scheme (aasv != apgs)
-//!
-//! // Note: For fixed oborons, string encoding (c32/b32/b64/hex) must match the instance encoding
-//! let aasv_b64 = oboron::AasvB64::new(&key)?;  // "aasv.b64" fixed-format ObtextCodec
-//! let ot_b64 = aasv_b64.enc("data3")?;
-//! assert!(aasv.dec_auto_scheme(&ot_b64).is_err());  // Error: Encoding mismatch (c32 != b64)
-//! // For mixed encodings, use ObMulti instead (see above)
 //! # }
 //! # Ok(())
 //! # }

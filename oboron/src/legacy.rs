@@ -282,8 +282,7 @@ macro_rules! impl_legacy_codec {
                 Self::from_bytes_internal(&HARDCODED_KEY_BYTES)
             }
 
-            pub fn dec_auto_scheme(&self, obtext: &str) {
-                // Use autodetection to handle any scheme format
+            pub fn dec_auto_scheme(&self, obtext: &str) -> Result<String, Error> {
                 crate::dec_auto::dec_any_scheme(&self.keychain, self.format.encoding(), obtext)
             }
         }

@@ -33,21 +33,13 @@ but note that pre-1.0 releases may not adhere strictly to all guidelines.
     - is not extracted from master key => no related key safety issues with unsafe schemes
 
 - API BREAKING CHANGE: ObtextCodec API change:
-  - dec_strict() -> dec()
-  - remove former scheme-autodetecting dec() method
+  - renamed dec_strict() -> dec()
+  - removed former scheme-autodetecting dec() method
   - no more autodetection on static types
 
 - API BREAKING CHANGE: Ob/ObFlex API change
-  - former scheme-autodetecting dec() -> dec_auto_scheme()
+  - former scheme-autodetecting dec() renamed to dec_auto_scheme()
   - only Ob/ObFlex have such a method now.
-
-- API BREAKING CHANGE: New ObMulti API
-  - dec() -> dec_with_format_and_key(obtext, format, key) - format given
-  - NEW: dec_with_encoding_and_key(obtext, encoding, key) - encoding given
-  - autodec() -> autodec_with_key(obtext, key) - full autodecode
-
-- API BREAKING CHANGE: Format constans from str to &Format:
-  - AASV_C32: &str "aasv.c32" -> &Format{Scheme::Aasv, Encoding::C32}
 
 
 [1.0.0-rc.1] - 2025-12-19
@@ -104,6 +96,15 @@ but note that pre-1.0 releases may not adhere strictly to all guidelines.
     - Ob31pBase64                -> ApgsB64
     - Ob31pHex                   -> ApgsHex
     - etc.
+
+- API BREAKING CHANGE: New ObMulti API
+  - dec() -> dec_with_format(obtext, format) - format given
+  - NEW: dec_with_encoding(obtext, encoding) - encoding given
+  - autodec() -> autodec(obtext) - full autodecode
+
+- API BREAKING CHANGE: Format constans from str to &Format:
+  - AASV_C32: &str "aasv.c32" -> &Format{Scheme::Aasv, Encoding::C32}
+  - new AASV_C32_STR constants
 
 - Feature-gated convenience functions ("convenience" feature)
 

@@ -107,12 +107,6 @@ macro_rules! impl_codec {
                     keychain: Keychain::from_bytes(key_bytes)?,
                 })
             }
-
-            #[inline]
-            fn dec_auto_scheme(&self, obtext: &str) -> Result<String, Error> {
-                // Use autodetection for cross-scheme compatibility
-                crate::dec_auto::dec_any_scheme(&self.keychain, $encoding, obtext)
-            }
         }
 
         impl ObtextCodec for $name {

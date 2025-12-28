@@ -1,4 +1,3 @@
-use ::oboron::ObtextCodec;
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use pyo3::types::PyBytes;
@@ -605,7 +604,7 @@ impl ObMulti {
     ///     ValueError: If the enc operation fails or format is invalid.
     fn enc(&self, plaintext: &str, format: &str) -> PyResult<String> {
         self.inner
-            .enc(plaintext, format)
+            .enc_with_format_str(plaintext, format)
             .map_err(|e| PyValueError::new_err(format!("Enc operation failed: {}", e)))
     }
 
@@ -622,7 +621,7 @@ impl ObMulti {
     ///     ValueError: If the dec operation fails or format is invalid.
     fn dec(&self, obtext: &str, format: &str) -> PyResult<String> {
         self.inner
-            .dec(obtext, format)
+            .dec_with_format_str(obtext, format)
             .map_err(|e| PyValueError::new_err(format!("Dec operation failed: {}", e)))
     }
 
