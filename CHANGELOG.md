@@ -32,18 +32,9 @@ but note that pre-1.0 releases may not adhere strictly to all guidelines.
     - secret <> cryptographic key, does not suggest cryptographic safe
     - is not extracted from master key => no related key safety issues with unsafe schemes
 
-- API BREAKING CHANGE: ObtextCodec API change:
-  - renamed dec_strict() -> dec()
-  - removed former scheme-autodetecting dec() method
-  - no more autodetection on static types
-
-- API BREAKING CHANGE: Ob/ObFlex API change
-  - former scheme-autodetecting dec() renamed to dec_auto_scheme()
-  - only Ob/ObFlex have such a method now.
-
 
 [1.0.0-rc.1] - 2025-12-19
---------------------
+-------------------------
 
 ### Changed
 
@@ -101,6 +92,15 @@ but note that pre-1.0 releases may not adhere strictly to all guidelines.
   - dec() -> dec_with_format(obtext, format) - format given
   - NEW: dec_with_encoding(obtext, encoding) - encoding given
   - autodec() -> autodec(obtext) - full autodecode
+
+- API BREAKING CHANGE: ObtextCodec API change:
+  - renamed dec_strict() -> dec()
+  - removed former scheme-autodetecting dec() method
+  - no more autodetection on static types
+
+- API BREAKING CHANGE: Ob/ObFlex API change
+  - former scheme-autodetecting dec() renamed to dec_auto_scheme()
+  - only Ob/ObFlex have such a method now.
 
 - API BREAKING CHANGE: Format constans from str to &Format:
   - AASV_C32: &str "aasv.c32" -> &Format{Scheme::Aasv, Encoding::C32}

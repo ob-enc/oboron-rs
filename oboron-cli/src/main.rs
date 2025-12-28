@@ -620,17 +620,17 @@ fn dec_command(
 
     // Get ob instance
     let ob = if keyless {
-        oboron::new_keyless(&format)?
+        oboron::Ob::new_keyless(&format)?
     } else {
         let b64_key = get_key(key.as_ref(), profile.as_deref(), cfg.as_ref())?;
-        oboron::new(&format, &b64_key)?
+        oboron::Ob::new(&format, &b64_key)?
     };
 
     // Decode (strict if scheme was explicitly specified)
     let decd = if scheme_is_explicit {
-        ob.dec_strict(&text)?
-    } else {
         ob.dec(&text)?
+    } else {
+        ob.dec_auto_scheme(&text)?
     };
 
     println!("{}", decd);
