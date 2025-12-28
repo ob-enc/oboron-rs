@@ -398,13 +398,13 @@ fn test_cross_scheme_decoding_should_fail() {
     let aags = AagsB64::from_bytes(&key).expect("Failed to create aags");
     let ot_aags = aags.enc(plaintext).expect("Failed to enc with aags");
 
-    // Try to dec with aasv using dec_strict (should fail)
+    // Try to dec with aasv using dec (should fail)
     let aasv = AasvB64::from_bytes(&key).expect("Failed to create aasv");
-    let result = aasv.dec_strict(&ot_aags);
+    let result = aasv.dec(&ot_aags);
 
     assert!(
         result.is_err(),
-        "dec_strict should fail when decoding aags ciphertext with aasv decr"
+        "dec should fail when decoding aags ciphertext with aasv decr"
     );
 
     eprintln!("✓ Cross-scheme decoding failure test passed");

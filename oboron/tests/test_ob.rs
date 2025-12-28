@@ -123,11 +123,13 @@ fn test_ob_scheme_autodetection() {
     // Decode with mock1 (different scheme, same encoding)
     let mock1 =
         Ob::from_bytes("mock1.b64", &key).expect("Failed to create Ob with mock1.b64 format");
-    let decd = mock1.dec(&encd).expect("Failed to dec with autodetection");
+    let decd = mock1
+        .dec_auto_scheme(&encd)
+        .expect("Failed to dec with autodetection");
     assert_eq!(decd, "test");
 
-    // But dec_strict fails (scheme mismatch)
-    assert!(mock1.dec_strict(&encd).is_err());
+    // But strict dec fails (scheme mismatch)
+    assert!(mock1.dec(&encd).is_err());
 }
 
 #[test]
@@ -141,7 +143,7 @@ fn test_ob_encoding_must_match() {
     // Try to dec with B64 (wrong encoding)
     let ob_b64 = Ob::from_bytes("mock1.b64", &key).expect("Failed to create Ob with b64");
     assert!(
-        ob_b64.dec(&encd).is_err(),
+        ob_b64.dec_auto_scheme(&encd).is_err(),
         "Should fail with wrong encoding"
     );
 }

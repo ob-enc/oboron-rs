@@ -57,7 +57,7 @@ fn test_all_vectors() {
                 .dec_with_format_str(&vector.obtext, &vector.format)
                 .unwrap_or_else(|e| {
                     panic!(
-                        "Failed to dec '{}' with format '{}': {:?}",
+                        "Failed to dec_with_format_str '{}' with format '{}': {:?}",
                         vector.obtext, vector.format, e
                     )
                 });

@@ -27,7 +27,7 @@ Crockford base32 encoding (e.g., `AagsC32`).
 | 128B       | 270.2 ns | 246.5 ns | 545.2 ns | 454.2 ns | 265.7 ns | 578.3 ns | 520.6 ns |
 
 
-## `dec_strict()` Performance
+## `dec()` Performance
 
 | Input Size | legacy     | zrbcx     | aags     | aasv     | upbc    | apgs    | apsv    |
 |-----------:|----------|----------|----------|----------|----------|----------|----------|

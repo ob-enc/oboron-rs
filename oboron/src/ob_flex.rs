@@ -245,6 +245,12 @@ impl ObFlex {
             core: ObCore::from_bytes_with_format(format, key)?,
         })
     }
+
+    /// Decode and decrypt obtext with scheme autodetection
+    #[inline]
+    pub fn dec_auto_scheme(&self, obtext: &str) -> Result<String, Error> {
+        self.core.dec_auto_scheme(obtext)
+    }
 }
 
 impl ObtextCodec for ObFlex {
@@ -254,10 +260,6 @@ impl ObtextCodec for ObFlex {
 
     fn dec(&self, obtext: &str) -> Result<String, Error> {
         self.core.dec(obtext)
-    }
-
-    fn dec_strict(&self, obtext: &str) -> Result<String, Error> {
-        self.core.dec_strict(obtext)
     }
 
     fn format(&self) -> Format {
@@ -295,16 +297,10 @@ impl ObFlex {
         <Self as ObtextCodec>::enc(self, plaintext)
     }
 
-    /// Decode and decrypt obtext (with scheme autodetection)
+    /// Decode and decrypt obtext (no scheme autodetection)
     #[inline]
     pub fn dec(&self, obtext: &str) -> Result<String, Error> {
         <Self as ObtextCodec>::dec(self, obtext)
-    }
-
-    /// Decode and decrypt obtext (strict - no autodetection)
-    #[inline]
-    pub fn dec_strict(&self, obtext: &str) -> Result<String, Error> {
-        <Self as ObtextCodec>::dec_strict(self, obtext)
     }
 
     /// Get the scheme

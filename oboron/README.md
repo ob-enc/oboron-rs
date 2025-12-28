@@ -861,8 +861,6 @@ consistent interface:
   obtext
 - `dec(obtext: &str) -> Result<String, Error>` - Decode with automatic
   scheme detection
-- `dec_strict(obtext: &str) -> Result<String, Error>` - Decode only
-  matching configured scheme (no autodetection; error if not matching)
 - `scheme() -> Scheme` - Current scheme
 - `encoding() -> Encoding` - Current encoding
 - `key() -> String` - Base64 key access

@@ -149,11 +149,6 @@ macro_rules! impl_legacy_codec {
             }
 
             fn dec(&self, obtext: &str) -> Result<String, Error> {
-                // Use autodetection to handle any scheme format
-                crate::dec_auto::dec_any_scheme(&self.keychain, self.format.encoding(), obtext)
-            }
-
-            fn dec_strict(&self, obtext: &str) -> Result<String, Error> {
                 // Only decode legacy format, no autodetection
                 let ciphertext = decode_obtext_to_ciphertext(self.format.encoding(), obtext)?;
                 Ok(unsafe {
@@ -286,6 +281,11 @@ macro_rules! impl_legacy_codec {
             pub fn new_keyless() -> Result<Self, Error> {
                 Self::from_bytes_internal(&HARDCODED_KEY_BYTES)
             }
+
+            pub fn dec_auto_scheme(&self, obtext: &str) {
+                // Use autodetection to handle any scheme format
+                crate::dec_auto::dec_any_scheme(&self.keychain, self.format.encoding(), obtext)
+            }
         }
 
         // Add inherent methods that delegate to trait methods
@@ -296,16 +296,10 @@ macro_rules! impl_legacy_codec {
                 <Self as ObtextCodec>::enc(self, plaintext)
             }
 
-            /// Decode and decrypt obtext (with scheme autodetection)
+            /// Decode and decrypt obtext (no scheme autodetection)
             #[inline]
             pub fn dec(&self, obtext: &str) -> Result<String, Error> {
                 <Self as ObtextCodec>::dec(self, obtext)
-            }
-
-            /// Decode and decrypt obtext (strict - no autodetection)
-            #[inline]
-            pub fn dec_strict(&self, obtext: &str) -> Result<String, Error> {
-                <Self as ObtextCodec>::dec_strict(self, obtext)
             }
 
             /// Get the format
@@ -363,7 +357,7 @@ mod tests {
         let ob = LegacyB32::new_keyless().unwrap();
         let pt = "hello world";
         let ot = ob.enc(pt).unwrap();
-        let pt2 = ob.dec_strict(&ot).unwrap();
+        let pt2 = ob.dec(&ot).unwrap();
         assert_eq!(pt, pt2);
     }
 
@@ -383,10 +377,10 @@ mod tests {
         let ot_hex = ob_hex.enc(pt).unwrap();
 
         // All should decode back to pt
-        assert_eq!(ob_c32.dec_strict(&ot_c32).unwrap(), pt);
-        assert_eq!(ob_b32.dec_strict(&ot_b32).unwrap(), pt);
-        assert_eq!(ob_b64.dec_strict(&ot_b64).unwrap(), pt);
-        assert_eq!(ob_hex.dec_strict(&ot_hex).unwrap(), pt);
+        assert_eq!(ob_c32.dec(&ot_c32).unwrap(), pt);
+        assert_eq!(ob_b32.dec(&ot_b32).unwrap(), pt);
+        assert_eq!(ob_b64.dec(&ot_b64).unwrap(), pt);
+        assert_eq!(ob_hex.dec(&ot_hex).unwrap(), pt);
 
         // Encodings should be different
         assert_ne!(ot_c32, ot_b64);
@@ -399,13 +393,13 @@ mod tests {
 
     #[test]
     #[cfg(feature = "keyless")]
-    fn test_legacy_dec_with_autodetect() {
+    fn test_legacy_dec_auto_scheme() {
         let ob = LegacyB32::new_keyless().unwrap();
         let pt = "autodetect test";
         let ot = ob.enc(pt).unwrap();
 
-        // decode() should work (uses autodetection)
-        let pt2 = ob.dec(&ot).unwrap();
+        // should work (uses autodetection)
+        let pt2 = ob.dec_auto_scheme(&ot).unwrap();
         assert_eq!(pt, pt2);
     }
 }

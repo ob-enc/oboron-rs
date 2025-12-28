@@ -12,7 +12,7 @@ fn test_zrbcx_basic() {
     let original = "hello world";
     let ob = ZrbcxC32::new_keyless().unwrap();
     let ot = ob.enc(original).unwrap();
-    let pt2 = ob.dec_strict(&ot).unwrap();
+    let pt2 = ob.dec(&ot).unwrap();
 
     assert_eq!(original, pt2);
     assert!(ot.len() > 0);
@@ -32,7 +32,7 @@ fn test_zrbcx_all_printable_ascii() {
     let original = (32..127).map(|c| c as u8 as char).collect::<String>();
     let ob = ZrbcxC32::new_keyless().unwrap();
     let ot = ob.enc(&original).unwrap();
-    let pt2 = ob.dec_strict(&ot).unwrap();
+    let pt2 = ob.dec(&ot).unwrap();
 
     assert_eq!(original, pt2);
 }
@@ -62,7 +62,7 @@ fn test_aags_deterministic() {
     // aags is deterministic - same input produces same output
     assert_eq!(ot1, ot2);
 
-    let pt2 = ob.dec_strict(&ot1).unwrap();
+    let pt2 = ob.dec(&ot1).unwrap();
     assert_eq!(original, pt2);
 }
 
@@ -78,8 +78,8 @@ fn test_upbc_probabilistic() {
     // upbc is probabilistic - same input produces different output
     assert_ne!(ot1, ot2);
 
-    let pt21 = ob.dec_strict(&ot1).unwrap();
-    let pt22 = ob.dec_strict(&ot2).unwrap();
+    let pt21 = ob.dec(&ot1).unwrap();
+    let pt22 = ob.dec(&ot2).unwrap();
     assert_eq!(original, pt21);
     assert_eq!(original, pt22);
 }

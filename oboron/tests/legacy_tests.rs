@@ -25,7 +25,7 @@ fn test_legacy_basic() {
     let pt = "hello world";
     let ob = LegacyC32::new_keyless().unwrap();
     let ot = ob.enc(pt).unwrap();
-    let pt2 = ob.dec_strict(&ot).unwrap();
+    let pt2 = ob.dec(&ot).unwrap();
 
     assert_eq!(pt, pt2);
     assert!(ot.len() > 0);
@@ -46,7 +46,7 @@ fn test_legacy_with_equals_padding() {
     let pt = "test==";
     let ob = LegacyC32::new_keyless().unwrap();
     let ot = ob.enc(pt).unwrap();
-    let pt2 = ob.dec_strict(&ot).unwrap();
+    let pt2 = ob.dec(&ot).unwrap();
 
     // legacy strips trailing '='
     assert_eq!("test", pt2);
@@ -59,7 +59,7 @@ fn test_legacy_custom_keys() {
 
     let ob = LegacyC32::from_bytes(&key).unwrap();
     let ot = ob.enc(pt).unwrap();
-    let pt2 = ob.dec_strict(&ot).unwrap();
+    let pt2 = ob.dec(&ot).unwrap();
 
     assert_eq!(pt, pt2);
 }
@@ -74,7 +74,7 @@ fn test_legacy_different_key_fails() {
     let ob2 = LegacyC32::from_bytes(&key2).unwrap();
 
     let ot = ob1.enc(pt).unwrap();
-    let pt2 = ob2.dec_strict(&ot);
+    let pt2 = ob2.dec(&ot);
 
     // Should fail or produce garbage (not the pt)
     assert!(pt2.is_err() || pt2.unwrap() != pt);
@@ -94,9 +94,9 @@ fn test_legacy_all_encodings() {
     let enc_hex = ob_hex.enc(pt).unwrap();
 
     // All should dec back to pt
-    assert_eq!(ob_b32.dec_strict(&enc_b32).unwrap(), pt);
-    assert_eq!(ob_b64.dec_strict(&enc_b64).unwrap(), pt);
-    assert_eq!(ob_hex.dec_strict(&enc_hex).unwrap(), pt);
+    assert_eq!(ob_b32.dec(&enc_b32).unwrap(), pt);
+    assert_eq!(ob_b64.dec(&enc_b64).unwrap(), pt);
+    assert_eq!(ob_hex.dec(&enc_hex).unwrap(), pt);
 
     // Encodings should be different
     assert_ne!(enc_b32, enc_b64);
@@ -114,7 +114,7 @@ fn test_legacy_long_string() {
     let pt = "a".repeat(1000);
     let ob = LegacyC32::new_keyless().unwrap();
     let ot = ob.enc(&pt).unwrap();
-    let pt2 = ob.dec_strict(&ot).unwrap();
+    let pt2 = ob.dec(&ot).unwrap();
 
     assert_eq!(pt, pt2);
 }
@@ -124,7 +124,7 @@ fn test_legacy_special_characters() {
     let pt = "hello\nworld\t!  @#$%^&*()";
     let ob = LegacyC32::new_keyless().unwrap();
     let ot = ob.enc(pt).unwrap();
-    let pt2 = ob.dec_strict(&ot).unwrap();
+    let pt2 = ob.dec(&ot).unwrap();
 
     assert_eq!(pt, pt2);
 }
@@ -134,7 +134,7 @@ fn test_legacy_unicode() {
     let pt = "Hello 世界 🌍";
     let ob = LegacyC32::new_keyless().unwrap();
     let ot = ob.enc(pt).unwrap();
-    let pt2 = ob.dec_strict(&ot).unwrap();
+    let pt2 = ob.dec(&ot).unwrap();
 
     assert_eq!(pt, pt2);
 }
@@ -152,7 +152,7 @@ fn test_legacy_hex_key() {
 
     let ob = LegacyC32::from_hex_key(hex_key).unwrap();
     let ot = ob.enc(pt).unwrap();
-    let pt2 = ob.dec_strict(&ot).unwrap();
+    let pt2 = ob.dec(&ot).unwrap();
 
     assert_eq!(pt, pt2);
 }
@@ -179,7 +179,7 @@ fn test_legacy_vector_test() {
     println!("Encoded '{}' as: {}", plaintext, ot);
 
     // Then verify roundtrip
-    let pt2 = ob.dec_strict(&ot).unwrap();
+    let pt2 = ob.dec(&ot).unwrap();
     assert_eq!(pt2, plaintext);
 }
 
@@ -216,7 +216,7 @@ fn test_legacy_roundtrip_vectors() {
 
     for plaintext in test_cases {
         let ot = ob.enc(plaintext).unwrap();
-        let pt2 = ob.dec_strict(&ot).unwrap();
+        let pt2 = ob.dec(&ot).unwrap();
         assert_eq!(pt2, plaintext, "Roundtrip failed for: {}", plaintext);
     }
 }
@@ -232,25 +232,7 @@ fn test_legacy_keyless_encoding() {
         let ot = ob.enc(plaintext).unwrap();
         println!("Public key ot '{}' as: {}", plaintext, ot);
 
-        let pt2 = ob.dec_strict(&ot).unwrap();
+        let pt2 = ob.dec(&ot).unwrap();
         assert_eq!(pt2, plaintext);
     }
-}
-
-// If you have actual legacy ot strings, add them here:
-#[test]
-#[ignore] // Remove this when you have actual legacy vectors
-fn test_specific_legacy_vectors() {
-    // let ob = LegacyC32::new_keyless().unwrap();
-
-    // Example format (uncomment and add real vectors when available):
-    // let vectors = vec![
-    //     ("ot_string_1", "expected_plaintext_1"),
-    //     ("ot_string_2", "expected_plaintext_2"),
-    // ];
-    //
-    // for (ot, expected) in vectors {
-    //     let pt2 = ob.dec(ot).unwrap();
-    //     assert_eq!(pt2, expected, "Failed to dec legacy vector: {}", ot);
-    // }
 }

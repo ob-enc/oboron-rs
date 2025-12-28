@@ -106,7 +106,7 @@ fn test_mock1_keyless() {
 }
 
 #[test]
-fn test_mock1_dec_strict() {
+fn test_mock1_dec() {
     let key = oboron::generate_key();
     let mock1 = oboron::Mock1C32::new(&key).unwrap();
 
@@ -114,7 +114,7 @@ fn test_mock1_dec_strict() {
     let encd = mock1.enc(plaintext).unwrap();
 
     // Strict dec should work with matching scheme
-    assert_eq!(mock1.dec_strict(&encd).unwrap(), plaintext);
+    assert_eq!(mock1.dec(&encd).unwrap(), plaintext);
 }
 
 #[test]
@@ -128,10 +128,10 @@ fn test_mock1_cannot_dec_other_schemes_strict() {
     let encd_aasv = aasv.enc(plaintext).unwrap();
 
     // Strict dec should fail when scheme doesn't match
-    assert!(mock1.dec_strict(&encd_aasv).is_err());
+    assert!(mock1.dec(&encd_aasv).is_err());
 
-    // But regular dec (with autodetection) should work
-    assert_eq!(mock1.dec(&encd_aasv).unwrap(), plaintext);
+    // But scheme-autodetecting dec should work
+    assert_eq!(mock1.dec_auto_scheme(&encd_aasv).unwrap(), plaintext);
 }
 
 #[test]
@@ -297,11 +297,11 @@ fn test_mock1_encoding_mismatch() {
     let enc_b32 = ob_b32.enc(plaintext).unwrap();
 
     // Strict dec with wrong encoding should fail
-    assert!(ob_b64.dec_strict(&enc_b32).is_err());
+    assert!(ob_b64.dec(&enc_b32).is_err());
 
     // But autodetect dec won't work across encodings
     // (autodetect only handles scheme, not encoding)
-    assert!(ob_b64.dec(&enc_b32).is_err());
+    assert!(ob_b64.dec_auto_scheme(&enc_b32).is_err());
 }
 
 #[test]

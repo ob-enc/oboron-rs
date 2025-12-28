@@ -87,10 +87,10 @@ fn test_legacy_vectors() {
         }
 
         // Test strict decoding
-        let pt2 = match ob.dec_strict(&vector.obtext) {
+        let pt2 = match ob.dec(&vector.obtext) {
             Ok(d) => d,
             Err(e) => {
-                println!("Failed to dec_strict at vector {}: {}", index, e);
+                println!("Failed to dec at vector {}: {}", index, e);
                 continue;
             }
         };
@@ -101,7 +101,7 @@ fn test_legacy_vectors() {
         }
 
         // Test autodetection
-        let autodetected = match ob.dec(&vector.obtext) {
+        let autodetected = match ob.dec_auto_scheme(&vector.obtext) {
             Ok(a) => a,
             Err(e) => {
                 println!("Failed to autodetect at vector {}: {}", index, e);

@@ -14,11 +14,8 @@ pub trait ObtextCodec {
     /// Encode a plaintext string.
     fn enc(&self, plaintext: &str) -> Result<String, Error>;
 
-    /// Decode an encoded string back to plaintext with scheme autodetection.
+    /// Decode an encoded string back to plaintext
     fn dec(&self, obtext: &str) -> Result<String, Error>;
-
-    /// Decode an encoded string back to plaintext, strictly using the configured scheme.
-    fn dec_strict(&self, obtext: &str) -> Result<String, Error>;
 
     /// Get the full format (encapsulating scheme + encoding) used by this instance
     fn format(&self) -> Format;
@@ -110,6 +107,12 @@ macro_rules! impl_codec {
                     keychain: Keychain::from_bytes(key_bytes)?,
                 })
             }
+
+            #[inline]
+            fn dec_auto_scheme(&self, obtext: &str) -> Result<String, Error> {
+                // Use autodetection for cross-scheme compatibility
+                crate::dec_auto::dec_any_scheme(&self.keychain, $encoding, obtext)
+            }
         }
 
         impl ObtextCodec for $name {
@@ -121,12 +124,6 @@ macro_rules! impl_codec {
 
             #[inline]
             fn dec(&self, obtext: &str) -> Result<String, Error> {
-                // Use autodetection for cross-scheme compatibility
-                crate::dec_auto::dec_any_scheme(&self.keychain, $encoding, obtext)
-            }
-
-            #[inline]
-            fn dec_strict(&self, obtext: &str) -> Result<String, Error> {
                 // Decode with known encoding - direct call
                 let format = Format::new($scheme, $encoding);
                 crate::dec::dec_from_format(obtext, format, &self.keychain)
@@ -173,16 +170,10 @@ macro_rules! impl_codec {
                 <Self as ObtextCodec>::enc(self, plaintext)
             }
 
-            /// Decode and decrypt obtext (with scheme autodetection)
+            /// Decode and decrypt obtext (no scheme autodetection)
             #[inline]
             pub fn dec(&self, obtext: &str) -> Result<String, Error> {
                 <Self as ObtextCodec>::dec(self, obtext)
-            }
-
-            /// Decode and decrypt obtext (strict - no autodetection)
-            #[inline]
-            pub fn dec_strict(&self, obtext: &str) -> Result<String, Error> {
-                <Self as ObtextCodec>::dec_strict(self, obtext)
             }
 
             /// Get the format
@@ -477,7 +468,6 @@ macro_rules! delegate_to_inner {
 impl ObtextCodec for ObAny {
     delegate_to_inner!(fn enc(&self, plaintext: &str) -> Result<String, Error>);
     delegate_to_inner!(fn dec(&self, obtext: &str) -> Result<String, Error>);
-    delegate_to_inner!(fn dec_strict(&self, obtext: &str) -> Result<String, Error>);
     delegate_to_inner!(fn format(&self) -> Format);
     delegate_to_inner!(fn scheme(&self) -> Scheme);
     delegate_to_inner!(fn encoding(&self) -> Encoding);
@@ -1229,7 +1219,7 @@ mod tests {
                 let ob = new_with_format(format, &key).unwrap();
 
                 let ot = ob.enc(&plaintext).unwrap();
-                let pt2 = ob.dec_strict(&ot).unwrap();
+                let pt2 = ob.dec(&ot).unwrap();
 
                 assert_eq!(
                     pt2, plaintext,

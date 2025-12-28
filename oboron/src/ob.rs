@@ -16,7 +16,7 @@ use crate::{ob_core::ObCore, Encoding, Error, Format, ObtextCodec, Scheme};
 /// # fn main() -> Result<(), oboron::Error> {
 /// # #[cfg(feature = "aasv")]
 /// # {
-/// # use oboron::{Ob, ObtextCodec, generate_key};
+/// # use oboron::{Ob, generate_key};
 /// # let key = generate_key();
 /// let ob = Ob::new("aasv.b64", &key)?;
 /// let ot = ob.enc("hello")?; // obtext
@@ -267,6 +267,10 @@ impl Ob {
             core: ObCore::from_bytes_with_format(format, key)?,
         })
     }
+
+    pub fn dec_auto_scheme(&self, obtext: &str) -> Result<String, Error> {
+        self.core.dec_auto_scheme(obtext)
+    }
 }
 
 impl ObtextCodec for Ob {
@@ -276,10 +280,6 @@ impl ObtextCodec for Ob {
 
     fn dec(&self, obtext: &str) -> Result<String, Error> {
         self.core.dec(obtext)
-    }
-
-    fn dec_strict(&self, obtext: &str) -> Result<String, Error> {
-        self.core.dec_strict(obtext)
     }
 
     fn format(&self) -> Format {
@@ -317,16 +317,10 @@ impl Ob {
         <Self as ObtextCodec>::enc(self, plaintext)
     }
 
-    /// Decode and decrypt obtext (with scheme autodetection)
+    /// Decode and decrypt obtext (no scheme autodetection)
     #[inline]
     pub fn dec(&self, obtext: &str) -> Result<String, Error> {
         <Self as ObtextCodec>::dec(self, obtext)
-    }
-
-    /// Decode and decrypt obtext (strict - no autodetection)
-    #[inline]
-    pub fn dec_strict(&self, obtext: &str) -> Result<String, Error> {
-        <Self as ObtextCodec>::dec_strict(self, obtext)
     }
 
     /// Get the scheme

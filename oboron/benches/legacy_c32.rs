@@ -86,18 +86,6 @@ fn run_legacy_c32_benchmarks(c: &mut Criterion) {
                     });
                 }
             }
-            "dec_strict" => {
-                if let Some(precompute) = spec.precompute {
-                    // Precompute outside timed loop
-                    let ot = ob.enc(&precompute.plaintext).unwrap();
-                    bench_count += 1;
-
-                    // Only the dec_strict operation is timed
-                    c.bench_function(&spec.id, |b| {
-                        b.iter(|| ob.dec_strict(black_box(&ot)).unwrap());
-                    });
-                }
-            }
             _ => {
                 eprintln!("Skipping unknown operation: {}", spec.operation);
             }

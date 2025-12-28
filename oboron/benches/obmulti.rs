@@ -82,7 +82,7 @@ fn run_obmulti_benchmarks(c: &mut Criterion) {
                     });
                 }
             }
-            "dec" => {
+            "dec_with_format_str" => {
                 let format = match spec.format {
                     Some(f) => f,
                     None => {
@@ -98,7 +98,7 @@ fn run_obmulti_benchmarks(c: &mut Criterion) {
 
                     // Only the dec operation is timed
                     c.bench_function(&spec.id, |b| {
-                        b.iter(|| ob.dec(black_box(&ot), &format).unwrap());
+                        b.iter(|| ob.dec_with_format_str(black_box(&ot), &format).unwrap());
                     });
                 }
             }

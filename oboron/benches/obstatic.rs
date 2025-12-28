@@ -116,27 +116,8 @@ fn run_standard_benchmarks(c: &mut Criterion) {
                     }
                 }
             }
-            "dec_strict" => {
-                // For dec_strict, format is at top level
-                let format = match &spec.format {
-                    Some(f) => f,
-                    None => continue,
-                };
-
-                // Create ob ONCE, outside the timed loop
-                let ob = match oboron::new_keyless(format) {
-                    Ok(e) => e,
-                    Err(_) => continue,
-                };
-
-                if let Some(precompute) = spec.precompute {
-                    if let Some(ot) = precompute_value(&precompute) {
-                        // Only the dec_strict operation is timed
-                        c.bench_function(&spec.id, |b| {
-                            b.iter(|| ob.dec_strict(black_box(&ot)).unwrap());
-                        });
-                    }
-                }
+            "dec_auto_scheme" => {
+                // Static ObXX interface doesn't support dec_auto_scheme
             }
             "autodec" => {
                 // Static ObXX interface doesn't support autodec

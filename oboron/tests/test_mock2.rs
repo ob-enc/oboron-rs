@@ -78,12 +78,12 @@ fn test_mock2_cross_scheme_with_mock1() {
     let ot70 = mock1.enc(plaintext).unwrap();
 
     // Strict dec should fail across schemes
-    assert!(mock2.dec_strict(&ot70).is_err());
-    assert!(mock1.dec_strict(&ot71).is_err());
+    assert!(mock2.dec(&ot70).is_err());
+    assert!(mock1.dec(&ot71).is_err());
 
     // But auto-detect dec should work
-    assert_eq!(mock2.dec(&ot70).unwrap(), plaintext);
-    assert_eq!(mock1.dec(&ot71).unwrap(), plaintext);
+    assert_eq!(mock2.dec_auto_scheme(&ot70).unwrap(), plaintext);
+    assert_eq!(mock1.dec_auto_scheme(&ot71).unwrap(), plaintext);
 }
 
 #[test]

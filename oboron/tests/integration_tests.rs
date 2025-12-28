@@ -91,10 +91,10 @@ fn test_cross_scheme_decoding() {
     let enc32 = aasv.enc("world").unwrap();
 
     // Auto-detection should work across schemes
-    assert_eq!(aags.dec(&enc32).unwrap(), "world");
-    assert_eq!(aasv.dec(&enc31).unwrap(), "hello");
+    assert_eq!(aags.dec_auto_scheme(&enc32).unwrap(), "world");
+    assert_eq!(aasv.dec_auto_scheme(&enc31).unwrap(), "hello");
 
     // Strict decoding should fail
-    assert!(aags.dec_strict(&enc32).is_err());
-    assert!(aasv.dec_strict(&enc31).is_err());
+    assert!(aags.dec(&enc32).is_err());
+    assert!(aasv.dec(&enc31).is_err());
 }

@@ -1,3 +1,5 @@
+//! ObCore is the common functionality shared by Ob and ObFlex
+
 #[cfg(feature = "keyless")]
 use crate::constants::HARDCODED_KEY_BYTES;
 use crate::{Encoding, Error, Format, Keychain, ObtextCodec, Scheme};
@@ -105,6 +107,10 @@ impl ObCore {
             format,
         })
     }
+
+    pub(crate) fn dec_auto_scheme(&self, obtext: &str) -> Result<String, Error> {
+        crate::dec_auto::dec_any_scheme(&self.keychain, self.format.encoding(), obtext)
+    }
 }
 
 impl ObtextCodec for ObCore {
@@ -113,10 +119,6 @@ impl ObtextCodec for ObCore {
     }
 
     fn dec(&self, obtext: &str) -> Result<String, Error> {
-        crate::dec_auto::dec_any_scheme(&self.keychain, self.format.encoding(), obtext)
-    }
-
-    fn dec_strict(&self, obtext: &str) -> Result<String, Error> {
         crate::dec::dec_from_format(obtext, self.format, &self.keychain)
     }
 
