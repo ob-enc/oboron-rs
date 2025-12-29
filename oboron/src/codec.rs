@@ -209,6 +209,142 @@ macro_rules! impl_codec {
     };
 }
 
+/// Macro for z-tier (insecure obfuscation-only) schemes.
+///
+/// These schemes use a hardcoded key and provide no real security.
+/// Only :: new_keyless() constructor is available - no custom keys allowed.
+#[cfg(feature = "zrbcx")]
+macro_rules! impl_ztier_codec {
+    (
+        $name: ident,           // Type name (e.g., ZrbcxC32)
+        $scheme:expr,          // Scheme constant (e.g., Scheme::Zrbcx)
+        $encoding:expr,        // Encoding constant (e.g., Encoding::C32)
+        $format_str:expr       // Format string for docs (e.g., "zrbcx.c32")
+    ) => {
+        #[doc = concat! ("**INSECURE OBFUSCATION-ONLY** ObtextCodec for ", $format_str, ".\n\n")]
+        #[doc = "⚠️ This scheme uses a hardcoded key and provides no security.\n"]
+        #[doc = "Use only for obfuscation, never for actual encryption.\n\n"]
+        #[doc = concat!("Corresponds to format string: `\"", $format_str, "\"`")]
+        #[allow(non_camel_case_types)]
+        pub struct $name {
+            keychain: Keychain,
+        }
+
+        impl $name {
+            /// Create a new instance with hardcoded key (obfuscation only).
+            ///
+            /// **WARNING**: This uses a publicly available hardcoded key and provides no security.
+            #[inline]
+            #[cfg(feature = "keyless")]
+            pub fn new_keyless() -> Result<Self, Error> {
+                Ok(Self {
+                    keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
+                })
+            }
+
+            /// Internal constructor used by factory functions.
+            #[inline]
+            #[cfg(any(feature = "keyless", feature = "bytes-keys"))]
+            fn from_bytes_internal(key_bytes: &[u8; 64]) -> Result<Self, Error> {
+                Ok(Self {
+                    keychain: Keychain::from_bytes(key_bytes)?,
+                })
+            }
+        }
+
+        impl ObtextCodec for $name {
+            #[inline]
+            fn enc(&self, plaintext: &str) -> Result<String, Error> {
+                let format = Format::new($scheme, $encoding);
+                crate::enc::enc_to_format(plaintext, format, &self.keychain)
+            }
+
+            #[inline]
+            fn dec(&self, obtext: &str) -> Result<String, Error> {
+                let format = Format::new($scheme, $encoding);
+                crate::dec::dec_from_format(obtext, format, &self.keychain)
+            }
+
+            #[inline]
+            fn format(&self) -> Format {
+                Format::new($scheme, $encoding)
+            }
+
+            #[inline]
+            fn scheme(&self) -> Scheme {
+                $scheme
+            }
+
+            #[inline]
+            fn encoding(&self) -> Encoding {
+                $encoding
+            }
+
+            #[inline]
+            fn key(&self) -> String {
+                self.keychain.key_base64()
+            }
+
+            #[inline]
+            #[cfg(feature = "hex-keys")]
+            fn key_hex(&self) -> String {
+                self.keychain.key_hex()
+            }
+
+            #[inline]
+            #[cfg(feature = "bytes-keys")]
+            fn key_bytes(&self) -> &[u8; 64] {
+                self.keychain.key_bytes()
+            }
+        }
+
+        // Add inherent methods that delegate to trait methods
+        impl $name {
+            #[inline]
+            pub fn enc(&self, plaintext: &str) -> Result<String, Error> {
+                <Self as ObtextCodec>::enc(self, plaintext)
+            }
+
+            #[inline]
+            pub fn dec(&self, obtext: &str) -> Result<String, Error> {
+                <Self as ObtextCodec>::dec(self, obtext)
+            }
+
+            #[inline]
+            pub fn format(&self) -> Format {
+                <Self as ObtextCodec>::format(self)
+            }
+
+            #[inline]
+            pub fn scheme(&self) -> Scheme {
+                <Self as ObtextCodec>::scheme(self)
+            }
+
+            #[inline]
+            pub fn encoding(&self) -> Encoding {
+                <Self as ObtextCodec>::encoding(self)
+            }
+
+            #[inline]
+            pub fn key(&self) -> String {
+                <Self as ObtextCodec>::key(self)
+            }
+
+            #[cfg(feature = "hex-keys")]
+            #[inline]
+            pub fn key_hex(&self) -> String {
+                <Self as ObtextCodec>::key_hex(self)
+            }
+
+            #[cfg(feature = "bytes-keys")]
+            #[inline]
+            pub fn key_bytes(&self) -> &[u8; 64] {
+                <Self as ObtextCodec>::key_bytes(self)
+            }
+        }
+    };
+}
+
 // Generate all scheme+encoding combinations using the optimized macro
 
 // aags variants
@@ -263,13 +399,13 @@ impl_codec!(UpbcHex, Scheme::Upbc, Encoding::Hex, "upbc.hex");
 
 // zrbcx variants
 #[cfg(feature = "zrbcx")]
-impl_codec!(ZrbcxB32, Scheme::Zrbcx, Encoding::B32, "zrbcx.b32");
+impl_ztier_codec!(ZrbcxB32, Scheme::Zrbcx, Encoding::B32, "zrbcx.b32");
 #[cfg(feature = "zrbcx")]
-impl_codec!(ZrbcxC32, Scheme::Zrbcx, Encoding::C32, "zrbcx.c32");
+impl_ztier_codec!(ZrbcxC32, Scheme::Zrbcx, Encoding::C32, "zrbcx.c32");
 #[cfg(feature = "zrbcx")]
-impl_codec!(ZrbcxB64, Scheme::Zrbcx, Encoding::B64, "zrbcx.b64");
+impl_ztier_codec!(ZrbcxB64, Scheme::Zrbcx, Encoding::B64, "zrbcx.b64");
 #[cfg(feature = "zrbcx")]
-impl_codec!(ZrbcxHex, Scheme::Zrbcx, Encoding::Hex, "zrbcx.hex");
+impl_ztier_codec!(ZrbcxHex, Scheme::Zrbcx, Encoding::Hex, "zrbcx.hex");
 
 // Testing
 
@@ -782,13 +918,13 @@ pub fn new(fmt: &str, key: &str) -> Result<ObAny, Error> {
 pub fn new_with_format(format: Format, key: &str) -> Result<ObAny, Error> {
     match (format.scheme(), format.encoding()) {
         #[cfg(feature = "zrbcx")]
-        (Scheme::Zrbcx, Encoding::C32) => Ok(ObAny::ZrbcxC32(ZrbcxC32::new(key)?)),
+        (Scheme::Zrbcx, Encoding::C32) => Ok(ObAny::ZrbcxC32(ZrbcxC32::new_keyless()?)),
         #[cfg(feature = "zrbcx")]
-        (Scheme::Zrbcx, Encoding::B32) => Ok(ObAny::ZrbcxB32(ZrbcxB32::new(key)?)),
+        (Scheme::Zrbcx, Encoding::B32) => Ok(ObAny::ZrbcxB32(ZrbcxB32::new_keyless()?)),
         #[cfg(feature = "zrbcx")]
-        (Scheme::Zrbcx, Encoding::B64) => Ok(ObAny::ZrbcxB64(ZrbcxB64::new(key)?)),
+        (Scheme::Zrbcx, Encoding::B64) => Ok(ObAny::ZrbcxB64(ZrbcxB64::new_keyless()?)),
         #[cfg(feature = "zrbcx")]
-        (Scheme::Zrbcx, Encoding::Hex) => Ok(ObAny::ZrbcxHex(ZrbcxHex::new(key)?)),
+        (Scheme::Zrbcx, Encoding::Hex) => Ok(ObAny::ZrbcxHex(ZrbcxHex::new_keyless()?)),
         #[cfg(feature = "upbc")]
         (Scheme::Upbc, Encoding::C32) => Ok(ObAny::UpbcC32(UpbcC32::new(key)?)),
         #[cfg(feature = "upbc")]

@@ -39,7 +39,7 @@ all-siv-schemes = ["aasv", "apsv"]  # Shares AES-SIV deps
 
 # Individual schemes
 # ==================
-zrbcx = ["aes", "cipher", "cbc"]
+zrbcx = ["aes", "cipher", "cbc", "keyless"]
 upbc = ["aes", "cipher", "cbc"]
 aags = ["aes-gcm-siv"]
 apgs = ["aes-gcm-siv"]

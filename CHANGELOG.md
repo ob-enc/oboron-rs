@@ -14,22 +14,20 @@ but note that pre-1.0 releases may not adhere strictly to all guidelines.
 
 - Batch and iter versions of all `enc*()`/`dec*()` methods and functions.
 
+- `ZrbcxXXX::new_with_secret(&secret)` - takes a 256-bit secret that is used as key + IV for CBC
+    - "secret" does not have the implication of cryptographic key, does not suggest cryptographic safe
+    - is not extracted from master key => no related key safety issues with unsafe schemes
+
 ### Changed
 
 - DATA FORMAT BREAKING CHANGE
   - switched from 1B scheme byte to 2B scheme marker
-  - structure: `[ext][tier][properties][algorithm]`
+  - structure: `[ext][version][tier][properties][algorithm]`
     - `[ext]` (1 bit): flip on when more bytes are needed (scheme marker extension)
+    - `[version]` (4 bits): version (used for data format changes, logic changes, key extraction changes etc.)
     - `[tier]` (3 bits): `a`, `u`, `z`, `mock`
-    - `[properties]` (4 bits): `h`, `f`, `p`
-    - `[algorithm]`: 11 bits
-
-
-- `zrbcx` to not use Oboron master key any more; two constructors possible:
-  - ::new_keyless() - keyless feature always enabled with zrbcx
-  - ::new_with_secret(&secret) - takes a 256-bit secret that is used as key + IV for CBC
-    - secret <> cryptographic key, does not suggest cryptographic safe
-    - is not extracted from master key => no related key safety issues with unsafe schemes
+    - `[properties]` (4 bits): `a`, `r`, `p`
+    - `[algorithm]` (4 bits): representing `cb`, `sv`, `gs`
 
 
 [1.0.0-rc.1] - 2025-12-19
@@ -104,6 +102,11 @@ but note that pre-1.0 releases may not adhere strictly to all guidelines.
 - API BREAKING CHANGE: Format constans from str to &Format:
   - AASV_C32: &str "aasv.c32" -> &Format{Scheme::Aasv, Encoding::C32}
   - new AASV_C32_STR constants
+
+- API BREAKING CHANGE, DATA FORMAT BREAKING CHANGE:
+  - `zrbcx` to not use Oboron master key any more
+  - no more `ZrbcxXXX::new()` constructor, only `::new_keyless()`
+  - keyless feature always enabled with zrbcx
 
 - DATA FORMAT BREAKING CHANGE: `upbc` to use 256-bit encryption (was 128-bit)
 

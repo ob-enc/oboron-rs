@@ -477,7 +477,7 @@ fn test_deterministic_schemes_consistency() {
     let iterations = 100;
 
     // Test Zrbcx
-    let zrbcx = ZrbcxB64::from_bytes(&key).expect("Failed to create zrbcx");
+    let zrbcx = ZrbcxB64::new_keyless().expect("Failed to create zrbcx");
     let first = zrbcx.enc(plaintext).expect("Failed to enc with zrbcx");
     for _ in 0..iterations {
         let ot = zrbcx.enc(plaintext).expect("Failed to enc with zrbcx");
