@@ -1,5 +1,6 @@
 use crate::{
     base32::{BASE32_CROCKFORD, BASE32_RFC},
+    constants::SCHEME_MARKER_SIZE,
     error::Error,
     Encoding, Format, Keychain, Scheme,
 };
@@ -29,7 +30,7 @@ use crate::encrypt_mock2;
 /// Steps:
 /// 1. Call scheme-specific encrypt function
 /// 2. Optionally Reverse the bytes
-/// 3. Append scheme byte to ciphertext payload
+/// 3. Append 2-byte scheme marker to ciphertext payload
 /// 4. Encode to specified format
 pub(crate) fn enc_to_format(
     plaintext: &str,
@@ -61,24 +62,28 @@ pub(crate) fn enc_to_format(
         Scheme::Mock2 => encrypt_mock2(keychain.mock2(), plaintext.as_bytes())?,
         // Legacy - legacy does not use this call path
         #[cfg(feature = "legacy")]
-        Scheme::Legacy => unreachable!("called generic dec function for legacy"),
+        Scheme::Legacy => unreachable!("called generic enc function for legacy"),
     };
 
-    // Step 2+3: Build payload with scheme byte and conditionally reverse
-    let mut payload = Vec::with_capacity(ciphertext.len() + 1);
+    // Step 2+3: Build payload with 2-byte scheme marker and conditionally reverse
+    let marker = format.scheme().marker();
+    let mut payload = Vec::with_capacity(ciphertext.len() + SCHEME_MARKER_SIZE);
+
     if format.scheme().is_ciphertext_reversed() {
-        // Reversed schemes: prepend scheme byte, append ciphertext, then reverse in-place
-        payload.push(format.scheme().byte());
+        // Reversed schemes: prepend marker, append ciphertext, then reverse in-place
+        payload.extend_from_slice(&marker);
         payload.extend_from_slice(&ciphertext);
-        payload.reverse(); // scheme byte at tail
+        payload.reverse(); // marker at tail
     } else {
-        // Non-reversed schemes: append ciphertext, then scheme byte
+        // Non-reversed schemes: append ciphertext, then marker
         payload.extend_from_slice(&ciphertext);
-        payload.push(format.scheme().byte()); // scheme byte at tail
+        payload.extend_from_slice(&marker);
     }
-    // XOR the scheme byte with the first byte for entropy
+
+    // XOR the scheme marker bytes with the first two bytes for entropy
     let len = payload.len();
     payload[len - 1] ^= payload[0];
+    payload[len - 2] ^= payload[1];
 
     // Step 4: Encode to specified format
     match format.encoding() {

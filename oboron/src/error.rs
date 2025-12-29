@@ -45,7 +45,10 @@ pub enum Error {
     DecryptionFailed,
     #[error("invalid block length")]
     InvalidBlockLength,
+    #[error("decoding failed: scheme marker mismatch")]
+    SchemeMarkerMismatch,
     #[error("decoding failed: scheme byte mismatch")]
+    #[deprecated(since = "1.0.0", note = "Use SchemeMarkerMismatch instead")]
     SchemeByteMismatch,
     #[cfg(feature = "legacy")]
     #[error("legacy fallback produced invalid output (likely encoding mismatch)")]

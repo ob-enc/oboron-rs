@@ -1,4 +1,4 @@
-//! Scheme identifiers for oboron encryption schemes.
+//!  Scheme identifiers for oboron encryption schemes.
 
 use crate::{constants, error::Error};
 
@@ -92,33 +92,45 @@ impl Scheme {
 
     /// Only schemes that need byte reversal for prefix entropy maximization use it
     pub fn is_ciphertext_reversed(&self) -> bool {
-        constants::REVERSED_SCHEME_BYTES.contains(&self.byte())
+        constants::REVERSED_SCHEME_MARKERS
+            .iter()
+            .any(|m| m == &self.marker())
     }
 
-    /// Get the tail byte for this scheme.
-    pub fn byte(&self) -> u8 {
+    /// Get the 2-byte scheme marker for this scheme.
+    pub fn marker(&self) -> [u8; 2] {
         match self {
             #[cfg(feature = "zrbcx")]
-            Scheme::Zrbcx => constants::ZRBCX_BYTE,
+            Scheme::Zrbcx => constants::ZRBCX_MARKER,
             #[cfg(feature = "upbc")]
-            Scheme::Upbc => constants::UPBC_BYTE,
+            Scheme::Upbc => constants::UPBC_MARKER,
             #[cfg(feature = "aags")]
-            Scheme::Aags => constants::AAGS_BYTE,
+            Scheme::Aags => constants::AAGS_MARKER,
             #[cfg(feature = "apgs")]
-            Scheme::Apgs => constants::APGS_BYTE,
+            Scheme::Apgs => constants::APGS_MARKER,
             #[cfg(feature = "aasv")]
-            Scheme::Aasv => constants::AASV_BYTE,
+            Scheme::Aasv => constants::AASV_MARKER,
             #[cfg(feature = "apsv")]
-            Scheme::Apsv => constants::APSV_BYTE,
+            Scheme::Apsv => constants::APSV_MARKER,
             // Testing
             #[cfg(feature = "mock")]
-            Scheme::Mock1 => constants::MOCK1_BYTE,
+            Scheme::Mock1 => constants::MOCK1_MARKER,
             #[cfg(feature = "mock")]
-            Scheme::Mock2 => constants::MOCK2_BYTE,
+            Scheme::Mock2 => constants::MOCK2_MARKER,
             // Legacy
             #[cfg(feature = "legacy")]
-            Scheme::Legacy => unreachable!("legacy does not use a scheme byte"),
+            Scheme::Legacy => unreachable!("legacy does not use a scheme marker"),
         }
+    }
+
+    /// Legacy compatibility:  get single byte representation (deprecated)
+    #[deprecated(
+        since = "1.0.0",
+        note = "Use marker() instead for 2-byte scheme markers"
+    )]
+    pub fn byte(&self) -> u8 {
+        // Return second byte of marker for legacy compatibility
+        self.marker()[1]
     }
 }
 

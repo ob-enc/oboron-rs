@@ -1,27 +1,27 @@
-use crate::{error::Error, Encoding, Keychain};
+use crate::{constants::SCHEME_MARKER_SIZE, error::Error, Encoding, Keychain};
 #[cfg(feature = "legacy")]
 use crate::{Format, Scheme};
 
 // Always available
-use crate::constants::REVERSED_SCHEME_BYTES;
+use crate::constants::REVERSED_SCHEME_MARKERS;
 
 #[cfg(feature = "aags")]
-use crate::{constants::AAGS_BYTE, decrypt_aags};
+use crate::{constants::AAGS_MARKER, decrypt_aags};
 #[cfg(feature = "aasv")]
-use crate::{constants::AASV_BYTE, decrypt_aasv};
+use crate::{constants::AASV_MARKER, decrypt_aasv};
 #[cfg(feature = "apgs")]
-use crate::{constants::APGS_BYTE, decrypt_apgs};
+use crate::{constants::APGS_MARKER, decrypt_apgs};
 #[cfg(feature = "apsv")]
-use crate::{constants::APSV_BYTE, decrypt_apsv};
+use crate::{constants::APSV_MARKER, decrypt_apsv};
 #[cfg(feature = "upbc")]
-use crate::{constants::UPBC_BYTE, decrypt_upbc};
+use crate::{constants::UPBC_MARKER, decrypt_upbc};
 #[cfg(feature = "zrbcx")]
-use crate::{constants::ZRBCX_BYTE, decrypt_zrbcx};
+use crate::{constants::ZRBCX_MARKER, decrypt_zrbcx};
 // Testing
 #[cfg(feature = "mock")]
-use crate::{constants::MOCK1_BYTE, decrypt_mock1};
+use crate::{constants::MOCK1_MARKER, decrypt_mock1};
 #[cfg(feature = "mock")]
-use crate::{constants::MOCK2_BYTE, decrypt_mock2};
+use crate::{constants::MOCK2_MARKER, decrypt_mock2};
 // Legacy
 #[cfg(feature = "legacy")]
 use crate::legacy;
@@ -47,45 +47,47 @@ pub fn dec_any_scheme(
         }
     };
 
-    if buffer.is_empty() {
-        return Err(Error::EmptyPayload);
+    if buffer.len() < SCHEME_MARKER_SIZE {
+        return Err(Error::PayloadTooShort);
     }
 
-    // XOR last byte with first byte for unmixing the scheme byte
+    // Step 2: XOR the last two bytes with the first two to undo mixing
     let len = buffer.len();
     buffer[len - 1] ^= buffer[0];
+    buffer[len - 2] ^= buffer[1];
 
-    // Step 2: Extract scheme byte from end (last byte)
-    let scheme_byte = buffer.pop().unwrap(); // Remove scheme byte in-place
+    // Step 3: Extract 2-byte scheme marker from end
+    let scheme_marker = [buffer[len - 2], buffer[len - 1]];
+    buffer.truncate(len - SCHEME_MARKER_SIZE);
 
-    // Step 3: Reverse the ciphertext in-place to get original order
-    if REVERSED_SCHEME_BYTES.contains(&scheme_byte) {
+    // Step 4: Reverse the ciphertext in-place to get original order if needed
+    if REVERSED_SCHEME_MARKERS.iter().any(|m| m == &scheme_marker) {
         buffer.reverse();
     }
 
     // At this point buffer = ciphertext, ready to be decrypted
 
-    // Step 4: Match scheme byte and decrypt with available schemes
-    let plaintext_bytes = match scheme_byte {
+    // Step 5: Match scheme marker and decrypt with available schemes
+    let plaintext_bytes = match scheme_marker {
         #[cfg(feature = "zrbcx")]
-        ZRBCX_BYTE => decrypt_zrbcx(keychain.zrbcx(), &buffer)?,
+        ZRBCX_MARKER => decrypt_zrbcx(keychain.zrbcx(), &buffer)?,
         #[cfg(feature = "upbc")]
-        UPBC_BYTE => decrypt_upbc(keychain.upbc(), &buffer)?,
+        UPBC_MARKER => decrypt_upbc(keychain.upbc(), &buffer)?,
         #[cfg(feature = "aags")]
-        AAGS_BYTE => decrypt_aags(keychain.aags(), &buffer)?,
+        AAGS_MARKER => decrypt_aags(keychain.aags(), &buffer)?,
         #[cfg(feature = "apgs")]
-        APGS_BYTE => decrypt_apgs(keychain.apgs(), &buffer)?,
+        APGS_MARKER => decrypt_apgs(keychain.apgs(), &buffer)?,
         #[cfg(feature = "aasv")]
-        AASV_BYTE => decrypt_aasv(keychain.aasv(), &buffer)?,
+        AASV_MARKER => decrypt_aasv(keychain.aasv(), &buffer)?,
         #[cfg(feature = "apsv")]
-        APSV_BYTE => decrypt_apsv(keychain.apsv(), &buffer)?,
+        APSV_MARKER => decrypt_apsv(keychain.apsv(), &buffer)?,
         // Testing
         #[cfg(feature = "mock")]
-        MOCK1_BYTE => decrypt_mock1(keychain.mock1(), &buffer)?,
+        MOCK1_MARKER => decrypt_mock1(keychain.mock1(), &buffer)?,
         #[cfg(feature = "mock")]
-        MOCK2_BYTE => decrypt_mock2(keychain.mock2(), &buffer)?,
+        MOCK2_MARKER => decrypt_mock2(keychain.mock2(), &buffer)?,
         _ => {
-            // Unknown scheme byte - try legacy as fallback
+            // Unknown scheme marker - try legacy as fallback
             #[cfg(feature = "legacy")]
             {
                 let format = Format::new(Scheme::Legacy, encoding);
@@ -99,7 +101,7 @@ pub fn dec_any_scheme(
         }
     };
 
-    // Step 5: Convert to string
+    // Step 6: Convert to string
 
     // Unchecked (Assuming plaintext was originally valid UTF-8, and correct key is used)
     #[cfg(feature = "unchecked-utf8")]
@@ -125,8 +127,8 @@ fn validate_legacy_output(plaintext: &str) -> Result<(), Error> {
         .chars()
         .filter(|&c| {
             c.is_ascii_graphic()  // Printable ASCII
-            || c.is_whitespace()   // Whitespace
-            || (c >= '\u{0080}' && c <= '\u{FFFF}' && !c.is_control()) // Valid Unicode (not control chars)
+            || c. is_whitespace()   // Whitespace
+            || (c >= '\u{0080}' && c <= '\u{FFFF}' && ! c.is_control()) // Valid Unicode (not control chars)
         })
         .count();
 

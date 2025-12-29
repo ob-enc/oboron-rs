@@ -9,65 +9,89 @@ pub const HARDCODED_KEY_BYTES: [u8; 64] = [
     0xa9, 0xf4, 0x8e, 0xec, 0x4b, 0xa4, 0x46, 0xdd, 0xfc, 0x8b, 0x78, 0x58, 0x78, 0x95, 0x35, 0x6f,
     0x45, 0xa7, 0x5a, 0x1a, 0xb7, 0x41, 0x94, 0x54, 0xdd, 0x9f, 0x7a, 0xa8, 0xa9, 0x5d, 0xbd, 0xd5,
 ];
-// Scheme byte (scheme identifier)
-// ===============================
-// (tail byte appended to ciphertext payload before encoding)
+
+// Scheme marker size (2 bytes)
+pub const SCHEME_MARKER_SIZE: usize = 2;
+
+// Scheme marker structure (2 bytes = 16 bits):
+// Byte 1: [ext:1][version:4][tier:3]
+// Byte 2: [properties:4][algorithm:4]
 //
-// Tail byte structure: [tier:3 bits][scheme:4 bits][probabilistic:1 bit]
+// ext (1 bit): Extension flag (0 = no extension, 1 = more bytes follow)
+// version (4 bits): Format version (0000 = v0)
+// tier (3 bits): Security tier
+//   - 000 (0): `mock` - testing
+//   - 001 (1): `a` - authenticated (secure)
+//   - 010 (2): `u` - unauthenticated (secure)
+//   - 111 (7): `z` - insecure/obfuscation
+// properties (4 bits): Scheme properties
+//   - 0000 (0): `p` - probabilistic
+//   - 0001 (1): `a` - deterministic avalanche
+//   - 0010 (2): `r` - deterministic referenceable / prefix-restricted avalanche
+// algorithm (4 bits): Encryption algorithm
+//   - 0001 (1): CBC
+//   - 0010 (2): GCM-SIV
+//   - 0011 (3): SIV
 
-// Tier ob0x - Insecure, non-authenticated
-// ---------------------------------------
-// zrbcx:  tier=0 (000), scheme=1 (0001), probabilistic=0 -> 00000010 = 0x02 (decimal: 2)
-#[cfg(feature = "zrbcx")]
-pub const ZRBCX_BYTE: u8 = 0x02;
+// Helper function to construct scheme marker
+const fn make_marker(tier: u8, properties: u8, algorithm: u8) -> [u8; 2] {
+    let byte1 = (0 << 7) | (0 << 3) | tier; // ext=0, version=0000, tier
+    let byte2 = (properties << 4) | algorithm;
+    [byte1, byte2]
+}
 
-// Tier ob2x - Secure, non-authenticated
-// -------------------------------------
-// upbc: tier=2 (010), scheme=2 (0001), probabilistic=1 -> 01000011 = 0x23 (decimal: 35)
-#[cfg(feature = "upbc")]
-pub const UPBC_BYTE: u8 = 0x23;
+// Tier ob0x - Testing (non-encrypted)
+// -----------------------------------
+// mock1:  tier=000, properties=0001 (det-auth), algorithm=0000 (none)
+#[cfg(feature = "mock")]
+pub const MOCK1_MARKER: [u8; 2] = make_marker(0, 1, 0);
 
-// Tier ob3x - Secure, authenticated
+// mock2: tier=000, properties=0001 (det-auth), algorithm=0000 (none)
+#[cfg(feature = "mock")]
+pub const MOCK2_MARKER: [u8; 2] = make_marker(0, 2, 0);
+
+// `a`-tier - Secure, authenticated
 // ---------------------------------
-// aags: tier=3 (011), scheme=1 (0001), probabilistic=0 -> 01100010 = 0x62 (decimal: 98)
+// aags: tier=001, properties=0001 (det-auth), algorithm=0010 (GCM-SIV)
 #[cfg(feature = "aags")]
-pub const AAGS_BYTE: u8 = 0x62;
+pub const AAGS_MARKER: [u8; 2] = make_marker(1, 1, 2);
 
-// apgs: tier=3 (011), scheme=1 (0001), probabilistic=1 -> 01100011 = 0x63 (decimal: 99)
+// apgs: tier=001, properties=0000 (probabilistic), algorithm=0010 (GCM-SIV)
 #[cfg(feature = "apgs")]
-pub const APGS_BYTE: u8 = 0x63;
+pub const APGS_MARKER: [u8; 2] = make_marker(1, 0, 2);
 
-// aasv: tier=3 (011), scheme=2 (0010), probabilistic=0 -> 01100100 = 0x64 (decimal: 100)
+// aasv: tier=001, properties=0001 (det-auth), algorithm=0011 (SIV)
 #[cfg(feature = "aasv")]
-pub const AASV_BYTE: u8 = 0x64;
+pub const AASV_MARKER: [u8; 2] = make_marker(1, 1, 3);
 
-// apsv: tier=3 (011), scheme=2 (0010), probabilistic=1 -> 01100101 = 0x65 (decimal: 101)
+// apsv: tier=001, properties=0000 (probabilistic), algorithm=0011 (SIV)
 #[cfg(feature = "apsv")]
-pub const APSV_BYTE: u8 = 0x65;
+pub const APSV_MARKER: [u8; 2] = make_marker(1, 0, 3);
 
-// Tier ob7x - Testing
-// -------------------
-// Identity scheme (no encryption)
-// mock1: tier=7 (111), scheme=0 (0000), probabilistic=0 -> 11100000 = 0xE0 (decimal: 224)
-#[cfg(feature = "mock")]
-pub const MOCK1_BYTE: u8 = 0xE0;
-// String-reversal (no encryption)
-// mock2: tier=7 (111), scheme=1 (0001), probabilistic=0 -> 11100010 = 0xE2 (decimal: 226)
-#[cfg(feature = "mock")]
-pub const MOCK2_BYTE: u8 = 0xE2;
+// `u`-tier - Secure, unauthenticated
+// ----------------------------------
+// upbc: tier=010, properties=0000 (probabilistic), algorithm=0001 (CBC)
+#[cfg(feature = "upbc")]
+pub const UPBC_MARKER: [u8; 2] = make_marker(2, 0, 1);
 
-// For efficient resolution in decode logic, list all scheme bytes of reversed schemes
-const fn get_reversed_schemes() -> &'static [u8] {
+// `z`-tier - Not IND-CPA secure; obfuscation only
+// -----------------------------------------------
+// zrbcx:  tier=111, properties=0010 (det-reversed), algorithm=0001 (CBC)
+#[cfg(feature = "zrbcx")]
+pub const ZRBCX_MARKER: [u8; 2] = make_marker(7, 2, 1);
+
+// For efficient resolution in decode logic, list all scheme markers of reversed schemes
+const fn get_reversed_schemes() -> &'static [[u8; 2]] {
     #[cfg(all(feature = "zrbcx", feature = "upbc"))]
-    return &[ZRBCX_BYTE, UPBC_BYTE];
+    return &[ZRBCX_MARKER, UPBC_MARKER];
     #[cfg(all(feature = "zrbcx", not(feature = "upbc")))]
-    return &[ZRBCX_BYTE];
+    return &[ZRBCX_MARKER];
     #[cfg(all(not(feature = "zrbcx"), feature = "upbc"))]
-    return &[UPBC_BYTE];
+    return &[UPBC_MARKER];
     #[cfg(all(not(feature = "zrbcx"), not(feature = "upbc")))]
     return &[];
 }
-pub const REVERSED_SCHEME_BYTES: &[u8] = get_reversed_schemes();
+pub const REVERSED_SCHEME_MARKERS: &[[u8; 2]] = get_reversed_schemes();
 
 // Format identifiers
 //
@@ -167,5 +191,43 @@ mod tests {
             encoded, HARDCODED_KEY_BASE64,
             "Bytes encoded back to base64 must match original"
         );
+    }
+
+    #[test]
+    fn test_scheme_marker_structure() {
+        // Test that markers are correctly formed
+        #[cfg(feature = "aags")]
+        {
+            let marker = AAGS_MARKER;
+            let byte1 = marker[0];
+            let byte2 = marker[1];
+
+            let ext = (byte1 >> 7) & 0x01;
+            let version = (byte1 >> 3) & 0x0F;
+            let tier = byte1 & 0x07;
+            let properties = (byte2 >> 4) & 0x0F;
+            let algorithm = byte2 & 0x0F;
+
+            assert_eq!(ext, 0, "Extension bit should be 0");
+            assert_eq!(version, 0, "Version should be 0");
+            assert_eq!(tier, 1, "AAGS tier should be 1 (authenticated)");
+            assert_eq!(properties, 1, "AAGS properties should be 1 (det-auth)");
+            assert_eq!(algorithm, 2, "AAGS algorithm should be 2 (GCM-SIV)");
+        }
+
+        #[cfg(feature = "zrbcx")]
+        {
+            let marker = ZRBCX_MARKER;
+            let byte1 = marker[0];
+            let byte2 = marker[1];
+
+            let tier = byte1 & 0x07;
+            let properties = (byte2 >> 4) & 0x0F;
+            let algorithm = byte2 & 0x0F;
+
+            assert_eq!(tier, 7, "ZRBCX tier should be 7 (insecure)");
+            assert_eq!(properties, 2, "ZRBCX properties should be 2 (det-reversed)");
+            assert_eq!(algorithm, 1, "ZRBCX algorithm should be 1 (CBC)");
+        }
     }
 }
