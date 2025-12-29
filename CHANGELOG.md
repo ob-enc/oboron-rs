@@ -20,15 +20,6 @@ but note that pre-1.0 releases may not adhere strictly to all guidelines.
 
 ### Changed
 
-- DATA FORMAT BREAKING CHANGE
-  - switched from 1B scheme byte to 2B scheme marker
-  - structure: `[ext][version][tier][properties][algorithm]`
-    - `[ext]` (1 bit): flip on when more bytes are needed (scheme marker extension)
-    - `[version]` (4 bits): version (used for data format changes, logic changes, key extraction changes etc.)
-    - `[tier]` (3 bits): `a`, `u`, `z`, `mock`
-    - `[properties]` (4 bits): `a`, `r`, `p`
-    - `[algorithm]` (4 bits): representing `cb`, `sv`, `gs`
-
 
 [1.0.0-rc.1] - 2025-12-19
 -------------------------
@@ -103,6 +94,15 @@ but note that pre-1.0 releases may not adhere strictly to all guidelines.
   - AASV_C32: &str "aasv.c32" -> &Format{Scheme::Aasv, Encoding::C32}
   - new AASV_C32_STR constants
 
+- DATA FORMAT BREAKING CHANGE
+  - switched from 1B scheme byte to 2B scheme marker
+  - structure: `[ext][version][tier][properties][algorithm]`
+    - `[ext]` (1 bit): flip on when more bytes are needed (scheme marker extension)
+    - `[version]` (4 bits): version (used for data format changes, logic changes, key extraction changes etc.)
+    - `[tier]` (3 bits): `a`, `u`, `z`, `mock`
+    - `[properties]` (4 bits): `a`, `r`, `p`
+    - `[algorithm]` (4 bits): representing `cb`, `sv`, `gs`
+
 - API BREAKING CHANGE, DATA FORMAT BREAKING CHANGE:
   - `zrbcx` to not use Oboron master key any more
   - no more `ZrbcxXXX::new()` constructor, only `::new_keyless()`
@@ -112,12 +112,13 @@ but note that pre-1.0 releases may not adhere strictly to all guidelines.
 
 - Feature-gated convenience functions ("convenience" feature)
 
-- Moved Keychain from obcrypt up to root lib level
+- Moved `r`-property logic from enc.rs/dec.rs/dec_auto.rs down to individual scheme obcrypt implementation
 
-- Python crate README.md - rewrite parallel to oboron crate, adapted
+- Moved Keychain from obcrypt up to root lib level
 
 - Moved `generate_key()` from obcrypt module to top level lib level
 
+- Python crate README.md - rewrite parallel to oboron crate, adapted
 
 ### Fixed
 

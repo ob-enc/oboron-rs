@@ -2,9 +2,6 @@ use crate::{constants::SCHEME_MARKER_SIZE, error::Error, Encoding, Keychain};
 #[cfg(feature = "legacy")]
 use crate::{Format, Scheme};
 
-// Always available
-use crate::constants::REVERSED_SCHEME_MARKERS;
-
 #[cfg(feature = "aags")]
 use crate::{constants::AAGS_MARKER, decrypt_aags};
 #[cfg(feature = "aasv")]
@@ -36,7 +33,7 @@ pub fn dec_any_scheme(
     let mut buffer = match crate::dec::decode_obtext_to_payload(obtext, encoding) {
         Ok(ct) => ct,
         Err(decode_err) => {
-            // Decoding failed - try legacy (legacy format with reversal applied to final encoding rather than bytes as in zrbcx)
+            // Decoding failed - try legacy
             #[cfg(feature = "legacy")]
             {
                 let format = Format::new(Scheme::Legacy, encoding);
@@ -60,14 +57,7 @@ pub fn dec_any_scheme(
     let scheme_marker = [buffer[len - 2], buffer[len - 1]];
     buffer.truncate(len - SCHEME_MARKER_SIZE);
 
-    // Step 4: Reverse the ciphertext in-place to get original order if needed
-    if REVERSED_SCHEME_MARKERS.iter().any(|m| m == &scheme_marker) {
-        buffer.reverse();
-    }
-
-    // At this point buffer = ciphertext, ready to be decrypted
-
-    // Step 5: Match scheme marker and decrypt with available schemes
+    // Step 4: Match scheme marker and decrypt with available schemes
     let plaintext_bytes = match scheme_marker {
         #[cfg(feature = "zrbcx")]
         ZRBCX_MARKER => decrypt_zrbcx(keychain.zrbcx(), &buffer)?,
@@ -101,7 +91,7 @@ pub fn dec_any_scheme(
         }
     };
 
-    // Step 6: Convert to string
+    // Step 5: Convert to string
 
     // Unchecked (Assuming plaintext was originally valid UTF-8, and correct key is used)
     #[cfg(feature = "unchecked-utf8")]

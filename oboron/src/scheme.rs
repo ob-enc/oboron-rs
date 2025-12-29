@@ -1,4 +1,4 @@
-//!  Scheme identifiers for oboron encryption schemes.
+//! Scheme identifiers for oboron encryption schemes.
 
 use crate::{constants, error::Error};
 
@@ -88,13 +88,6 @@ impl Scheme {
     /// Check if this scheme is probabilistic (produces different output each time).
     pub fn is_probabilistic(&self) -> bool {
         !self.is_deterministic()
-    }
-
-    /// Only schemes that need byte reversal for prefix entropy maximization use it
-    pub fn is_ciphertext_reversed(&self) -> bool {
-        constants::REVERSED_SCHEME_MARKERS
-            .iter()
-            .any(|m| m == &self.marker())
     }
 
     /// Get the 2-byte scheme marker for this scheme.

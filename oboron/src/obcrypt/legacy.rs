@@ -8,7 +8,7 @@ use cipher::{BlockDecryptMut, BlockEncryptMut, KeyIvInit};
 type Aes128CbcEnc = Encryptor<Aes128>;
 type Aes128CbcDec = Decryptor<Aes128>;
 
-const LEGACY_PADDING_BYTE: u8 = b'='; // legacy - legacy only
+const LEGACY_PADDING_BYTE: u8 = b'=';
 
 /// Encrypt plaintext bytes using legacy AES-CBC (legacy scheme).
 /// Returns raw ciphertext bytes with custom padding.

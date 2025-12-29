@@ -28,9 +28,9 @@ use crate::encrypt_mock2;
 /// Generic encoding pipeline for all schemes (except legacy).
 ///
 /// Steps:
-/// 1. Call scheme-specific encrypt function
-/// 2. Optionally Reverse the bytes
-/// 3. Append 2-byte scheme marker to ciphertext payload
+/// 1. Call scheme-specific encrypt function (handles any scheme-specific transformations like reversal)
+/// 2. Append 2-byte scheme marker to ciphertext payload
+/// 3. XOR marker bytes with first two payload bytes for entropy
 /// 4. Encode to specified format
 pub(crate) fn enc_to_format(
     plaintext: &str,
@@ -41,7 +41,7 @@ pub(crate) fn enc_to_format(
         return Err(Error::EmptyPlaintext);
     }
 
-    // Step 1: Encrypt using scheme-specific function based on format
+    // Step 1: Encrypt using scheme-specific function
     let ciphertext = match format.scheme() {
         #[cfg(feature = "zrbcx")]
         Scheme::Zrbcx => encrypt_zrbcx(keychain.zrbcx(), plaintext.as_bytes())?,
@@ -65,22 +65,13 @@ pub(crate) fn enc_to_format(
         Scheme::Legacy => unreachable!("called generic enc function for legacy"),
     };
 
-    // Step 2+3: Build payload with 2-byte scheme marker and conditionally reverse
+    // Step 2: Build payload with 2-byte scheme marker appended
     let marker = format.scheme().marker();
     let mut payload = Vec::with_capacity(ciphertext.len() + SCHEME_MARKER_SIZE);
+    payload.extend_from_slice(&ciphertext);
+    payload.extend_from_slice(&marker);
 
-    if format.scheme().is_ciphertext_reversed() {
-        // Reversed schemes: prepend marker, append ciphertext, then reverse in-place
-        payload.extend_from_slice(&marker);
-        payload.extend_from_slice(&ciphertext);
-        payload.reverse(); // marker at tail
-    } else {
-        // Non-reversed schemes: append ciphertext, then marker
-        payload.extend_from_slice(&ciphertext);
-        payload.extend_from_slice(&marker);
-    }
-
-    // XOR the scheme marker bytes with the first two bytes for entropy
+    // Step 3: XOR the scheme marker bytes with the first two bytes for entropy
     let len = payload.len();
     payload[len - 1] ^= payload[0];
     payload[len - 2] ^= payload[1];

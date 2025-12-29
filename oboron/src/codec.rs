@@ -618,7 +618,7 @@ impl ObAny {
         return Ok(ObAny::Mock1C32(Mock1C32::new(key)?));
         #[cfg(feature = "zrbcx")]
         #[cfg(not(feature = "mock"))]
-        return Ok(ObAny::ZrbcxC32(ZrbcxC32::new(key)?));
+        return Ok(ObAny::ZrbcxC32(ZrbcxC32::new_keyless()?));
         #[cfg(feature = "upbc")]
         #[cfg(not(any(feature = "mock", feature = "zrbcx")))]
         return Ok(ObAny::UpbcC32(UpbcC32::new(key)?));

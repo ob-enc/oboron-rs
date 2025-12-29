@@ -80,19 +80,6 @@ pub const UPBC_MARKER: [u8; 2] = make_marker(2, 0, 1);
 #[cfg(feature = "zrbcx")]
 pub const ZRBCX_MARKER: [u8; 2] = make_marker(7, 2, 1);
 
-// For efficient resolution in decode logic, list all scheme markers of reversed schemes
-const fn get_reversed_schemes() -> &'static [[u8; 2]] {
-    #[cfg(all(feature = "zrbcx", feature = "upbc"))]
-    return &[ZRBCX_MARKER, UPBC_MARKER];
-    #[cfg(all(feature = "zrbcx", not(feature = "upbc")))]
-    return &[ZRBCX_MARKER];
-    #[cfg(all(not(feature = "zrbcx"), feature = "upbc"))]
-    return &[UPBC_MARKER];
-    #[cfg(all(not(feature = "zrbcx"), not(feature = "upbc")))]
-    return &[];
-}
-pub const REVERSED_SCHEME_MARKERS: &[[u8; 2]] = get_reversed_schemes();
-
 // Format identifiers
 //
 #[cfg(feature = "aags")]

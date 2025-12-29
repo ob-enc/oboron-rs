@@ -9,7 +9,8 @@ type Aes128CbcEnc = Encryptor<Aes128>;
 type Aes128CbcDec = Decryptor<Aes128>;
 
 /// Encrypt plaintext bytes using deterministic AES-CBC (zrbcx scheme).
-/// Returns raw ciphertext bytes.   Not cryptographically secure - for obfuscation only.
+/// Returns raw ciphertext bytes **reversed** for prefix entropy maximization.
+/// Not cryptographically secure - for obfuscation only.
 pub fn encrypt(secret: &[u8; 32], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
     if plaintext_bytes.is_empty() {
         return Err(Error::EmptyPlaintext);
@@ -26,25 +27,29 @@ pub fn encrypt(secret: &[u8; 32], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Err
     buffer.resize(total_len, CBC_PADDING_BYTE);
 
     // Encrypt in-place
-
     let cipher = Aes128CbcEnc::new(secret[0..16].into(), secret[16..32].into());
     cipher
         .encrypt_padded_mut::<cipher::block_padding::NoPadding>(&mut buffer, total_len)
         .map_err(|_| Error::EncryptionFailed)?;
 
+    // Reverse for prefix entropy maximization (zrbcx-specific)
+    buffer.reverse();
+
     Ok(buffer)
 }
 
 /// Decrypt ciphertext using deterministic AES-CBC (zrbcx scheme).
-/// Returns plaintext bytes with padding removed.
+/// Expects **reversed** ciphertext.  Returns plaintext bytes with padding removed.
 pub fn decrypt(secret: &[u8; 32], data: &[u8]) -> Result<Vec<u8>, Error> {
     // Decrypt with AES-128-CBC
     if data.len() % AES_BLOCK_SIZE != 0 {
         return Err(Error::InvalidBlockLength);
     }
 
+    // Reverse back to original order (zrbcx-specific)
+    let mut buffer: Vec<u8> = data.iter().rev().copied().collect();
+
     let cipher = Aes128CbcDec::new(secret[0..16].into(), secret[16..32].into());
-    let mut buffer = data.to_vec();
 
     cipher
         .decrypt_padded_mut::<cipher::block_padding::NoPadding>(&mut buffer)

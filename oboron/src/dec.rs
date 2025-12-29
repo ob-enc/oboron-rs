@@ -1,6 +1,6 @@
 use crate::{
     base32::{BASE32_CROCKFORD, BASE32_RFC},
-    constants::{REVERSED_SCHEME_MARKERS, SCHEME_MARKER_SIZE},
+    constants::SCHEME_MARKER_SIZE,
     error::Error,
     Encoding, Format, Keychain, Scheme,
 };
@@ -29,9 +29,9 @@ use crate::decrypt_mock2;
 ///
 /// Steps:
 /// 1. Decode obtext using format's encoding
-/// 2. Extract and verify 2-byte scheme marker
-/// 3. Optionally reverse the bytes (select schemes only)
-/// 4. Call scheme-specific decrypt function
+/// 2. XOR last two bytes with first two to undo entropy mixing
+/// 3. Extract and verify 2-byte scheme marker
+/// 4. Call scheme-specific decrypt function (handles any scheme-specific transformations like reversal)
 /// 5. Convert to UTF-8 string
 pub(crate) fn dec_from_format(
     obtext: &str,
@@ -45,13 +45,12 @@ pub(crate) fn dec_from_format(
         return Err(Error::PayloadTooShort);
     }
 
-    // Step 2: Get 2-byte scheme marker
-    // XOR the last two bytes with the first two to undo mixing
+    // Step 2: XOR the last two bytes with the first two to undo mixing
     let len = buffer.len();
     buffer[len - 1] ^= buffer[0];
     buffer[len - 2] ^= buffer[1];
 
-    // Extract the 2-byte scheme marker from tail
+    // Step 3: Extract the 2-byte scheme marker from tail
     let scheme_marker = [buffer[len - 2], buffer[len - 1]];
     buffer.truncate(len - SCHEME_MARKER_SIZE);
 
@@ -60,12 +59,7 @@ pub(crate) fn dec_from_format(
         return Err(Error::SchemeMarkerMismatch);
     }
 
-    // Step 3: Reverse if needed to get original order
-    if REVERSED_SCHEME_MARKERS.iter().any(|m| m == &scheme_marker) {
-        buffer.reverse();
-    }
-
-    // Step 4: Decrypt using scheme-specific function based on format
+    // Step 4:  Decrypt using scheme-specific function
     let plaintext_bytes = match format.scheme() {
         #[cfg(feature = "zrbcx")]
         Scheme::Zrbcx => decrypt_zrbcx(keychain.zrbcx(), &buffer)?,
