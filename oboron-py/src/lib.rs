@@ -84,12 +84,8 @@ macro_rules! impl_cipher_class {
             ///     ValueError: If the dec operation fails, or if strict=True and the ciphertext
             ///                 was created with a different scheme.
             #[pyo3(signature = (obtext, strict=false))]
-            fn dec(&self, obtext: &str, strict: bool) -> PyResult<String> {
-                let result = if strict {
-                    self.inner.dec_strict(obtext)
-                } else {
-                    self.inner.dec(obtext)
-                };
+            fn dec(&self, obtext: &str) -> PyResult<String> {
+                let result = self.inner.dec(obtext);
                 result.map_err(|e| PyValueError::new_err(format!("Dec operation failed: {}", e)))
             }
 
@@ -456,9 +452,9 @@ impl Ob {
     #[pyo3(signature = (obtext, strict=false))]
     fn dec(&self, obtext: &str, strict: bool) -> PyResult<String> {
         let result = if strict {
-            self.inner.dec_strict(obtext)
-        } else {
             self.inner.dec(obtext)
+        } else {
+            self.inner.dec_auto_scheme(obtext)
         };
         result.map_err(|e| PyValueError::new_err(format!("Dec operation failed: {}", e)))
     }

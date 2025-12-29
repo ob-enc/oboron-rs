@@ -86,8 +86,8 @@ impl Keychain {
     // upbc key - AES-128 key for AES-CBC (first 16 bytes)
     #[inline]
     #[cfg(any(feature = "upbc"))]
-    pub(crate) fn upbc(&self) -> &[u8; 16] {
-        self.key[..16].try_into().unwrap()
+    pub(crate) fn upbc(&self) -> &[u8; 32] {
+        self.key[8..40].try_into().unwrap()
     }
 
     // zrbcx secret - AES-128 key + IV for AES-CBC (first 16+16 bytes)

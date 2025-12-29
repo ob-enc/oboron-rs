@@ -24,7 +24,6 @@ but note that pre-1.0 releases may not adhere strictly to all guidelines.
     - `[properties]` (4 bits): `h`, `f`, `p`
     - `[algorithm]`: 11 bits
 
-- `upbc` to use 256-bit encryption (was 128-bit)
 
 - `zrbcx` to not use Oboron master key any more; two constructors possible:
   - ::new_keyless() - keyless feature always enabled with zrbcx
@@ -105,6 +104,8 @@ but note that pre-1.0 releases may not adhere strictly to all guidelines.
 - API BREAKING CHANGE: Format constans from str to &Format:
   - AASV_C32: &str "aasv.c32" -> &Format{Scheme::Aasv, Encoding::C32}
   - new AASV_C32_STR constants
+
+- DATA FORMAT BREAKING CHANGE: `upbc` to use 256-bit encryption (was 128-bit)
 
 - Feature-gated convenience functions ("convenience" feature)
 
