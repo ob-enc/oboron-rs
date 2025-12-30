@@ -22,7 +22,14 @@ macro_rules! impl_legacy_codec {
         }
 
         impl $name {
-            /// Create with hardcoded secret (testing only)
+            /// Create with a 43-character base64 secret string
+            pub fn new(secret: &str) -> Result<Self, Error> {
+                Ok(Self {
+                    zkeychain: ZKeychain::from_base64(secret)?,
+                })
+            }
+
+            /// Create with hardcoded secret (testing/obfuscation only)
             #[cfg(feature = "keyless")]
             pub fn new_keyless() -> Result<Self, Error> {
                 Ok(Self {
@@ -30,12 +37,19 @@ macro_rules! impl_legacy_codec {
                 })
             }
 
-            /// Internal constructor from 64-byte key (uses first 32 bytes as secret)
-            #[cfg(any(feature = "keyless", feature = "bytes-keys"))]
-            pub(crate) fn from_bytes_internal(key_bytes: &[u8; 64]) -> Result<Self, Error> {
-                let secret: [u8; 32] = key_bytes[0..32].try_into().unwrap();
+            /// Create from a 64-character hex secret string
+            #[cfg(feature = "hex-keys")]
+            pub fn from_hex_key(secret_hex: &str) -> Result<Self, Error> {
                 Ok(Self {
-                    zkeychain: ZKeychain::from_bytes(&secret)?,
+                    zkeychain: ZKeychain::from_hex(secret_hex)?,
+                })
+            }
+
+            /// Create from a 32-byte secret
+            #[cfg(feature = "bytes-keys")]
+            pub fn from_bytes(secret_bytes: &[u8; 32]) -> Result<Self, Error> {
+                Ok(Self {
+                    zkeychain: ZKeychain::from_bytes(secret_bytes)?,
                 })
             }
         }
@@ -161,7 +175,7 @@ impl_legacy_codec!(LegacyB64, Encoding::B64, "legacy.b64");
 impl_legacy_codec!(LegacyHex, Encoding::Hex, "legacy.hex");
 
 /// Encrypt plaintext bytes using legacy AES-CBC
-fn encrypt_legacy(secret: &[u8; 32], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
+pub(crate) fn encrypt_legacy(secret: &[u8; 32], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
     use aes::Aes128;
     use cbc::cipher::{BlockEncryptMut, KeyIvInit};
     use cbc::Encryptor;
@@ -192,7 +206,7 @@ fn encrypt_legacy(secret: &[u8; 32], plaintext_bytes: &[u8]) -> Result<Vec<u8>, 
 }
 
 /// Decrypt ciphertext using legacy AES-CBC
-fn decrypt_legacy(secret: &[u8; 32], data: &[u8]) -> Result<Vec<u8>, Error> {
+pub(crate) fn decrypt_legacy(secret: &[u8; 32], data: &[u8]) -> Result<Vec<u8>, Error> {
     use aes::Aes128;
     use cbc::cipher::{BlockDecryptMut, KeyIvInit};
     use cbc::Decryptor;
