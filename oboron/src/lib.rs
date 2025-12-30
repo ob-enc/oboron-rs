@@ -36,11 +36,10 @@
 //! # let obm = oboron::ObMulti::new(&key)?;
 //! // Operations: data, format
 //! let ot = obm.enc_with_format_str("plaintext", "aasv.b64")?;
-//! obm.dec_with_format_str(&ot, "aasv.b64")?;
+//! obm.dec_with_format_str(&ot, "aasv. b64")?;
 //!
 //! // Constructors: format, key
 //! oboron::Ob::new("aasv.b64", &key)?;
-//! oboron::ObFlex::new("aasv.b64", &key)?;
 //!
 //! // Convenience functions: data, format, key
 //! # #[cfg(feature = "convenience")]
@@ -80,60 +79,34 @@
 //! - Performance: Fastest (zero overhead)
 //! - Flexibility: Format fixed, explicit in type name
 //!
-//! ## 2. `Ob` - Runtime Format (Immutable)
+//! ## 2. `Ob` - Runtime Format (Flexible)
 //!
-//! Use `Ob` when you need to choose the format at runtime, but won't change it:
+//! Use `Ob` when you need to choose the format at runtime:
 //!
 //! ```rust
 //! # fn main() -> Result<(), oboron::Error> {
 //! # #[cfg(feature = "aasv")]
 //! # {
 //! # use oboron::{Ob, ObtextCodec};
-//! # let key = oboron::generate_key();
-//! // Format chosen at runtime, immutable instance
-//! let ob = Ob::new("aasv.b64", &key)?;
+//!  # let key = oboron::generate_key();
+//! // Format chosen at runtime
+//! let mut ob = Ob::new("aasv.b64", &key)?;
 //!
 //! let ot = ob.enc("hello")?;
 //! let pt2 = ob.dec(&ot)?;
+//!
+//! // Can change format if needed
+//! ob.set_format("aasv.hex")?;
 //! # }
 //! # Ok(())
 //! # }
-//! ```
+//!  ```
 //!
 //! - Use case: Format determined at runtime (config, user input)
 //! - Performance: Near-zero overhead (inlines to static functions)
-//! - Flexibility: Runtime format selection, immutable after construction
+//! - Flexibility: Runtime format selection, can be changed after construction
 //!
-//! ## 3. `ObFlex` - Mutable Format
-//!
-//! Use `ObFlex` when you need to change formats during execution:
-//!
-//! ```rust
-//! # fn main() -> Result<(), oboron::Error> {
-//! # #[cfg(all(feature = "aasv", feature = "mock"))]
-//! # {
-//! # use oboron::{ObFlex, Scheme, Encoding, AASV_B64};
-//! # let key = oboron::generate_key();
-//! let mut flex = ObFlex::new("aasv.b64", &key)?;
-//! let ot1 = flex.enc("hello")?;    // aasv.b64 format
-//!
-//! // Change format at runtime
-//! flex.set_scheme(Scheme::Mock1)?; // set_scheme() only with ObFlex
-//! let ot2 = flex.enc("hello")? ;   // mock1.b64 format output
-//! // Also available:
-//! flex.set_encoding(Encoding::Hex)?; // now set as mock1.hex
-//! flex.set_format("aasv.b32")?;    // now aasv.b32
-//! flex.set_format(AASV_B64)?;      // now aasv.b64 (using constant)
-//! # }
-//! # Ok(())
-//! # }
-//! ```
-//!
-//! - Use case: Need to switch between formats dynamically
-//! - Performance: Minimal overhead
-//! - Flexibility: Fully mutable format
-//!
-//! ## 4. `ObMulti` - Multi-Format Operations
+//! ## 3. `ObMulti` - Multi-Format Operations
 //!
 //! Use `ObMulti` when working with different formats in a single context:
 //!
@@ -166,8 +139,7 @@
 //! | Type            | Format             | Use Case          | Performance         |
 //! |-----------------|--------------------|-------------------|---------------------|
 //! | `AasvC32`, etc. | Compile-time       | Known format      | Fastest (zero-cost) |
-//! | `Ob`            | Runtime, immutable | Config-driven     | Near-zero overhead  |
-//! | `ObFlex`        | Runtime, mutable   | Dynamic switching | Minimal overhead    |
+//! | `Ob`            | Runtime, mutable   | Config-driven     | Near-zero overhead  |
 //! | `ObMulti`       | Per-operation      | Multiple formats  | Small overhead      |
 //!
 //! # Typical Production Usage: Fixed ObtextCodec
@@ -222,9 +194,7 @@
 //!
 //! # The `ObtextCodec` Trait
 //!
-//! All types (`AasvC32`, `Ob`, `ObFlex`, etc.) except `ObMulti` implement the `ObtextCodec` trait,
-//! providing a consistent interface:
-//!
+//! All types (`Ob`, `AasvC32`, `ApsvB64`, etc.) except `ObMulti` implement the `ObtextCodec` trait,
 //! ```rust
 //! # fn main() -> Result<(), oboron::Error> {
 //! # #[cfg(feature = "aasv")]
@@ -260,8 +230,6 @@ mod format;
 mod keychain;
 mod keygen;
 mod ob;
-mod ob_core;
-mod ob_flex;
 mod ob_multi;
 mod obcrypt;
 mod scheme;
@@ -306,9 +274,8 @@ pub use encoding::Encoding;
 pub use format::Format;
 pub use scheme::Scheme;
 
-// Re-export trait-based implementations
+// Re-export Ob
 pub use ob::Ob;
-pub use ob_flex::ObFlex;
 
 // Factory functions
 #[cfg(feature = "bytes-keys")]
@@ -399,7 +366,7 @@ pub mod prelude {
     #[cfg(feature = "apsv")]
     pub use crate::{ApsvB32, ApsvB64, ApsvC32, ApsvHex};
     pub use crate::{Encoding, Error, Format, ObtextCodec, Scheme};
-    pub use crate::{Ob, ObFlex, ObMulti};
+    pub use crate::{Ob, ObMulti};
 }
 
 // ============================================================================
