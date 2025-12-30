@@ -5,7 +5,8 @@
 
 use super::zkeychain::ZKeychain;
 use crate::{
-    constants::HARDCODED_SECRET_BYTES, error::Error, Encoding, Format, ObtextCodec, Scheme,
+    constants::HARDCODED_SECRET_BYTES, error::Error, Encoding, ExtractedKey, Format, ObtextCodec,
+    Scheme,
 };
 
 /// Macro to implement z-tier codec types (32-byte secrets, obfuscation-only)
@@ -43,13 +44,13 @@ macro_rules! impl_zcodec {
             fn enc(&self, plaintext: &str) -> Result<String, Error> {
                 let format = Format::new(Scheme::Zrbcx, $encoding);
                 let secret = self.zkeychain.zrbcx();
-                crate::enc::enc_to_format(plaintext, format, secret)
+                crate::enc::enc_to_format(plaintext, format, ExtractedKey::Key32(secret))
             }
 
             fn dec(&self, obtext: &str) -> Result<String, Error> {
                 let format = Format::new(Scheme::Zrbcx, $encoding);
                 let secret = self.zkeychain.zrbcx();
-                crate::dec::dec_from_format(obtext, format, secret)
+                crate::dec::dec_from_format(obtext, format, ExtractedKey::Key32(secret))
             }
 
             fn format(&self) -> Format {
