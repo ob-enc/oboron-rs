@@ -2,40 +2,38 @@
 
 #![cfg(feature = "zrbcx")]
 
+use super::ZKeychain;
 use crate::{
-    constants::HARDCODED_SECRET_BYTES, error::Error, Encoding, Format, Keychain, ObtextCodec,
-    Scheme,
+    constants::HARDCODED_SECRET_BYTES, error::Error, Encoding, Format, ObtextCodec, Scheme,
 };
 
-/// Macro to implement z-tier codec types (uses first 32 bytes of 64-byte key as secret)
+/// Macro to implement z-tier codec types (32-byte secrets, obfuscation-only)
 macro_rules! impl_zcodec {
     ($name:ident, $encoding:expr, $format_str:expr) => {
-        #[doc = concat!("**INSECURE OBFUSCATION-ONLY** Codec for ", $format_str, ".\n\n")]
+        #[doc = concat! ("**INSECURE OBFUSCATION-ONLY** Codec for ", $format_str, ".\n\n")]
         #[doc = "⚠️ This scheme provides no cryptographic security.\n"]
         #[doc = "Use only for obfuscation, never for actual encryption.\n\n"]
-        #[doc = concat!("Format: `\"", $format_str, "\"`")]
+        #[doc = concat!("Format:  `\"", $format_str, "\"`")]
         #[allow(non_camel_case_types)]
         pub struct $name {
-            keychain: Keychain,
+            zkeychain: ZKeychain,
         }
 
         impl $name {
             /// Create with hardcoded secret (testing/obfuscation only)
             #[cfg(feature = "keyless")]
             pub fn new_keyless() -> Result<Self, Error> {
-                // Create a 64-byte key with secret in first 32 bytes, zeros in last 32
-                let mut key_bytes = [0u8; 64];
-                key_bytes[0..32].copy_from_slice(&HARDCODED_SECRET_BYTES);
                 Ok(Self {
-                    keychain: Keychain::from_bytes(&key_bytes)?,
+                    zkeychain: ZKeychain::from_bytes(&HARDCODED_SECRET_BYTES)?,
                 })
             }
 
             /// Internal constructor from 64-byte key (uses first 32 bytes as secret)
             #[cfg(any(feature = "keyless", feature = "bytes-keys"))]
             pub(crate) fn from_bytes_internal(key_bytes: &[u8; 64]) -> Result<Self, Error> {
+                let secret:  [u8; 32] = key_bytes[0..32].try_into().unwrap();
                 Ok(Self {
-                    keychain: Keychain::from_bytes(key_bytes)?,
+                    zkeychain: ZKeychain::from_bytes(&secret)?,
                 })
             }
         }
@@ -43,12 +41,20 @@ macro_rules! impl_zcodec {
         impl ObtextCodec for $name {
             fn enc(&self, plaintext: &str) -> Result<String, Error> {
                 let format = Format::new(Scheme::Zrbcx, $encoding);
-                crate::enc::enc_to_format(plaintext, format, &self.keychain)
+                crate::enc::enc_to_format(plaintext, format, &crate::Keychain::from_bytes(&{
+                    let mut key = [0u8; 64];
+                    key[0..32].copy_from_slice(self.zkeychain. secret_bytes());
+                    key
+                })?)
             }
 
             fn dec(&self, obtext: &str) -> Result<String, Error> {
                 let format = Format::new(Scheme::Zrbcx, $encoding);
-                crate::dec::dec_from_format(obtext, format, &self.keychain)
+                crate::dec::dec_from_format(obtext, format, &crate::Keychain::from_bytes(&{
+                    let mut key = [0u8; 64];
+                    key[0..32].copy_from_slice(self.zkeychain.secret_bytes());
+                    key
+                })?)
             }
 
             fn format(&self) -> Format {
@@ -64,17 +70,24 @@ macro_rules! impl_zcodec {
             }
 
             fn key(&self) -> String {
-                self.keychain.key_base64()
+                use data_encoding::BASE64URL_NOPAD;
+                // For z-tier, return the 32-byte secret padded to 64 bytes
+                let mut key = [0u8; 64];
+                key[0..32]. copy_from_slice(self. zkeychain.secret_bytes());
+                BASE64URL_NOPAD.encode(&key)
             }
 
             #[cfg(feature = "hex-keys")]
             fn key_hex(&self) -> String {
-                self.keychain.key_hex()
+                // For z-tier, return the 32-byte secret padded to 64 bytes
+                let mut key = [0u8; 64];
+                key[0..32].copy_from_slice(self.zkeychain. secret_bytes());
+                hex::encode(&key)
             }
 
             #[cfg(feature = "bytes-keys")]
             fn key_bytes(&self) -> &[u8; 64] {
-                self.keychain.key_bytes()
+                panic!("Z-tier schemes use 32-byte secrets, not 64-byte keys.  Use secret_bytes() instead.")
             }
         }
 
@@ -105,21 +118,17 @@ macro_rules! impl_zcodec {
                 <Self as ObtextCodec>::encoding(self)
             }
 
+            /// Get the secret as base64 (for z-tier compatibility)
             #[inline]
-            pub fn key(&self) -> String {
-                <Self as ObtextCodec>::key(self)
-            }
-
-            #[cfg(feature = "hex-keys")]
-            #[inline]
-            pub fn key_hex(&self) -> String {
-                <Self as ObtextCodec>::key_hex(self)
+            pub fn secret(&self) -> String {
+                use data_encoding::BASE64URL_NOPAD;
+                BASE64URL_NOPAD.encode(self.zkeychain.secret_bytes())
             }
 
             #[cfg(feature = "bytes-keys")]
             #[inline]
-            pub fn key_bytes(&self) -> &[u8; 64] {
-                <Self as ObtextCodec>::key_bytes(self)
+            pub fn secret_bytes(&self) -> &[u8; 32] {
+                self.zkeychain.secret_bytes()
             }
         }
     };

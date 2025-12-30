@@ -1,6 +1,4 @@
 use crate::{constants::SCHEME_MARKER_SIZE, error::Error, Encoding, Keychain};
-#[cfg(feature = "legacy")]
-use crate::{Format, Scheme};
 
 #[cfg(feature = "aags")]
 use crate::{constants::AAGS_MARKER, decrypt_aags};
@@ -12,37 +10,20 @@ use crate::{constants::APGS_MARKER, decrypt_apgs};
 use crate::{constants::APSV_MARKER, decrypt_apsv};
 #[cfg(feature = "upbc")]
 use crate::{constants::UPBC_MARKER, decrypt_upbc};
-#[cfg(feature = "zrbcx")]
-use crate::{constants::ZRBCX_MARKER, decrypt_zrbcx};
 // Testing
 #[cfg(feature = "mock")]
 use crate::{constants::MOCK1_MARKER, decrypt_mock1};
 #[cfg(feature = "mock")]
 use crate::{constants::MOCK2_MARKER, decrypt_mock2};
-// Legacy
-#[cfg(feature = "legacy")]
-use crate::legacy;
 
-/// Decode the given encoding, then decrypt autodetecting the scheme
+/// Decode the given encoding, then decrypt autodetecting the scheme (SECURE SCHEMES ONLY)
 pub fn dec_any_scheme(
     keychain: &Keychain,
     encoding: Encoding,
     obtext: &str,
 ) -> Result<String, Error> {
     // Step 1: Decode obtext using encoding
-    let mut buffer = match crate::dec::decode_obtext_to_payload(obtext, encoding) {
-        Ok(ct) => ct,
-        Err(decode_err) => {
-            // Decoding failed - try legacy
-            #[cfg(feature = "legacy")]
-            {
-                let format = Format::new(Scheme::Legacy, encoding);
-                return legacy::dec_legacy(obtext, format, keychain).or(Err(decode_err));
-            }
-            #[cfg(not(feature = "legacy"))]
-            return Err(decode_err);
-        }
-    };
+    let mut buffer = crate::dec::decode_obtext_to_payload(obtext, encoding)?;
 
     if buffer.len() < SCHEME_MARKER_SIZE {
         return Err(Error::PayloadTooShort);
@@ -57,10 +38,8 @@ pub fn dec_any_scheme(
     let scheme_marker = [buffer[len - 2], buffer[len - 1]];
     buffer.truncate(len - SCHEME_MARKER_SIZE);
 
-    // Step 4: Match scheme marker and decrypt with available schemes
+    // Step 4: Match scheme marker and decrypt with available SECURE schemes only
     let plaintext_bytes = match scheme_marker {
-        #[cfg(feature = "zrbcx")]
-        ZRBCX_MARKER => decrypt_zrbcx(keychain.zrbcx(), &buffer)?,
         #[cfg(feature = "upbc")]
         UPBC_MARKER => decrypt_upbc(keychain.upbc(), &buffer)?,
         #[cfg(feature = "aags")]
@@ -77,16 +56,7 @@ pub fn dec_any_scheme(
         #[cfg(feature = "mock")]
         MOCK2_MARKER => decrypt_mock2(keychain.mock2(), &buffer)?,
         _ => {
-            // Unknown scheme marker - try legacy as fallback
-            #[cfg(feature = "legacy")]
-            {
-                let format = Format::new(Scheme::Legacy, encoding);
-                let legacy_result = legacy::dec_legacy(obtext, format, keychain)?;
-                // Only validate legacy fallback results to avoid false positives
-                validate_legacy_output(&legacy_result)?;
-                return Ok(legacy_result);
-            }
-            #[cfg(not(feature = "legacy"))]
+            // Unknown scheme marker - no fallback for secure schemes
             return Err(Error::UnknownScheme);
         }
     };
@@ -103,31 +73,6 @@ pub fn dec_any_scheme(
     {
         String::from_utf8(plaintext_bytes).map_err(|_| Error::DecryptionFailed)
     }
-}
-
-/// Validate legacy output to prevent false positives from encoding mismatches
-#[cfg(feature = "legacy")]
-fn validate_legacy_output(plaintext: &str) -> Result<(), Error> {
-    let total_chars = plaintext.chars().count();
-    if total_chars == 0 {
-        return Ok(()); // Empty string is fine
-    }
-
-    let reasonable_count = plaintext
-        .chars()
-        .filter(|&c| {
-            c.is_ascii_graphic()  // Printable ASCII
-            || c. is_whitespace()   // Whitespace
-            || (c >= '\u{0080}' && c <= '\u{FFFF}' && ! c.is_control()) // Valid Unicode (not control chars)
-        })
-        .count();
-
-    // Require at least 70% of characters to be reasonable (lowered threshold)
-    if reasonable_count * 10 < total_chars * 7 {
-        return Err(Error::InvalidLegacyOutput);
-    }
-
-    Ok(())
 }
 
 /// Decode c32, autodetect the scheme and decrypt accordingly
@@ -150,7 +95,7 @@ pub(crate) fn dec_any_scheme_hex(keychain: &Keychain, obtext: &str) -> Result<St
     dec_any_scheme(keychain, Encoding::Hex, obtext)
 }
 
-/// Autodetect both the encoding and scheme, then decode accordingly.
+/// Autodetect both the encoding and scheme, then decode accordingly (SECURE SCHEMES ONLY).
 ///
 /// This function analyzes the characteristics of the input text to determine
 /// the most likely encoding format, then delegates to the appropriate decoder.
@@ -161,7 +106,7 @@ pub(crate) fn dec_any_scheme_hex(keychain: &Keychain, obtext: &str) -> Result<St
 /// 2. Else if text contains non-hex lowercase letters (g-z) -> Try Base32, fallback to B64
 /// 3. Else -> Try Hex, fallback to Base32, then B64
 pub fn dec_any_format(keychain: &Keychain, obtext: &str) -> Result<String, Error> {
-    // Check for B64 indicators:  '-', '_', or mixed case letters (definitive)
+    // Check for B64 indicators:   '-', '_', or mixed case letters (definitive)
     if obtext.contains('-')
         || obtext.contains('_')
         || (obtext.chars().any(|c| c.is_ascii_lowercase())

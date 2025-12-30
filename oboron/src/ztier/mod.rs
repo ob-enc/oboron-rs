@@ -8,11 +8,12 @@
 #![cfg(feature = "ztier")]
 
 // Z-tier scheme implementations
-#[cfg(feature = "zrbcx")]
-mod zcodec;
+mod zkeychain;
 
 #[cfg(feature = "legacy")]
 mod legacy;
+#[cfg(feature = "zrbcx")]
+mod zrbcx;
 
 // Re-export public types
 #[cfg(feature = "zrbcx")]

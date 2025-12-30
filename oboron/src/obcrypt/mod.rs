@@ -12,18 +12,12 @@ mod apgs; // AES-GCM-SIV (probabilistic)
 mod apsv;
 #[cfg(feature = "upbc")]
 mod upbc; // AES-CBC (probabilistic)
-#[cfg(feature = "zrbcx")]
-mod zrbcx; //  AES-CBC (deterministic, not cryptographically secure - obfuscation only!) // AES-SIV (probabilistic)
 
 // Testing schemes (no encryption - no dependencies)
 #[cfg(feature = "mock")]
 mod mock1;
 #[cfg(feature = "mock")]
 mod mock2; // Identity // String reversal
-
-// Legacy
-#[cfg(feature = "legacy")]
-mod legacy; //  Legacy AES-CBC
 
 #[cfg(feature = "aags")]
 pub use aags::{decrypt as decrypt_aags, encrypt as encrypt_aags};
@@ -35,15 +29,9 @@ pub use apgs::{decrypt as decrypt_apgs, encrypt as encrypt_apgs};
 pub use apsv::{decrypt as decrypt_apsv, encrypt as encrypt_apsv};
 #[cfg(feature = "upbc")]
 pub use upbc::{decrypt as decrypt_upbc, encrypt as encrypt_upbc};
-#[cfg(feature = "zrbcx")]
-pub use zrbcx::{decrypt as decrypt_zrbcx, encrypt as encrypt_zrbcx};
 
 // Testing
 #[cfg(feature = "mock")]
 pub use mock1::{decrypt as decrypt_mock1, encrypt as encrypt_mock1};
 #[cfg(feature = "mock")]
 pub use mock2::{decrypt as decrypt_mock2, encrypt as encrypt_mock2};
-
-// Legacy
-#[cfg(feature = "legacy")]
-pub use legacy::{decrypt as decrypt_legacy, encrypt as encrypt_legacy};

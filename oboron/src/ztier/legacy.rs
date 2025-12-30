@@ -1,391 +1,222 @@
-//! Legacy AES-CBC scheme (legacy)
-//!
-//! **Deprecated**: This scheme exists only for compatibility with
-//! existing deployments.  New code should use secure schemes instead.
-
 #![cfg(feature = "legacy")]
 
-use crate::{
-    base32::BASE32_CROCKFORD,
-    constants::HARDCODED_KEY_BYTES,
-    error::Error,
-    obcrypt::{decrypt_legacy, encrypt_legacy},
-    Encoding, Format, Keychain, ObtextCodec, Scheme,
-};
-use data_encoding::{BASE32, BASE64URL_NOPAD, HEXLOWER};
+use crate::constants::HARDCODED_SECRET_BYTES;
+use crate::{error::Error, Encoding, Format, ObtextCodec, Scheme};
 
-// ============================================================================
-// Internal Helper Functions (legacy-specific encoding/decoding)
-// ============================================================================
+// Re-use ZKeychain from zcodec module
+use super::zkeychain::ZKeychain;
 
-/// Encode raw ciphertext bytes to oboron legacy string format.
-fn encode_ciphertext_to_obtext(encoding: Encoding, ciphertext: &[u8]) -> String {
-    let enc = match encoding {
-        Encoding::C32 => {
-            let encoded = BASE32_CROCKFORD.encode(ciphertext);
-            // Trim '=' for consistency with b32 legacy bug; lowercase
-            let end = encoded.trim_end_matches('=').len();
-            encoded[..end].to_string() // already lowercase
-        }
-        Encoding::B32 => {
-            let encoded = BASE32.encode(ciphertext);
-            // Trim B32 padding and lowercase
-            let end = encoded.trim_end_matches('=').len();
-            encoded[..end].to_ascii_lowercase()
-        }
-        Encoding::B64 => {
-            let encoded = BASE64URL_NOPAD.encode(ciphertext);
-            // Trim '=' for consistency with b32 legacy bug
-            let end = encoded.trim_end_matches('=').len();
-            encoded[..end].to_string()
-        }
-        Encoding::Hex => HEXLOWER.encode(ciphertext),
-    };
+const AES_BLOCK_SIZE: usize = 16;
+const LEGACY_PADDING_BYTE: u8 = b'=';
 
-    // Step 3: Reverse (byte-based for performance)
-    let mut result = enc.into_bytes();
-    result.reverse();
-    // SAFETY: Plaintext was originally valid UTF-8, and encryption preserves byte sequences
-    unsafe { String::from_utf8_unchecked(result) }
-}
-
-/// Decode oboron legacy string to raw ciphertext bytes.
-fn decode_obtext_to_ciphertext(encoding: Encoding, obtext: &str) -> Result<Vec<u8>, Error> {
-    match encoding {
-        Encoding::C32 => {
-            // Reverse the string first
-            let reversed: Vec<u8> = obtext.as_bytes().iter().rev().copied().collect();
-            BASE32_CROCKFORD
-                .decode(&reversed)
-                .map_err(|_| Error::InvalidC32)
-        }
-        Encoding::B32 => {
-            // Special handling for B32: need to add padding
-            let enc_len = obtext.len();
-            let padding = (8 - (enc_len % 8)) % 8;
-
-            // Reverse and uppercase (byte-based for performance)
-            let mut buffer = Vec::with_capacity(enc_len + padding);
-            for &b in obtext.as_bytes().iter().rev() {
-                buffer.push(b.to_ascii_uppercase());
-            }
-
-            // Add B32 padding
-            buffer.resize(enc_len + padding, b'=');
-
-            // B32 decode
-            BASE32.decode(&buffer).map_err(|_| Error::InvalidB32)
-        }
-        Encoding::B64 => {
-            // Reverse the string first
-            let reversed: Vec<u8> = obtext.as_bytes().iter().rev().copied().collect();
-            BASE64URL_NOPAD
-                .decode(&reversed)
-                .map_err(|_| Error::InvalidB64)
-        }
-        Encoding::Hex => {
-            // Reverse the hex string first
-            let reversed: String = obtext.chars().rev().collect();
-            HEXLOWER
-                .decode(reversed.as_bytes())
-                .map_err(|_| Error::InvalidHex)
-        }
-    }
-}
-
-/// Decode legacy format to plaintext (used by autodetection in dec_auto.rs).
-pub(crate) fn dec_legacy(
-    obtext: &str,
-    format: Format,
-    keychain: &Keychain,
-) -> Result<String, Error> {
-    assert_eq!(format.scheme(), Scheme::Legacy);
-    let ciphertext = decode_obtext_to_ciphertext(format.encoding(), obtext)?;
-    // SAFETY: Plaintext was originally valid UTF-8, and encryption preserves byte sequences
-    Ok(unsafe { String::from_utf8_unchecked(decrypt_legacy(keychain.legacy(), &ciphertext)?) })
-}
-
-// ============================================================================
-// Public ObtextCodec Implementations (LegacyC32, LegacyB32, LegacyB64, LegacyHex)
-// ============================================================================
-
-/// Macro to implement legacy ObtextCodec variants with different encodings.
+/// Legacy codec implementation
 macro_rules! impl_legacy_codec {
-    ($name:ident,         // Type name (e.g., LegacyC32)
-     $encoding:expr,      // Encoding constant (e.g., Encoding::C32)
-     $format_str:expr     // Format string for docs (e.g., "legacy.c32")
-     ) => {
-        #[doc = concat!("Legacy ObtextCodec implementation for ", $format_str, " format.\n\n")]
-        #[doc = "**LEGACY**: This scheme is maintained for backward compatibility only.\n"]
-        #[doc = "The legacy scheme uses legacy AES-CBC encryption with custom padding.\n"]
-        #[doc = "For new projects, consider using zrbcx or more secure schemes like aags/aasv.\n"]
-        #[doc = concat!("\nCorresponds to format string: `\"", $format_str, "\"`")]
+    ($name: ident, $encoding:expr, $format_str:expr) => {
+        #[doc = concat! ("**DEPRECATED** Legacy codec for ", $format_str, ".\n\n")]
+        #[doc = "⚠️ This scheme exists for compatibility only.\n"]
+        #[doc = "Use secure schemes for new code.\n\n"]
+        #[doc = concat!("Format:  `\"", $format_str, "\"`")]
         #[allow(non_camel_case_types)]
         pub struct $name {
-            keychain: Keychain,
-            format: Format,
+            zkeychain: ZKeychain,
+        }
+
+        impl $name {
+            /// Create with hardcoded secret (testing only)
+            #[cfg(feature = "keyless")]
+            pub fn new_keyless() -> Result<Self, Error> {
+                Ok(Self {
+                    zkeychain: ZKeychain::from_bytes(&HARDCODED_SECRET_BYTES)?,
+                })
+            }
+
+            /// Internal constructor from 64-byte key (uses first 32 bytes as secret)
+            #[cfg(any(feature = "keyless", feature = "bytes-keys"))]
+            pub(crate) fn from_bytes_internal(key_bytes: &[u8; 64]) -> Result<Self, Error> {
+                let secret: [u8; 32] = key_bytes[0..32].try_into().unwrap();
+                Ok(Self {
+                    zkeychain: ZKeychain::from_bytes(&secret)?,
+                })
+            }
         }
 
         impl ObtextCodec for $name {
             fn enc(&self, plaintext: &str) -> Result<String, Error> {
-                let ciphertext = encrypt_legacy(&self.keychain.legacy(), plaintext.as_bytes())?;
-                Ok(encode_ciphertext_to_obtext(
-                    self.format.encoding(),
-                    &ciphertext,
-                ))
+                let plaintext_bytes = plaintext.as_bytes();
+                if plaintext_bytes.is_empty() {
+                    return Err(Error::EmptyPlaintext);
+                }
+
+                // Encrypt using legacy AES-CBC
+                let ciphertext = encrypt_legacy(self.zkeychain.secret_bytes(), plaintext_bytes)?;
+
+                // Encode based on encoding type
+                match $encoding {
+                    Encoding::C32 => Ok(crate::base32::BASE32_CROCKFORD.encode(&ciphertext)),
+                    Encoding::B32 => Ok(crate::base32::BASE32_RFC.encode(&ciphertext)),
+                    Encoding::B64 => Ok(data_encoding::BASE64URL_NOPAD.encode(&ciphertext)),
+                    Encoding::Hex => Ok(data_encoding::HEXLOWER.encode(&ciphertext)),
+                }
             }
 
             fn dec(&self, obtext: &str) -> Result<String, Error> {
-                // Only decode legacy format, no autodetection
-                let ciphertext = decode_obtext_to_ciphertext(self.format.encoding(), obtext)?;
-                Ok(unsafe {
-                    // SAFETY: Plaintext was originally valid UTF-8, and encryption preserves byte sequences
-                    String::from_utf8_unchecked(decrypt_legacy(
-                        &self.keychain.legacy(),
-                        &ciphertext,
-                    )?)
-                })
+                // Decode based on encoding type
+                let ciphertext = match $encoding {
+                    Encoding::C32 => crate::base32::BASE32_CROCKFORD
+                        .decode(obtext.as_bytes())
+                        .map_err(|_| Error::InvalidC32)?,
+                    Encoding::B32 => crate::base32::BASE32_RFC
+                        .decode(obtext.as_bytes())
+                        .map_err(|_| Error::InvalidB32)?,
+                    Encoding::B64 => data_encoding::BASE64URL_NOPAD
+                        .decode(obtext.as_bytes())
+                        .map_err(|_| Error::InvalidB64)?,
+                    Encoding::Hex => data_encoding::HEXLOWER
+                        .decode(obtext.as_bytes())
+                        .map_err(|_| Error::InvalidHex)?,
+                };
+
+                // Decrypt using legacy AES-CBC
+                let plaintext_bytes = decrypt_legacy(self.zkeychain.secret_bytes(), &ciphertext)?;
+
+                // Convert to string
+                #[cfg(feature = "unchecked-utf8")]
+                {
+                    Ok(unsafe { String::from_utf8_unchecked(plaintext_bytes) })
+                }
+
+                #[cfg(not(feature = "unchecked-utf8"))]
+                {
+                    String::from_utf8(plaintext_bytes).map_err(|_| Error::DecryptionFailed)
+                }
             }
 
             fn format(&self) -> Format {
-                self.format
+                Format::new(Scheme::Legacy, $encoding)
             }
 
             fn scheme(&self) -> Scheme {
-                self.format.scheme()
+                Scheme::Legacy
             }
 
             fn encoding(&self) -> Encoding {
-                self.format.encoding()
+                $encoding
             }
 
             fn key(&self) -> String {
-                self.keychain.key_base64()
+                use data_encoding::BASE64URL_NOPAD;
+                // For legacy (z-tier), return the 32-byte secret padded to 64 bytes
+                let mut key = [0u8; 64];
+                key[0..32].copy_from_slice(self.zkeychain.secret_bytes());
+                BASE64URL_NOPAD.encode(&key)
             }
 
             #[cfg(feature = "hex-keys")]
             fn key_hex(&self) -> String {
-                self.keychain.key_hex()
+                let mut key = [0u8; 64];
+                key[0..32].copy_from_slice(self.zkeychain.secret_bytes());
+                hex::encode(&key)
             }
 
             #[cfg(feature = "bytes-keys")]
             fn key_bytes(&self) -> &[u8; 64] {
-                self.keychain.key_bytes()
+                panic!("Legacy (z-tier) schemes use 32-byte secrets, not 64-byte keys.")
             }
         }
 
+        // Inherent methods
         impl $name {
-            /// Create a new instance from a base64-encoded key string.
-            ///
-            /// # Arguments
-            ///
-            /// * `key` - A 86-character base64 string representing 64 bytes
-            ///
-            /// # Examples
-            ///
-            /// ```
-            /// # use oboron::{ObtextCodec, LegacyB32};
-            /// let key = oboron::generate_key();
-            /// let ob = LegacyB32::new(&key)? ;
-            /// # Ok::<(), oboron::Error>(())
-            /// ```
-            pub fn new(key: &str) -> Result<Self, Error> {
-                let keychain = Keychain::from_base64(key)?;
-                Ok(Self {
-                    keychain,
-                    format: Format::new(Scheme::Legacy, $encoding),
-                })
-            }
-
-            /// Create a new instance from a hex-encoded key string.
-            ///
-            /// # Arguments
-            ///
-            /// * `key_hex` - A 128-character hexadecimal string representing 64 bytes
-            ///
-            /// # Examples
-            ///
-            /// ```
-            /// use oboron::{ObtextCodec, LegacyB32};
-            ///
-            /// let key_hex = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-            /// let ob = LegacyB32::from_hex_key(key_hex)? ;
-            /// # Ok::<(), oboron::Error>(())
-            /// ```
-            #[cfg(feature = "hex-keys")]
-            pub fn from_hex_key(key_hex: &str) -> Result<Self, Error> {
-                let keychain = Keychain::from_hex(key_hex)?;
-                Ok(Self {
-                    keychain,
-                    format: Format::new(Scheme::Legacy, $encoding),
-                })
-            }
-
-            /// Create a new instance from raw key bytes.
-            ///
-            /// # Arguments
-            ///
-            /// * `key` - A 64-byte array
-            ///
-            /// # Examples
-            ///
-            /// ```
-            /// use oboron::{ObtextCodec, LegacyB32};
-            ///
-            /// let key = [0u8; 64];
-            /// let ob = LegacyB32::from_bytes(&key)?;
-            /// # Ok::<(), oboron::Error>(())
-            /// ```
-            #[inline]
-            #[cfg(feature = "bytes-keys")]
-            pub fn from_bytes(key: &[u8; 64]) -> Result<Self, Error> {
-                Self::from_bytes_internal(key)
-            }
-
-            pub(crate) fn from_bytes_internal(key: &[u8; 64]) -> Result<Self, Error> {
-                let keychain = Keychain::from_bytes(key)?;
-                Ok(Self {
-                    keychain,
-                    format: Format::new(Scheme::Legacy, $encoding),
-                })
-            }
-
-            /// Create a new instance with hardcoded key (testing only).
-            ///
-            /// **WARNING**: This uses a publicly available hardcoded key and provides no security.
-            /// Only use this for testing or when obfuscation (not encryption) is the goal.
-            ///
-            /// # Examples
-            ///
-            /// ```
-            /// use oboron::{ObtextCodec, LegacyB32};
-            ///
-            /// let ob = LegacyB32::new_keyless()?;
-            /// let ot = ob.enc("test")?;
-            /// # Ok::<(), oboron::Error>(())
-            /// ```
-            #[cfg(feature = "keyless")]
-            pub fn new_keyless() -> Result<Self, Error> {
-                Self::from_bytes_internal(&HARDCODED_KEY_BYTES)
-            }
-
-            pub fn dec_auto_scheme(&self, obtext: &str) -> Result<String, Error> {
-                crate::dec_auto::dec_any_scheme(&self.keychain, self.format.encoding(), obtext)
-            }
-        }
-
-        // Add inherent methods that delegate to trait methods
-        impl $name {
-            /// Encrypt and encode plaintext
             #[inline]
             pub fn enc(&self, plaintext: &str) -> Result<String, Error> {
                 <Self as ObtextCodec>::enc(self, plaintext)
             }
 
-            /// Decode and decrypt obtext (no scheme autodetection)
             #[inline]
             pub fn dec(&self, obtext: &str) -> Result<String, Error> {
                 <Self as ObtextCodec>::dec(self, obtext)
             }
 
-            /// Get the format
             #[inline]
             pub fn format(&self) -> Format {
                 <Self as ObtextCodec>::format(self)
             }
 
-            /// Get the scheme
             #[inline]
             pub fn scheme(&self) -> Scheme {
                 <Self as ObtextCodec>::scheme(self)
             }
 
-            /// Get the encoding
             #[inline]
             pub fn encoding(&self) -> Encoding {
                 <Self as ObtextCodec>::encoding(self)
-            }
-
-            /// Get the key as base64
-            #[inline]
-            pub fn key(&self) -> String {
-                <Self as ObtextCodec>::key(self)
-            }
-
-            #[cfg(feature = "hex-keys")]
-            #[inline]
-            pub fn key_hex(&self) -> String {
-                <Self as ObtextCodec>::key_hex(self)
-            }
-
-            #[cfg(feature = "bytes-keys")]
-            #[inline]
-            pub fn key_bytes(&self) -> &[u8; 64] {
-                <Self as ObtextCodec>::key_bytes(self)
             }
         }
     };
 }
 
-// Generate all legacy encoding variants
+// Generate all legacy variants
 impl_legacy_codec!(LegacyC32, Encoding::C32, "legacy.c32");
 impl_legacy_codec!(LegacyB32, Encoding::B32, "legacy.b32");
 impl_legacy_codec!(LegacyB64, Encoding::B64, "legacy.b64");
 impl_legacy_codec!(LegacyHex, Encoding::Hex, "legacy.hex");
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+/// Encrypt plaintext bytes using legacy AES-CBC
+fn encrypt_legacy(secret: &[u8; 32], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
+    use aes::Aes128;
+    use cbc::cipher::{BlockEncryptMut, KeyIvInit};
+    use cbc::Encryptor;
 
-    #[test]
-    #[cfg(feature = "keyless")]
-    fn test_legacy_roundtrip() {
-        let ob = LegacyB32::new_keyless().unwrap();
-        let pt = "hello world";
-        let ot = ob.enc(pt).unwrap();
-        let pt2 = ob.dec(&ot).unwrap();
-        assert_eq!(pt, pt2);
+    type Aes128CbcEnc = Encryptor<Aes128>;
+
+    if plaintext_bytes.is_empty() {
+        return Err(Error::EmptyPlaintext);
     }
 
-    #[test]
-    fn test_legacy_encoding_variants() {
-        let pt = "test123";
-        let key = [42u8; 64];
+    // Calculate padding to align to block size
+    let data_len = plaintext_bytes.len();
+    let padding_size = (AES_BLOCK_SIZE - (data_len % AES_BLOCK_SIZE)) % AES_BLOCK_SIZE;
+    let total_len = data_len + padding_size;
 
-        let ob_c32 = LegacyC32::from_bytes(&key).unwrap();
-        let ob_b32 = LegacyB32::from_bytes(&key).unwrap();
-        let ob_b64 = LegacyB64::from_bytes(&key).unwrap();
-        let ob_hex = LegacyHex::from_bytes(&key).unwrap();
+    // Allocate once with the correct size
+    let mut buffer = Vec::with_capacity(total_len);
+    buffer.extend_from_slice(plaintext_bytes);
+    buffer.resize(total_len, LEGACY_PADDING_BYTE);
 
-        let ot_c32 = ob_c32.enc(pt).unwrap();
-        let ot_b32 = ob_b32.enc(pt).unwrap();
-        let ot_b64 = ob_b64.enc(pt).unwrap();
-        let ot_hex = ob_hex.enc(pt).unwrap();
+    // Encrypt in-place
+    let cipher = Aes128CbcEnc::new(secret[0..16].into(), secret[16..32].into());
+    cipher
+        .encrypt_padded_mut::<cbc::cipher::block_padding::NoPadding>(&mut buffer, total_len)
+        .map_err(|_| Error::EncryptionFailed)?;
 
-        // All should decode back to pt
-        assert_eq!(ob_c32.dec(&ot_c32).unwrap(), pt);
-        assert_eq!(ob_b32.dec(&ot_b32).unwrap(), pt);
-        assert_eq!(ob_b64.dec(&ot_b64).unwrap(), pt);
-        assert_eq!(ob_hex.dec(&ot_hex).unwrap(), pt);
+    Ok(buffer)
+}
 
-        // Encodings should be different
-        assert_ne!(ot_c32, ot_b64);
-        assert_ne!(ot_c32, ot_hex);
-        assert_ne!(ot_c32, ot_b32);
-        assert_ne!(ot_b32, ot_b64);
-        assert_ne!(ot_b32, ot_hex);
-        assert_ne!(ot_b64, ot_hex);
+/// Decrypt ciphertext using legacy AES-CBC
+fn decrypt_legacy(secret: &[u8; 32], data: &[u8]) -> Result<Vec<u8>, Error> {
+    use aes::Aes128;
+    use cbc::cipher::{BlockDecryptMut, KeyIvInit};
+    use cbc::Decryptor;
+
+    type Aes128CbcDec = Decryptor<Aes128>;
+
+    // Decrypt with AES-128-CBC
+    if data.len() % AES_BLOCK_SIZE != 0 {
+        return Err(Error::InvalidBlockLength);
     }
 
-    #[test]
-    #[cfg(feature = "keyless")]
-    fn test_legacy_dec_auto_scheme() {
-        let ob = LegacyB32::new_keyless().unwrap();
-        let pt = "autodetect test";
-        let ot = ob.enc(pt).unwrap();
+    let cipher = Aes128CbcDec::new(secret[0..16].into(), secret[16..32].into());
+    let mut buffer = data.to_vec();
 
-        // should work (uses autodetection)
-        let pt2 = ob.dec_auto_scheme(&ot).unwrap();
-        assert_eq!(pt, pt2);
-    }
+    cipher
+        .decrypt_padded_mut::<cbc::cipher::block_padding::NoPadding>(&mut buffer)
+        .map_err(|_| Error::DecryptionFailed)?;
+
+    // Remove '=' padding by finding the end and truncating
+    let end = buffer
+        .iter()
+        .rposition(|&b| b != LEGACY_PADDING_BYTE)
+        .map_or(0, |i| i + 1);
+    buffer.truncate(end);
+
+    Ok(buffer)
 }
