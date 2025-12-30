@@ -7,7 +7,7 @@
 
 #![cfg(feature = "ztier")]
 
-mod dec_auto;
+mod zdec_auto;
 mod zkeychain;
 
 #[cfg(feature = "legacy")]

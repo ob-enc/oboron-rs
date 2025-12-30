@@ -1,6 +1,8 @@
 //! Keychain for z-tier schemes (32-byte secrets, obfuscation-only)
 
-use crate::Error;
+#![cfg(feature = "ztier")]
+
+use crate::{Error, ExtractedKey, Scheme};
 use data_encoding::BASE64URL_NOPAD;
 
 /// Keychain for z-tier schemes (obfuscation-only, 32-byte secrets)
@@ -71,6 +73,32 @@ impl ZKeychain {
     // Secret extraction for specific schemes
     // ========================================
 
+    #[inline]
+    #[allow(dead_code)]
+    pub(crate) fn extract_secret(&self, scheme: Scheme) -> Result<ExtractedKey<'_>, Error> {
+        match scheme {
+            #[cfg(feature = "zrbcx")]
+            Scheme::Zrbcx => Ok(ExtractedKey::Key32(self.zrbcx())),
+            #[cfg(feature = "legacy")]
+            Scheme::Legacy => Ok(ExtractedKey::Key32(self.legacy())),
+            // other schemes should use Keychain, not ZKeychain
+            #[cfg(feature = "aags")]
+            Scheme::Aags => Err(Error::InvalidScheme),
+            #[cfg(feature = "apgs")]
+            Scheme::Apgs => Err(Error::InvalidScheme),
+            #[cfg(feature = "aasv")]
+            Scheme::Aasv => Err(Error::InvalidScheme),
+            #[cfg(feature = "apsv")]
+            Scheme::Apsv => Err(Error::InvalidScheme),
+            #[cfg(feature = "upbc")]
+            Scheme::Upbc => Err(Error::InvalidScheme),
+            #[cfg(feature = "mock")]
+            Scheme::Mock1 => Err(Error::InvalidScheme),
+            #[cfg(feature = "mock")]
+            Scheme::Mock2 => Err(Error::InvalidScheme),
+        }
+    }
+
     /// Get secret for zrbcx scheme (all 32 bytes)
     #[inline]
     #[cfg(feature = "zrbcx")]
@@ -81,7 +109,7 @@ impl ZKeychain {
     /// Get secret for legacy scheme (all 32 bytes)
     #[inline]
     #[cfg(feature = "legacy")]
-    #[allow(dead_code)] // Used by dec_auto fallback
+    #[allow(dead_code)] // Used by zdec_auto fallback
     pub(crate) fn legacy(&self) -> &[u8; 32] {
         &self.secret
     }

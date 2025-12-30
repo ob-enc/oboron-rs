@@ -2,7 +2,7 @@ use crate::{
     base32::{BASE32_CROCKFORD, BASE32_RFC},
     constants::SCHEME_MARKER_SIZE,
     error::Error,
-    Encoding, Format, Keychain, Scheme,
+    Encoding, ExtractedKey, Format, Scheme,
 };
 use data_encoding::{BASE64URL_NOPAD, HEXLOWER};
 
@@ -36,7 +36,7 @@ use crate::decrypt_mock2;
 pub(crate) fn dec_from_format(
     obtext: &str,
     format: Format,
-    keychain: &Keychain,
+    extracted_key: ExtractedKey,
 ) -> Result<String, Error> {
     // Step 1: Decode obtext
     let mut buffer = decode_obtext_to_payload(obtext, format.encoding())?;
@@ -60,27 +60,30 @@ pub(crate) fn dec_from_format(
     }
 
     // Step 4:  Decrypt using scheme-specific function
-    let plaintext_bytes = match format.scheme() {
+    let plaintext_bytes = match (format.scheme(), extracted_key) {
         #[cfg(feature = "zrbcx")]
-        Scheme::Zrbcx => decrypt_zrbcx(keychain.zrbcx(), &buffer)?,
+        (Scheme::Zrbcx, ExtractedKey::Key32(k)) => decrypt_zrbcx(k, &buffer)?,
         #[cfg(feature = "upbc")]
-        Scheme::Upbc => decrypt_upbc(keychain.upbc(), &buffer)?,
+        (Scheme::Upbc, ExtractedKey::Key32(k)) => decrypt_upbc(k, &buffer)?,
         #[cfg(feature = "aags")]
-        Scheme::Aags => decrypt_aags(keychain.aags(), &buffer)?,
+        (Scheme::Aags, ExtractedKey::Key32(k)) => decrypt_aags(k, &buffer)?,
         #[cfg(feature = "apgs")]
-        Scheme::Apgs => decrypt_apgs(keychain.apgs(), &buffer)?,
+        (Scheme::Apgs, ExtractedKey::Key32(k)) => decrypt_apgs(k, &buffer)?,
         #[cfg(feature = "aasv")]
-        Scheme::Aasv => decrypt_aasv(keychain.aasv(), &buffer)?,
+        (Scheme::Aasv, ExtractedKey::Key64(k)) => decrypt_aasv(k, &buffer)?,
         #[cfg(feature = "apsv")]
-        Scheme::Apsv => decrypt_apsv(keychain.apsv(), &buffer)?,
+        (Scheme::Apsv, ExtractedKey::Key64(k)) => decrypt_apsv(k, &buffer)?,
         // Testing
         #[cfg(feature = "mock")]
-        Scheme::Mock1 => decrypt_mock1(keychain.mock1(), &buffer)?,
+        (Scheme::Mock1, ExtractedKey::Key32(k)) => decrypt_mock1(k, &buffer)?,
         #[cfg(feature = "mock")]
-        Scheme::Mock2 => decrypt_mock2(keychain.mock2(), &buffer)?,
+        (Scheme::Mock2, ExtractedKey::Key32(k)) => decrypt_mock2(k, &buffer)?,
         // Legacy - legacy does not use this call path
         #[cfg(feature = "legacy")]
-        Scheme::Legacy => unreachable!("called generic dec function for legacy"),
+        (Scheme::Legacy, ExtractedKey::Key32(_k)) => {
+            unreachable!("called generic dec function for legacy")
+        }
+        _ => return Err(Error::InvalidKeyLength),
     };
 
     // Step 5: Convert to string

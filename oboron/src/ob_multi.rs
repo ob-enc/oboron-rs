@@ -128,7 +128,8 @@ impl ObMulti {
     /// ```
     pub fn dec_with_format_str(&self, obtext: &str, fmt: &str) -> Result<String, Error> {
         let format = Format::from_str(fmt)?;
-        crate::dec::dec_from_format(obtext, format, &self.keychain)
+        let extracted_key = self.keychain.extract_key(format.scheme())?;
+        crate::dec::dec_from_format(obtext, format, extracted_key)
     }
 
     /// Decode+decrypt with a pre-parsed Format.
@@ -155,7 +156,8 @@ impl ObMulti {
     /// # }
     /// ```
     pub fn dec_with_format(&self, obtext: &str, format: Format) -> Result<String, Error> {
-        crate::dec::dec_from_format(obtext, format, &self.keychain)
+        let extracted_key = self.keychain.extract_key(format.scheme())?;
+        crate::dec::dec_from_format(obtext, format, extracted_key)
     }
 
     /// Decode+decrypt with automatic scheme and encoding detection.

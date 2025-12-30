@@ -118,7 +118,8 @@ macro_rules! impl_codec {
             fn dec(&self, obtext: &str) -> Result<String, Error> {
                 // Decode with known encoding - direct call
                 let format = Format::new($scheme, $encoding);
-                crate::dec::dec_from_format(obtext, format, &self.keychain)
+                let extracted_key = self.keychain.extract_key(format.scheme())?;
+                crate::dec::dec_from_format(obtext, format, extracted_key)
             }
 
             #[inline]

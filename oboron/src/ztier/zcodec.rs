@@ -1,5 +1,6 @@
 //! Zrbcx codec implementations (z-tier, obfuscation-only)
 
+#![cfg(feature = "ztier")]
 #![cfg(feature = "zrbcx")]
 
 use super::ZKeychain;
@@ -47,11 +48,8 @@ macro_rules! impl_zcodec {
 
             fn dec(&self, obtext: &str) -> Result<String, Error> {
                 let format = Format::new(Scheme::Zrbcx, $encoding);
-                crate::dec::dec_from_format(obtext, format, &crate::Keychain::from_bytes(&{
-                    let mut key = [0u8; 64];
-                    key[0..32].copy_from_slice(self.zkeychain.secret_bytes());
-                    key
-                })?)
+                let secret = self.zkeychain.zrbcx();
+                crate::dec::dec_from_format(obtext, format, secret)
             }
 
             fn format(&self) -> Format {
