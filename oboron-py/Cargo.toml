@@ -1,6 +1,6 @@
 [package]
 name = "oboron-py"
-version = "1.0.0-beta.1"
+version = "1.0.0-beta.2"
 edition = "2021"
 
 [lib]
@@ -23,7 +23,7 @@ all-schemes = ["zrbcx", "upbc", "aags", "apgs", "aasv", "apsv"]
 keyless = ["oboron/keyless"]
 
 [dependencies]
-oboron = { version = "1.0.0-beta.1", path = "../oboron", default-features = false, features=["full"] }
+oboron = { version = "1.0.0-beta.2", path = "../oboron", default-features = false, features=["full"] }
 pyo3 = { version = "0.22", features = ["extension-module"] }
 hex = "0.4"
 
