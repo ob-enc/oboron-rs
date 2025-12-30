@@ -19,5 +19,8 @@ mod zrbcx;
 #[cfg(feature = "zrbcx")]
 pub use zcodec::{ZrbcxB32, ZrbcxB64, ZrbcxC32, ZrbcxHex};
 
+#[cfg(feature = "zrbcx")]
+pub(crate) use zrbcx::{decrypt_zrbcx, encrypt_zrbcx};
+
 #[cfg(feature = "legacy")]
 pub use legacy::{LegacyB32, LegacyB64, LegacyC32, LegacyHex};
