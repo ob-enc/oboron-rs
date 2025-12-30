@@ -110,7 +110,7 @@ macro_rules! impl_codec {
             #[inline]
             fn enc(&self, plaintext: &str) -> Result<String, Error> {
                 let format = Format::new($scheme, $encoding);
-                let extracted_key = self.keychain.extract_key($scheme);
+                let extracted_key = self.keychain.extract_key($scheme)?;
                 crate::enc::enc_to_format(plaintext, format, extracted_key)
             }
 

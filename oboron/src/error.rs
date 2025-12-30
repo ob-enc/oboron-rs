@@ -23,6 +23,8 @@ pub enum Error {
     // --------------------
     #[error("invalid format string")]
     InvalidFormat,
+    #[error("invalid scheme")]
+    InvalidScheme,
     #[error("unknown scheme")]
     UnknownScheme,
     #[error("unknown encoding")]

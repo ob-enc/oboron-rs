@@ -59,18 +59,19 @@ impl Keychain {
     // Key extraction ==================================================
 
     #[inline]
-    pub(crate) fn extract_key(&self, scheme: Scheme) -> ExtractedKey {
+    pub(crate) fn extract_key(&self, scheme: Scheme) -> Result<ExtractedKey<'_>, Error> {
         match scheme {
             #[cfg(feature = "aags")]
-            Scheme::Aags => ExtractedKey::Key32(self.aags()),
+            Scheme::Aags => Ok(ExtractedKey::Key32(self.aags())),
             #[cfg(feature = "apgs")]
-            Scheme::Apgs => ExtractedKey::Key32(self.apgs()),
+            Scheme::Apgs => Ok(ExtractedKey::Key32(self.apgs())),
             #[cfg(feature = "aasv")]
-            Scheme::Aasv => ExtractedKey::Key64(self.aasv()),
+            Scheme::Aasv => Ok(ExtractedKey::Key64(self.aasv())),
             #[cfg(feature = "apsv")]
-            Scheme::Apsv => ExtractedKey::Key64(self.apsv()),
+            Scheme::Apsv => Ok(ExtractedKey::Key64(self.apsv())),
             #[cfg(feature = "upbc")]
-            Scheme::Upbc => ExtractedKey::Key32(self.upbc()),
+            Scheme::Upbc => Ok(ExtractedKey::Key32(self.upbc())),
+            _ => Err(Error::InvalidScheme),
         }
     }
 

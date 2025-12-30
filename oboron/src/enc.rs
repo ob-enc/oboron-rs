@@ -2,7 +2,7 @@ use crate::{
     base32::{BASE32_CROCKFORD, BASE32_RFC},
     constants::SCHEME_MARKER_SIZE,
     error::Error,
-    Encoding, ExtractedKey, Format, Keychain, Scheme,
+    Encoding, ExtractedKey, Format, Scheme,
 };
 use data_encoding::{BASE64URL_NOPAD, HEXLOWER};
 
@@ -100,7 +100,7 @@ mod tests {
         // Create a real keychain for testing
         let key = [0u8; 64];
         let keychain = Keychain::from_bytes(&key).unwrap();
-        let extracted_key = keychain.extract_key(format.scheme());
+        let extracted_key = keychain.extract_key(format.scheme()).unwrap();
         let result = enc_to_format("test", format, extracted_key).unwrap();
         assert!(!result.is_empty());
     }
