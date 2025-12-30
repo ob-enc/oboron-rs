@@ -62,7 +62,7 @@ pub(crate) fn enc_to_format(
         (Scheme::Mock2, ExtractedKey::Key32(k)) => encrypt_mock2(k, plaintext.as_bytes())?,
         // Legacy - legacy does not use this call path
         #[cfg(feature = "legacy")]
-        (Scheme::Legacy, ExtractedKey::Key32(k)) => {
+        (Scheme::Legacy, ExtractedKey::Key32(_k)) => {
             unreachable!("called generic enc function for legacy")
         }
         _ => return Err(Error::InvalidKeyLength),

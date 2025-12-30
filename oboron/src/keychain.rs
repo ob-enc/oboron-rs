@@ -71,7 +71,15 @@ impl Keychain {
             Scheme::Apsv => Ok(ExtractedKey::Key64(self.apsv())),
             #[cfg(feature = "upbc")]
             Scheme::Upbc => Ok(ExtractedKey::Key32(self.upbc())),
-            _ => Err(Error::InvalidScheme),
+            #[cfg(feature = "mock")]
+            Scheme::Mock1 => Ok(ExtractedKey::Key32(self.mock1())),
+            #[cfg(feature = "mock")]
+            Scheme::Mock2 => Ok(ExtractedKey::Key32(self.mock2())),
+            // Z-tier schemes should use ZKeychain, not Keychain
+            #[cfg(feature = "zrbcx")]
+            Scheme::Zrbcx => Err(Error::InvalidScheme),
+            #[cfg(feature = "legacy")]
+            Scheme::Legacy => Err(Error::InvalidScheme),
         }
     }
 
