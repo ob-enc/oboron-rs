@@ -537,26 +537,26 @@ impl Ob {
     }
 }
 
-/// ObMulti - Multi-format cipher with full autodetection.
+/// Omnib - Multi-format cipher with full autodetection.
 ///
-/// Unlike other ciphers, ObMulti doesn't store a format internally.
+/// Unlike other ciphers, Omnib doesn't store a format internally.
 /// The format must be specified for each enc operation, and it can
 /// automatically detect both scheme and encoding on dec operations.
 #[pyclass]
-struct ObMulti {
-    inner: ::oboron::ObMulti,
+struct Omnib {
+    inner: ::oboron::Omnib,
 }
 
 #[pymethods]
-impl ObMulti {
-    /// Create a new ObMulti instance.
+impl Omnib {
+    /// Create a new Omnib instance.
     ///
     /// Args:
     ///     key:     86-character base64 string key (512 bits).  Required if keyless=False.
     ///     keyless: If True, uses the hardcoded key (testing only, NOT SECURE).
     ///
     /// Returns:
-    ///     A new ObMulti instance.
+    ///     A new Omnib instance.
     ///
     /// Raises:
     ///     ValueError: If key is invalid.
@@ -564,13 +564,10 @@ impl ObMulti {
     #[pyo3(signature = (key=None, keyless=false))]
     fn new(key: Option<String>, keyless: bool) -> PyResult<Self> {
         let inner = match (key, keyless) {
-            (Some(key), false) => ::oboron::ObMulti::new(&key)
-                .map_err(|e| PyValueError::new_err(format!("Failed to create ObMulti: {}", e)))?,
-            (None, true) => ::oboron::ObMulti::new_keyless().map_err(|e| {
-                PyValueError::new_err(format!(
-                    "Failed to create ObMulti with hardcoded key: {}",
-                    e
-                ))
+            (Some(key), false) => ::oboron::Omnib::new(&key)
+                .map_err(|e| PyValueError::new_err(format!("Failed to create Omnib: {}", e)))?,
+            (None, true) => ::oboron::Omnib::new_keyless().map_err(|e| {
+                PyValueError::new_err(format!("Failed to create Omnib with hardcoded key: {}", e))
             })?,
             (Some(_), true) => {
                 return Err(PyValueError::new_err(
@@ -792,7 +789,7 @@ fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<Ob>()?;
 
     // Multi-format interface
-    m.add_class::<ObMulti>()?;
+    m.add_class::<Omnib>()?;
 
     // Legacy variants (LEGACY)
     #[cfg(feature = "legacy")]

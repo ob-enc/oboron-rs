@@ -33,7 +33,7 @@
 //! # {
 //! # use oboron;
 //! # let key = oboron::generate_key();
-//! # let obm = oboron::ObMulti::new(&key)?;
+//! # let obm = oboron::Omnib::new(&key)?;
 //! // Operations: data, format
 //! let ot = obm.enc_with_format_str("plaintext", "aasv.b64")?;
 //! obm.dec_with_format_str(&ot, "aasv.b64")?;
@@ -106,17 +106,17 @@
 //! - Performance: Near-zero overhead (inlines to static functions)
 //! - Flexibility: Runtime format selection, can be changed after construction
 //!
-//! ## 3. `ObMulti` - Multi-Format Operations
+//! ## 3. `Omnib` - Multi-Format Operations
 //!
-//! Use `ObMulti` when working with different formats in a single context:
+//! Use `Omnib` when working with different formats in a single context:
 //!
 //! ```rust
 //! # fn main() -> Result<(), oboron::Error> {
 //! # #[cfg(feature = "aasv")]
 //! # {
-//! # use oboron::ObMulti;
+//! # use oboron::Omnib;
 //! # let key = oboron::generate_key();
-//! let obm = ObMulti::new(&key)?;
+//! let obm = Omnib::new(&key)?;
 //!
 //! // Encode to different formats
 //! let ot_b32 = obm.enc_with_format_str("data", "aasv.c32")?;
@@ -140,7 +140,7 @@
 //! |-----------------|--------------------|-------------------|---------------------|
 //! | `AasvC32`, etc. | Compile-time       | Known format      | Fastest (zero-cost) |
 //! | `Ob`            | Runtime, mutable   | Config-driven     | Near-zero overhead  |
-//! | `ObMulti`       | Per-operation      | Multiple formats  | Small overhead      |
+//! | `Omnib`       | Per-operation      | Multiple formats  | Small overhead      |
 //!
 //! # Typical Production Usage: Fixed ObtextCodec
 //!
@@ -194,7 +194,7 @@
 //!
 //! # The `ObtextCodec` Trait
 //!
-//! All types (`Ob`, `AasvC32`, `ApsvB64`, etc.) except `ObMulti` implement the `ObtextCodec` trait,
+//! All types (`Ob`, `AasvC32`, `ApsvB64`, etc.) except `Omnib` implement the `ObtextCodec` trait,
 //! ```rust
 //! # fn main() -> Result<(), oboron::Error> {
 //! # #[cfg(feature = "aasv")]
@@ -230,8 +230,8 @@ mod format;
 mod keychain;
 mod keygen;
 mod ob;
-mod ob_multi;
 mod obcrypt;
+mod omnib;
 mod scheme;
 #[cfg(feature = "ztier")]
 mod ztier;
@@ -350,7 +350,7 @@ pub use codec::{Mock1B32, Mock1B64, Mock1C32, Mock1Hex};
 pub use codec::{Mock2B32, Mock2B64, Mock2C32, Mock2Hex};
 
 // Re-export multi-format Oboron implementation
-pub use ob_multi::ObMulti;
+pub use omnib::Omnib;
 
 /// Convenience prelude for common imports.
 ///
@@ -368,7 +368,7 @@ pub mod prelude {
     #[cfg(feature = "apsv")]
     pub use crate::{ApsvB32, ApsvB64, ApsvC32, ApsvHex};
     pub use crate::{Encoding, Error, Format, ObtextCodec, Scheme};
-    pub use crate::{Ob, ObMulti};
+    pub use crate::{Ob, Omnib};
 }
 
 // ============================================================================
@@ -386,8 +386,8 @@ pub mod prelude {
 
 /// Encrypt+encode plaintext with a specified format.
 ///
-/// This is a convenience wrapper around [`ObMulti::enc`].
-/// For repeated operations, consider creating an [`ObMulti`] instance directly.
+/// This is a convenience wrapper around [`Omnib::enc`].
+/// For repeated operations, consider creating an [`Omnib`] instance directly.
 ///
 /// # Parameter Order
 /// `(data, format, key)` - follows the convention: data < format < key
@@ -407,7 +407,7 @@ pub mod prelude {
 /// ```
 #[cfg(feature = "convenience")]
 pub fn enc(plaintext: &str, format: &str, key: &str) -> Result<String, Error> {
-    ObMulti::new(key)?.enc_with_format_str(plaintext, format)
+    Omnib::new(key)?.enc_with_format_str(plaintext, format)
 }
 
 /// Encrypt+encode plaintext with a specified format using the hardcoded key (testing only).
@@ -430,13 +430,13 @@ pub fn enc(plaintext: &str, format: &str, key: &str) -> Result<String, Error> {
 #[cfg(feature = "convenience")]
 #[cfg(feature = "keyless")]
 pub fn enc_keyless(plaintext: &str, format: &str) -> Result<String, Error> {
-    ObMulti::new_keyless()?.enc_with_format_str(plaintext, format)
+    Omnib::new_keyless()?.enc_with_format_str(plaintext, format)
 }
 
 /// Decode+decrypt obtext with a specified format.
 ///
-/// This is a convenience wrapper around [`ObMulti::dec_with_format`].
-/// For repeated operations, consider creating an [`ObMulti`] instance directly.
+/// This is a convenience wrapper around [`Omnib::dec_with_format`].
+/// For repeated operations, consider creating an [`Omnib`] instance directly.
 ///
 /// # Parameter Order
 /// `(data, format, key)` - follows the convention: data < format < key
@@ -458,7 +458,7 @@ pub fn enc_keyless(plaintext: &str, format: &str) -> Result<String, Error> {
 /// ```
 #[cfg(feature = "convenience")]
 pub fn dec(obtext: &str, format: &str, key: &str) -> Result<String, Error> {
-    ObMulti::new(key)?.dec_with_format_str(obtext, format)
+    Omnib::new(key)?.dec_with_format_str(obtext, format)
 }
 
 /// Decode+decrypt obtext with a specified format using the hardcoded key (testing only).
@@ -483,13 +483,13 @@ pub fn dec(obtext: &str, format: &str, key: &str) -> Result<String, Error> {
 #[cfg(feature = "convenience")]
 #[cfg(feature = "keyless")]
 pub fn dec_keyless(obtext: &str, format: &str) -> Result<String, Error> {
-    ObMulti::new_keyless()?.dec_with_format_str(obtext, format)
+    Omnib::new_keyless()?.dec_with_format_str(obtext, format)
 }
 
 /// Decode+decrypt obtext with automatic format detection.
 ///
 /// Automatically detects both the scheme and encoding used.
-/// This is a convenience wrapper around [`ObMulti::autodec`].
+/// This is a convenience wrapper around [`Omnib::autodec`].
 ///
 /// # Parameter Order
 /// `(data, key)` - format is autodetected
@@ -511,7 +511,7 @@ pub fn dec_keyless(obtext: &str, format: &str) -> Result<String, Error> {
 /// ```
 #[cfg(feature = "convenience")]
 pub fn autodec(obtext: &str, key: &str) -> Result<String, Error> {
-    ObMulti::new(key)?.autodec(obtext)
+    Omnib::new(key)?.autodec(obtext)
 }
 
 /// Decode+decrypt obtext with automatic format detection using the hardcoded key (testing only).
@@ -536,5 +536,5 @@ pub fn autodec(obtext: &str, key: &str) -> Result<String, Error> {
 #[cfg(feature = "convenience")]
 #[cfg(feature = "keyless")]
 pub fn autodec_keyless(obtext: &str) -> Result<String, Error> {
-    ObMulti::new_keyless()?.autodec(obtext)
+    Omnib::new_keyless()?.autodec(obtext)
 }

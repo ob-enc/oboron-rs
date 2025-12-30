@@ -17,7 +17,7 @@ def test_isinstance_checks():
     ob = oboron.Ob("aasv.b64", key=key)
     assert isinstance(ob, oboron.OboronBase)
     
-    ob_multi = oboron.ObMulti(key=key)
+    ob_multi = oboron.Omnib(key=key)
     assert isinstance(ob_multi, oboron.OboronBase)
     
     print("✓ All isinstance checks passed!")

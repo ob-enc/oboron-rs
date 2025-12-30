@@ -993,17 +993,17 @@ ob.enc("hello")  # now upbc.b64-encoded obtext
 
 Example use: format provided by environment variable.
 
-### 3. Multiple Format Support (`ObMulti`)
+### 3. Multiple Format Support (`Omnib`)
 
-`ObMulti` differs in format management and provides comprehensive
+`Omnib` differs in format management and provides comprehensive
 `autodec()` functionality.
 
 **Multi-Format Workflow:** Designed for simultaneous work with different
 formats, requiring format specification in each operation:
 ```python
-from oboron import ObMulti
+from oboron import Omnib
 
-obm = ObMulti(key)
+obm = Omnib(key)
 
 # Format specification per operation
 ot = obm.enc("test", "apsv.b64")
@@ -1012,7 +1012,7 @@ pt_other = obm.dec(other, "zrbcx.c32")
 ```
 
 **Autodecode:** While other interfaces perform *scheme* autodetection in
-`dec()` methods, only `ObMulti` provides full format autodetection
+`dec()` methods, only `Omnib` provides full format autodetection
 including encoding (base32rfc, base32crockford, base64, or hex).  Other
 classes decode only encodings matching their format.
 ```python
@@ -1035,13 +1035,13 @@ For type safety and discoverability, use the provided format constants
 instead of string literals:
 
 ```python
-from oboron import Ob, ObMulti, formats
+from oboron import Ob, Omnib, formats
 
 # With Ob (runtime format selection)
 ob = Ob(formats.AASV_B64, key)
 
-# With ObMulti (multi-format operations)
-obm = ObMulti(key)
+# With Omnib (multi-format operations)
+obm = Omnib(key)
 ot_b64 = obm.enc("data", formats.AASV_B64)
 ot_hex = obm.enc("data", formats.AASV_HEX)
 ```
@@ -1071,7 +1071,7 @@ needed.
 
 ### `OboronBase` class
 
-All types except `ObMulti` implement the `Oboron` trait, providing a
+All types except `Omnib` implement the `Oboron` trait, providing a
 consistent interface:
 
 Methods:

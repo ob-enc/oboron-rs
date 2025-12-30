@@ -1,6 +1,6 @@
 #[cfg(feature = "aags")]
 use oboron::AagsC32;
-use oboron::ObMulti;
+use oboron::Omnib;
 #[cfg(feature = "upbc")]
 use oboron::UpbcC32;
 #[cfg(feature = "zrbcx")]
@@ -87,7 +87,7 @@ fn test_upbc_probabilistic() {
 #[test]
 fn test_autodetect_all_formats() {
     let original = "autodetect all";
-    let obm = ObMulti::new_keyless().unwrap();
+    let obm = Omnib::new_keyless().unwrap();
 
     #[cfg(feature = "zrbcx")]
     {

@@ -1,7 +1,7 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 #[cfg(feature = "legacy")]
 use oboron::LegacyC32;
-use oboron::{AagsC32, AasvC32, ApgsC32, ApsvC32, ObMulti, ObtextCodec, UpbcC32, ZrbcxC32};
+use oboron::{AagsC32, AasvC32, ApgsC32, ApsvC32, ObtextCodec, Omnib, UpbcC32, ZrbcxC32};
 #[cfg(feature = "mock")]
 use oboron::{Mock1C32, Mock2C32};
 
@@ -149,14 +149,14 @@ fn benchmark_dec_apsv(c: &mut Criterion) {
 }
 
 fn benchmark_aasv_obm_enc(c: &mut Criterion) {
-    let ob = ObMulti::new_keyless().unwrap();
+    let ob = Omnib::new_keyless().unwrap();
     c.bench_function("auto_encode_aasv", |b| {
         b.iter(|| ob.enc(black_box("test123"), "aasv.c32").unwrap());
     });
 }
 
 fn benchmark_aasv_obm_autodec(c: &mut Criterion) {
-    let ob = ObMulti::new_keyless().unwrap();
+    let ob = Omnib::new_keyless().unwrap();
     let ot = ob.enc("test123", "aasv.c32").unwrap();
     c.bench_function("auto_decode_aasv", |b| {
         b.iter(|| ob.autodec(black_box(&ot)).unwrap());
@@ -183,7 +183,7 @@ criterion_group!(
     benchmark_mock2_enc,
     benchmark_upbc_enc,
     benchmark_zrbcx_enc,
-    // ObMulti
+    // Omnib
     benchmark_aasv_obm_autodec
     benchmark_aasv_obm_enc,
 );

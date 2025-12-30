@@ -77,6 +77,7 @@ but note that pre-1.0 releases may not adhere strictly to all guidelines.
     - etc.
 
 - API BREAKING CHANGE: New ObMulti API
+  - renamed ObMulti to Omnib
   - dec() -> dec_with_format(obtext, format) - format given
   - NEW: dec_with_encoding(obtext, encoding) - encoding given
   - autodec() -> autodec(obtext) - full autodecode

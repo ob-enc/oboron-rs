@@ -2,7 +2,7 @@
 //!
 //! These tests are isolated from main tests to ensure legacy functionality works independently.
 //!
-//! **Note**: ObMulti and convenience functions (enc_keyless, dec_keyless) will NOT work
+//! **Note**: Omnib and convenience functions (enc_keyless, dec_keyless) will NOT work
 //! with legacy scheme. Use the LegacyC32 struct directly instead:
 //!
 //! ```ignore

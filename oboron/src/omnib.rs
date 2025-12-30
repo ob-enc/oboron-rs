@@ -18,9 +18,9 @@ use crate::{Error, Format, Keychain};
 /// # fn main() -> Result<(), oboron::Error> {
 /// # #[cfg(all(feature = "aasv", feature="mock"))]
 /// # {
-/// # use oboron::{ObMulti, MOCK1_B64};
+/// # use oboron::{Omnib, MOCK1_B64};
 /// # let key = oboron::generate_key();
-/// let obm = ObMulti::new(&key)?;
+/// let obm = Omnib::new(&key)?;
 ///
 /// // Encode with explicit format
 /// let ot1 = obm.enc_with_format_str("hello", "aasv.c32")?; // using explicit string
@@ -33,19 +33,19 @@ use crate::{Error, Format, Keychain};
 /// # Ok(())
 /// # }
 /// ```
-pub struct ObMulti {
+pub struct Omnib {
     keychain: Keychain,
 }
 
-impl ObMulti {
-    /// Create a new ObMulti instance with a base64 key.
+impl Omnib {
+    /// Create a new Omnib instance with a base64 key.
     pub fn new(key_b64: &str) -> Result<Self, Error> {
         Ok(Self {
             keychain: Keychain::from_base64(key_b64)?,
         })
     }
 
-    /// Create a new ObMulti instance with hardcoded key (testing only).
+    /// Create a new Omnib instance with hardcoded key (testing only).
     #[cfg(feature = "keyless")]
     pub fn new_keyless() -> Result<Self, Error> {
         Self::from_bytes(&HARDCODED_KEY_BYTES)
@@ -62,9 +62,9 @@ impl ObMulti {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(all(feature = "aasv", feature="mock"))]
     /// # {
-    /// # use oboron::ObMulti;
+    /// # use oboron::Omnib;
     /// let key = oboron::generate_key();
-    /// let obm = ObMulti::new(&key)?;
+    /// let obm = Omnib::new(&key)?;
     ///
     /// let ot = obm.enc_with_format_str("hello", "aasv.c32")?;
     /// let ot2 = obm.enc_with_format_str("world", "mock1.b64")?;
@@ -88,9 +88,9 @@ impl ObMulti {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(feature = "aasv")]
     /// # {
-    /// # use oboron::{ObMulti, Format, Scheme, Encoding};
+    /// # use oboron::{Omnib, Format, Scheme, Encoding};
     /// # let key = oboron::generate_key();
-    /// # let obm = ObMulti::new(&key)?;
+    /// # let obm = Omnib::new(&key)?;
     /// let format = Format::new(Scheme::Aasv, Encoding::C32);
     ///
     /// // Reuse format across multiple calls
@@ -116,9 +116,9 @@ impl ObMulti {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(feature = "aasv")]
     /// # {
-    /// # use oboron::ObMulti;
+    /// # use oboron::Omnib;
     /// # let key = oboron::generate_key();
-    /// # let obm = ObMulti::new(&key)?;
+    /// # let obm = Omnib::new(&key)?;
     /// let ot = obm.enc_with_format_str("hello", "aasv.b64")?;
     /// let pt2 = obm.dec_with_format_str(&ot, "aasv.b64")? ;
     /// assert_eq!(pt2, "hello");
@@ -143,9 +143,9 @@ impl ObMulti {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(feature = "aasv")]
     /// # {
-    /// # use oboron::{ObMulti, Format, Scheme, Encoding};
+    /// # use oboron::{Omnib, Format, Scheme, Encoding};
     /// # let key = oboron::generate_key();
-    /// # let obm = ObMulti::new(&key)?;
+    /// # let obm = Omnib::new(&key)?;
     /// let format = Format::new(Scheme::Aasv, Encoding::B64);
     ///
     /// let ot = obm.enc_with_format("hello", format)?;
@@ -168,9 +168,9 @@ impl ObMulti {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(feature = "aasv")]
     /// # {
-    /// # use oboron::ObMulti;
+    /// # use oboron::Omnib;
     /// # let key = oboron::generate_key();
-    /// # let obm = ObMulti::new(&key)?;
+    /// # let obm = Omnib::new(&key)?;
     /// let ot = obm.enc_with_format_str("hello", "aasv.b64")?;
     /// let pt2 = obm.autodec(&ot)?;  // Autodetects aasv.b64
     /// assert_eq!(pt2, "hello");
@@ -199,7 +199,7 @@ impl ObMulti {
 
     // Alt input constructors ==========================================
 
-    /// Create a new ObMulti instance with a hex key.
+    /// Create a new Omnib instance with a hex key.
     #[cfg(feature = "hex-keys")]
     pub fn from_key_hex(key_hex: &str) -> Result<Self, Error> {
         Ok(Self {
@@ -207,7 +207,7 @@ impl ObMulti {
         })
     }
 
-    /// Create a new ObMulti instance from raw bytes.
+    /// Create a new Omnib instance from raw bytes.
     pub fn from_bytes(key_bytes: &[u8; 64]) -> Result<Self, Error> {
         Ok(Self {
             keychain: Keychain::from_bytes(key_bytes)?,

@@ -1,4 +1,4 @@
-use oboron::{Format, ObMulti};
+use oboron::{Format, Omnib};
 use serde::Deserialize;
 use std::fs;
 use std::path::PathBuf;
@@ -40,7 +40,7 @@ fn test_all_vectors() {
     let vectors = load_test_vectors();
     println!("Loaded {} test vectors", vectors.len());
 
-    let obm = ObMulti::new_keyless().expect("Failed to create ObMulti");
+    let obm = Omnib::new_keyless().expect("Failed to create Omnib");
 
     for vector in vectors {
         let format = Format::from_str(&vector.format)

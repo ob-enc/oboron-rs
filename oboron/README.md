@@ -766,17 +766,17 @@ ob.set_format("apsv.hex")?;
 let ot_hex = ob.enc("world")?; // apsv.hex obtext
 ```
 
-### 4. Multiple Format Support (`ObMulti`)
+### 4. Multiple Format Support (`Omnib`)
 
-`ObMulti` differs in format management and provides comprehensive
+`Omnib` differs in format management and provides comprehensive
 `autodec()` functionality.
 
 **Multi-Format Workflow:** Designed for simultaneous work with different
 formats, requiring format specification in each operation:
 ```rust
-use oboron::{ObMulti, ObtextCodec};
+use oboron::{Omnib, ObtextCodec};
 
-let obm = ObMulti::new(&key)?;
+let obm = Omnib::new(&key)?;
 
 // Format specification per operation
 let ot = obm.enc("test", "apsv.b64");
@@ -785,7 +785,7 @@ let pt_other = obm.dec(&other, "aasv.c32");
 ```
 
 **Autodecode:** While other interfaces perform *scheme* autodetection in
-`dec()` methods, only `ObMulti` provides full format autodetection
+`dec()` methods, only `Omnib` provides full format autodetection
 including encoding (`b32`, `c32`, `b64`, or `hex`).  Other structs decode
 only encodings matching their format.
 ```rust
@@ -806,15 +806,15 @@ For type safety and discoverability, use the provided format constants
 instead of string literals:
 
 ```rust
-use oboron::{Ob, ObMulti, ObtextCodec, AASV_B64, AASV_HEX};
+use oboron::{Ob, Omnib, ObtextCodec, AASV_B64, AASV_HEX};
 
 let key = oboron::generate_key();
 
 // With Ob (runtime format selection)
 let ob = Ob::new(AASV_B64, &key)?;
 
-// With ObMulti (multi-format operations)
-let obm = ObMulti::new(&key)?;
+// With Omnib (multi-format operations)
+let obm = Omnib::new(&key)?;
 let ot_b64 = obm.enc("data", AASV_B64)?;
 let ot_hex = obm.enc("data", AASV_HEX)?;
 ```
@@ -854,7 +854,7 @@ Format structs are needed.
 
 ### The `ObtextCodec` Trait
 
-All types except `ObMulti` implement the `ObtextCodec` trait, providing a
+All types except `Omnib` implement the `ObtextCodec` trait, providing a
 consistent interface:
 
 - `enc(plaintext: &str) -> Result<String, Error>` - Encode plaintext to

@@ -1,5 +1,5 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use oboron::ObMulti;
+use oboron::Omnib;
 use serde::Deserialize;
 use std::fs;
 use std::path::PathBuf;
@@ -28,39 +28,39 @@ struct PrecomputeSpec {
 
 fn load_benchmark_specs() -> Vec<BenchmarkSpec> {
     let possible_paths = vec![
-        PathBuf::from("benches/benchmarks_obmulti.jsonl"),
-        PathBuf::from("oboron/benches/benchmarks_obmulti.jsonl"),
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("benches/benchmarks_obmulti. jsonl"),
+        PathBuf::from("benches/benchmarks_omnib.jsonl"),
+        PathBuf::from("oboron/benches/benchmarks_omnib.jsonl"),
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("benches/benchmarks_omnib.jsonl"),
     ];
 
     for path in &possible_paths {
         if path.exists() {
-            eprintln!("Found obmulti benchmarks at: {:?}", path);
-            let data = fs::read_to_string(path).expect("Failed to read benchmarks_obmulti.jsonl");
+            eprintln!("Found omnib benchmarks at: {:?}", path);
+            let data = fs::read_to_string(path).expect("Failed to read benchmarks_omnib.jsonl");
             let specs: Vec<BenchmarkSpec> = data
                 .lines()
                 .filter(|line| !line.trim().is_empty())
                 .map(|line| serde_json::from_str(line).expect("Failed to parse benchmark spec"))
                 .collect();
-            eprintln!("Loaded {} obmulti benchmark specifications", specs.len());
+            eprintln!("Loaded {} omnib benchmark specifications", specs.len());
             return specs;
         }
     }
 
-    eprintln!("Warning: benchmarks_obmulti.jsonl not found");
+    eprintln!("Warning: benchmarks_omnib.jsonl not found");
     vec![]
 }
 
-fn run_obmulti_benchmarks(c: &mut Criterion) {
+fn run_omnib_benchmarks(c: &mut Criterion) {
     let specs = load_benchmark_specs();
 
     if specs.is_empty() {
-        eprintln!("No obmulti specs loaded");
+        eprintln!("No omnib specs loaded");
         return;
     }
 
-    // Create ObMulti once, OUTSIDE the timed loop
-    let ob = ObMulti::new_keyless().unwrap();
+    // Create Omnib once, OUTSIDE the timed loop
+    let ob = Omnib::new_keyless().unwrap();
 
     let mut bench_count = 0;
     for spec in specs {
@@ -122,8 +122,8 @@ fn run_obmulti_benchmarks(c: &mut Criterion) {
             }
         }
     }
-    eprintln!("Registered {} obmulti benchmarks", bench_count);
+    eprintln!("Registered {} omnib benchmarks", bench_count);
 }
 
-criterion_group!(benches, run_obmulti_benchmarks);
+criterion_group!(benches, run_omnib_benchmarks);
 criterion_main!(benches);
