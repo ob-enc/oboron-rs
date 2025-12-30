@@ -17,8 +17,10 @@
 
 use oboron::{LegacyB64, LegacyC32, LegacyHex};
 
-// 128 hex characters = 64 bytes
-const HEX_KEY: &str = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+const TEST_SECRET: [u8; 32] = [
+    0x38, 0x12, 0x84, 0x63, 0x3d, 0x02, 0xea, 0x5f, 0x35, 0xdf, 0x85, 0x96, 0xb5, 0xcc, 0x42, 0x18,
+    0x31, 0x00, 0x60, 0x46, 0x8e, 0x8b, 0x46, 0x54, 0x55, 0xa4, 0x15, 0x17, 0x4e, 0xa6, 0xe9, 0x66,
+];
 
 #[test]
 fn test_legacy_basic() {
@@ -53,11 +55,11 @@ fn test_legacy_with_equals_padding() {
 }
 
 #[test]
-fn test_legacy_custom_keys() {
-    let key = [1u8; 64];
-    let pt = "custom keys test";
+fn test_legacy_custom_secret() {
+    let secret = [1u8; 32];
+    let pt = "custom secret test";
 
-    let ob = LegacyC32::from_bytes(&key).unwrap();
+    let ob = LegacyC32::from_bytes(&secret).unwrap();
     let ot = ob.enc(pt).unwrap();
     let pt2 = ob.dec(&ot).unwrap();
 
@@ -65,13 +67,13 @@ fn test_legacy_custom_keys() {
 }
 
 #[test]
-fn test_legacy_different_key_fails() {
-    let key1 = [1u8; 64];
-    let key2 = [2u8; 64];
-    let pt = "different keys";
+fn test_legacy_different_secret_fails() {
+    let secret1 = [1u8; 32];
+    let secret2 = [2u8; 32];
+    let pt = "different secrets";
 
-    let ob1 = LegacyC32::from_bytes(&key1).unwrap();
-    let ob2 = LegacyC32::from_bytes(&key2).unwrap();
+    let ob1 = LegacyC32::from_bytes(&secret1).unwrap();
+    let ob2 = LegacyC32::from_bytes(&secret2).unwrap();
 
     let ot = ob1.enc(pt).unwrap();
     let pt2 = ob2.dec(&ot);
@@ -83,11 +85,11 @@ fn test_legacy_different_key_fails() {
 #[test]
 fn test_legacy_all_encodings() {
     let pt = "encoding test";
-    let key = [42u8; 64];
+    let secret = [42u8; 32];
 
-    let ob_b32 = LegacyC32::from_bytes(&key).unwrap();
-    let ob_b64 = LegacyB64::from_bytes(&key).unwrap();
-    let ob_hex = LegacyHex::from_bytes(&key).unwrap();
+    let ob_b32 = LegacyC32::from_bytes(&secret).unwrap();
+    let ob_b64 = LegacyB64::from_bytes(&secret).unwrap();
+    let ob_hex = LegacyHex::from_bytes(&secret).unwrap();
 
     let enc_b32 = ob_b32.enc(pt).unwrap();
     let enc_b64 = ob_b64.enc(pt).unwrap();
@@ -146,8 +148,9 @@ fn test_legacy_empty_string_fails() {
 }
 
 #[test]
+#[cfg(feature = "hex-keys")]
 fn test_legacy_hex_key() {
-    let hex_key = "00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff";
+    let hex_key = "00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff";
     let pt = "hex key test";
 
     let ob = LegacyC32::from_hex_key(hex_key).unwrap();
@@ -171,7 +174,7 @@ fn test_legacy_short_hex_key() {
 
 #[test]
 fn test_legacy_vector_test() {
-    let ob = LegacyC32::from_hex_key(HEX_KEY).unwrap();
+    let ob = LegacyC32::from_bytes(&TEST_SECRET).unwrap();
     let plaintext = "test";
 
     // First enc to see what we actually get
@@ -189,7 +192,7 @@ fn test_legacy_backward_compatibility() {
     // Note: These test vectors need to be generated with the actual implementation
     // For now, we'll do a roundtrip test to ensure encoding/decoding works
 
-    let ob = LegacyC32::from_hex_key(HEX_KEY).unwrap();
+    let ob = LegacyC32::from_bytes(&TEST_SECRET).unwrap();
 
     let test_plaintexts = vec!["test", "hello", "world"];
 
@@ -202,7 +205,7 @@ fn test_legacy_backward_compatibility() {
 
 #[test]
 fn test_legacy_roundtrip_vectors() {
-    let ob = LegacyC32::from_hex_key(HEX_KEY).unwrap();
+    let ob = LegacyC32::from_bytes(&TEST_SECRET).unwrap();
 
     let test_cases = vec![
         "test",

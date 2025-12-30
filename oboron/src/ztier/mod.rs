@@ -7,7 +7,7 @@
 
 #![cfg(feature = "ztier")]
 
-// Z-tier scheme implementations
+mod dec_auto;
 mod zkeychain;
 
 #[cfg(feature = "legacy")]
