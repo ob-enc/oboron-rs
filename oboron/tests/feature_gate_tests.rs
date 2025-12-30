@@ -17,7 +17,6 @@ mod bytes_keys_enabled {
         {
             let _ = AasvC32::from_bytes(&key);
             let _ = Ob::from_bytes("aasv.c32", &key);
-            let _ = ObFlex::from_bytes("aasv.c32", &key);
             let _ = ObMulti::from_bytes(&key);
         }
     }
@@ -49,7 +48,6 @@ mod hex_keys_enabled {
         {
             let _ = AasvC32::from_hex_key(&key);
             let _ = Ob::from_hex_key("aasv.c32", &key);
-            let _ = ObFlex::from_hex_key("aasv.c32", &key);
             let _ = ObMulti::from_key_hex(&key);
         }
     }
@@ -79,7 +77,6 @@ mod keyless_enabled {
         {
             let _ = AasvC32::new_keyless();
             let _ = Ob::new_keyless("aasv.c32");
-            let _ = ObFlex::new_keyless("aasv.c32");
             let _ = ObMulti::new_keyless();
         }
     }

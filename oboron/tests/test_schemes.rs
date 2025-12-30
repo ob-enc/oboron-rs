@@ -10,7 +10,7 @@ use oboron::{AasvB64, AasvC32, AasvHex};
 use oboron::{ApgsB64, ApgsC32, ApgsHex};
 #[cfg(feature = "apsv")]
 use oboron::{ApsvB64, ApsvC32, ApsvHex};
-use oboron::{Encoding, ObFlex, Scheme};
+use oboron::{Encoding, Scheme};
 
 #[test]
 #[cfg(feature = "apgs")]
@@ -174,20 +174,19 @@ fn test_apsv_all_encodings() {
 #[cfg(feature = "apgs")]
 #[cfg(feature = "aasv")]
 #[cfg(feature = "apsv")]
-fn test_obflex_basic() {
+fn test_ob_basic() {
     let key = [0u8; 64];
-    let mut ob = ObFlex::from_bytes("zrbcx.c32", &key).expect("Failed to create ObFlex");
+    let mut ob = Ob::from_bytes("zrbcx.c32", &key).expect("Failed to create Ob");
 
-    let plaintext = "Testing ObFlex";
+    let plaintext = "Testing Ob";
 
     // Test with different schemes
     for scheme in &[
-        Scheme::Zrbcx,
-        Scheme::Upbc,
         Scheme::Aags,
         Scheme::Apgs,
         Scheme::Aasv,
         Scheme::Apsv,
+        Scheme::Upbc,
     ] {
         ob.set_scheme(*scheme)
             .expect(&format!("Failed to set scheme {:?}", scheme));
@@ -202,7 +201,7 @@ fn test_obflex_basic() {
         assert_eq!(pt2, plaintext, "Decoding mismatch for scheme {:?}", scheme);
     }
 
-    eprintln!("✓ ObFlex basic test passed");
+    eprintln!("✓ Ob basic test passed");
 }
 
 #[test]
@@ -214,29 +213,14 @@ fn test_obflex_basic() {
 #[cfg(feature = "apsv")]
 fn test_obflex_all_formats() {
     let key = [0u8; 64];
-    let mut ob = ObFlex::from_bytes("zrbcx.c32", &key).expect("Failed to create ObFlex");
+    let mut ob = Ob::from_bytes("zrbcx.c32", &key).expect("Failed to create Ob");
 
-    let plaintext = "Testing all ObFlex formats";
+    let plaintext = "Testing all Ob formats";
 
     let formats = [
-        "zrbcx.c32",
-        "zrbcx.b64",
-        "zrbcx.hex",
-        "upbc.c32",
-        "upbc.b64",
-        "upbc.hex",
-        "aags.c32",
-        "aags.b64",
-        "aags.hex",
-        "apgs.c32",
-        "apgs.b64",
-        "apgs.hex",
-        "aasv.c32",
-        "aasv.b64",
-        "aasv.hex",
-        "apsv.c32",
-        "apsv.b64",
-        "apsv.hex",
+        "aags.c32", "aags.b32", "aags.b64", "aags.hex", "apgs.c32", "apgs.b32", "apgs.b64",
+        "apgs.hex", "aasv.c32", "aasv.b32", "aasv.b64", "aasv.hex", "apsv.c32", "apsv.b32",
+        "apsv.b64", "apsv.hex", "upbc.c32", "upbc.b32", "upbc.b64", "upbc.hex",
     ];
 
     for format in &formats {
@@ -253,14 +237,14 @@ fn test_obflex_all_formats() {
         assert_eq!(pt2, plaintext, "Decoding mismatch for format {}", format);
     }
 
-    eprintln!("✓ ObFlex all formats test passed ({})", formats.len());
+    eprintln!("✓ Ob all formats test passed ({})", formats.len());
 }
 
 #[test]
 #[cfg(feature = "aags")]
 fn test_obflex_encoding_changes() {
     let key = [0u8; 64];
-    let mut ob = ObFlex::from_bytes("aags.c32", &key).expect("Failed to create ObFlex");
+    let mut ob = Ob::from_bytes("aags.c32", &key).expect("Failed to create Ob");
 
     let plaintext = "Testing encoding changes";
 
@@ -282,7 +266,7 @@ fn test_obflex_encoding_changes() {
         );
     }
 
-    eprintln!("✓ ObFlex encoding changes test passed");
+    eprintln!("✓ Ob encoding changes test passed");
 }
 
 #[test]

@@ -97,21 +97,6 @@ fn test_ob_format_getter() {
 }
 
 #[test]
-fn test_ob_immutable_format() {
-    // This test documents that Ob's format is immutable
-    // Unlike ObFlex, there's no set_format() method
-    let key = [0u8; 64];
-    let ob = Ob::from_bytes("mock1.c32", &key).expect("Failed to create Ob");
-
-    // Verify format is set
-    assert_eq!(ob.scheme(), Scheme::Mock1);
-    assert_eq!(ob.encoding(), Encoding::C32);
-
-    // Format cannot be changed (no set_format method exists)
-    // This is compile-time enforced, but we document the intent
-}
-
-#[test]
 #[cfg(feature = "aasv")]
 fn test_ob_scheme_autodetection() {
     let key = [0u8; 64];
