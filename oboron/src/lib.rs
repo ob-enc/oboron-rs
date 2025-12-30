@@ -287,7 +287,7 @@ pub(crate) use obcrypt::{decrypt_apsv, encrypt_apsv};
 #[cfg(feature = "upbc")]
 pub(crate) use obcrypt::{decrypt_upbc, encrypt_upbc};
 #[cfg(feature = "zrbcx")]
-pub(crate) use obcrypt::{decrypt_zrbcx, encrypt_zrbcx};
+pub(crate) use ztier::{decrypt_zrbcx, encrypt_zrbcx};
 
 // Testing
 #[cfg(feature = "mock")]

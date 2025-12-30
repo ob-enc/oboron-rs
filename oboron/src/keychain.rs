@@ -90,24 +90,6 @@ impl Keychain {
         self.key[8..40].try_into().unwrap()
     }
 
-    // zrbcx secret - AES-128 key + IV for AES-CBC (first 16+16 bytes)
-    // Note: This combines the cryptographic key and IV in a static way,
-    // which is an antipattern.  Use for obfuscation only, not secure encryption.
-    #[inline]
-    #[cfg(any(feature = "zrbcx"))]
-    pub(crate) fn zrbcx(&self) -> &[u8; 32] {
-        self.key[..32].try_into().unwrap()
-    }
-
-    // legacy secret - AES-128 key + IV for AES-CBC (first 16+16 bytes)
-    // Note: This combines the cryptographic key and IV in a static way,
-    // which is an antipattern.  Use for obfuscation only, not secure encryption.
-    #[inline]
-    #[cfg(any(feature = "legacy"))]
-    pub(crate) fn legacy(&self) -> &[u8; 32] {
-        self.key[..32].try_into().unwrap()
-    }
-
     // mock1 - no actual key needed
     #[inline]
     #[cfg(any(feature = "mock"))]

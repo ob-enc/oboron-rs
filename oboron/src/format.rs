@@ -393,7 +393,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(all(feature = "all-schemes", feature = "mock"))]
+    #[cfg(all(feature = "secure-schemes", feature = "ztier", feature = "mock"))]
     fn test_all_schemes_support_both_base32_variants() {
         // All schemes should support both RFC 4648 base32 (b32) and Crockford base32 (c32)
         let schemes = vec![
