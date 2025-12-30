@@ -259,14 +259,14 @@ mod error;
 mod format;
 mod keychain;
 mod keygen;
-#[cfg(feature = "legacy")]
-mod legacy;
 mod ob;
 mod ob_core;
 mod ob_flex;
 mod ob_multi;
 mod obcrypt;
 mod scheme;
+#[cfg(feature = "ztier")]
+mod ztier;
 
 // Re-export public types and constants
 pub use constants::{HARDCODED_KEY_BASE64, HARDCODED_KEY_BYTES};
@@ -369,11 +369,11 @@ pub use codec::{ApgsB32, ApgsB64, ApgsC32, ApgsHex};
 pub use codec::{ApsvB32, ApsvB64, ApsvC32, ApsvHex};
 #[cfg(feature = "upbc")]
 pub use codec::{UpbcB32, UpbcB64, UpbcC32, UpbcHex};
-#[cfg(feature = "zrbcx")]
-pub use codec::{ZrbcxB32, ZrbcxB64, ZrbcxC32, ZrbcxHex};
-// Legacy
+// Z-tier
 #[cfg(feature = "legacy")]
-pub use legacy::{LegacyB32, LegacyB64, LegacyC32, LegacyHex};
+pub use ztier::{LegacyB32, LegacyB64, LegacyC32, LegacyHex};
+#[cfg(feature = "zrbcx")]
+pub use ztier::{ZrbcxB32, ZrbcxB64, ZrbcxC32, ZrbcxHex};
 // Testing
 #[cfg(feature = "mock")]
 pub use codec::{Mock1B32, Mock1B64, Mock1C32, Mock1Hex};

@@ -19,7 +19,10 @@ default = ["std"]
 # ===================
 std = ["secure-schemes"]
 secure-min = ["aasv"]  # Minimum secure setup
-full = ["all-schemes", "all-alt-keys", "keyless", "legacy", "mock", "convenience"]
+full = ["secure-schemes", "ztier", "all-alt-keys", "keyless", "legacy", "mock", "convenience"]
+
+
+ztier = []  # Z-tier infrastructure
 
 dev = ["full"]  # Development setup
 
@@ -39,7 +42,7 @@ all-siv-schemes = ["aasv", "apsv"]  # Shares AES-SIV deps
 
 # Individual schemes
 # ==================
-zrbcx = ["aes", "cipher", "cbc", "keyless"]
+zrbcx = ["aes", "cipher", "cbc", "keyless", "ztier"]
 upbc = ["aes", "cipher", "cbc"]
 aags = ["aes-gcm-siv"]
 apgs = ["aes-gcm-siv"]
@@ -48,7 +51,7 @@ apsv = ["aes-siv"]
 # Testing only
 mock = []
 # Legacy
-legacy = ["aes", "cipher", "cbc"]  # backward compatibility
+legacy = ["aes", "cipher", "cbc", "ztier"]  # backward compatibility
 
 # Misc features
 # =============
@@ -58,17 +61,12 @@ unchecked-utf8 = [] # Unsafe performance enhacement
 
 # Scheme categories
 # =================
-ob0x = ["zrbcx"] # insecure, not authenticated
-ob1x = []  # insecure, authenticated
-ob2x = ["upbc"]  # secure, not authenticated
-ob3x = ["aags", "apgs", "aasv", "apsv"]  # secure, authenticated
-ob7x = ["mock"]  # testing
-insecure-schemes = ["ob0x", "ob1x"]
-secure-schemes = ["ob2x", "ob3x"]
-authenticated-schemes = ["ob3x"]
-deterministic-schemes = ["zrbcx", "aags", "aasv"]
+atier = ["aags", "apgs", "aasv", "apsv"]  # secure, authenticated
+utier = ["upbc"]  # secure, not authenticated
+
+secure-schemes = ["atier", "utier"]
+deterministic-schemes = ["aags", "aasv"]
 probabilistic-schemes = ["upbc", "apgs", "apsv"]
-all-schemes = ["ob0x", "ob1x", "ob2x", "ob3x"]
 
 [dependencies]
 # Always needed

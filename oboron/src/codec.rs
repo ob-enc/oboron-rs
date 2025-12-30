@@ -5,7 +5,7 @@ use crate::{error::Error, Encoding, Format, Keychain, Scheme};
 
 /// Core trait for ObtextCodec encryption+encoding/decoding+decryption implementations.
 ///
-/// Each scheme+encoding combination (ZrbcxC32, ZrbcxB64, etc.) implements this trait
+/// Each scheme+encoding combination (AasvC32, AasvB64, etc.) implements this trait
 /// to provide a consistent interface for encoding and decoding operations.
 ///
 /// Note: Construction methods (`new`, `from_bytes`, `new_keyless`) are not part of
@@ -38,9 +38,6 @@ pub trait ObtextCodec {
     fn key_bytes(&self) -> &[u8; 64];
 }
 
-#[cfg(feature = "legacy")]
-use crate::legacy::{LegacyB32, LegacyB64, LegacyC32, LegacyHex};
-
 /// Macro to implement optimized ObtextCodec types with compile-time specialization.
 ///
 /// This macro generates a complete ObtextCodec implementation with all overhead eliminated:
@@ -51,10 +48,10 @@ use crate::legacy::{LegacyB32, LegacyB64, LegacyC32, LegacyHex};
 /// - All constants baked in at compile time
 macro_rules! impl_codec {
     (
-        $name:ident,           // Type name (e.g., ZrbcxC32)
-        $scheme:expr,          // Scheme constant (e.g., Scheme::Zrbcx)
+        $name:ident,           // Type name (e.g., AasvC32)
+        $scheme:expr,          // Scheme constant (e.g., Scheme::Aasv)
         $encoding:expr,        // Encoding constant (e.g., Encoding::C32)
-        $format_str:expr       // Format string for docs (e.g., "zrbcx.c32")
+        $format_str:expr       // Format string for docs (e.g., "aasv.c32")
     ) => {
         #[doc = concat!("ObtextCodec implementation for ", $format_str, " format.\n\n")]
         #[doc = concat!("Corresponds to format string: `\"", $format_str, "\"`")]
@@ -209,142 +206,6 @@ macro_rules! impl_codec {
     };
 }
 
-/// Macro for z-tier (insecure obfuscation-only) schemes.
-///
-/// These schemes use a hardcoded key and provide no real security.
-/// Only :: new_keyless() constructor is available - no custom keys allowed.
-#[cfg(feature = "zrbcx")]
-macro_rules! impl_ztier_codec {
-    (
-        $name: ident,           // Type name (e.g., ZrbcxC32)
-        $scheme:expr,          // Scheme constant (e.g., Scheme::Zrbcx)
-        $encoding:expr,        // Encoding constant (e.g., Encoding::C32)
-        $format_str:expr       // Format string for docs (e.g., "zrbcx.c32")
-    ) => {
-        #[doc = concat! ("**INSECURE OBFUSCATION-ONLY** ObtextCodec for ", $format_str, ".\n\n")]
-        #[doc = "⚠️ This scheme uses a hardcoded key and provides no security.\n"]
-        #[doc = "Use only for obfuscation, never for actual encryption.\n\n"]
-        #[doc = concat!("Corresponds to format string: `\"", $format_str, "\"`")]
-        #[allow(non_camel_case_types)]
-        pub struct $name {
-            keychain: Keychain,
-        }
-
-        impl $name {
-            /// Create a new instance with hardcoded key (obfuscation only).
-            ///
-            /// **WARNING**: This uses a publicly available hardcoded key and provides no security.
-            #[inline]
-            #[cfg(feature = "keyless")]
-            pub fn new_keyless() -> Result<Self, Error> {
-                Ok(Self {
-                    keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
-                })
-            }
-
-            /// Internal constructor used by factory functions.
-            #[inline]
-            #[cfg(any(feature = "keyless", feature = "bytes-keys"))]
-            fn from_bytes_internal(key_bytes: &[u8; 64]) -> Result<Self, Error> {
-                Ok(Self {
-                    keychain: Keychain::from_bytes(key_bytes)?,
-                })
-            }
-        }
-
-        impl ObtextCodec for $name {
-            #[inline]
-            fn enc(&self, plaintext: &str) -> Result<String, Error> {
-                let format = Format::new($scheme, $encoding);
-                crate::enc::enc_to_format(plaintext, format, &self.keychain)
-            }
-
-            #[inline]
-            fn dec(&self, obtext: &str) -> Result<String, Error> {
-                let format = Format::new($scheme, $encoding);
-                crate::dec::dec_from_format(obtext, format, &self.keychain)
-            }
-
-            #[inline]
-            fn format(&self) -> Format {
-                Format::new($scheme, $encoding)
-            }
-
-            #[inline]
-            fn scheme(&self) -> Scheme {
-                $scheme
-            }
-
-            #[inline]
-            fn encoding(&self) -> Encoding {
-                $encoding
-            }
-
-            #[inline]
-            fn key(&self) -> String {
-                self.keychain.key_base64()
-            }
-
-            #[inline]
-            #[cfg(feature = "hex-keys")]
-            fn key_hex(&self) -> String {
-                self.keychain.key_hex()
-            }
-
-            #[inline]
-            #[cfg(feature = "bytes-keys")]
-            fn key_bytes(&self) -> &[u8; 64] {
-                self.keychain.key_bytes()
-            }
-        }
-
-        // Add inherent methods that delegate to trait methods
-        impl $name {
-            #[inline]
-            pub fn enc(&self, plaintext: &str) -> Result<String, Error> {
-                <Self as ObtextCodec>::enc(self, plaintext)
-            }
-
-            #[inline]
-            pub fn dec(&self, obtext: &str) -> Result<String, Error> {
-                <Self as ObtextCodec>::dec(self, obtext)
-            }
-
-            #[inline]
-            pub fn format(&self) -> Format {
-                <Self as ObtextCodec>::format(self)
-            }
-
-            #[inline]
-            pub fn scheme(&self) -> Scheme {
-                <Self as ObtextCodec>::scheme(self)
-            }
-
-            #[inline]
-            pub fn encoding(&self) -> Encoding {
-                <Self as ObtextCodec>::encoding(self)
-            }
-
-            #[inline]
-            pub fn key(&self) -> String {
-                <Self as ObtextCodec>::key(self)
-            }
-
-            #[cfg(feature = "hex-keys")]
-            #[inline]
-            pub fn key_hex(&self) -> String {
-                <Self as ObtextCodec>::key_hex(self)
-            }
-
-            #[cfg(feature = "bytes-keys")]
-            #[inline]
-            pub fn key_bytes(&self) -> &[u8; 64] {
-                <Self as ObtextCodec>::key_bytes(self)
-            }
-        }
-    };
-}
-
 // Generate all scheme+encoding combinations using the optimized macro
 
 // aags variants
@@ -397,16 +258,6 @@ impl_codec!(UpbcB64, Scheme::Upbc, Encoding::B64, "upbc.b64");
 #[cfg(feature = "upbc")]
 impl_codec!(UpbcHex, Scheme::Upbc, Encoding::Hex, "upbc.hex");
 
-// zrbcx variants
-#[cfg(feature = "zrbcx")]
-impl_ztier_codec!(ZrbcxB32, Scheme::Zrbcx, Encoding::B32, "zrbcx.b32");
-#[cfg(feature = "zrbcx")]
-impl_ztier_codec!(ZrbcxC32, Scheme::Zrbcx, Encoding::C32, "zrbcx.c32");
-#[cfg(feature = "zrbcx")]
-impl_ztier_codec!(ZrbcxB64, Scheme::Zrbcx, Encoding::B64, "zrbcx.b64");
-#[cfg(feature = "zrbcx")]
-impl_ztier_codec!(ZrbcxHex, Scheme::Zrbcx, Encoding::Hex, "zrbcx.hex");
-
 // Testing
 
 // mock1 (identity scheme)
@@ -435,22 +286,6 @@ impl_codec!(Mock2Hex, Scheme::Mock2, Encoding::Hex, "mock2.hex");
 /// It's returned by the `oboron::new()` factory function.
 #[allow(non_camel_case_types)]
 pub enum ObAny {
-    #[cfg(feature = "zrbcx")]
-    ZrbcxC32(ZrbcxC32),
-    #[cfg(feature = "zrbcx")]
-    ZrbcxB32(ZrbcxB32),
-    #[cfg(feature = "zrbcx")]
-    ZrbcxB64(ZrbcxB64),
-    #[cfg(feature = "zrbcx")]
-    ZrbcxHex(ZrbcxHex),
-    #[cfg(feature = "upbc")]
-    UpbcC32(UpbcC32),
-    #[cfg(feature = "upbc")]
-    UpbcB32(UpbcB32),
-    #[cfg(feature = "upbc")]
-    UpbcB64(UpbcB64),
-    #[cfg(feature = "upbc")]
-    UpbcHex(UpbcHex),
     #[cfg(feature = "aags")]
     AagsC32(AagsC32),
     #[cfg(feature = "aags")]
@@ -483,6 +318,14 @@ pub enum ObAny {
     ApsvB64(ApsvB64),
     #[cfg(feature = "apsv")]
     ApsvHex(ApsvHex),
+    #[cfg(feature = "upbc")]
+    UpbcC32(UpbcC32),
+    #[cfg(feature = "upbc")]
+    UpbcB32(UpbcB32),
+    #[cfg(feature = "upbc")]
+    UpbcB64(UpbcB64),
+    #[cfg(feature = "upbc")]
+    UpbcHex(UpbcHex),
     // Testing
     #[cfg(feature = "mock")]
     Mock1C32(Mock1C32),
@@ -500,15 +343,6 @@ pub enum ObAny {
     Mock2Hex(Mock2Hex),
     #[cfg(feature = "mock")]
     Mock2B64(Mock2B64),
-    // Legacy
-    #[cfg(feature = "legacy")]
-    LegacyC32(LegacyC32),
-    #[cfg(feature = "legacy")]
-    LegacyB32(LegacyB32),
-    #[cfg(feature = "legacy")]
-    LegacyB64(LegacyB64),
-    #[cfg(feature = "legacy")]
-    LegacyHex(LegacyHex),
 }
 
 // Macro to delegate ObtextCodec methods to the inner type
@@ -516,22 +350,6 @@ macro_rules! delegate_to_inner {
     (fn $method:ident(&self $(, $arg:ident: $argty:ty)*) -> $ret:ty) => {
         fn $method(&self $(, $arg: $argty)*) -> $ret {
             match self {
-                #[cfg(feature = "zrbcx")]
-                ObAny::ZrbcxC32(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "zrbcx")]
-                ObAny::ZrbcxB32(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "zrbcx")]
-                ObAny::ZrbcxB64(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "zrbcx")]
-                ObAny::ZrbcxHex(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "upbc")]
-                ObAny::UpbcC32(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "upbc")]
-                ObAny::UpbcB32(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "upbc")]
-                ObAny::UpbcB64(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "upbc")]
-                ObAny::UpbcHex(ob) => ob.$method($($arg),*),
                 #[cfg(feature = "aags")]
                 ObAny::AagsC32(ob) => ob.$method($($arg),*),
                 #[cfg(feature = "aags")]
@@ -564,6 +382,14 @@ macro_rules! delegate_to_inner {
                 ObAny::ApsvB64(ob) => ob.$method($($arg),*),
                 #[cfg(feature = "apsv")]
                 ObAny::ApsvHex(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "upbc")]
+                ObAny::UpbcC32(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "upbc")]
+                ObAny::UpbcB32(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "upbc")]
+                ObAny::UpbcB64(ob) => ob.$method($($arg),*),
+                #[cfg(feature = "upbc")]
+                ObAny::UpbcHex(ob) => ob.$method($($arg),*),
                 // Testing
                 #[cfg(feature = "mock")]
                 ObAny::Mock1C32(ob) => ob.$method($($arg),*),
@@ -581,15 +407,6 @@ macro_rules! delegate_to_inner {
                 ObAny::Mock2B64(ob) => ob.$method($($arg),*),
                 #[cfg(feature = "mock")]
                 ObAny::Mock2Hex(ob) => ob.$method($($arg),*),
-                // Legacy
-                #[cfg(feature = "legacy")]
-                ObAny::LegacyC32(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "legacy")]
-                ObAny::LegacyB32(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "legacy")]
-                ObAny::LegacyB64(ob) => ob.$method($($arg),*),
-                #[cfg(feature = "legacy")]
-                ObAny::LegacyHex(ob) => ob.$method($($arg),*),
             }
         }
     };
@@ -616,62 +433,34 @@ impl ObAny {
     pub fn new(key: &str) -> Result<Self, Error> {
         #[cfg(feature = "mock")]
         return Ok(ObAny::Mock1C32(Mock1C32::new(key)?));
-        #[cfg(feature = "zrbcx")]
-        #[cfg(not(feature = "mock"))]
-        return Ok(ObAny::ZrbcxC32(ZrbcxC32::new_keyless()?));
         #[cfg(feature = "upbc")]
-        #[cfg(not(any(feature = "mock", feature = "zrbcx")))]
+        #[cfg(not(any(feature = "mock")))]
         return Ok(ObAny::UpbcC32(UpbcC32::new(key)?));
         #[cfg(feature = "aags")]
-        #[cfg(not(any(feature = "mock", feature = "zrbcx", feature = "upbc")))]
+        #[cfg(not(any(feature = "mock", feature = "upbc")))]
         return Ok(ObAny::AagsC32(AagsC32::new(key)?));
         #[cfg(feature = "apgs")]
-        #[cfg(not(any(
-            feature = "mock",
-            feature = "zrbcx",
-            feature = "upbc",
-            feature = "aags"
-        )))]
+        #[cfg(not(any(feature = "mock", feature = "upbc", feature = "aags")))]
         return Ok(ObAny::ApgsC32(ApgsC32::new(key)?));
         #[cfg(feature = "aasv")]
-        #[cfg(not(any(
-            feature = "mock",
-            feature = "zrbcx",
-            feature = "upbc",
-            feature = "aags",
-            feature = "apgs"
-        )))]
+        #[cfg(not(any(feature = "mock", feature = "upbc", feature = "aags", feature = "apgs")))]
         return Ok(ObAny::AasvC32(AasvC32::new(key)?));
         #[cfg(feature = "apsv")]
         #[cfg(not(any(
             feature = "mock",
-            feature = "zrbcx",
             feature = "upbc",
             feature = "aags",
             feature = "apgs",
             feature = "aasv"
         )))]
         return Ok(ObAny::ApsvC32(ApsvC32::new(key)?));
-        #[cfg(feature = "legacy")]
         #[cfg(not(any(
             feature = "mock",
-            feature = "zrbcx",
-            feature = "upbc",
-            feature = "aags",
-            feature = "apgs",
-            feature = "aasv",
-            feature = "apsv"
-        )))]
-        return Ok(ObAny::LegacyC32(LegacyC32::new(key)?));
-        #[cfg(not(any(
-            feature = "mock",
-            feature = "zrbcx",
             feature = "upbc",
             feature = "aags",
             feature = "apgs",
             feature = "aasv",
             feature = "apsv",
-            feature = "legacy"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
     }
@@ -686,76 +475,44 @@ impl ObAny {
         return Ok(ObAny::Mock1C32(Mock1C32 {
             keychain: Keychain::from_bytes(key_bytes)?,
         }));
-        #[cfg(feature = "zrbcx")]
-        #[cfg(not(feature = "mock"))]
-        return Ok(ObAny::ZrbcxC32(ZrbcxC32 {
-            keychain: Keychain::from_bytes(key_bytes)?,
-        }));
         #[cfg(feature = "upbc")]
-        #[cfg(not(any(feature = "mock", feature = "zrbcx")))]
+        #[cfg(not(any(feature = "mock")))]
         return Ok(ObAny::UpbcC32(UpbcC32 {
             keychain: Keychain::from_bytes(key_bytes)?,
         }));
         #[cfg(feature = "aags")]
-        #[cfg(not(any(feature = "mock", feature = "zrbcx", feature = "upbc")))]
+        #[cfg(not(any(feature = "mock", feature = "upbc")))]
         return Ok(ObAny::AagsC32(AagsC32 {
             keychain: Keychain::from_bytes(key_bytes)?,
         }));
         #[cfg(feature = "apgs")]
-        #[cfg(not(any(
-            feature = "mock",
-            feature = "zrbcx",
-            feature = "upbc",
-            feature = "aags"
-        )))]
+        #[cfg(not(any(feature = "mock", feature = "upbc", feature = "aags")))]
         return Ok(ObAny::ApgsC32(ApgsC32 {
             keychain: Keychain::from_bytes(key_bytes)?,
         }));
         #[cfg(feature = "aasv")]
-        #[cfg(not(any(
-            feature = "mock",
-            feature = "zrbcx",
-            feature = "upbc",
-            feature = "aags",
-            feature = "apgs"
-        )))]
+        #[cfg(not(any(feature = "mock", feature = "upbc", feature = "aags", feature = "apgs")))]
         return Ok(ObAny::AasvC32(AasvC32 {
             keychain: Keychain::from_bytes(key_bytes)?,
         }));
         #[cfg(feature = "apsv")]
         #[cfg(not(any(
-            feature = "mock",
-            feature = "zrbcx",
-            feature = "upbc",
             feature = "aags",
+            feature = "aasv",
             feature = "apgs",
-            feature = "aasv"
+            feature = "mock",
+            feature = "upbc",
         )))]
         return Ok(ObAny::ApsvC32(ApsvC32 {
             keychain: Keychain::from_bytes(key_bytes)?,
         }));
-        #[cfg(feature = "legacy")]
         #[cfg(not(any(
-            feature = "mock",
-            feature = "zrbcx",
-            feature = "upbc",
             feature = "aags",
-            feature = "apgs",
             feature = "aasv",
-            feature = "apsv"
-        )))]
-        return Ok(ObAny::LegacyC32(LegacyC32 {
-            keychain: Keychain::from_bytes(key_bytes)?,
-        }));
-        #[cfg(not(any(
-            feature = "mock",
-            feature = "zrbcx",
-            feature = "upbc",
-            feature = "aags",
             feature = "apgs",
-            feature = "aasv",
             feature = "apsv",
-            feature = "legacy"
+            feature = "mock",
+            feature = "upbc",
         )))]
         compile_error!("At least one oboron scheme must be enabled");
     }
@@ -764,62 +521,34 @@ impl ObAny {
     pub fn from_hex_key(key_hex: &str) -> Result<Self, Error> {
         #[cfg(feature = "mock")]
         return Ok(ObAny::Mock1C32(Mock1C32::from_hex_key(key_hex)?));
-        #[cfg(feature = "zrbcx")]
-        #[cfg(not(feature = "mock"))]
-        return Ok(ObAny::ZrbcxC32(ZrbcxC32::from_hex_key(key_hex)?));
         #[cfg(feature = "upbc")]
-        #[cfg(not(any(feature = "mock", feature = "zrbcx")))]
+        #[cfg(not(any(feature = "mock")))]
         return Ok(ObAny::UpbcC32(UpbcC32::from_hex_key(key_hex)?));
         #[cfg(feature = "aags")]
-        #[cfg(not(any(feature = "mock", feature = "zrbcx", feature = "upbc")))]
+        #[cfg(not(any(feature = "mock", feature = "upbc")))]
         return Ok(ObAny::AagsC32(AagsC32::from_hex_key(key_hex)?));
         #[cfg(feature = "apgs")]
-        #[cfg(not(any(
-            feature = "mock",
-            feature = "zrbcx",
-            feature = "upbc",
-            feature = "aags"
-        )))]
+        #[cfg(not(any(feature = "mock", feature = "upbc", feature = "aags")))]
         return Ok(ObAny::ApgsC32(ApgsC32::from_hex_key(key_hex)?));
         #[cfg(feature = "aasv")]
-        #[cfg(not(any(
-            feature = "mock",
-            feature = "zrbcx",
-            feature = "upbc",
-            feature = "aags",
-            feature = "apgs"
-        )))]
+        #[cfg(not(any(feature = "mock", feature = "upbc", feature = "aags", feature = "apgs")))]
         return Ok(ObAny::AasvC32(AasvC32::from_hex_key(key_hex)?));
         #[cfg(feature = "apsv")]
         #[cfg(not(any(
             feature = "mock",
-            feature = "zrbcx",
             feature = "upbc",
             feature = "aags",
             feature = "apgs",
             feature = "aasv"
         )))]
         return Ok(ObAny::ApsvC32(ApsvC32::from_hex_key(key_hex)?));
-        #[cfg(feature = "legacy")]
         #[cfg(not(any(
             feature = "mock",
-            feature = "zrbcx",
-            feature = "upbc",
-            feature = "aags",
-            feature = "apgs",
-            feature = "aasv",
-            feature = "apsv"
-        )))]
-        return Ok(ObAny::LegacyC32(LegacyC32::from_hex_key(key_hex)?));
-        #[cfg(not(any(
-            feature = "mock",
-            feature = "zrbcx",
             feature = "upbc",
             feature = "aags",
             feature = "apgs",
             feature = "aasv",
             feature = "apsv",
-            feature = "legacy"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
     }
@@ -833,46 +562,29 @@ impl ObAny {
         return Ok(ObAny::Mock1C32(Mock1C32 {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
         }));
-        #[cfg(feature = "zrbcx")]
-        #[cfg(not(feature = "mock"))]
-        return Ok(ObAny::ZrbcxC32(ZrbcxC32 {
-            keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
-        }));
         #[cfg(feature = "upbc")]
-        #[cfg(not(any(feature = "mock", feature = "zrbcx")))]
+        #[cfg(not(any(feature = "mock")))]
         return Ok(ObAny::UpbcC32(UpbcC32 {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
         }));
         #[cfg(feature = "aags")]
-        #[cfg(not(any(feature = "mock", feature = "zrbcx", feature = "upbc")))]
+        #[cfg(not(any(feature = "mock", feature = "upbc")))]
         return Ok(ObAny::AagsC32(AagsC32 {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
         }));
         #[cfg(feature = "apgs")]
-        #[cfg(not(any(
-            feature = "mock",
-            feature = "zrbcx",
-            feature = "upbc",
-            feature = "aags"
-        )))]
+        #[cfg(not(any(feature = "mock", feature = "upbc", feature = "aags")))]
         return Ok(ObAny::ApgsC32(ApgsC32 {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
         }));
         #[cfg(feature = "aasv")]
-        #[cfg(not(any(
-            feature = "mock",
-            feature = "zrbcx",
-            feature = "upbc",
-            feature = "aags",
-            feature = "apgs"
-        )))]
+        #[cfg(not(any(feature = "mock", feature = "upbc", feature = "aags", feature = "apgs")))]
         return Ok(ObAny::AasvC32(AasvC32 {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
         }));
         #[cfg(feature = "apsv")]
         #[cfg(not(any(
             feature = "mock",
-            feature = "zrbcx",
             feature = "upbc",
             feature = "aags",
             feature = "apgs",
@@ -881,28 +593,13 @@ impl ObAny {
         return Ok(ObAny::ApsvC32(ApsvC32 {
             keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
         }));
-        #[cfg(feature = "legacy")]
         #[cfg(not(any(
             feature = "mock",
-            feature = "zrbcx",
-            feature = "upbc",
-            feature = "aags",
-            feature = "apgs",
-            feature = "aasv",
-            feature = "apsv"
-        )))]
-        return Ok(ObAny::LegacyC32(LegacyC32 {
-            keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
-        }));
-        #[cfg(not(any(
-            feature = "mock",
-            feature = "zrbcx",
             feature = "upbc",
             feature = "aags",
             feature = "apgs",
             feature = "aasv",
             feature = "apsv",
-            feature = "legacy"
         )))]
         compile_error!("At least one oboron scheme must be enabled");
     }
@@ -917,14 +614,6 @@ pub fn new(fmt: &str, key: &str) -> Result<ObAny, Error> {
 /// Create an encoder from a pre-parsed Format and base64 key.
 pub fn new_with_format(format: Format, key: &str) -> Result<ObAny, Error> {
     match (format.scheme(), format.encoding()) {
-        #[cfg(feature = "zrbcx")]
-        (Scheme::Zrbcx, Encoding::C32) => Ok(ObAny::ZrbcxC32(ZrbcxC32::new_keyless()?)),
-        #[cfg(feature = "zrbcx")]
-        (Scheme::Zrbcx, Encoding::B32) => Ok(ObAny::ZrbcxB32(ZrbcxB32::new_keyless()?)),
-        #[cfg(feature = "zrbcx")]
-        (Scheme::Zrbcx, Encoding::B64) => Ok(ObAny::ZrbcxB64(ZrbcxB64::new_keyless()?)),
-        #[cfg(feature = "zrbcx")]
-        (Scheme::Zrbcx, Encoding::Hex) => Ok(ObAny::ZrbcxHex(ZrbcxHex::new_keyless()?)),
         #[cfg(feature = "upbc")]
         (Scheme::Upbc, Encoding::C32) => Ok(ObAny::UpbcC32(UpbcC32::new(key)?)),
         #[cfg(feature = "upbc")]
@@ -982,15 +671,6 @@ pub fn new_with_format(format: Format, key: &str) -> Result<ObAny, Error> {
         (Scheme::Mock2, Encoding::B64) => Ok(ObAny::Mock2B64(Mock2B64::new(key)?)),
         #[cfg(feature = "mock")]
         (Scheme::Mock2, Encoding::Hex) => Ok(ObAny::Mock2Hex(Mock2Hex::new(key)?)),
-        // Legacy
-        #[cfg(feature = "legacy")]
-        (Scheme::Legacy, Encoding::C32) => Ok(ObAny::LegacyC32(LegacyC32::new(key)?)),
-        #[cfg(feature = "legacy")]
-        (Scheme::Legacy, Encoding::B32) => Ok(ObAny::LegacyB32(LegacyB32::new(key)?)),
-        #[cfg(feature = "legacy")]
-        (Scheme::Legacy, Encoding::B64) => Ok(ObAny::LegacyB64(LegacyB64::new(key)?)),
-        #[cfg(feature = "legacy")]
-        (Scheme::Legacy, Encoding::Hex) => Ok(ObAny::LegacyHex(LegacyHex::new(key)?)),
         #[allow(unreachable_patterns)]
         _ => Err(Error::UnknownScheme),
     }
@@ -999,22 +679,6 @@ pub fn new_with_format(format: Format, key: &str) -> Result<ObAny, Error> {
 #[cfg(any(feature = "keyless", feature = "bytes-keys", feature = "hex-keys"))]
 fn from_bytes_with_format_internal(format: Format, key_bytes: &[u8; 64]) -> Result<ObAny, Error> {
     match (format.scheme(), format.encoding()) {
-        #[cfg(feature = "zrbcx")]
-        (Scheme::Zrbcx, Encoding::C32) => {
-            Ok(ObAny::ZrbcxC32(ZrbcxC32::from_bytes_internal(key_bytes)?))
-        }
-        #[cfg(feature = "zrbcx")]
-        (Scheme::Zrbcx, Encoding::B32) => {
-            Ok(ObAny::ZrbcxB32(ZrbcxB32::from_bytes_internal(key_bytes)?))
-        }
-        #[cfg(feature = "zrbcx")]
-        (Scheme::Zrbcx, Encoding::B64) => {
-            Ok(ObAny::ZrbcxB64(ZrbcxB64::from_bytes_internal(key_bytes)?))
-        }
-        #[cfg(feature = "zrbcx")]
-        (Scheme::Zrbcx, Encoding::Hex) => {
-            Ok(ObAny::ZrbcxHex(ZrbcxHex::from_bytes_internal(key_bytes)?))
-        }
         #[cfg(feature = "upbc")]
         (Scheme::Upbc, Encoding::C32) => {
             Ok(ObAny::UpbcC32(UpbcC32::from_bytes_internal(key_bytes)?))
@@ -1128,23 +792,6 @@ fn from_bytes_with_format_internal(format: Format, key_bytes: &[u8; 64]) -> Resu
         (Scheme::Mock2, Encoding::Hex) => {
             Ok(ObAny::Mock2Hex(Mock2Hex::from_bytes_internal(key_bytes)?))
         }
-        // Legacy
-        #[cfg(feature = "legacy")]
-        (Scheme::Legacy, Encoding::C32) => {
-            Ok(ObAny::LegacyC32(LegacyC32::from_bytes_internal(key_bytes)?))
-        }
-        #[cfg(feature = "legacy")]
-        (Scheme::Legacy, Encoding::B32) => {
-            Ok(ObAny::LegacyB32(LegacyB32::from_bytes_internal(key_bytes)?))
-        }
-        #[cfg(feature = "legacy")]
-        (Scheme::Legacy, Encoding::B64) => {
-            Ok(ObAny::LegacyB64(LegacyB64::from_bytes_internal(key_bytes)?))
-        }
-        #[cfg(feature = "legacy")]
-        (Scheme::Legacy, Encoding::Hex) => {
-            Ok(ObAny::LegacyHex(LegacyHex::from_bytes_internal(key_bytes)?))
-        }
         #[allow(unreachable_patterns)]
         _ => Err(Error::UnknownScheme),
     }
@@ -1207,8 +854,6 @@ mod tests {
 
         // Define all schemes
         let schemes = vec![
-            #[cfg(feature = "zrbcx")]
-            Scheme::Zrbcx,
             #[cfg(feature = "upbc")]
             Scheme::Upbc,
             #[cfg(feature = "aags")]
@@ -1224,9 +869,6 @@ mod tests {
             Scheme::Mock1,
             #[cfg(feature = "mock")]
             Scheme::Mock2,
-            // Legacy
-            #[cfg(feature = "legacy")]
-            Scheme::Legacy,
         ];
 
         // Define all encodings
@@ -1271,10 +913,6 @@ mod tests {
         let schemes = vec![
             Scheme::Mock2,
             Scheme::Mock1,
-            #[cfg(feature = "legacy")]
-            Scheme::Legacy,
-            #[cfg(feature = "zrbcx")]
-            Scheme::Zrbcx,
             #[cfg(feature = "upbc")]
             Scheme::Upbc,
             #[cfg(feature = "aags")]
@@ -1327,8 +965,6 @@ mod tests {
         let schemes = vec![
             Scheme::Mock2,
             Scheme::Mock1,
-            #[cfg(feature = "zrbcx")]
-            Scheme::Zrbcx,
             #[cfg(feature = "aags")]
             Scheme::Aags,
             #[cfg(feature = "aasv")]

@@ -1,20 +1,7 @@
 //! Legacy AES-CBC scheme (legacy)
 //!
 //! **Deprecated**: This scheme exists only for compatibility with
-//! existing deployments. New code should use `zrbcx` instead.
-//!
-//! Differences from `zrbcx`:
-//! - Reverses obtext characters rather than payload bytes
-//! - Uses different padding scheme
-//! - Less optimal prefix entropy distribution
-//!
-//! This module contains fully the isolated implementation of the
-//! deprecated `legacy` scheme.
-//! This is maintained for backward compatibility but should not be used
-//! for new code.
-//!
-//! **Architecture**: This module is intentionally self-contained, duplicating some
-//! encoding/decoding logic to keep legacy code isolated from the main codebase.
+//! existing deployments.  New code should use secure schemes instead.
 
 #![cfg(feature = "legacy")]
 
