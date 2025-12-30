@@ -337,6 +337,8 @@ pub use codec::{ApsvB32, ApsvB64, ApsvC32, ApsvHex};
 #[cfg(feature = "upbc")]
 pub use codec::{UpbcB32, UpbcB64, UpbcC32, UpbcHex};
 // Z-tier
+#[cfg(feature = "ztier")]
+pub use ztier::Oz;
 #[cfg(feature = "legacy")]
 pub use ztier::{LegacyB32, LegacyB64, LegacyC32, LegacyHex};
 #[cfg(feature = "zrbcx")]

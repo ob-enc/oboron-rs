@@ -7,6 +7,7 @@
 
 #![cfg(feature = "ztier")]
 
+mod oz;
 mod zdec_auto;
 mod zkeychain;
 
@@ -18,6 +19,8 @@ mod zrbcx;
 // Re-export public types
 #[cfg(feature = "zrbcx")]
 pub use zcodec::{ZrbcxB32, ZrbcxB64, ZrbcxC32, ZrbcxHex};
+
+pub use oz::Oz;
 
 #[cfg(feature = "zrbcx")]
 pub(crate) use zrbcx::{decrypt_zrbcx, encrypt_zrbcx};
