@@ -1,6 +1,6 @@
 [package]
 name = "oboron-cli"
-version = "1.0.0-beta.2"
+version = "1.0.0-beta.3"
 edition = "2021"
 rust-version = "1.74.0"
 authors = ["Bojan Đuričković"]
@@ -42,7 +42,7 @@ name = "ob"
 path = "src/main.rs"
 
 [dependencies]
-oboron = { version = "1.0.0-beta.2", path = "../oboron", features=["keyless"] }
+oboron = { version = "1.0.0-beta.3", path = "../oboron", features=["keyless"] }
 clap = { version = "4.5", features = ["derive", "cargo"] }
 clap_complete = "4.5"
 serde = { version = "1.0", features = ["derive"] }
