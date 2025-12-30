@@ -7,7 +7,9 @@
 
 #![cfg(feature = "ztier")]
 
+mod constants;
 mod oz;
+mod zcodec;
 mod zdec_auto;
 mod zkeychain;
 

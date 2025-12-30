@@ -11,7 +11,7 @@ type Aes128CbcDec = Decryptor<Aes128>;
 /// Encrypt plaintext bytes using deterministic AES-CBC (zrbcx scheme).
 /// Returns raw ciphertext bytes **reversed** for prefix entropy maximization.
 /// Not cryptographically secure - for obfuscation only.
-pub fn encrypt(secret: &[u8; 32], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
+pub fn encrypt_zrbcx(secret: &[u8; 32], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
     if plaintext_bytes.is_empty() {
         return Err(Error::EmptyPlaintext);
     }
@@ -40,7 +40,7 @@ pub fn encrypt(secret: &[u8; 32], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Err
 
 /// Decrypt ciphertext using deterministic AES-CBC (zrbcx scheme).
 /// Expects **reversed** ciphertext.  Returns plaintext bytes with padding removed.
-pub fn decrypt(secret: &[u8; 32], data: &[u8]) -> Result<Vec<u8>, Error> {
+pub fn decrypt_zrbcx(secret: &[u8; 32], data: &[u8]) -> Result<Vec<u8>, Error> {
     // Decrypt with AES-128-CBC
     if data.len() % AES_BLOCK_SIZE != 0 {
         return Err(Error::InvalidBlockLength);

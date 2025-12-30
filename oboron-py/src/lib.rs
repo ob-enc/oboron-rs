@@ -2,8 +2,8 @@ use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use pyo3::types::PyBytes;
 
-/// Macro to generate Python wrapper classes for fixed-format ObtextCodec ciphers
-macro_rules! impl_cipher_class {
+/// Macro to generate Python wrapper classes for fixed-format ObtextCodec types
+macro_rules! impl_codec_class {
     ($py_name:ident, $rust_type:ty, $doc:expr) => {
         #[doc = $doc]
         #[pyclass]
@@ -14,14 +14,14 @@ macro_rules! impl_cipher_class {
 
         #[pymethods]
         impl $py_name {
-            /// Create a new cipher instance.
+            /// Create a new codec instance.
             ///
             /// Args:
             ///     key:     86-character base64 string key (512 bits).  Required if keyless=False.
             ///     keyless: If True, uses the hardcoded key (testing only, NOT SECURE).
             ///
             /// Returns:
-            ///     A new cipher instance.
+            ///     A new codec instance.
             ///
             /// Raises:
             ///     ValueError: If key is invalid or both key and keyless are provided.
@@ -30,11 +30,11 @@ macro_rules! impl_cipher_class {
             fn new(key: Option<String>, keyless: bool) -> PyResult<Self> {
                 let inner = match (key, keyless) {
                     (Some(key), false) => <$rust_type>::new(&key).map_err(|e| {
-                        PyValueError::new_err(format!("Failed to create cipher: {}", e))
+                        PyValueError::new_err(format!("Failed to create codec: {}", e))
                     })?,
                     (None, true) => <$rust_type>::new_keyless().map_err(|e| {
                         PyValueError::new_err(format!(
-                            "Failed to create cipher with hardcoded key: {}",
+                            "Failed to create codec with hardcoded key: {}",
                             e
                         ))
                     })?,
@@ -128,249 +128,249 @@ macro_rules! impl_cipher_class {
 // Aags variants
 // -------------
 #[cfg(feature = "aags")]
-impl_cipher_class!(
+impl_codec_class!(
     AagsB32,
     ::oboron::AagsB32,
-    "Aags cipher (deterministic AES-GCM-SIV) with B32 encoding "
+    "Aags codec (deterministic AES-GCM-SIV) with B32 encoding "
 );
 #[cfg(feature = "aags")]
-impl_cipher_class!(
+impl_codec_class!(
     AagsB64,
     ::oboron::AagsB64,
-    "Aags cipher (deterministic AES-GCM-SIV) with B64 encoding"
+    "Aags codec (deterministic AES-GCM-SIV) with B64 encoding"
 );
 #[cfg(feature = "aags")]
-impl_cipher_class!(
+impl_codec_class!(
     AagsC32,
     ::oboron::AagsC32,
-    "Aags cipher (deterministic AES-GCM-SIV) with C32 encoding"
+    "Aags codec (deterministic AES-GCM-SIV) with C32 encoding"
 );
 #[cfg(feature = "aags")]
-impl_cipher_class!(
+impl_codec_class!(
     AagsHex,
     ::oboron::AagsHex,
-    "Aags cipher (deterministic AES-GCM-SIV) with Hex encoding"
+    "Aags codec (deterministic AES-GCM-SIV) with Hex encoding"
 );
 
 // Aasv variants
 // -------------
 #[cfg(feature = "aasv")]
-impl_cipher_class!(
+impl_codec_class!(
     AasvB32,
     ::oboron::AasvB32,
-    "Aasv cipher (deterministic AES-SIV, nonce-misuse resistant) with B32 encoding"
+    "Aasv codec (deterministic AES-SIV, nonce-misuse resistant) with B32 encoding"
 );
 #[cfg(feature = "aasv")]
-impl_cipher_class!(
+impl_codec_class!(
     AasvB64,
     ::oboron::AasvB64,
-    "Aasv cipher (deterministic AES-SIV, nonce-misuse resistant) with B64 encoding"
+    "Aasv codec (deterministic AES-SIV, nonce-misuse resistant) with B64 encoding"
 );
 #[cfg(feature = "aasv")]
-impl_cipher_class!(
+impl_codec_class!(
     AasvC32,
     ::oboron::AasvC32,
-    "Aasv cipher (deterministic AES-SIV, nonce-misuse resistant) with C32 encoding"
+    "Aasv codec (deterministic AES-SIV, nonce-misuse resistant) with C32 encoding"
 );
 #[cfg(feature = "aasv")]
-impl_cipher_class!(
+impl_codec_class!(
     AasvHex,
     ::oboron::AasvHex,
-    "Aasv cipher (deterministic AES-SIV, nonce-misuse resistant) with Hex encoding"
+    "Aasv codec (deterministic AES-SIV, nonce-misuse resistant) with Hex encoding"
 );
 
 // Apgs variants
 // --------------
 #[cfg(feature = "apgs")]
-impl_cipher_class!(
+impl_codec_class!(
     ApgsB32,
     ::oboron::ApgsB32,
-    "Apgs cipher (probabilistic AES-GCM-SIV) with B32 encoding"
+    "Apgs codec (probabilistic AES-GCM-SIV) with B32 encoding"
 );
 #[cfg(feature = "apgs")]
-impl_cipher_class!(
+impl_codec_class!(
     ApgsB64,
     ::oboron::ApgsB64,
-    "Apgs cipher (probabilistic AES-GCM-SIV) with B64 encoding"
+    "Apgs codec (probabilistic AES-GCM-SIV) with B64 encoding"
 );
 #[cfg(feature = "apgs")]
-impl_cipher_class!(
+impl_codec_class!(
     ApgsC32,
     ::oboron::ApgsC32,
-    "Apgs cipher (probabilistic AES-GCM-SIV) with C32 encoding"
+    "Apgs codec (probabilistic AES-GCM-SIV) with C32 encoding"
 );
 #[cfg(feature = "apgs")]
-impl_cipher_class!(
+impl_codec_class!(
     ApgsHex,
     ::oboron::ApgsHex,
-    "Apgs cipher (probabilistic AES-GCM-SIV) with Hex encoding"
+    "Apgs codec (probabilistic AES-GCM-SIV) with Hex encoding"
 );
 
 // Apsv variants
 // --------------
 #[cfg(feature = "apsv")]
-impl_cipher_class!(
+impl_codec_class!(
     ApsvB32,
     ::oboron::ApsvB32,
-    "Apsv cipher (probabilistic AES-SIV) with B32 encoding"
+    "Apsv codec (probabilistic AES-SIV) with B32 encoding"
 );
 #[cfg(feature = "apsv")]
-impl_cipher_class!(
+impl_codec_class!(
     ApsvB64,
     ::oboron::ApsvB64,
-    "Apsv cipher (probabilistic AES-SIV) with B64 encoding"
+    "Apsv codec (probabilistic AES-SIV) with B64 encoding"
 );
 #[cfg(feature = "apsv")]
-impl_cipher_class!(
+impl_codec_class!(
     ApsvC32,
     ::oboron::ApsvC32,
-    "Apsv cipher (probabilistic AES-SIV) with C32 encoding"
+    "Apsv codec (probabilistic AES-SIV) with C32 encoding"
 );
 #[cfg(feature = "apsv")]
-impl_cipher_class!(
+impl_codec_class!(
     ApsvHex,
     ::oboron::ApsvHex,
-    "Apsv cipher (probabilistic AES-SIV) with Hex encoding"
+    "Apsv codec (probabilistic AES-SIV) with Hex encoding"
 );
 
 // Upbc variants
 // ------------
 #[cfg(feature = "upbc")]
-impl_cipher_class!(
+impl_codec_class!(
     UpbcB32,
     ::oboron::UpbcB32,
-    "Upbc cipher (probabilistic AES-CBC) with B32 encoding"
+    "Upbc codec (probabilistic AES-CBC) with B32 encoding"
 );
 #[cfg(feature = "upbc")]
-impl_cipher_class!(
+impl_codec_class!(
     UpbcB64,
     ::oboron::UpbcB64,
-    "Upbc cipher (probabilistic AES-CBC) with B64 encoding"
+    "Upbc codec (probabilistic AES-CBC) with B64 encoding"
 );
 #[cfg(feature = "upbc")]
-impl_cipher_class!(
+impl_codec_class!(
     UpbcC32,
     ::oboron::UpbcC32,
-    "Upbc cipher (probabilistic AES-CBC) with C32 encoding"
+    "Upbc codec (probabilistic AES-CBC) with C32 encoding"
 );
 #[cfg(feature = "upbc")]
-impl_cipher_class!(
+impl_codec_class!(
     UpbcHex,
     ::oboron::UpbcHex,
-    "Upbc cipher (probabilistic AES-CBC) with Hex encoding"
+    "Upbc codec (probabilistic AES-CBC) with Hex encoding"
 );
 
 // Zrbcx variants
 // -------------
 #[cfg(feature = "zrbcx")]
-impl_cipher_class!(
+impl_codec_class!(
     ZrbcxB32,
     ::oboron::ZrbcxB32,
-    "Zrbcx cipher (deterministic AES-CBC, constant IV) with B32 encoding "
+    "Zrbcx codec (deterministic AES-CBC, constant IV) with B32 encoding "
 );
 #[cfg(feature = "zrbcx")]
-impl_cipher_class!(
+impl_codec_class!(
     ZrbcxB64,
     ::oboron::ZrbcxB64,
-    "Zrbcx cipher (deterministic AES-CBC, constant IV) with B64 encoding"
+    "Zrbcx codec (deterministic AES-CBC, constant IV) with B64 encoding"
 );
 #[cfg(feature = "zrbcx")]
-impl_cipher_class!(
+impl_codec_class!(
     ZrbcxC32,
     ::oboron::ZrbcxC32,
-    "Zrbcx cipher (deterministic AES-CBC, constant IV) with C32 encoding"
+    "Zrbcx codec (deterministic AES-CBC, constant IV) with C32 encoding"
 );
 #[cfg(feature = "zrbcx")]
-impl_cipher_class!(
+impl_codec_class!(
     ZrbcxHex,
     ::oboron::ZrbcxHex,
-    "Zrbcx cipher (deterministic AES-CBC, constant IV) with Hex encoding"
+    "Zrbcx codec (deterministic AES-CBC, constant IV) with Hex encoding"
 );
 
 // --- TESTING CLASSES ---
 
 // Mock1 variants
 // -------------
-impl_cipher_class!(
+impl_codec_class!(
     Mock1B32,
     ::oboron::Mock1B32,
-    "Mock1 cipher (identity scheme, for testing) with B32 encoding"
+    "Mock1 codec (identity scheme, for testing) with B32 encoding"
 );
-impl_cipher_class!(
+impl_codec_class!(
     Mock1B64,
     ::oboron::Mock1B64,
-    "Mock1 cipher (identity scheme, for testing) with B64 encoding"
+    "Mock1 codec (identity scheme, for testing) with B64 encoding"
 );
-impl_cipher_class!(
+impl_codec_class!(
     Mock1C32,
     ::oboron::Mock1C32,
-    "Mock1 cipher (identity scheme, for testing) with C32 encoding"
+    "Mock1 codec (identity scheme, for testing) with C32 encoding"
 );
-impl_cipher_class!(
+impl_codec_class!(
     Mock1Hex,
     ::oboron::Mock1Hex,
-    "Mock1 cipher (identity scheme, for testing) with Hex encoding"
+    "Mock1 codec (identity scheme, for testing) with Hex encoding"
 );
 
 // Mock2 variants
 // -------------
-impl_cipher_class!(
+impl_codec_class!(
     Mock2B32,
     ::oboron::Mock2B32,
-    "Mock2 cipher (reverse plaintext scheme, for testing) with B32 encoding"
+    "Mock2 codec (reverse plaintext scheme, for testing) with B32 encoding"
 );
-impl_cipher_class!(
+impl_codec_class!(
     Mock2B64,
     ::oboron::Mock2B64,
-    "Mock2 cipher (reverse plaintext scheme, for testing) with B64 encoding"
+    "Mock2 codec (reverse plaintext scheme, for testing) with B64 encoding"
 );
-impl_cipher_class!(
+impl_codec_class!(
     Mock2C32,
     ::oboron::Mock2C32,
-    "Mock2 cipher (reverse plaintext scheme, for testing) with C32 encoding"
+    "Mock2 codec (reverse plaintext scheme, for testing) with C32 encoding"
 );
-impl_cipher_class!(
+impl_codec_class!(
     Mock2Hex,
     ::oboron::Mock2Hex,
-    "Mock2 cipher (reverse plaintext scheme, for testing) with Hex encoding"
+    "Mock2 codec (reverse plaintext scheme, for testing) with Hex encoding"
 );
 
 // Legacy - LEGACY variants
 // ----------------------
 #[cfg(feature = "legacy")]
-impl_cipher_class!(
+impl_codec_class!(
     LegacyB32,
     ::oboron::LegacyB32,
-    "Legacy cipher (deterministic AES-CBC, constant IV, custom padding) with B32 encoding\n\n\
+    "Legacy codec (deterministic AES-CBC, constant IV, custom padding) with B32 encoding\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
      For new projects, use Zrbcx or more secure schemes like Aags/Aasv."
 );
 #[cfg(feature = "legacy")]
-impl_cipher_class!(
+impl_codec_class!(
     LegacyB64,
     ::oboron::LegacyB64,
-    "Legacy cipher (deterministic AES-CBC, constant IV, custom padding) with B64 encoding\n\n\
+    "Legacy codec (deterministic AES-CBC, constant IV, custom padding) with B64 encoding\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
      For new projects, use Zrbcx or more secure schemes like Aags/Aasv."
 );
 #[cfg(feature = "legacy")]
-impl_cipher_class!(
+impl_codec_class!(
     LegacyC32,
     ::oboron::LegacyC32,
-    "Legacy cipher (deterministic AES-CBC, constant IV, custom padding) with C32 encoding\n\n\
+    "Legacy codec (deterministic AES-CBC, constant IV, custom padding) with C32 encoding\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
      For new projects, use Zrbcx or more secure schemes like Aags/Aasv."
 );
 #[cfg(feature = "legacy")]
-impl_cipher_class!(
+impl_codec_class!(
     LegacyHex,
     ::oboron::LegacyHex,
-    "Legacy cipher (deterministic AES-CBC, constant IV, custom padding) with Hex encoding\n\n\
+    "Legacy codec (deterministic AES-CBC, constant IV, custom padding) with Hex encoding\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
      For new projects, use Zrbcx or more secure schemes like Aags/Aasv."
 );
 
-/// Ob - Flexible cipher with runtime format selection.   
+/// Ob - Flexible codec with runtime format selection.   
 ///
 /// This is the main interface for most use cases.  It wraps Rust's ObFlex
 /// and allows changing the format (scheme + encoding) at runtime.
@@ -537,9 +537,9 @@ impl Ob {
     }
 }
 
-/// Omnib - Multi-format cipher with full autodetection.
+/// Omnib - Multi-format codec with full autodetection.
 ///
-/// Unlike other ciphers, Omnib doesn't store a format internally.
+/// Unlike other codecs, Omnib doesn't store a format internally.
 /// The format must be specified for each enc operation, and it can
 /// automatically detect both scheme and encoding on dec operations.
 #[pyclass]
@@ -791,33 +791,6 @@ fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
     // Multi-format interface
     m.add_class::<Omnib>()?;
 
-    // Legacy variants (LEGACY)
-    #[cfg(feature = "legacy")]
-    {
-        m.add_class::<LegacyC32>()?;
-        m.add_class::<LegacyB32>()?;
-        m.add_class::<LegacyB64>()?;
-        m.add_class::<LegacyHex>()?;
-    }
-
-    // Zrbcx variants
-    #[cfg(feature = "zrbcx")]
-    {
-        m.add_class::<ZrbcxC32>()?;
-        m.add_class::<ZrbcxB32>()?;
-        m.add_class::<ZrbcxB64>()?;
-        m.add_class::<ZrbcxHex>()?;
-    }
-
-    // Upbc variants
-    #[cfg(feature = "upbc")]
-    {
-        m.add_class::<UpbcC32>()?;
-        m.add_class::<UpbcB32>()?;
-        m.add_class::<UpbcB64>()?;
-        m.add_class::<UpbcHex>()?;
-    }
-
     // Aags variants
     #[cfg(feature = "aags")]
     {
@@ -854,6 +827,17 @@ fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m.add_class::<ApsvHex>()?;
     }
 
+    // Upbc variants
+    #[cfg(feature = "upbc")]
+    {
+        m.add_class::<UpbcC32>()?;
+        m.add_class::<UpbcB32>()?;
+        m.add_class::<UpbcB64>()?;
+        m.add_class::<UpbcHex>()?;
+    }
+
+    // TESTING =======================
+
     // Mock variants
     #[cfg(feature = "mock")]
     {
@@ -869,6 +853,31 @@ fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m.add_class::<Mock1B64>()?;
         m.add_class::<Mock1Hex>()?;
     }
+
+    // Z-TIER =========================
+    //
+    // Main flexible interface
+    m.add_class::<Oz>()?;
+
+    // Zrbcx variants
+    #[cfg(feature = "zrbcx")]
+    {
+        m.add_class::<ZrbcxC32>()?;
+        m.add_class::<ZrbcxB32>()?;
+        m.add_class::<ZrbcxB64>()?;
+        m.add_class::<ZrbcxHex>()?;
+    }
+
+    // Legacy variants
+    #[cfg(feature = "legacy")]
+    {
+        m.add_class::<LegacyC32>()?;
+        m.add_class::<LegacyB32>()?;
+        m.add_class::<LegacyB64>()?;
+        m.add_class::<LegacyHex>()?;
+    }
+
+    // Functions =====================
 
     // Utility functions
     m.add_function(wrap_pyfunction!(generate_key, m)?)?;

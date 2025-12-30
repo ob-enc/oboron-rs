@@ -3,7 +3,7 @@
 #![cfg(feature = "ztier")]
 #![cfg(feature = "zrbcx")]
 
-use super::ZKeychain;
+use super::zkeychain::ZKeychain;
 use crate::{
     constants::HARDCODED_SECRET_BYTES, error::Error, Encoding, Format, ObtextCodec, Scheme,
 };

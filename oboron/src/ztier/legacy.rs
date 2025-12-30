@@ -4,9 +4,9 @@ use crate::constants::HARDCODED_SECRET_BYTES;
 use crate::{error::Error, Encoding, Format, ObtextCodec, Scheme};
 
 // Re-use ZKeychain from zcodec module
+use super::constants::AES_BLOCK_SIZE;
 use super::zkeychain::ZKeychain;
 
-const AES_BLOCK_SIZE: usize = 16;
 const LEGACY_PADDING_BYTE: u8 = b'=';
 
 /// Legacy codec implementation
