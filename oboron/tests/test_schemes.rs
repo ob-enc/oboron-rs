@@ -10,7 +10,7 @@ use oboron::{AasvB64, AasvC32, AasvHex};
 use oboron::{ApgsB64, ApgsC32, ApgsHex};
 #[cfg(feature = "apsv")]
 use oboron::{ApsvB64, ApsvC32, ApsvHex};
-use oboron::{Encoding, Ob, Scheme};
+use oboron::{Encoding, Ob};
 
 #[test]
 #[cfg(feature = "apgs")]
@@ -168,15 +168,15 @@ fn test_apsv_all_encodings() {
 }
 
 #[test]
-#[cfg(feature = "zrbcx")]
-#[cfg(feature = "upbc")]
 #[cfg(feature = "aags")]
 #[cfg(feature = "apgs")]
 #[cfg(feature = "aasv")]
 #[cfg(feature = "apsv")]
+#[cfg(feature = "upbc")]
 fn test_ob_basic() {
+    use oboron::Scheme;
     let key = [0u8; 64];
-    let mut ob = Ob::from_bytes("zrbcx.c32", &key).expect("Failed to create Ob");
+    let mut ob = Ob::from_bytes("upbc.c32", &key).expect("Failed to create Ob");
 
     let plaintext = "Testing Ob";
 
@@ -205,15 +205,14 @@ fn test_ob_basic() {
 }
 
 #[test]
-#[cfg(feature = "zrbcx")]
-#[cfg(feature = "upbc")]
 #[cfg(feature = "aags")]
-#[cfg(feature = "apgs")]
 #[cfg(feature = "aasv")]
+#[cfg(feature = "apgs")]
 #[cfg(feature = "apsv")]
-fn test_obflex_all_formats() {
+#[cfg(feature = "upbc")]
+fn test_ob_all_formats() {
     let key = [0u8; 64];
-    let mut ob = Ob::from_bytes("zrbcx.c32", &key).expect("Failed to create Ob");
+    let mut ob = Ob::from_bytes("upbc.c32", &key).expect("Failed to create Ob");
 
     let plaintext = "Testing all Ob formats";
 
@@ -242,7 +241,7 @@ fn test_obflex_all_formats() {
 
 #[test]
 #[cfg(feature = "aags")]
-fn test_obflex_encoding_changes() {
+fn test_ob_encoding_changes() {
     let key = [0u8; 64];
     let mut ob = Ob::from_bytes("aags.c32", &key).expect("Failed to create Ob");
 
