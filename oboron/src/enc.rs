@@ -2,7 +2,7 @@ use crate::{
     base32::{BASE32_CROCKFORD, BASE32_RFC},
     constants::SCHEME_MARKER_SIZE,
     error::Error,
-    Encoding, Format, Keychain, Scheme,
+    Encoding, ExtractedKey, Format, Keychain, Scheme,
 };
 use data_encoding::{BASE64URL_NOPAD, HEXLOWER};
 
@@ -35,34 +35,37 @@ use crate::encrypt_mock2;
 pub(crate) fn enc_to_format(
     plaintext: &str,
     format: Format,
-    keychain: &Keychain,
+    extracted_key: ExtractedKey,
 ) -> Result<String, Error> {
     if plaintext.is_empty() {
         return Err(Error::EmptyPlaintext);
     }
 
     // Step 1: Encrypt using scheme-specific function
-    let ciphertext = match format.scheme() {
-        #[cfg(feature = "zrbcx")]
-        Scheme::Zrbcx => encrypt_zrbcx(keychain.zrbcx(), plaintext.as_bytes())?,
-        #[cfg(feature = "upbc")]
-        Scheme::Upbc => encrypt_upbc(keychain.upbc(), plaintext.as_bytes())?,
+    let ciphertext = match (format.scheme(), extracted_key) {
         #[cfg(feature = "aags")]
-        Scheme::Aags => encrypt_aags(keychain.aags(), plaintext.as_bytes())?,
+        (Scheme::Aags, ExtractedKey::Key32(k)) => encrypt_aags(k, plaintext.as_bytes())?,
         #[cfg(feature = "apgs")]
-        Scheme::Apgs => encrypt_apgs(keychain.apgs(), plaintext.as_bytes())?,
+        (Scheme::Apgs, ExtractedKey::Key32(k)) => encrypt_apgs(k, plaintext.as_bytes())?,
         #[cfg(feature = "aasv")]
-        Scheme::Aasv => encrypt_aasv(keychain.aasv(), plaintext.as_bytes())?,
+        (Scheme::Aasv, ExtractedKey::Key64(k)) => encrypt_aasv(k, plaintext.as_bytes())?,
         #[cfg(feature = "apsv")]
-        Scheme::Apsv => encrypt_apsv(keychain.apsv(), plaintext.as_bytes())?,
+        (Scheme::Apsv, ExtractedKey::Key64(k)) => encrypt_apsv(k, plaintext.as_bytes())?,
+        #[cfg(feature = "upbc")]
+        (Scheme::Upbc, ExtractedKey::Key32(k)) => encrypt_upbc(k, plaintext.as_bytes())?,
+        #[cfg(feature = "zrbcx")]
+        (Scheme::Zrbcx, ExtractedKey::Key32(k)) => encrypt_zrbcx(k, plaintext.as_bytes())?,
         // Testing
         #[cfg(feature = "mock")]
-        Scheme::Mock1 => encrypt_mock1(keychain.mock1(), plaintext.as_bytes())?,
+        (Scheme::Mock1, ExtractedKey::Key32(k)) => encrypt_mock1(k, plaintext.as_bytes())?,
         #[cfg(feature = "mock")]
-        Scheme::Mock2 => encrypt_mock2(keychain.mock2(), plaintext.as_bytes())?,
+        (Scheme::Mock2, ExtractedKey::Key32(k)) => encrypt_mock2(k, plaintext.as_bytes())?,
         // Legacy - legacy does not use this call path
         #[cfg(feature = "legacy")]
-        Scheme::Legacy => unreachable!("called generic enc function for legacy"),
+        (Scheme::Legacy, ExtractedKey::Key32(k)) => {
+            unreachable!("called generic enc function for legacy")
+        }
+        _ => return Err(Error::InvalidKeyLength),
     };
 
     // Step 2: Build payload with 2-byte scheme marker appended
@@ -97,8 +100,8 @@ mod tests {
         // Create a real keychain for testing
         let key = [0u8; 64];
         let keychain = Keychain::from_bytes(&key).unwrap();
-
-        let result = enc_to_format("test", format, &keychain).unwrap();
+        let extracted_key = keychain.extract_key(format.scheme());
+        let result = enc_to_format("test", format, extracted_key).unwrap();
         assert!(!result.is_empty());
     }
 }

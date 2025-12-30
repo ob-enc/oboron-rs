@@ -74,7 +74,8 @@ impl ObMulti {
     /// ```
     pub fn enc_with_format_str(&self, plaintext: &str, fmt: &str) -> Result<String, Error> {
         let format = Format::from_str(fmt)?;
-        crate::enc::enc_to_format(plaintext, format, &self.keychain)
+        let extracted_key = self.keychain.extract_key(format.scheme());
+        crate::enc::enc_to_format(plaintext, format, extracted_key)
     }
 
     /// Encrypt+encode with a pre-parsed Format.
@@ -100,7 +101,8 @@ impl ObMulti {
     /// # }
     /// ```
     pub fn enc_with_format(&self, plaintext: &str, format: Format) -> Result<String, Error> {
-        crate::enc::enc_to_format(plaintext, format, &self.keychain)
+        let extracted_key = self.keychain.extract_key(format.scheme());
+        crate::enc::enc_to_format(plaintext, format, extracted_key)
     }
 
     /// Decode+decrypt with an explicitly provided format string.

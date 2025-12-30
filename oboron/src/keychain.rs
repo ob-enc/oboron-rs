@@ -1,8 +1,13 @@
-use crate::Error; // Use top-level error
+use crate::{Error, Scheme};
 use data_encoding::BASE64URL_NOPAD;
 
 pub struct Keychain {
     key: [u8; 64],
+}
+
+pub(crate) enum ExtractedKey<'a> {
+    Key32(&'a [u8; 32]),
+    Key64(&'a [u8; 64]),
 }
 
 impl Keychain {
@@ -52,6 +57,22 @@ impl Keychain {
     }
 
     // Key extraction ==================================================
+
+    #[inline]
+    pub(crate) fn extract_key(&self, scheme: Scheme) -> ExtractedKey {
+        match scheme {
+            #[cfg(feature = "aags")]
+            Scheme::Aags => ExtractedKey::Key32(self.aags()),
+            #[cfg(feature = "apgs")]
+            Scheme::Apgs => ExtractedKey::Key32(self.apgs()),
+            #[cfg(feature = "aasv")]
+            Scheme::Aasv => ExtractedKey::Key64(self.aasv()),
+            #[cfg(feature = "apsv")]
+            Scheme::Apsv => ExtractedKey::Key64(self.apsv()),
+            #[cfg(feature = "upbc")]
+            Scheme::Upbc => ExtractedKey::Key32(self.upbc()),
+        }
+    }
 
     // aags key - AES-256 key for AES-GCM-SIV (second 32 bytes)
     #[inline]

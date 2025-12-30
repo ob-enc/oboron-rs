@@ -41,11 +41,8 @@ macro_rules! impl_zcodec {
         impl ObtextCodec for $name {
             fn enc(&self, plaintext: &str) -> Result<String, Error> {
                 let format = Format::new(Scheme::Zrbcx, $encoding);
-                crate::enc::enc_to_format(plaintext, format, &crate::Keychain::from_bytes(&{
-                    let mut key = [0u8; 64];
-                    key[0..32].copy_from_slice(self.zkeychain. secret_bytes());
-                    key
-                })?)
+                let secret = self.zkeychain.zrbcx();
+                crate::enc::enc_to_format(plaintext, format, secret)
             }
 
             fn dec(&self, obtext: &str) -> Result<String, Error> {

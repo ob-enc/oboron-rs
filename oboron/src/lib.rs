@@ -240,7 +240,7 @@ mod ztier;
 pub use constants::{HARDCODED_KEY_BASE64, HARDCODED_KEY_BYTES};
 pub use error::Error;
 
-pub(crate) use keychain::Keychain;
+pub(crate) use keychain::{ExtractedKey, Keychain};
 
 // Re-export from obcrypt
 

@@ -300,7 +300,8 @@ impl Ob {
 
 impl ObtextCodec for Ob {
     fn enc(&self, plaintext: &str) -> Result<String, Error> {
-        crate::enc::enc_to_format(plaintext, self.format, &self.keychain)
+        let extracted_key = self.keychain.extract_key(self.format.scheme());
+        crate::enc::enc_to_format(plaintext, self.format, extracted_key)
     }
 
     fn dec(&self, obtext: &str) -> Result<String, Error> {
