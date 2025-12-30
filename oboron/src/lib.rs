@@ -36,7 +36,7 @@
 //! # let obm = oboron::ObMulti::new(&key)?;
 //! // Operations: data, format
 //! let ot = obm.enc_with_format_str("plaintext", "aasv.b64")?;
-//! obm.dec_with_format_str(&ot, "aasv. b64")?;
+//! obm.dec_with_format_str(&ot, "aasv.b64")?;
 //!
 //! // Constructors: format, key
 //! oboron::Ob::new("aasv.b64", &key)?;

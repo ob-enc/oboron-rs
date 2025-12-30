@@ -3,7 +3,7 @@ use crate::constants::HARDCODED_KEY_BYTES;
 use crate::{Error, Format, Keychain};
 
 /// An ObtextCodec implementation that takes format on enc operation and autodetects on dec operation.
-/// Unlike all other implementations (Ob, ObFlex, ZrbcxC32, .. .) it does not have
+/// Unlike all other implementations (Ob, ZrbcxC32, .. .) it does not have
 /// a format stored internally.
 ///
 /// This struct allows specifying the format (scheme + encoding) at enc call time,

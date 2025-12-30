@@ -1,6 +1,6 @@
 //! Autodetection for z-tier schemes (zrbcx, legacy)
 
-use super::ZKeychain;
+use super::zkeychain::ZKeychain;
 use crate::{constants::SCHEME_MARKER_SIZE, error::Error, Encoding, Format, Scheme};
 
 #[cfg(feature = "zrbcx")]

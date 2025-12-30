@@ -387,12 +387,6 @@ pub trait IntoFormat: private::Sealed {
     fn into_format(self) -> Result<Format, Error>;
 }
 
-impl IntoFormat for &str {
-    fn into_format(self) -> Result<Format, Error> {
-        Format::from_str(self)
-    }
-}
-
 impl IntoFormat for Format {
     fn into_format(self) -> Result<Format, Error> {
         Ok(self)
@@ -405,10 +399,30 @@ impl IntoFormat for &Format {
     }
 }
 
+impl IntoFormat for &str {
+    fn into_format(self) -> Result<Format, Error> {
+        Format::from_str(self)
+    }
+}
+
+impl IntoFormat for String {
+    fn into_format(self) -> Result<Format, Error> {
+        Format::from_str(&self)
+    }
+}
+
+impl IntoFormat for &String {
+    fn into_format(self) -> Result<Format, Error> {
+        Format::from_str(self)
+    }
+}
+
 // Seal the trait to prevent external implementations
 mod private {
     pub trait Sealed {}
     impl Sealed for &str {}
+    impl Sealed for String {}
+    impl Sealed for &String {}
     impl Sealed for super::Format {}
     impl Sealed for &super::Format {}
 }
