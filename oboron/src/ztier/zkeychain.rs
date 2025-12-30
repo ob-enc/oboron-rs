@@ -22,6 +22,7 @@ impl ZKeychain {
 
     /// Create a new ZKeychain from a 43-character base64 string secret.
     #[inline]
+    #[allow(dead_code)] // Used by Zob constructors
     pub(crate) fn from_base64(secret_base64: &str) -> Result<Self, Error> {
         let secret: [u8; 32] = BASE64URL_NOPAD
             .decode(secret_base64.as_bytes())
@@ -34,6 +35,7 @@ impl ZKeychain {
 
     /// Create a new ZKeychain from a 64-character hex string.
     #[inline]
+    #[allow(dead_code)] // Used by Zob constructors
     #[cfg(feature = "hex-keys")]
     pub(crate) fn from_hex(secret_hex: &str) -> Result<Self, Error> {
         let secret_bytes: [u8; 32] = hex::decode(secret_hex)?
@@ -45,12 +47,14 @@ impl ZKeychain {
 
     /// Get the secret as base64 string.
     #[inline]
+    #[allow(dead_code)] // Used by Zob.key() method
     pub(crate) fn secret_base64(&self) -> String {
         BASE64URL_NOPAD.encode(&self.secret)
     }
 
     /// Get the secret as raw bytes.
     #[inline]
+    #[allow(dead_code)] // Used by Zob.key_bytes()
     #[cfg(feature = "bytes-keys")]
     pub(crate) fn secret_bytes(&self) -> &[u8; 32] {
         &self.secret
@@ -58,6 +62,7 @@ impl ZKeychain {
 
     /// Get the secret as hex string.
     #[inline]
+    #[allow(dead_code)] // Used by Zob.key_hex()
     #[cfg(feature = "hex-keys")]
     pub(crate) fn secret_hex(&self) -> String {
         hex::encode(&self.secret)
@@ -76,6 +81,7 @@ impl ZKeychain {
     /// Get secret for legacy scheme (all 32 bytes)
     #[inline]
     #[cfg(feature = "legacy")]
+    #[allow(dead_code)] // Used by dec_auto fallback
     pub(crate) fn legacy(&self) -> &[u8; 32] {
         &self.secret
     }

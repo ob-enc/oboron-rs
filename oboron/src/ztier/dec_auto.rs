@@ -7,14 +7,14 @@ use crate::{constants::SCHEME_MARKER_SIZE, error::Error, Encoding, Format, Schem
 use crate::{constants::ZRBCX_MARKER, decrypt_zrbcx};
 
 #[cfg(feature = "legacy")]
-use super::legacy::decrypt_legacy as decrypt_legacy_bytes;
+use super::legacy::decrypt_legacy;
 
 /// Decode the given encoding, then decrypt autodetecting the z-tier scheme
 ///
-/// This function handles z-tier schemes (zrbcx, legacy) with legacy fallback.
+/// This function handles z-tier schemes (zrbcx, legacy) with legacy fallback.  
 /// If the payload doesn't have a valid scheme marker or decoding fails,
 /// it attempts legacy decryption as a fallback.
-pub fn dec_any_scheme_ztier(
+pub(crate) fn dec_any_scheme_ztier(
     zkeychain: &ZKeychain,
     encoding: Encoding,
     obtext: &str,
@@ -55,27 +55,29 @@ pub fn dec_any_scheme_ztier(
     buffer.truncate(len - SCHEME_MARKER_SIZE);
 
     // Step 4: Match scheme marker and decrypt with available Z-TIER schemes
-    let plaintext_bytes = match scheme_marker {
-        #[cfg(feature = "zrbcx")]
-        ZRBCX_MARKER => decrypt_zrbcx(zkeychain.zrbcx(), &buffer)?,
-        _ => {
-            // Unknown scheme marker - try legacy as fallback
-            #[cfg(feature = "legacy")]
-            {
-                let format = Format::new(Scheme::Legacy, encoding);
-                let legacy_result = dec_legacy_fallback(zkeychain, obtext, format)?;
-                // Only validate legacy fallback results to avoid false positives
-                validate_legacy_output(&legacy_result)?;
-                return Ok(legacy_result);
-            }
-            #[cfg(not(feature = "legacy"))]
-            return Err(Error::UnknownScheme);
-        }
-    };
+    #[cfg(feature = "zrbcx")]
+    if scheme_marker == ZRBCX_MARKER {
+        let plaintext_bytes = decrypt_zrbcx(zkeychain.zrbcx(), &buffer)?;
+        return bytes_to_string(plaintext_bytes);
+    }
 
-    // Step 5: Convert to string
+    // Unknown scheme marker - try legacy as fallback
+    #[cfg(feature = "legacy")]
+    {
+        let format = Format::new(Scheme::Legacy, encoding);
+        let legacy_result = dec_legacy_fallback(zkeychain, obtext, format)?;
+        // Only validate legacy fallback results to avoid false positives
+        validate_legacy_output(&legacy_result)?;
+        return Ok(legacy_result);
+    }
 
-    // Unchecked (Assuming plaintext was originally valid UTF-8, and correct key is used)
+    #[cfg(not(feature = "legacy"))]
+    Err(Error::UnknownScheme)
+}
+
+/// Helper function to convert bytes to string
+#[inline]
+fn bytes_to_string(plaintext_bytes: Vec<u8>) -> Result<String, Error> {
     #[cfg(feature = "unchecked-utf8")]
     {
         Ok(unsafe { String::from_utf8_unchecked(plaintext_bytes) })
@@ -100,18 +102,9 @@ fn dec_legacy_fallback(
     let ciphertext = decode_obtext_to_payload(obtext, format.encoding())?;
 
     // Decrypt using legacy scheme
-    let plaintext_bytes = decrypt_legacy_bytes(zkeychain.legacy(), &ciphertext)?;
+    let plaintext_bytes = decrypt_legacy(zkeychain.legacy(), &ciphertext)?;
 
-    // Convert to string
-    #[cfg(feature = "unchecked-utf8")]
-    {
-        Ok(unsafe { String::from_utf8_unchecked(plaintext_bytes) })
-    }
-
-    #[cfg(not(feature = "unchecked-utf8"))]
-    {
-        String::from_utf8(plaintext_bytes).map_err(|_| Error::DecryptionFailed)
-    }
+    bytes_to_string(plaintext_bytes)
 }
 
 /// Validate that legacy fallback output looks reasonable
@@ -134,6 +127,7 @@ fn validate_legacy_output(output: &str) -> Result<(), Error> {
 }
 
 /// Decode c32, autodetect the z-tier scheme and decrypt accordingly
+#[allow(dead_code)] // May be used by Zob in the future
 pub(crate) fn dec_any_scheme_c32_ztier(
     zkeychain: &ZKeychain,
     obtext: &str,
@@ -142,6 +136,7 @@ pub(crate) fn dec_any_scheme_c32_ztier(
 }
 
 /// Decode b32, autodetect the z-tier scheme and decrypt accordingly
+#[allow(dead_code)] // May be used by Zob in the future
 pub(crate) fn dec_any_scheme_b32_ztier(
     zkeychain: &ZKeychain,
     obtext: &str,
@@ -150,6 +145,7 @@ pub(crate) fn dec_any_scheme_b32_ztier(
 }
 
 /// Decode b64, autodetect the z-tier scheme and decrypt accordingly
+#[allow(dead_code)] // May be used by Zob in the future
 pub(crate) fn dec_any_scheme_b64_ztier(
     zkeychain: &ZKeychain,
     obtext: &str,
@@ -158,6 +154,7 @@ pub(crate) fn dec_any_scheme_b64_ztier(
 }
 
 /// Decode hex, autodetect the z-tier scheme and decrypt accordingly
+#[allow(dead_code)] // May be used by Zob in the future
 pub(crate) fn dec_any_scheme_hex_ztier(
     zkeychain: &ZKeychain,
     obtext: &str,
@@ -175,7 +172,8 @@ pub(crate) fn dec_any_scheme_hex_ztier(
 /// 1. If text contains '-', '_', or uppercase letters -> B64 (definitive)
 /// 2. Else if text contains non-hex lowercase letters (g-z) -> Try Base32, fallback to B64
 /// 3. Else -> Try Hex, fallback to Base32, then B64
-pub fn dec_any_format_ztier(zkeychain: &ZKeychain, obtext: &str) -> Result<String, Error> {
+#[allow(dead_code)] // May be used by Zob in the future
+pub(crate) fn dec_any_format_ztier(zkeychain: &ZKeychain, obtext: &str) -> Result<String, Error> {
     // Check for B64 indicators:  '-', '_', or mixed case letters (definitive)
     if obtext.contains('-')
         || obtext.contains('_')
