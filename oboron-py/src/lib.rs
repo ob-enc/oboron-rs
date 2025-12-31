@@ -368,14 +368,11 @@ impl_codec_class!(
 
 /// Ob - Flexible codec with runtime format selection.   
 ///
-/// This is the main interface for most use cases.  It wraps Rust's ObFlex
+/// This is the main interface for most use cases.  It wraps Rust's Ob
 /// and allows changing the format (scheme + encoding) at runtime.
-///
-/// Note: In Rust, there's both Ob (immutable) and ObFlex (mutable), but since
-/// Python doesn't have immutability, we expose ObFlex as "Ob" in Python.
 #[pyclass]
 struct Ob {
-    inner: ::oboron::ObFlex,
+    inner: ::oboron::Ob,
 }
 
 #[pymethods]
@@ -396,9 +393,9 @@ impl Ob {
     #[pyo3(signature = (format, key=None, keyless=false))]
     fn new(format: &str, key: Option<String>, keyless: bool) -> PyResult<Self> {
         let inner = match (key, keyless) {
-            (Some(key), false) => ::oboron::ObFlex::new(format, &key)
+            (Some(key), false) => ::oboron::Ob::new(format, &key)
                 .map_err(|e| PyValueError::new_err(format!("Failed to create Ob: {}", e)))?,
-            (None, true) => ::oboron::ObFlex::new_keyless(format).map_err(|e| {
+            (None, true) => ::oboron::Ob::new_keyless(format).map_err(|e| {
                 PyValueError::new_err(format!("Failed to create Ob with hardcoded key: {}", e))
             })?,
             (Some(_), true) => {
@@ -448,12 +445,31 @@ impl Ob {
         result.map_err(|e| PyValueError::new_err(format!("Dec operation failed: {}", e)))
     }
 
-    /// Change the format (scheme + encoding).   
+    /// Decode+decrypt with automatic scheme and encoding detection.
     ///
-    /// Args:
+    /// This method tries to decode with the instance's encoding, and if that fails
+    /// it does full format autodetection (`Omnib.autodec()` functionality as failover)
+    ///
+    /// Args:  
+    ///     obtext: The encrypted+encoded string to decode+decrypt.
+    ///
+    /// Returns:  
+    ///     The decoded+decrypted plaintext string.
+    ///
+    /// Raises:  
+    ///     ValueError: If the dec operation fails or format cannot be detected.
+    fn autodec(&self, obtext: &str) -> PyResult<String> {
+        self.inner
+            .autodec(obtext)
+            .map_err(|e| PyValueError::new_err(format!("Autodec operation failed: {}", e)))
+    }
+
+    /// Change the format (scheme + encoding).  
+    ///
+    /// Args:  
     ///     format: Format string like "aags.b64", "apsv.hex", "zrbcx.c32", "zrbcx.b32", etc.
     ///
-    /// Raises:
+    /// Raises:  
     ///     ValueError: If format is invalid.
     fn set_format(&mut self, format: &str) -> PyResult<()> {
         self.inner
@@ -586,7 +602,7 @@ impl Omnib {
     ///     ValueError: If the enc operation fails or format is invalid.
     fn enc(&self, plaintext: &str, format: &str) -> PyResult<String> {
         self.inner
-            .enc_with_format_str(plaintext, format)
+            .enc(plaintext, format)
             .map_err(|e| PyValueError::new_err(format!("Enc operation failed: {}", e)))
     }
 
@@ -603,7 +619,7 @@ impl Omnib {
     ///     ValueError: If the dec operation fails or format is invalid.
     fn dec(&self, obtext: &str, format: &str) -> PyResult<String> {
         self.inner
-            .dec_with_format_str(obtext, format)
+            .dec(obtext, format)
             .map_err(|e| PyValueError::new_err(format!("Dec operation failed: {}", e)))
     }
 
