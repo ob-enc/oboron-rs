@@ -10,10 +10,10 @@ fn test_mock2_basic_roundtrip() {
     let ob = oboron::Mock2C32::new(&key).unwrap();
 
     let plaintext = "hello world";
-    let encd = ob.enc(plaintext).unwrap();
-    let decd = ob.dec(&encd).unwrap();
+    let ot = ob.enc(plaintext).unwrap();
+    let pt2 = ob.dec(&ot).unwrap();
 
-    assert_eq!(decd, plaintext);
+    assert_eq!(pt2, plaintext);
 }
 
 #[test]
@@ -82,8 +82,8 @@ fn test_mock2_cross_scheme_with_mock1() {
     assert!(mock1.dec(&ot71).is_err());
 
     // But auto-detect dec should work
-    assert_eq!(mock2.dec_auto_scheme(&ot70).unwrap(), plaintext);
-    assert_eq!(mock1.dec_auto_scheme(&ot71).unwrap(), plaintext);
+    assert_eq!(mock2.autodec(&ot70).unwrap(), plaintext);
+    assert_eq!(mock1.autodec(&ot71).unwrap(), plaintext);
 }
 
 #[test]
@@ -94,9 +94,9 @@ fn test_mock2_utf8() {
     let test_cases = vec!["UTF-8: こんにちは", "Emoji: 🚀🔥💯", "Mixed: Hello世界! "];
 
     for plaintext in test_cases {
-        let encd = ob.enc(plaintext).unwrap();
-        let decd = ob.dec(&encd).unwrap();
-        assert_eq!(decd, plaintext, "Failed for: {}", plaintext);
+        let ot = ob.enc(plaintext).unwrap();
+        let pt2 = ob.dec(&ot).unwrap();
+        assert_eq!(pt2, plaintext, "Failed for: {}", plaintext);
     }
 }
 
@@ -107,10 +107,10 @@ fn test_mock2_palindrome() {
 
     // Palindromes should still roundtrip correctly
     let plaintext = "racecar";
-    let encd = ob.enc(plaintext).unwrap();
-    let decd = ob.dec(&encd).unwrap();
+    let ot = ob.enc(plaintext).unwrap();
+    let pt2 = ob.dec(&ot).unwrap();
 
-    assert_eq!(decd, plaintext);
+    assert_eq!(pt2, plaintext);
 }
 
 #[test]
@@ -163,8 +163,8 @@ fn test_mock2_long_string() {
     let ob = oboron::Mock2C32::new(&key).unwrap();
 
     let plaintext = "a".repeat(10000);
-    let encd = ob.enc(&plaintext).unwrap();
-    let decd = ob.dec(&encd).unwrap();
+    let ot = ob.enc(&plaintext).unwrap();
+    let pt2 = ob.dec(&ot).unwrap();
 
-    assert_eq!(decd, plaintext);
+    assert_eq!(pt2, plaintext);
 }

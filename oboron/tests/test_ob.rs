@@ -6,10 +6,10 @@ fn test_ob_basic_roundtrip() {
     let ob = Ob::from_bytes("mock1.c32", &key).expect("Failed to create Ob");
 
     let plaintext = "Hello, Ob!";
-    let encd = ob.enc(plaintext).expect("Failed to enc");
-    let decd = ob.dec(&encd).expect("Failed to dec");
+    let ot = ob.enc(plaintext).expect("Failed to enc");
+    let pt2 = ob.dec(&ot).expect("Failed to dec");
 
-    assert_eq!(decd, plaintext);
+    assert_eq!(pt2, plaintext);
 }
 
 #[test]
@@ -19,11 +19,11 @@ fn test_ob_deterministic() {
     let ob = Ob::from_bytes("aasv.b64", &key).expect("Failed to create Ob with aasv");
 
     let plaintext = "Deterministic test";
-    let encd1 = ob.enc(plaintext).expect("Failed to enc");
-    let encd2 = ob.enc(plaintext).expect("Failed to enc");
+    let ot1 = ob.enc(plaintext).expect("Failed to enc");
+    let ot2 = ob.enc(plaintext).expect("Failed to enc");
 
     // Aasv is deterministic
-    assert_eq!(encd1, encd2);
+    assert_eq!(ot1, ot2);
 }
 
 #[test]
@@ -33,15 +33,15 @@ fn test_ob_probabilistic() {
     let ob = Ob::from_bytes("apsv.b64", &key).expect("Failed to create Ob with apsv");
 
     let plaintext = "Probabilistic test";
-    let encd1 = ob.enc(plaintext).expect("Failed to enc");
-    let encd2 = ob.enc(plaintext).expect("Failed to enc");
+    let ot1 = ob.enc(plaintext).expect("Failed to enc");
+    let ot2 = ob.enc(plaintext).expect("Failed to enc");
 
     // Apsv is probabilistic
-    assert_ne!(encd1, encd2);
+    assert_ne!(ot1, ot2);
 
     // But both dec correctly
-    assert_eq!(ob.dec(&encd1).unwrap(), plaintext);
-    assert_eq!(ob.dec(&encd2).unwrap(), plaintext);
+    assert_eq!(ob.dec(&ot1).unwrap(), plaintext);
+    assert_eq!(ob.dec(&ot2).unwrap(), plaintext);
 }
 
 #[test]
@@ -53,14 +53,14 @@ fn test_ob_all_encodings() {
         let ob =
             Ob::from_bytes(format, &key).expect(&format!("Failed to create Ob with {}", format));
 
-        let encd = ob
+        let ot = ob
             .enc(plaintext)
             .expect(&format!("Failed to enc with {}", format));
-        let decd = ob
-            .dec(&encd)
+        let pt2 = ob
+            .dec(&ot)
             .expect(&format!("Failed to dec with {}", format));
 
-        assert_eq!(decd, plaintext, "Mismatch for format {}", format);
+        assert_eq!(pt2, plaintext, "Mismatch for format {}", format);
     }
 }
 
@@ -70,10 +70,10 @@ fn test_ob_from_hex_key() {
     let ob = Ob::from_hex_key("mock1.c32", hex_key).expect("Failed to create Ob from hex");
 
     let plaintext = "Testing hex key";
-    let encd = ob.enc(plaintext).expect("Failed to enc");
-    let decd = ob.dec(&encd).expect("Failed to dec");
+    let ot = ob.enc(plaintext).expect("Failed to enc");
+    let pt2 = ob.dec(&ot).expect("Failed to dec");
 
-    assert_eq!(decd, plaintext);
+    assert_eq!(pt2, plaintext);
 }
 
 #[test]
@@ -103,34 +103,31 @@ fn test_ob_scheme_autodetection() {
 
     // Encode with aasv
     let aasv = Ob::from_bytes("aasv.b64", &key).expect("Failed to create Ob with aasv.b64 format");
-    let encd = aasv.enc("test").expect("Failed to enc");
+    let ot = aasv.enc("test").expect("Failed to enc");
 
     // Decode with mock1 (different scheme, same encoding)
     let mock1 =
         Ob::from_bytes("mock1.b64", &key).expect("Failed to create Ob with mock1.b64 format");
-    let decd = mock1
-        .dec_auto_scheme(&encd)
+    let pt2 = mock1
+        .autodec(&ot)
         .expect("Failed to dec with autodetection");
-    assert_eq!(decd, "test");
+    assert_eq!(pt2, "test");
 
     // But strict dec fails (scheme mismatch)
-    assert!(mock1.dec(&encd).is_err());
+    assert!(mock1.dec(&ot).is_err());
 }
 
 #[test]
-fn test_ob_encoding_must_match() {
+fn test_ob_autodec() {
     let key = [0u8; 64];
 
     // Encode with C32
     let ob_b32 = Ob::from_bytes("mock1.c32", &key).expect("Failed to create Ob with b32");
-    let encd = ob_b32.enc("test").expect("Failed to enc");
+    let ot = ob_b32.enc("test").expect("Failed to enc");
 
-    // Try to dec with B64 (wrong encoding)
+    // Dec with B64
     let ob_b64 = Ob::from_bytes("mock1.b64", &key).expect("Failed to create Ob with b64");
-    assert!(
-        ob_b64.dec_auto_scheme(&encd).is_err(),
-        "Should fail with wrong encoding"
-    );
+    assert_eq!(ob_b64.autodec(&ot).unwrap(), "test");
 }
 
 #[test]
@@ -149,10 +146,10 @@ fn test_ob_special_characters() {
     let ob = Ob::new("mock1.b64", &key).expect("Failed to create Ob");
 
     let plaintext = "Special: !@#$%^&*(){}[]|\\:;\"'<>,.?/~`±§";
-    let encd = ob.enc(plaintext).expect("Failed to enc");
-    let decd = ob.dec(&encd).expect("Failed to dec");
+    let ot = ob.enc(plaintext).expect("Failed to enc");
+    let pt2 = ob.dec(&ot).expect("Failed to dec");
 
-    assert_eq!(decd, plaintext);
+    assert_eq!(pt2, plaintext);
 }
 
 #[test]
@@ -160,10 +157,10 @@ fn test_ob_keyless() {
     let ob = Ob::new_keyless("mock1.c32").expect("Failed to create Ob with hardcoded key");
 
     let plaintext = "keyless test";
-    let encd = ob.enc(plaintext).expect("Failed to enc");
-    let decd = ob.dec(&encd).expect("Failed to dec");
+    let ot = ob.enc(plaintext).expect("Failed to enc");
+    let pt2 = ob.dec(&ot).expect("Failed to dec");
 
-    assert_eq!(decd, plaintext);
+    assert_eq!(pt2, plaintext);
 }
 
 #[test]
@@ -177,6 +174,6 @@ fn test_ob_generic_usage() {
         "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
     let ob = Ob::new("mock1.c32", key).expect("Failed to create Ob");
 
-    let encd = enc_with_oboron(&ob, "generic test");
-    assert!(encd.len() > 0);
+    let ot = enc_with_oboron(&ob, "generic test");
+    assert!(ot.len() > 0);
 }

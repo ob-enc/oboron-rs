@@ -11,10 +11,10 @@ fn test_mock1_basic_roundtrip() {
     let ob = oboron::Mock1C32::new(&key).unwrap();
 
     let plaintext = "hello world";
-    let encd = ob.enc(plaintext).unwrap();
-    let decd = ob.dec(&encd).unwrap();
+    let ot = ob.enc(plaintext).unwrap();
+    let pt2 = ob.dec(&ot).unwrap();
 
-    assert_eq!(decd, plaintext);
+    assert_eq!(pt2, plaintext);
 }
 
 #[test]
@@ -75,9 +75,9 @@ fn test_mock1_special_characters() {
     ];
 
     for plaintext in test_cases {
-        let encd = ob.enc(plaintext).unwrap();
-        let decd = ob.dec(&encd).unwrap();
-        assert_eq!(decd, plaintext, "Failed for: {}", plaintext);
+        let ot = ob.enc(plaintext).unwrap();
+        let pt2 = ob.dec(&ot).unwrap();
+        assert_eq!(pt2, plaintext, "Failed for: {}", plaintext);
     }
 }
 
@@ -88,10 +88,10 @@ fn test_mock1_long_string() {
 
     // Test with a long string
     let plaintext = "a".repeat(10000);
-    let encd = ob.enc(&plaintext).unwrap();
-    let decd = ob.dec(&encd).unwrap();
+    let ot = ob.enc(&plaintext).unwrap();
+    let pt2 = ob.dec(&ot).unwrap();
 
-    assert_eq!(decd, plaintext);
+    assert_eq!(pt2, plaintext);
 }
 
 #[test]
@@ -99,10 +99,10 @@ fn test_mock1_keyless() {
     let ob = oboron::Mock1C32::new_keyless().unwrap();
 
     let plaintext = "hardcoded key test";
-    let encd = ob.enc(plaintext).unwrap();
-    let decd = ob.dec(&encd).unwrap();
+    let ot = ob.enc(plaintext).unwrap();
+    let pt2 = ob.dec(&ot).unwrap();
 
-    assert_eq!(decd, plaintext);
+    assert_eq!(pt2, plaintext);
 }
 
 #[test]
@@ -111,10 +111,10 @@ fn test_mock1_dec() {
     let mock1 = oboron::Mock1C32::new(&key).unwrap();
 
     let plaintext = "strict dec test";
-    let encd = mock1.enc(plaintext).unwrap();
+    let ot = mock1.enc(plaintext).unwrap();
 
     // Strict dec should work with matching scheme
-    assert_eq!(mock1.dec(&encd).unwrap(), plaintext);
+    assert_eq!(mock1.dec(&ot).unwrap(), plaintext);
 }
 
 #[test]
@@ -125,13 +125,13 @@ fn test_mock1_cannot_dec_other_schemes_strict() {
     let aasv = oboron::Ob::new("aasv.c32", &key).unwrap();
 
     let plaintext = "cross-scheme test";
-    let encd_aasv = aasv.enc(plaintext).unwrap();
+    let ot_aasv = aasv.enc(plaintext).unwrap();
 
     // Strict dec should fail when scheme doesn't match
-    assert!(mock1.dec(&encd_aasv).is_err());
+    assert!(mock1.dec(&ot_aasv).is_err());
 
     // But scheme-autodetecting dec should work
-    assert_eq!(mock1.dec_auto_scheme(&encd_aasv).unwrap(), plaintext);
+    assert_eq!(mock1.autodec(&ot_aasv).unwrap(), plaintext);
 }
 
 #[test]
@@ -150,9 +150,9 @@ fn test_mock1_format_string() {
 
     // Test creating via format string
     let ob = oboron::new("mock1.c32", &key).unwrap();
-    let encd = ob.enc("format test").unwrap();
-    let decd = ob.dec(&encd).unwrap();
-    assert_eq!(decd, "format test");
+    let ot = ob.enc("format test").unwrap();
+    let pt2 = ob.dec(&ot).unwrap();
+    assert_eq!(pt2, "format test");
 
     // Test all format strings
     let formats = vec!["mock1.c32", "mock1.b64", "mock1.hex"];
@@ -168,10 +168,10 @@ fn test_mock1_from_bytes() {
     let ob = oboron::Mock1C32::from_bytes(&key_bytes).unwrap();
 
     let plaintext = "from bytes test";
-    let encd = ob.enc(plaintext).unwrap();
-    let decd = ob.dec(&encd).unwrap();
+    let ot = ob.enc(plaintext).unwrap();
+    let pt2 = ob.dec(&ot).unwrap();
 
-    assert_eq!(decd, plaintext);
+    assert_eq!(pt2, plaintext);
 }
 
 #[test]
@@ -180,10 +180,10 @@ fn test_mock1_factory_from_bytes() {
     let ob = oboron::from_bytes("mock1.c32", &key_bytes).unwrap();
 
     let plaintext = "factory from bytes";
-    let encd = ob.enc(plaintext).unwrap();
-    let decd = ob.dec(&encd).unwrap();
+    let ot = ob.enc(plaintext).unwrap();
+    let pt2 = ob.dec(&ot).unwrap();
 
-    assert_eq!(decd, plaintext);
+    assert_eq!(pt2, plaintext);
 }
 
 #[test]
@@ -192,10 +192,10 @@ fn test_mock1_convenience_functions() {
 
     // Test enc/dec convenience functions
     let plaintext = "convenience test";
-    let encd = oboron::enc(plaintext, "mock1.c32", &key).unwrap();
-    let decd = oboron::dec(&encd, "mock1.c32", &key).unwrap();
+    let ot = oboron::enc(plaintext, "mock1.c32", &key).unwrap();
+    let pt2 = oboron::dec(&ot, "mock1.c32", &key).unwrap();
 
-    assert_eq!(decd, plaintext);
+    assert_eq!(pt2, plaintext);
 }
 
 #[test]
@@ -203,21 +203,21 @@ fn test_mock1_autodec() {
     let key = oboron::generate_key();
 
     let plaintext = "autodec test";
-    let encd = oboron::enc(plaintext, "mock1.c32", &key).unwrap();
+    let ot = oboron::enc(plaintext, "mock1.c32", &key).unwrap();
 
     // Autodec should work without specifying format
-    let decd = oboron::autodec(&encd, &key).unwrap();
-    assert_eq!(decd, plaintext);
+    let pt2 = oboron::autodec(&ot, &key).unwrap();
+    assert_eq!(pt2, plaintext);
 }
 
 #[test]
 fn test_mock1_keyless_functions() {
     let plaintext = "keyless convenience";
 
-    let encd = oboron::enc_keyless(plaintext, "mock1.c32").unwrap();
-    let decd = oboron::dec_keyless(&encd, "mock1.c32").unwrap();
+    let ot = oboron::enc_keyless(plaintext, "mock1.c32").unwrap();
+    let pt2 = oboron::dec_keyless(&ot, "mock1.c32").unwrap();
 
-    assert_eq!(decd, plaintext);
+    assert_eq!(pt2, plaintext);
 }
 
 #[test]
@@ -229,10 +229,10 @@ fn test_mock1_ob_any_default() {
     assert_eq!(ob.scheme(), Scheme::Mock1);
 
     let plaintext = "ObAny default test";
-    let encd = ob.enc(plaintext).unwrap();
-    let decd = ob.dec(&encd).unwrap();
+    let ot = ob.enc(plaintext).unwrap();
+    let pt2 = ob.dec(&ot).unwrap();
 
-    assert_eq!(decd, plaintext);
+    assert_eq!(pt2, plaintext);
 }
 
 #[test]
@@ -258,12 +258,12 @@ fn test_mock1_different_keys() {
     let ob2 = oboron::Mock1C32::new(&key2).unwrap();
 
     let plaintext = "different keys test";
-    let encd = ob1.enc(plaintext).unwrap();
+    let ot = ob1.enc(plaintext).unwrap();
 
     // Since mock1 is identity, the key doesn't matter for decoding
     // (though in production this would be a security issue for real crypto)
-    let decd = ob2.dec(&encd).unwrap();
-    assert_eq!(decd, plaintext);
+    let pt2 = ob2.dec(&ot).unwrap();
+    assert_eq!(pt2, plaintext);
 }
 
 #[test]
@@ -301,7 +301,7 @@ fn test_mock1_encoding_mismatch() {
 
     // But autodetect dec won't work across encodings
     // (autodetect only handles scheme, not encoding)
-    assert!(ob_b64.dec_auto_scheme(&enc_b32).is_err());
+    assert_eq!(ob_b64.autodec(&enc_b32).unwrap(), plaintext);
 }
 
 #[test]
@@ -343,10 +343,10 @@ fn test_mock1_binary_data_in_string() {
 
     // Test with string containing various byte values
     let plaintext = "Binary: \x01\x02\x03\x7F";
-    let encd = ob.enc(plaintext).unwrap();
-    let decd = ob.dec(&encd).unwrap();
+    let ot = ob.enc(plaintext).unwrap();
+    let pt2 = ob.dec(&ot).unwrap();
 
-    assert_eq!(decd, plaintext);
+    assert_eq!(pt2, plaintext);
 }
 
 #[test]
@@ -356,16 +356,16 @@ fn test_mock1_sequential_operations() {
 
     // Encode multiple values in sequence
     let values = vec!["first", "second", "third"];
-    let mut encd_values = vec![];
+    let mut ot_values = vec![];
 
     for value in &values {
-        encd_values.push(ob.enc(value).unwrap());
+        ot_values.push(ob.enc(value).unwrap());
     }
 
     // Decode in sequence
-    for (i, encd) in encd_values.iter().enumerate() {
-        let decd = ob.dec(encd).unwrap();
-        assert_eq!(decd, values[i]);
+    for (i, ot) in ot_values.iter().enumerate() {
+        let pt2 = ob.dec(ot).unwrap();
+        assert_eq!(pt2, values[i]);
     }
 }
 

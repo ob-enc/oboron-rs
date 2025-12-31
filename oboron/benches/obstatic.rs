@@ -116,9 +116,6 @@ fn run_standard_benchmarks(c: &mut Criterion) {
                     }
                 }
             }
-            "dec_auto_scheme" => {
-                // Static ObXX interface doesn't support dec_auto_scheme
-            }
             "autodec" => {
                 // Static ObXX interface doesn't support autodec
             }

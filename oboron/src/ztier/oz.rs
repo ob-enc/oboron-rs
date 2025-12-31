@@ -213,16 +213,16 @@ impl Oz {
     /// let mut oz = Oz::new("zrbcx. b64", secret)?;
     /// let ot = oz.enc("test")?;
     ///
-    /// // Change scheme - dec_auto_scheme will still work
+    /// // Change scheme - autodec will still work
     /// oz.set_scheme(oboron::Scheme::Legacy)?;
-    /// let pt2 = oz.dec_auto_scheme(&ot)?;
+    /// let pt2 = oz.autodec(&ot)?;
     /// assert_eq!(pt2, "test");
     /// # }
     /// # Ok(())
     /// # }
     /// ```
     #[inline]
-    pub fn dec_auto_scheme(&self, obtext: &str) -> Result<String, Error> {
+    pub fn autodec(&self, obtext: &str) -> Result<String, Error> {
         zdec_auto::dec_any_scheme_ztier(&self.zkeychain, self.format.encoding(), obtext)
     }
 

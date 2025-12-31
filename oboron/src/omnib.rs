@@ -1,6 +1,6 @@
 #[cfg(feature = "keyless")]
 use crate::constants::HARDCODED_KEY_BYTES;
-use crate::{Error, Format, Keychain};
+use crate::{format::IntoFormat, Error, Keychain};
 
 /// An ObtextCodec implementation that takes format on enc operation and autodetects on dec operation.
 /// Unlike all other implementations (Ob, ZrbcxC32, .. .) it does not have
@@ -20,15 +20,15 @@ use crate::{Error, Format, Keychain};
 /// # {
 /// # use oboron::{Omnib, MOCK1_B64};
 /// # let key = oboron::generate_key();
-/// let obm = Omnib::new(&key)?;
+/// let omb = Omnib::new(&key)?;
 ///
 /// // Encode with explicit format
-/// let ot1 = obm.enc_with_format_str("hello", "aasv.c32")?; // using explicit string
-/// let ot2 = obm.enc_with_format("world", MOCK1_B64)?; // using format constant
+/// let ot1 = omb.enc("hello", "aasv.c32")?; // using explicit string
+/// let ot2 = omb.enc("world", MOCK1_B64)?; // using format constant
 ///
 /// // autodec detects both scheme and encoding
-/// let pt1 = obm.autodec(&ot1)?;
-/// let pt2 = obm.autodec(&ot2)?;
+/// let pt1 = omb.autodec(&ot1)?;
+/// let pt2 = omb.autodec(&ot2)?;
 /// # }
 /// # Ok(())
 /// # }
@@ -51,36 +51,42 @@ impl Omnib {
         Self::from_bytes(&HARDCODED_KEY_BYTES)
     }
 
-    /// Encrypt+encode with a specific format string.
+    /// Encrypt and encode plaintext with the specified format.
     ///
-    /// Accepts format strings like "zrbcx.c32", "aags.b64", etc.
-    /// For pre-parsed Format instances, use [`enc_with_format`](Self::enc_with_format).
+    /// Accepts either a format string (`&str`) or a `Format` instance.
     ///
     /// # Examples
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(all(feature = "aasv", feature="mock"))]
+    /// # #[cfg(feature = "aasv")]
     /// # {
-    /// # use oboron::Omnib;
-    /// let key = oboron::generate_key();
-    /// let obm = Omnib::new(&key)?;
+    /// # use oboron::{Omnib, Format, Scheme, Encoding, AASV_B64};
+    /// # let key = oboron::generate_key();
+    /// let omb = Omnib::new(&key)?;
     ///
-    /// let ot = obm.enc_with_format_str("hello", "aasv.c32")?;
-    /// let ot2 = obm.enc_with_format_str("world", "mock1.b64")?;
+    /// // Using format string
+    /// let ot1 = omb.enc("hello", "aasv.b64")?;
+    ///
+    /// // Using Format instance
+    /// let ot2 = omb.enc("hello", Format::new(Scheme::Aasv, Encoding::B64))?;
+    ///
+    /// // Using format constant
+    /// let ot3 = omb.enc("hello", AASV_B64)?;
     /// # }
     /// # Ok(())
     /// # }
     /// ```
-    pub fn enc_with_format_str(&self, plaintext: &str, fmt: &str) -> Result<String, Error> {
-        let format = Format::from_str(fmt)?;
+    #[inline]
+    pub fn enc(&self, plaintext: &str, format: impl IntoFormat) -> Result<String, Error> {
+        let format = format.into_format()?;
         let extracted_key = self.keychain.extract_key(format.scheme())?;
         crate::enc::enc_to_format(plaintext, format, extracted_key)
     }
 
-    /// Encrypt+encode with a pre-parsed Format.
+    /// Decode and decrypt obtext with the specified format.
     ///
-    /// This method is most efficient when the same format is used repeatedly,
+    /// Accepts either a format string (`&str`) or a `Format` instance.
     ///
     /// # Examples
     ///
@@ -90,72 +96,20 @@ impl Omnib {
     /// # {
     /// # use oboron::{Omnib, Format, Scheme, Encoding};
     /// # let key = oboron::generate_key();
-    /// # let obm = Omnib::new(&key)?;
-    /// let format = Format::new(Scheme::Aasv, Encoding::C32);
+    /// # let omb = Omnib::new(&key)?;
+    /// # let ot = omb.enc("test", "aasv.b64")?;
+    /// // Using format string
+    /// let pt1 = omb.dec(&ot, "aasv.b64")?;
     ///
-    /// // Reuse format across multiple calls
-    /// let ot1 = obm.enc_with_format("hello", format)? ;
-    /// let ot2 = obm.enc_with_format("world", format)?;
+    /// // Using Format instance
+    /// let pt2 = omb.dec(&ot, Format::new(Scheme::Aasv, Encoding::B64))?;
     /// # }
     /// # Ok(())
     /// # }
     /// ```
-    pub fn enc_with_format(&self, plaintext: &str, format: Format) -> Result<String, Error> {
-        let extracted_key = self.keychain.extract_key(format.scheme())?;
-        crate::enc::enc_to_format(plaintext, format, extracted_key)
-    }
-
-    /// Decode+decrypt with an explicitly provided format string.
-    ///
-    /// For pre-parsed Format instances, use [`dec_with_format`](Self::dec_with_format).
-    /// For automatic format detection, use [`autodec`](Self::autodec).
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(feature = "aasv")]
-    /// # {
-    /// # use oboron::Omnib;
-    /// # let key = oboron::generate_key();
-    /// # let obm = Omnib::new(&key)?;
-    /// let ot = obm.enc_with_format_str("hello", "aasv.b64")?;
-    /// let pt2 = obm.dec_with_format_str(&ot, "aasv.b64")? ;
-    /// assert_eq!(pt2, "hello");
-    /// # }
-    /// # Ok(())
-    /// # }
-    /// ```
-    pub fn dec_with_format_str(&self, obtext: &str, fmt: &str) -> Result<String, Error> {
-        let format = Format::from_str(fmt)?;
-        let extracted_key = self.keychain.extract_key(format.scheme())?;
-        crate::dec::dec_from_format(obtext, format, extracted_key)
-    }
-
-    /// Decode+decrypt with a pre-parsed Format.
-    ///
-    /// Re-uses the same format is used repeatedly.   Even though strings are matched, not parsed,
-    /// this saves a function call overhead on each call.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(feature = "aasv")]
-    /// # {
-    /// # use oboron::{Omnib, Format, Scheme, Encoding};
-    /// # let key = oboron::generate_key();
-    /// # let obm = Omnib::new(&key)?;
-    /// let format = Format::new(Scheme::Aasv, Encoding::B64);
-    ///
-    /// let ot = obm.enc_with_format("hello", format)?;
-    /// let pt2 = obm.dec_with_format(&ot, format)?;
-    /// assert_eq!(pt2, "hello");
-    /// # }
-    /// # Ok(())
-    /// # }
-    /// ```
-    pub fn dec_with_format(&self, obtext: &str, format: Format) -> Result<String, Error> {
+    #[inline]
+    pub fn dec(&self, obtext: &str, format: impl IntoFormat) -> Result<String, Error> {
+        let format = format.into_format()?;
         let extracted_key = self.keychain.extract_key(format.scheme())?;
         crate::dec::dec_from_format(obtext, format, extracted_key)
     }
@@ -170,9 +124,9 @@ impl Omnib {
     /// # {
     /// # use oboron::Omnib;
     /// # let key = oboron::generate_key();
-    /// # let obm = Omnib::new(&key)?;
-    /// let ot = obm.enc_with_format_str("hello", "aasv.b64")?;
-    /// let pt2 = obm.autodec(&ot)?;  // Autodetects aasv.b64
+    /// # let omb = Omnib::new(&key)?;
+    /// let ot = omb.enc("hello", "aasv.b64")?;
+    /// let pt2 = omb.autodec(&ot)?;  // Autodetects ob:aasv.b64
     /// assert_eq!(pt2, "hello");
     /// # }
     /// # Ok(())

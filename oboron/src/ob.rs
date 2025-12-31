@@ -1,6 +1,6 @@
 #[cfg(feature = "keyless")]
 use crate::constants::HARDCODED_KEY_BYTES;
-use crate::{Encoding, Error, Format, Keychain, ObtextCodec, Scheme};
+use crate::{format::IntoFormat, Encoding, Error, Format, Keychain, ObtextCodec, Scheme};
 
 /// A flexible ObtextCodec implementation with runtime format selection.
 ///
@@ -511,52 +511,4 @@ impl Ob {
     pub fn key_bytes(&self) -> &[u8; 64] {
         <Self as ObtextCodec>::key_bytes(self)
     }
-}
-
-/// Trait for types that can be converted into a Format.
-///
-/// This trait is sealed and only implemented for `&str`, `Format`, and `&Format`.
-pub trait IntoFormat: private::Sealed {
-    /// Convert into a Format, possibly returning an error.
-    fn into_format(self) -> Result<Format, Error>;
-}
-
-impl IntoFormat for Format {
-    fn into_format(self) -> Result<Format, Error> {
-        Ok(self)
-    }
-}
-
-impl IntoFormat for &Format {
-    fn into_format(self) -> Result<Format, Error> {
-        Ok(*self)
-    }
-}
-
-impl IntoFormat for &str {
-    fn into_format(self) -> Result<Format, Error> {
-        Format::from_str(self)
-    }
-}
-
-impl IntoFormat for String {
-    fn into_format(self) -> Result<Format, Error> {
-        Format::from_str(&self)
-    }
-}
-
-impl IntoFormat for &String {
-    fn into_format(self) -> Result<Format, Error> {
-        Format::from_str(self)
-    }
-}
-
-// Seal the trait to prevent external implementations
-mod private {
-    pub trait Sealed {}
-    impl Sealed for &str {}
-    impl Sealed for String {}
-    impl Sealed for &String {}
-    impl Sealed for super::Format {}
-    impl Sealed for &super::Format {}
 }

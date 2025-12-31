@@ -103,7 +103,7 @@ fn test_legacy_vectors() {
         // Change the code to use Ob instead of Box<dyn ObtextCodec>
         // Test autodetection
         let ob1 = Ob::new_keyless(&format!("{}", ob.format())).unwrap();
-        let autodetected = match ob1.dec_auto_scheme(&vector.obtext) {
+        let autodetected = match ob1.autodec(&vector.obtext) {
             Ok(pt) => pt,
             Err(e) => {
                 eprintln!("Autodetection failed:  {}", e);

@@ -53,19 +53,17 @@ fn test_all_vectors() {
             // (encoding produces different output each time)
 
             // Test decoding with format
-            let decd = obm
-                .dec_with_format_str(&vector.obtext, &vector.format)
-                .unwrap_or_else(|e| {
-                    panic!(
-                        "Failed to dec_with_format_str '{}' with format '{}': {:?}",
-                        vector.obtext, vector.format, e
-                    )
-                });
+            let pt2 = obm.dec(&vector.obtext, &vector.format).unwrap_or_else(|e| {
+                panic!(
+                    "Failed to dec '{}' with format '{}': {:?}",
+                    vector.obtext, vector.format, e
+                )
+            });
 
             assert_eq!(
-                decd, vector.plaintext,
+                pt2, vector.plaintext,
                 "Decoding mismatch for '{}' with format '{}'\nExpected: {}\nGot: {}",
-                vector.obtext, vector.format, vector.plaintext, decd
+                vector.obtext, vector.format, vector.plaintext, pt2
             );
 
             // Test autodetection
@@ -80,8 +78,8 @@ fn test_all_vectors() {
             );
 
             // Test that we can enc and then dec (roundtrip)
-            let new_encd = obm
-                .enc_with_format_str(&vector.plaintext, &vector.format)
+            let new_ot = obm
+                .enc(&vector.plaintext, &vector.format)
                 .unwrap_or_else(|e| {
                     panic!(
                         "Failed to enc '{}' with format '{}': {:?}",
@@ -89,14 +87,12 @@ fn test_all_vectors() {
                     )
                 });
 
-            let roundtrip = obm
-                .dec_with_format_str(&new_encd, &vector.format)
-                .unwrap_or_else(|e| {
-                    panic!(
-                        "Failed to dec roundtrip '{}' with format '{}': {:?}",
-                        new_encd, vector.format, e
-                    )
-                });
+            let roundtrip = obm.dec(&new_ot, &vector.format).unwrap_or_else(|e| {
+                panic!(
+                    "Failed to dec roundtrip '{}' with format '{}': {:?}",
+                    new_ot, vector.format, e
+                )
+            });
 
             assert_eq!(
                 roundtrip, vector.plaintext,
@@ -107,8 +103,8 @@ fn test_all_vectors() {
             // For deterministic schemes, test both encoding and decoding
 
             // Test encoding
-            let encd = obm
-                .enc_with_format_str(&vector.plaintext, &vector.format)
+            let ot = obm
+                .enc(&vector.plaintext, &vector.format)
                 .unwrap_or_else(|e| {
                     panic!(
                         "Failed to enc '{}' with format '{}': {:?}",
@@ -117,25 +113,23 @@ fn test_all_vectors() {
                 });
 
             assert_eq!(
-                encd, vector.obtext,
+                ot, vector.obtext,
                 "Encoding mismatch for '{}' with format '{}'\nExpected: {}\nGot: {}",
-                vector.plaintext, vector.format, vector.obtext, encd
+                vector.plaintext, vector.format, vector.obtext, ot
             );
 
             // Test decoding
-            let decd = obm
-                .dec_with_format_str(&vector.obtext, &vector.format)
-                .unwrap_or_else(|e| {
-                    panic!(
-                        "Failed to dec '{}' with format '{}': {:?}",
-                        vector.obtext, vector.format, e
-                    )
-                });
+            let pt2 = obm.dec(&vector.obtext, &vector.format).unwrap_or_else(|e| {
+                panic!(
+                    "Failed to dec '{}' with format '{}': {:?}",
+                    vector.obtext, vector.format, e
+                )
+            });
 
             assert_eq!(
-                decd, vector.plaintext,
+                pt2, vector.plaintext,
                 "Decoding mismatch for '{}' with format '{}'\nExpected: {}\nGot: {}",
-                vector.obtext, vector.format, vector.plaintext, decd
+                vector.obtext, vector.format, vector.plaintext, pt2
             );
 
             // Test autodetection

@@ -33,10 +33,10 @@
 //! # {
 //! # use oboron;
 //! # let key = oboron::generate_key();
-//! # let obm = oboron::Omnib::new(&key)?;
+//! # let omb = oboron::Omnib::new(&key)?;
 //! // Operations: data, format
-//! let ot = obm.enc_with_format_str("plaintext", "aasv.b64")?;
-//! obm.dec_with_format_str(&ot, "aasv.b64")?;
+//! let ot = omb.enc("plaintext", "aasv.b64")?;
+//! omb.dec(&ot, "aasv.b64")?;
 //!
 //! // Constructors: format, key
 //! oboron::Ob::new("aasv.b64", &key)?;
@@ -116,15 +116,15 @@
 //! # {
 //! # use oboron::Omnib;
 //! # let key = oboron::generate_key();
-//! let obm = Omnib::new(&key)?;
+//! let omb = Omnib::new(&key)?;
 //!
 //! // Encode to different formats
-//! let ot_b32 = obm.enc_with_format_str("data", "aasv.c32")?;
-//! let ot_b64 = obm.enc_with_format_str("data", "aasv.b64")?;
-//! let ot_hex = obm.enc_with_format_str("data", "aasv.hex")?;
+//! let ot_b32 = omb.enc("data", "aasv.c32")?;
+//! let ot_b64 = omb.enc("data", "aasv.b64")?;
+//! let ot_hex = omb.enc("data", "aasv.hex")?;
 //!
 //! // Decode with automatic format detection
-//! let pt2 = obm.autodec(&ot_b64)?;
+//! let pt2 = omb.autodec(&ot_b64)?;
 //! # }
 //! # Ok(())
 //! # }
@@ -407,7 +407,7 @@ pub mod prelude {
 /// ```
 #[cfg(feature = "convenience")]
 pub fn enc(plaintext: &str, format: &str, key: &str) -> Result<String, Error> {
-    Omnib::new(key)?.enc_with_format_str(plaintext, format)
+    Omnib::new(key)?.enc(plaintext, format)
 }
 
 /// Encrypt+encode plaintext with a specified format using the hardcoded key (testing only).
@@ -430,12 +430,12 @@ pub fn enc(plaintext: &str, format: &str, key: &str) -> Result<String, Error> {
 #[cfg(feature = "convenience")]
 #[cfg(feature = "keyless")]
 pub fn enc_keyless(plaintext: &str, format: &str) -> Result<String, Error> {
-    Omnib::new_keyless()?.enc_with_format_str(plaintext, format)
+    Omnib::new_keyless()?.enc(plaintext, format)
 }
 
 /// Decode+decrypt obtext with a specified format.
 ///
-/// This is a convenience wrapper around [`Omnib::dec_with_format`].
+/// This is a convenience wrapper around [`Omnib::dec`].
 /// For repeated operations, consider creating an [`Omnib`] instance directly.
 ///
 /// # Parameter Order
@@ -458,7 +458,7 @@ pub fn enc_keyless(plaintext: &str, format: &str) -> Result<String, Error> {
 /// ```
 #[cfg(feature = "convenience")]
 pub fn dec(obtext: &str, format: &str, key: &str) -> Result<String, Error> {
-    Omnib::new(key)?.dec_with_format_str(obtext, format)
+    Omnib::new(key)?.dec(obtext, format)
 }
 
 /// Decode+decrypt obtext with a specified format using the hardcoded key (testing only).
@@ -483,7 +483,7 @@ pub fn dec(obtext: &str, format: &str, key: &str) -> Result<String, Error> {
 #[cfg(feature = "convenience")]
 #[cfg(feature = "keyless")]
 pub fn dec_keyless(obtext: &str, format: &str) -> Result<String, Error> {
-    Omnib::new_keyless()?.dec_with_format_str(obtext, format)
+    Omnib::new_keyless()?.dec(obtext, format)
 }
 
 /// Decode+decrypt obtext with automatic format detection.
