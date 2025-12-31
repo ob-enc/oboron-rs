@@ -36,7 +36,7 @@ class OboronBase(ABC):
         ...
 
     @abstractmethod
-    def dec(self, obtext: str, strict: bool = False) -> str:
+    def dec(self, obtext: str) -> str:
         """Decode and decrypt obtext to plaintext."""
         ...
 

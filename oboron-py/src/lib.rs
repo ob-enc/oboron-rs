@@ -73,17 +73,13 @@ macro_rules! impl_codec_class {
             ///
             /// Args:
             ///     obtext: The encrypted+encoded string to decode+decrypt.
-            ///     strict: If True, only decrypt using this instance's scheme (no scheme autodetection).
-            ///             If False (default), automatically detects the scheme used for
-            ///             encryption.
             ///
             /// Returns:
             ///     The decoded+decrypted plaintext string.
             ///
             /// Raises:
-            ///     ValueError: If the dec operation fails, or if strict=True and the ciphertext
-            ///                 was created with a different scheme.
-            #[pyo3(signature = (obtext, strict=false))]
+            ///     ValueError: If the dec operation fails
+            #[pyo3(signature = (obtext))]
             fn dec(&self, obtext: &str) -> PyResult<String> {
                 let result = self.inner.dec(obtext);
                 result.map_err(|e| PyValueError::new_err(format!("Dec operation failed: {}", e)))
@@ -438,24 +434,17 @@ impl Ob {
 
     /// Decode+decrypt an obtext string back to plaintext.  
     ///
-    /// Args:
-    ///     obtext: The encrypted+encoded string to decode.
-    ///     strict: If True, only decrypt using this instance's scheme (no scheme autodetection).  
-    ///             If False (default), automatically detects the scheme used for encryption.  
+    /// Args:  
+    ///     obtext: The encrypted+encoded string to decode.  
     ///
-    /// Returns:
+    /// Returns:  
     ///     The decoded plaintext string.
     ///
-    /// Raises:
-    ///     ValueError: If the dec operation fails, or if strict=True and the obtext
-    ///                 was created with a different scheme.  
-    #[pyo3(signature = (obtext, strict=false))]
-    fn dec(&self, obtext: &str, strict: bool) -> PyResult<String> {
-        let result = if strict {
-            self.inner.dec(obtext)
-        } else {
-            self.inner.dec_auto_scheme(obtext)
-        };
+    /// Raises:  
+    ///     ValueError: If the dec operation fails
+    #[pyo3(signature = (obtext))]
+    fn dec(&self, obtext: &str) -> PyResult<String> {
+        let result = self.inner.dec(obtext);
         result.map_err(|e| PyValueError::new_err(format!("Dec operation failed: {}", e)))
     }
 

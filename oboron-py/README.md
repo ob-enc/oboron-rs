@@ -1076,8 +1076,7 @@ consistent interface:
 
 Methods:
 - `enc(plaintext: str) -> str` - Encrypt plaintext to obtext
-- `dec(obtext: str, strict: bool) -> str` - Decrypt with automatic scheme
-  detection (default) or without (strict=True)
+- `dec(obtext: str) -> str` - Decrypt obtext to plaintext
 Properties:
 - `key -> str` - Base64 key access
 - `key_bytes -> bytes` - Raw key bytes access
