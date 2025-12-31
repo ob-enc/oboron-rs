@@ -90,28 +90,6 @@ impl Ob {
         })
     }
 
-    /// Get the current format.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(feature = "aasv")]
-    /// # {
-    /// # use oboron::{Ob, Scheme, Encoding};
-    /// # let key = oboron::generate_key();
-    /// let ob = Ob::new("aasv.b64", &key)?;
-    /// let format = ob.format();
-    /// assert_eq!(format.scheme(), Scheme::Aasv);
-    /// assert_eq!(format.encoding(), Encoding::B64);
-    /// # }
-    /// # Ok(())
-    /// # }
-    /// ```
-    pub fn format(&self) -> Format {
-        self.format
-    }
-
     /// Set the format to a new value.
     ///
     /// Accepts either a format string (`&str`) or a `Format` instance.
@@ -178,9 +156,10 @@ impl Ob {
         Ok(())
     }
 
-    /// Decode and decrypt obtext with scheme autodetection.
+    /// Decode and decrypt obtext with automatic format detection.
     ///
-    /// Uses the current encoding but automatically detects the scheme from the payload.
+    /// Tries to decode using the instance's current encoding first (fast path),
+    /// then falls back to full format autodetection if that fails.
     ///
     /// # Examples
     ///
@@ -188,22 +167,35 @@ impl Ob {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(all(feature = "aasv", feature = "mock"))]
     /// # {
-    /// # use oboron:: Ob;
+    /// # use oboron::Ob;
     /// # let key = oboron::generate_key();
     /// let mut ob = Ob::new("aasv.b64", &key)?;
     /// let ot = ob.enc("test")?;
     ///
-    /// // Change scheme - dec_auto_scheme will still work
+    /// // Change scheme - autodec will still work
     /// ob.set_scheme(oboron::Scheme::Mock1)?;
-    /// let pt2 = ob.dec_auto_scheme(&ot)?;
+    /// let pt2 = ob.autodec(&ot)?;
     /// assert_eq!(pt2, "test");
+    ///
+    /// // Works even with different encoding (slower fallback path)
+    /// ob.set_encoding(oboron::Encoding::Hex)?;
+    /// let pt3 = ob.autodec(&ot)?; // Falls back to full autodetection
+    /// assert_eq!(pt3, "test");
     /// # }
     /// # Ok(())
     /// # }
     /// ```
     #[inline]
-    pub fn dec_auto_scheme(&self, obtext: &str) -> Result<String, Error> {
-        crate::dec_auto::dec_any_scheme(&self.keychain, self.format.encoding(), obtext)
+    pub fn autodec(&self, obtext: &str) -> Result<String, Error> {
+        // Fast path: try current encoding first
+        if let Ok(result) =
+            crate::dec_auto::dec_any_scheme(&self.keychain, self.format.encoding(), obtext)
+        {
+            return Ok(result);
+        }
+
+        // Fallback:  full format autodetection (encoding + scheme)
+        crate::dec_auto::dec_any_format(&self.keychain, obtext)
     }
 
     // Alt constructors ================================================
@@ -348,6 +340,29 @@ impl Ob {
     #[inline]
     pub fn dec(&self, obtext: &str) -> Result<String, Error> {
         <Self as ObtextCodec>::dec(self, obtext)
+    }
+
+    /// Get the current format.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # fn main() -> Result<(), oboron::Error> {
+    /// # #[cfg(feature = "aasv")]
+    /// # {
+    /// # use oboron::{Ob, Scheme, Encoding};
+    /// # let key = oboron::generate_key();
+    /// let ob = Ob::new("aasv.b64", &key)?;
+    /// let format = ob.format();
+    /// assert_eq!(format.scheme(), Scheme::Aasv);
+    /// assert_eq!(format.encoding(), Encoding::B64);
+    /// # }
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[inline]
+    pub fn format(&self) -> Format {
+        <Self as ObtextCodec>::format(self)
     }
 
     /// Get the scheme
