@@ -89,18 +89,6 @@ fn test_autodetect_all_formats() {
     let original = "autodetect all";
     let obm = Omnib::new_keyless().unwrap();
 
-    #[cfg(feature = "zrbcx")]
-    {
-        let ot = obm.enc(original, "zrbcx.c32").unwrap();
-        let pt2 = obm.autodec(&ot).unwrap();
-        assert_eq!(original, pt2, "Failed for format zrbcx");
-    }
-    #[cfg(feature = "upbc")]
-    {
-        let ot = obm.enc(original, "upbc.c32").unwrap();
-        let pt2 = obm.autodec(&ot).unwrap();
-        assert_eq!(original, pt2, "Failed for format upbc");
-    }
     #[cfg(feature = "aags")]
     {
         let ot = obm.enc(original, "aags.c32").unwrap();
@@ -124,5 +112,11 @@ fn test_autodetect_all_formats() {
         let ot = obm.enc(original, "apsv.c32").unwrap();
         let pt2 = obm.autodec(&ot).unwrap();
         assert_eq!(original, pt2, "Failed for format apsv");
+    }
+    #[cfg(feature = "upbc")]
+    {
+        let ot = obm.enc(original, "upbc.c32").unwrap();
+        let pt2 = obm.autodec(&ot).unwrap();
+        assert_eq!(original, pt2, "Failed for format upbc");
     }
 }

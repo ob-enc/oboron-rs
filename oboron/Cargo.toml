@@ -19,7 +19,7 @@ default = ["std"]
 # ===================
 std = ["secure-schemes"]
 secure-min = ["aasv"]  # Minimum secure setup
-full = ["secure-schemes", "ztier", "all-alt-keys", "keyless", "legacy", "mock", "convenience"]
+full = ["secure-schemes", "zrbcx", "all-alt-keys", "keyless", "legacy", "mock", "convenience"]
 
 
 ztier = []  # Z-tier infrastructure

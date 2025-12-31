@@ -160,10 +160,10 @@ impl Oz {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(all(feature = "zrbcx", feature = "legacy"))]
     /// # {
-    /// # use oboron::ztier::Oz;
+    /// # use oboron::Oz;
     /// # use oboron::Scheme;
     /// # let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-    /// let mut oz = Oz::new("zrbcx. c32", secret)?;
+    /// let mut oz = Oz::new("zrbcx.c32", secret)?;
     /// oz.set_scheme(Scheme::Legacy)?; // switch to legacy, keeping c32 encoding
     /// # }
     /// # Ok(())
@@ -484,6 +484,8 @@ mod private {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
     #[cfg(feature = "zrbcx")]
     fn test_oz_basic() {

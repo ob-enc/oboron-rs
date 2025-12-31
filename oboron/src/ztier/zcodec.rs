@@ -31,6 +31,7 @@ macro_rules! impl_zcodec {
             }
 
             /// Internal constructor from 64-byte key (uses first 32 bytes as secret)
+            #[allow(dead_code)]
             #[cfg(any(feature = "keyless", feature = "bytes-keys"))]
             pub(crate) fn from_bytes_internal(key_bytes: &[u8; 64]) -> Result<Self, Error> {
                 let secret:  [u8; 32] = key_bytes[0..32].try_into().unwrap();
