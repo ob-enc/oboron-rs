@@ -132,21 +132,21 @@ harness = false
 name = "omnib"
 harness = false
 
-[[bench]]
-name = "zrbcx_c32"
-harness = false
+# [[bench]]
+# name = "zrbcx_c32"
+# harness = false
 
-[[bench]]
-name = "zrbcx_b32"
-harness = false
+# [[bench]]
+# name = "zrbcx_b32"
+# harness = false
 
-[[bench]]
-name = "zrbcx_b64"
-harness = false
+# [[bench]]
+# name = "zrbcx_b64"
+# harness = false
 
-[[bench]]
-name = "zrbcx_hex"
-harness = false
+# [[bench]]
+# name = "zrbcx_hex"
+# harness = false
 
 [[bench]]
 name = "upbc_c32"

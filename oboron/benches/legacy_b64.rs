@@ -1,5 +1,5 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use oboron::{LegacyB64, ObtextCodec};
+use oboron::LegacyB64;
 use serde::Deserialize;
 use std::fs;
 use std::path::PathBuf;
