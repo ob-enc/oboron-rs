@@ -176,7 +176,6 @@ pub(crate) fn dec_any_scheme_hex_ztier(
 /// 1. If text contains '-', '_', or uppercase letters -> B64 (definitive)
 /// 2. Else if text contains non-hex lowercase letters (g-z) -> Try Base32, fallback to B64
 /// 3. Else -> Try Hex, fallback to Base32, then B64
-#[allow(dead_code)] // May be used by Zob in the future
 pub(crate) fn dec_any_format_ztier(zkeychain: &ZKeychain, obtext: &str) -> Result<String, Error> {
     // Check for B64 indicators:  '-', '_', or mixed case letters (definitive)
     if obtext.contains('-')

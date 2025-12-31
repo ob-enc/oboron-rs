@@ -223,7 +223,13 @@ impl Oz {
     /// ```
     #[inline]
     pub fn autodec(&self, obtext: &str) -> Result<String, Error> {
-        zdec_auto::dec_any_scheme_ztier(&self.zkeychain, self.format.encoding(), obtext)
+        // Fast path: try current encoding first
+        if let Ok(result) =
+            zdec_auto::dec_any_scheme_ztier(&self.zkeychain, self.format.encoding(), obtext)
+        {
+            return Ok(result);
+        }
+        zdec_auto::dec_any_format_ztier(&self.zkeychain, obtext)
     }
 
     // Alt constructors ================================================

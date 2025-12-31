@@ -76,10 +76,9 @@ but note that pre-1.0 releases may not adhere strictly to all guidelines.
     - Ob31pHex                   -> ApgsHex
     - etc.
 
-- API BREAKING CHANGE: New ObMulti API
-  - renamed ObMulti to Omnib
-  - dec() -> dec_with_format(obtext, format) - format given
-  - NEW: dec_with_encoding(obtext, encoding) - encoding given
+- API BREAKING CHANGE: ObMulti renamed -> Omnib
+  - enc()
+  - dec()
   - autodec() -> autodec(obtext) - full autodecode
 
 - API BREAKING CHANGE: ObtextCodec API change:
@@ -87,9 +86,11 @@ but note that pre-1.0 releases may not adhere strictly to all guidelines.
   - removed former scheme-autodetecting dec() method
   - no more autodetection on static types
 
-- API BREAKING CHANGE: Ob/ObFlex API change
-  - former scheme-autodetecting dec() renamed to dec_auto_scheme()
-  - only Ob/ObFlex have such a method now.
+- Removed ObFlex; Ob inherited full ObFlex functionality
+
+- API BREAKING CHANGE: Ob API change
+  - former scheme-autodetecting dec() now strict (like in fixed format types)
+  - autodec() works like in Omnib but optimized (tries current encoding first)
 
 - API BREAKING CHANGE: Format constans from str to &Format:
   - AASV_C32: &str "aasv.c32" -> &Format{Scheme::Aasv, Encoding::C32}
