@@ -425,6 +425,8 @@ fn validate_ztier_scheme(scheme: Scheme) -> Result<(), Error> {
     match scheme {
         #[cfg(feature = "zrbcx")]
         Scheme::Zrbcx => Ok(()),
+        #[cfg(feature = "zmock")]
+        Scheme::Zmock1 => Ok(()),
         #[cfg(feature = "legacy")]
         Scheme::Legacy => Ok(()),
         _ => Err(Error::InvalidScheme),

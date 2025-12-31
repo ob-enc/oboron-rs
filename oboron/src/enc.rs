@@ -24,6 +24,9 @@ use crate::encrypt_zrbcx;
 use crate::encrypt_mock1;
 #[cfg(feature = "mock")]
 use crate::encrypt_mock2;
+// Testing
+#[cfg(feature = "zmock")]
+use crate::encrypt_zmock1;
 
 /// Generic encoding pipeline for all schemes (except legacy).
 ///

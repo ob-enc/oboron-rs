@@ -5,17 +5,16 @@
 
 use super::zkeychain::ZKeychain;
 use crate::{
-    constants::HARDCODED_SECRET_BYTES, error::Error, Encoding, ExtractedKey, Format, ObtextCodec,
-    Scheme,
+    constants::HARDCODED_SECRET_BYTES, error::Error, Encoding, Format, ObtextCodec, Scheme,
 };
 
 /// Macro to implement z-tier codec types (32-byte secrets, obfuscation-only)
 macro_rules! impl_zcodec {
-    ($name:ident, $encoding:expr, $format_str:expr) => {
-        #[doc = concat! ("**INSECURE OBFUSCATION-ONLY** Codec for ", $format_str, ".\n\n")]
+    ($name:ident, $scheme:expr, $encoding:expr, $format_str:expr) => {
+        #[doc = concat!("**INSECURE OBFUSCATION-ONLY** Codec for ", $format_str, ".\n\n")]
         #[doc = "⚠️ This scheme provides no cryptographic security.\n"]
         #[doc = "Use only for obfuscation, never for actual encryption.\n\n"]
-        #[doc = concat!("Format:  `\"", $format_str, "\"`")]
+        #[doc = concat!("Format:   `\"", $format_str, "\"`")]
         #[allow(non_camel_case_types)]
         pub struct $name {
             zkeychain: ZKeychain,
@@ -43,23 +42,23 @@ macro_rules! impl_zcodec {
 
         impl ObtextCodec for $name {
             fn enc(&self, plaintext: &str) -> Result<String, Error> {
-                let format = Format::new(Scheme::Zrbcx, $encoding);
-                let secret = self.zkeychain.zrbcx();
-                crate::enc::enc_to_format(plaintext, format, ExtractedKey::Key32(secret))
+                let format = Format::new($scheme, $encoding);
+                let secret = self.zkeychain.extract_secret($scheme)?;
+                crate::enc::enc_to_format(plaintext, format, secret)
             }
 
             fn dec(&self, obtext: &str) -> Result<String, Error> {
-                let format = Format::new(Scheme::Zrbcx, $encoding);
-                let secret = self.zkeychain.zrbcx();
-                crate::dec::dec_from_format(obtext, format, ExtractedKey::Key32(secret))
+                let format = Format::new($scheme, $encoding);
+                let secret = self.zkeychain.extract_secret($scheme)?;
+                crate::dec::dec_from_format(obtext, format, secret)
             }
 
             fn format(&self) -> Format {
-                Format::new(Scheme::Zrbcx, $encoding)
+                Format::new($scheme, $encoding)
             }
 
             fn scheme(&self) -> Scheme {
-                Scheme::Zrbcx
+                $scheme
             }
 
             fn encoding(&self) -> Encoding {
@@ -68,17 +67,15 @@ macro_rules! impl_zcodec {
 
             fn key(&self) -> String {
                 use data_encoding::BASE64URL_NOPAD;
-                // For z-tier, return the 32-byte secret padded to 64 bytes
                 let mut key = [0u8; 64];
-                key[0..32]. copy_from_slice(self. zkeychain.secret_bytes());
+                key[0..32].copy_from_slice(self.zkeychain.secret_bytes());
                 BASE64URL_NOPAD.encode(&key)
             }
 
             #[cfg(feature = "hex-keys")]
             fn key_hex(&self) -> String {
-                // For z-tier, return the 32-byte secret padded to 64 bytes
                 let mut key = [0u8; 64];
-                key[0..32].copy_from_slice(self.zkeychain. secret_bytes());
+                key[0..32].copy_from_slice(self.zkeychain.secret_bytes());
                 hex::encode(&key)
             }
 
@@ -88,7 +85,7 @@ macro_rules! impl_zcodec {
             }
         }
 
-        // Inherent methods
+        // Inherent methods (same as before)
         impl $name {
             #[inline]
             pub fn enc(&self, plaintext: &str) -> Result<String, Error> {
@@ -115,7 +112,6 @@ macro_rules! impl_zcodec {
                 <Self as ObtextCodec>::encoding(self)
             }
 
-            /// Get the secret as base64 (for z-tier compatibility)
             #[inline]
             pub fn secret(&self) -> String {
                 use data_encoding::BASE64URL_NOPAD;
@@ -132,7 +128,17 @@ macro_rules! impl_zcodec {
 }
 
 // Generate all zrbcx variants
-impl_zcodec!(ZrbcxC32, Encoding::C32, "zrbcx.c32");
-impl_zcodec!(ZrbcxB32, Encoding::B32, "zrbcx.b32");
-impl_zcodec!(ZrbcxB64, Encoding::B64, "zrbcx.b64");
-impl_zcodec!(ZrbcxHex, Encoding::Hex, "zrbcx.hex");
+impl_zcodec!(ZrbcxC32, Scheme::Zrbcx, Encoding::C32, "zrbcx.c32");
+impl_zcodec!(ZrbcxB32, Scheme::Zrbcx, Encoding::B32, "zrbcx.b32");
+impl_zcodec!(ZrbcxB64, Scheme::Zrbcx, Encoding::B64, "zrbcx.b64");
+impl_zcodec!(ZrbcxHex, Scheme::Zrbcx, Encoding::Hex, "zrbcx.hex");
+
+// Zmock1 variants (z-tier testing scheme)
+#[cfg(feature = "zmock")]
+impl_zcodec!(Zmock1C32, Scheme::Zmock1, Encoding::C32, "zmock1. c32");
+#[cfg(feature = "zmock")]
+impl_zcodec!(Zmock1B32, Scheme::Zmock1, Encoding::B32, "zmock1.b32");
+#[cfg(feature = "zmock")]
+impl_zcodec!(Zmock1B64, Scheme::Zmock1, Encoding::B64, "zmock1.b64");
+#[cfg(feature = "zmock")]
+impl_zcodec!(Zmock1Hex, Scheme::Zmock1, Encoding::Hex, "zmock1.hex");

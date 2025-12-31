@@ -262,6 +262,8 @@ pub(crate) use ztier::{decrypt_zrbcx, encrypt_zrbcx};
 pub(crate) use obcrypt::{decrypt_mock1, encrypt_mock1};
 #[cfg(feature = "mock")]
 pub(crate) use obcrypt::{decrypt_mock2, encrypt_mock2};
+#[cfg(feature = "zmock")]
+pub(crate) use ztier::{decrypt_zmock1, encrypt_zmock1};
 
 pub use keygen::generate_key;
 #[cfg(feature = "bytes-keys")]

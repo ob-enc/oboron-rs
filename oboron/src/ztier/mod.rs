@@ -20,7 +20,7 @@ mod zmock1;
 mod zrbcx;
 
 // Re-export public types
-#[cfg(feature = "mock")]
+#[cfg(feature = "zmock")]
 pub use zcodec::{Zmock1B32, Zmock1B64, Zmock1C32, Zmock1Hex};
 #[cfg(feature = "zrbcx")]
 pub use zcodec::{ZrbcxB32, ZrbcxB64, ZrbcxC32, ZrbcxHex};
@@ -28,7 +28,7 @@ pub use zcodec::{ZrbcxB32, ZrbcxB64, ZrbcxC32, ZrbcxHex};
 pub use oz::Oz;
 
 #[cfg(feature = "zmock")]
-pub(crate) use mock::{decrypt_zmock1, encrypt_zmock1};
+pub(crate) use zmock1::{decrypt_zmock1, encrypt_zmock1};
 #[cfg(feature = "zrbcx")]
 pub(crate) use zrbcx::{decrypt_zrbcx, encrypt_zrbcx};
 

@@ -6,7 +6,9 @@ use super::zkeychain::ZKeychain;
 use crate::{constants::SCHEME_MARKER_SIZE, error::Error, Encoding, Format, Scheme};
 
 #[cfg(feature = "zmock")]
-use crate::{constants::ZMOCK1_MARKER, decrypt_zmock1};
+use super::zmock1::decrypt_zmock1;
+#[cfg(feature = "zmock")]
+use crate::constants::ZMOCK1_MARKER;
 #[cfg(feature = "zrbcx")]
 use crate::{constants::ZRBCX_MARKER, decrypt_zrbcx};
 

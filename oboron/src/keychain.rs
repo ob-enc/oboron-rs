@@ -78,6 +78,8 @@ impl Keychain {
             // Z-tier schemes should use ZKeychain, not Keychain
             #[cfg(feature = "zrbcx")]
             Scheme::Zrbcx => Err(Error::InvalidScheme),
+            #[cfg(feature = "zmock")]
+            Scheme::Zmock1 => Err(Error::InvalidScheme),
             #[cfg(feature = "legacy")]
             Scheme::Legacy => Err(Error::InvalidScheme),
         }

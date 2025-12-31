@@ -9,7 +9,7 @@ use crate::Error;
 
 /// "Encrypt" plaintext bytes using identity scheme (zmock1).
 /// Returns the input unchanged (no actual encryption).
-pub fn encrypt_zmock1(_key: &[u8; 32], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
+pub(crate) fn encrypt_zmock1(_key: &[u8; 32], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
     if plaintext_bytes.is_empty() {
         return Err(Error::EmptyPlaintext);
     }
@@ -19,7 +19,7 @@ pub fn encrypt_zmock1(_key: &[u8; 32], plaintext_bytes: &[u8]) -> Result<Vec<u8>
 
 /// "Decrypt" ciphertext bytes using identity scheme (zmock1).
 /// Returns the input unchanged (no actual decryption).
-pub fn decrypt_zmock1(_key: &[u8; 32], data: &[u8]) -> Result<Vec<u8>, Error> {
+pub(crate) fn decrypt_zmock1(_key: &[u8; 32], data: &[u8]) -> Result<Vec<u8>, Error> {
     if data.is_empty() {
         return Err(Error::EmptyPayload);
     }
