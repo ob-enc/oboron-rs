@@ -19,7 +19,7 @@ default = ["std"]
 # ===================
 std = ["secure-schemes"]
 secure-min = ["aasv"]  # Minimum secure setup
-full = ["secure-schemes", "zrbcx", "all-alt-keys", "keyless", "legacy", "mock", "convenience"]
+full = ["secure-schemes", "zrbcx", "all-alt-keys", "keyless", "legacy", "mock", "zmock", "convenience"]
 
 
 ztier = []  # Z-tier infrastructure
@@ -50,6 +50,7 @@ aasv = ["aes-siv"]
 apsv = ["aes-siv"]
 # Testing only
 mock = []
+zmock = []
 # Legacy
 legacy = ["aes", "cipher", "cbc", "ztier"]  # backward compatibility
 

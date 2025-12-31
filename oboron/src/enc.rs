@@ -53,6 +53,7 @@ pub(crate) fn enc_to_format(
         (Scheme::Apsv, ExtractedKey::Key64(k)) => encrypt_apsv(k, plaintext.as_bytes())?,
         #[cfg(feature = "upbc")]
         (Scheme::Upbc, ExtractedKey::Key32(k)) => encrypt_upbc(k, plaintext.as_bytes())?,
+        // Z-tier
         #[cfg(feature = "zrbcx")]
         (Scheme::Zrbcx, ExtractedKey::Key32(k)) => encrypt_zrbcx(k, plaintext.as_bytes())?,
         // Testing
@@ -60,6 +61,8 @@ pub(crate) fn enc_to_format(
         (Scheme::Mock1, ExtractedKey::Key32(k)) => encrypt_mock1(k, plaintext.as_bytes())?,
         #[cfg(feature = "mock")]
         (Scheme::Mock2, ExtractedKey::Key32(k)) => encrypt_mock2(k, plaintext.as_bytes())?,
+        #[cfg(feature = "zmock")]
+        (Scheme::Zmock1, ExtractedKey::Key32(k)) => encrypt_zmock1(k, plaintext.as_bytes())?,
         // Legacy - legacy does not use this call path
         #[cfg(feature = "legacy")]
         (Scheme::Legacy, ExtractedKey::Key32(_k)) => {

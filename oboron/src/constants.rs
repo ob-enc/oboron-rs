@@ -45,16 +45,6 @@ const fn make_marker(tier: u8, properties: u8, algorithm: u8) -> [u8; 2] {
     [byte1, byte2]
 }
 
-// Tier ob0x - Testing (non-encrypted)
-// -----------------------------------
-// mock1:  tier=000, properties=0001 (det-auth), algorithm=0000 (none)
-#[cfg(feature = "mock")]
-pub const MOCK1_MARKER: [u8; 2] = make_marker(0, 1, 0);
-
-// mock2: tier=000, properties=0001 (det-auth), algorithm=0000 (none)
-#[cfg(feature = "mock")]
-pub const MOCK2_MARKER: [u8; 2] = make_marker(0, 2, 0);
-
 // `a`-tier - Secure, authenticated
 // ---------------------------------
 // aags: tier=001, properties=0001 (det-auth), algorithm=0010 (GCM-SIV)
@@ -84,6 +74,23 @@ pub const UPBC_MARKER: [u8; 2] = make_marker(2, 0, 1);
 // zrbcx:  tier=111, properties=0010 (det-reversed), algorithm=0001 (CBC)
 #[cfg(feature = "zrbcx")]
 pub const ZRBCX_MARKER: [u8; 2] = make_marker(7, 2, 1);
+
+// Tier mock - Testing (non-encrypted)
+// -----------------------------------
+// mock1:  tier=000, properties=0001 (det-auth), algorithm=0000 (none)
+#[cfg(feature = "mock")]
+pub const MOCK1_MARKER: [u8; 2] = make_marker(0, 1, 0);
+
+// mock2: tier=000, properties=0001 (det-auth), algorithm=0000 (none)
+#[cfg(feature = "mock")]
+pub const MOCK2_MARKER: [u8; 2] = make_marker(0, 2, 0);
+
+// Tier zmock - Z-tier Testing (non-encrypted)
+// -------------------------------------------
+
+// zmock1:  tier=110, properties=0001 (det-auth), algorithm=0000 (none)
+#[cfg(feature = "zmock")]
+pub const ZMOCK1_MARKER: [u8; 2] = make_marker(6, 1, 0);
 
 // Format identifiers
 //

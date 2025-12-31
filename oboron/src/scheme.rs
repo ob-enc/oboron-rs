@@ -5,10 +5,6 @@ use crate::{constants, error::Error};
 /// Scheme identifier for oboron encoding schemes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Scheme {
-    #[cfg(feature = "zrbcx")]
-    Zrbcx,
-    #[cfg(feature = "upbc")]
-    Upbc,
     #[cfg(feature = "aags")]
     Aags,
     #[cfg(feature = "apgs")]
@@ -17,11 +13,18 @@ pub enum Scheme {
     Aasv,
     #[cfg(feature = "apsv")]
     Apsv,
+    #[cfg(feature = "upbc")]
+    Upbc,
+    // Z-tier
+    #[cfg(feature = "zrbcx")]
+    Zrbcx,
     // Testing
     #[cfg(feature = "mock")]
     Mock1,
     #[cfg(feature = "mock")]
     Mock2,
+    #[cfg(feature = "mock")]
+    Zmock1,
     // Legacy
     #[cfg(feature = "legacy")]
     Legacy,
@@ -31,10 +34,6 @@ impl Scheme {
     /// Convert scheme to string representation.
     pub fn as_str(&self) -> &'static str {
         match self {
-            #[cfg(feature = "zrbcx")]
-            Scheme::Zrbcx => "zrbcx",
-            #[cfg(feature = "upbc")]
-            Scheme::Upbc => "upbc",
             #[cfg(feature = "aags")]
             Scheme::Aags => "aags",
             #[cfg(feature = "apgs")]
@@ -43,11 +42,18 @@ impl Scheme {
             Scheme::Aasv => "aasv",
             #[cfg(feature = "apsv")]
             Scheme::Apsv => "apsv",
+            #[cfg(feature = "upbc")]
+            Scheme::Upbc => "upbc",
+            // Z-tier
+            #[cfg(feature = "zrbcx")]
+            Scheme::Zrbcx => "zrbcx",
             // Testing
             #[cfg(feature = "mock")]
             Scheme::Mock1 => "mock1",
             #[cfg(feature = "mock")]
             Scheme::Mock2 => "mock2",
+            #[cfg(feature = "zmock")]
+            Scheme::Zmock1 => "zmock1",
             // Legacy
             #[cfg(feature = "legacy")]
             Scheme::Legacy => "legacy",
@@ -62,10 +68,6 @@ impl Scheme {
     /// Check if this scheme is deterministic (produces the same output for the same input).
     pub fn is_deterministic(&self) -> bool {
         match self {
-            #[cfg(feature = "zrbcx")]
-            Scheme::Zrbcx => true,
-            #[cfg(feature = "upbc")]
-            Scheme::Upbc => false,
             #[cfg(feature = "aags")]
             Scheme::Aags => true,
             #[cfg(feature = "apgs")]
@@ -74,11 +76,18 @@ impl Scheme {
             Scheme::Aasv => true,
             #[cfg(feature = "apsv")]
             Scheme::Apsv => false,
+            #[cfg(feature = "upbc")]
+            Scheme::Upbc => false,
+            // Z-tier
+            #[cfg(feature = "zrbcx")]
+            Scheme::Zrbcx => true,
             // Testing
             #[cfg(feature = "mock")]
             Scheme::Mock1 => true,
             #[cfg(feature = "mock")]
             Scheme::Mock2 => true,
+            #[cfg(feature = "mock")]
+            Scheme::Zmock1 => true,
             // Legacy
             #[cfg(feature = "legacy")]
             Scheme::Legacy => true,
@@ -93,10 +102,6 @@ impl Scheme {
     /// Get the 2-byte scheme marker for this scheme.
     pub fn marker(&self) -> [u8; 2] {
         match self {
-            #[cfg(feature = "zrbcx")]
-            Scheme::Zrbcx => constants::ZRBCX_MARKER,
-            #[cfg(feature = "upbc")]
-            Scheme::Upbc => constants::UPBC_MARKER,
             #[cfg(feature = "aags")]
             Scheme::Aags => constants::AAGS_MARKER,
             #[cfg(feature = "apgs")]
@@ -105,11 +110,18 @@ impl Scheme {
             Scheme::Aasv => constants::AASV_MARKER,
             #[cfg(feature = "apsv")]
             Scheme::Apsv => constants::APSV_MARKER,
+            #[cfg(feature = "upbc")]
+            Scheme::Upbc => constants::UPBC_MARKER,
+            // Z-tier
+            #[cfg(feature = "zrbcx")]
+            Scheme::Zrbcx => constants::ZRBCX_MARKER,
             // Testing
             #[cfg(feature = "mock")]
             Scheme::Mock1 => constants::MOCK1_MARKER,
             #[cfg(feature = "mock")]
             Scheme::Mock2 => constants::MOCK2_MARKER,
+            #[cfg(feature = "mock")]
+            Scheme::Zmock1 => constants::ZMOCK1_MARKER,
             // Legacy
             #[cfg(feature = "legacy")]
             Scheme::Legacy => unreachable!("legacy does not use a scheme marker"),
@@ -132,10 +144,6 @@ impl std::str::FromStr for Scheme {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.to_lowercase().as_str() {
-            #[cfg(feature = "zrbcx")]
-            "zrbcx" => Ok(Scheme::Zrbcx),
-            #[cfg(feature = "upbc")]
-            "upbc" => Ok(Scheme::Upbc),
             #[cfg(feature = "aags")]
             "aags" => Ok(Scheme::Aags),
             #[cfg(feature = "apgs")]
@@ -144,11 +152,18 @@ impl std::str::FromStr for Scheme {
             "aasv" => Ok(Scheme::Aasv),
             #[cfg(feature = "apsv")]
             "apsv" => Ok(Scheme::Apsv),
+            #[cfg(feature = "upbc")]
+            "upbc" => Ok(Scheme::Upbc),
+            // Z-tier
+            #[cfg(feature = "zrbcx")]
+            "zrbcx" => Ok(Scheme::Zrbcx),
             // Testing
             #[cfg(feature = "mock")]
             "mock1" => Ok(Scheme::Mock1),
             #[cfg(feature = "mock")]
             "mock2" => Ok(Scheme::Mock2),
+            #[cfg(feature = "zmock")]
+            "zmock1" => Ok(Scheme::Zmock1),
             // Legacy
             #[cfg(feature = "legacy")]
             "legacy" => Ok(Scheme::Legacy),

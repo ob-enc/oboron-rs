@@ -79,6 +79,8 @@ impl ZKeychain {
         match scheme {
             #[cfg(feature = "zrbcx")]
             Scheme::Zrbcx => Ok(ExtractedKey::Key32(self.zrbcx())),
+            #[cfg(feature = "zmock")]
+            Scheme::Zmock1 => Ok(ExtractedKey::Key32(self.zmock1())),
             #[cfg(feature = "legacy")]
             Scheme::Legacy => Ok(ExtractedKey::Key32(self.legacy())),
             // other schemes should use Keychain, not ZKeychain
@@ -103,6 +105,13 @@ impl ZKeychain {
     #[inline]
     #[cfg(feature = "zrbcx")]
     pub(crate) fn zrbcx(&self) -> &[u8; 32] {
+        &self.secret
+    }
+
+    /// Get secret for zmock1 scheme (all 32 bytes)
+    #[inline]
+    #[cfg(feature = "zmock")]
+    pub(crate) fn zmock1(&self) -> &[u8; 32] {
         &self.secret
     }
 

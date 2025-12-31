@@ -234,7 +234,7 @@ mod obcrypt;
 mod omnib;
 mod scheme;
 #[cfg(feature = "ztier")]
-mod ztier;
+pub mod ztier;
 
 // Re-export public types and constants
 pub use constants::{HARDCODED_KEY_BASE64, HARDCODED_KEY_BYTES};

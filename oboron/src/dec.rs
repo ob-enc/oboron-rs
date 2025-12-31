@@ -17,6 +17,7 @@ use crate::decrypt_apgs;
 use crate::decrypt_apsv;
 #[cfg(feature = "upbc")]
 use crate::decrypt_upbc;
+// Z-tier
 #[cfg(feature = "zrbcx")]
 use crate::decrypt_zrbcx;
 // Testing
@@ -24,6 +25,8 @@ use crate::decrypt_zrbcx;
 use crate::decrypt_mock1;
 #[cfg(feature = "mock")]
 use crate::decrypt_mock2;
+#[cfg(feature = "zmock")]
+use crate::decrypt_zmock1;
 
 /// Generic decoding pipeline for all schemes (except legacy).
 ///
@@ -61,10 +64,6 @@ pub(crate) fn dec_from_format(
 
     // Step 4:  Decrypt using scheme-specific function
     let plaintext_bytes = match (format.scheme(), extracted_key) {
-        #[cfg(feature = "zrbcx")]
-        (Scheme::Zrbcx, ExtractedKey::Key32(k)) => decrypt_zrbcx(k, &buffer)?,
-        #[cfg(feature = "upbc")]
-        (Scheme::Upbc, ExtractedKey::Key32(k)) => decrypt_upbc(k, &buffer)?,
         #[cfg(feature = "aags")]
         (Scheme::Aags, ExtractedKey::Key32(k)) => decrypt_aags(k, &buffer)?,
         #[cfg(feature = "apgs")]
@@ -73,11 +72,18 @@ pub(crate) fn dec_from_format(
         (Scheme::Aasv, ExtractedKey::Key64(k)) => decrypt_aasv(k, &buffer)?,
         #[cfg(feature = "apsv")]
         (Scheme::Apsv, ExtractedKey::Key64(k)) => decrypt_apsv(k, &buffer)?,
+        #[cfg(feature = "upbc")]
+        (Scheme::Upbc, ExtractedKey::Key32(k)) => decrypt_upbc(k, &buffer)?,
+        // Z-tier
+        #[cfg(feature = "zrbcx")]
+        (Scheme::Zrbcx, ExtractedKey::Key32(k)) => decrypt_zrbcx(k, &buffer)?,
         // Testing
         #[cfg(feature = "mock")]
         (Scheme::Mock1, ExtractedKey::Key32(k)) => decrypt_mock1(k, &buffer)?,
         #[cfg(feature = "mock")]
         (Scheme::Mock2, ExtractedKey::Key32(k)) => decrypt_mock2(k, &buffer)?,
+        #[cfg(feature = "zmock")]
+        (Scheme::Zmock1, ExtractedKey::Key32(k)) => decrypt_zmock1(k, &buffer)?,
         // Legacy - legacy does not use this call path
         #[cfg(feature = "legacy")]
         (Scheme::Legacy, ExtractedKey::Key32(_k)) => {

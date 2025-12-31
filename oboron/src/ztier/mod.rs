@@ -8,22 +8,27 @@
 #![cfg(feature = "ztier")]
 
 mod constants;
+#[cfg(feature = "legacy")]
+mod legacy;
 mod oz;
 mod zcodec;
 mod zdec_auto;
 mod zkeychain;
-
-#[cfg(feature = "legacy")]
-mod legacy;
+#[cfg(feature = "zmock")]
+mod zmock1;
 #[cfg(feature = "zrbcx")]
 mod zrbcx;
 
 // Re-export public types
+#[cfg(feature = "mock")]
+pub use zcodec::{Zmock1B32, Zmock1B64, Zmock1C32, Zmock1Hex};
 #[cfg(feature = "zrbcx")]
 pub use zcodec::{ZrbcxB32, ZrbcxB64, ZrbcxC32, ZrbcxHex};
 
 pub use oz::Oz;
 
+#[cfg(feature = "zmock")]
+pub(crate) use mock::{decrypt_zmock1, encrypt_zmock1};
 #[cfg(feature = "zrbcx")]
 pub(crate) use zrbcx::{decrypt_zrbcx, encrypt_zrbcx};
 

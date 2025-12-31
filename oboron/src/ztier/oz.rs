@@ -43,7 +43,7 @@ use super::zkeychain::ZKeychain;
 ///
 /// ```rust
 /// # fn main() -> Result<(), oboron::Error> {
-/// # #[cfg(all(feature = "zrbcx", feature = "legacy"))]
+/// # #[cfg(all(feature = "zrbcx", feature = "zmock"))]
 /// # {
 /// # use oboron::ztier::Oz;
 /// # use oboron::{Scheme, Encoding, Format};
@@ -52,11 +52,11 @@ use super::zkeychain::ZKeychain;
 /// let ot1 = oz.enc("hello")?;
 ///
 /// // Change format at runtime
-/// oz.set_scheme(Scheme::Legacy)?;
-/// let ot2 = oz.enc("hello")?; // now legacy. c32
+/// oz.set_scheme(Scheme::Zmock1)?;
+/// let ot2 = oz.enc("hello")?; // now zmock1.c32
 ///
 /// // Change encoding
-/// oz.set_encoding(Encoding::B64)?; // now legacy.b64
+/// oz.set_encoding(Encoding::B64)?; // now zmock1.b64
 ///
 /// // Set entire format at once
 /// oz.set_format("zrbcx.hex")?; // now zrbcx.hex
@@ -206,15 +206,12 @@ impl Oz {
     ///
     /// ```rust
     /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(all(feature = "zrbcx", feature = "legacy"))]
+    /// # #[cfg(all(feature = "zrbcx"))]
     /// # {
     /// # use oboron::ztier::Oz;
     /// # let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-    /// let mut oz = Oz::new("zrbcx. b64", secret)?;
+    /// let mut oz = Oz::new("zrbcx.b64", secret)?;
     /// let ot = oz.enc("test")?;
-    ///
-    /// // Change scheme - autodec will still work
-    /// oz.set_scheme(oboron::Scheme::Legacy)?;
     /// let pt2 = oz.autodec(&ot)?;
     /// assert_eq!(pt2, "test");
     /// # }

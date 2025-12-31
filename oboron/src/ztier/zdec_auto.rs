@@ -5,6 +5,8 @@
 use super::zkeychain::ZKeychain;
 use crate::{constants::SCHEME_MARKER_SIZE, error::Error, Encoding, Format, Scheme};
 
+#[cfg(feature = "zmock")]
+use crate::{constants::ZMOCK1_MARKER, decrypt_zmock1};
 #[cfg(feature = "zrbcx")]
 use crate::{constants::ZRBCX_MARKER, decrypt_zrbcx};
 
@@ -52,17 +54,20 @@ pub(crate) fn dec_any_scheme_ztier(
     buffer[len - 1] ^= buffer[0];
     buffer[len - 2] ^= buffer[1];
 
-    #[cfg(feature = "zrbcx")]
-    {
-        // Step 3: Extract 2-byte scheme marker from end
-        let scheme_marker = [buffer[len - 2], buffer[len - 1]];
-        buffer.truncate(len - SCHEME_MARKER_SIZE);
+    // Step 3: Extract 2-byte scheme marker from end
+    let scheme_marker = [buffer[len - 2], buffer[len - 1]];
+    buffer.truncate(len - SCHEME_MARKER_SIZE);
 
-        // Step 4: Match scheme marker and decrypt with available Z-TIER schemes
-        if scheme_marker == ZRBCX_MARKER {
-            let plaintext_bytes = decrypt_zrbcx(zkeychain.zrbcx(), &buffer)?;
-            return bytes_to_string(plaintext_bytes);
-        }
+    // Step 4: Match scheme marker and decrypt with available Z-TIER schemes
+    #[cfg(feature = "zrbcx")]
+    if scheme_marker == ZRBCX_MARKER {
+        let plaintext_bytes = decrypt_zrbcx(zkeychain.zrbcx(), &buffer)?;
+        return bytes_to_string(plaintext_bytes);
+    }
+    #[cfg(feature = "zmock")]
+    if scheme_marker == ZMOCK1_MARKER {
+        let plaintext_bytes = decrypt_zmock1(zkeychain.zmock1(), &buffer)?;
+        return bytes_to_string(plaintext_bytes);
     }
 
     // Unknown scheme marker - try legacy as fallback
