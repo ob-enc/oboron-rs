@@ -76,7 +76,7 @@ impl Ob {
     /// let ob1 = Ob::new("aasv.b64", &key)?;
     ///
     /// // Using Format instance
-    /// let format = Format::new(Scheme:: Aasv, Encoding::B64);
+    /// let format = Format::new(Scheme::Aasv, Encoding::B64);
     /// let ob2 = Ob::new(format, &key)?;
     /// # }
     /// # Ok(())
@@ -102,9 +102,9 @@ impl Ob {
     /// # {
     /// # use oboron::{Ob, Format, Scheme, Encoding};
     /// # let key = oboron::generate_key();
-    /// let mut ob = Ob:: new("aasv.c32", &key)?;
+    /// let mut ob = Ob::new("aasv.c32", &key)?;
     /// ob.set_format("mock1.b64")?; // switch using string
-    /// ob.set_format(Format::new(Scheme::Mock2, Encoding:: Hex))?; // switch using Format
+    /// ob.set_format(Format::new(Scheme::Mock2, Encoding::Hex))?; // switch using Format
     /// # }
     /// # Ok(())
     /// # }
@@ -274,7 +274,7 @@ impl Ob {
     /// # use oboron::{Ob, Format, Scheme, Encoding};
     /// let key_bytes = oboron::generate_key_bytes();
     /// let ob1 = Ob::from_bytes("aasv.b64", &key_bytes)?; // using format string
-    /// let format = Format::new(Scheme:: Aasv, Encoding:: B64); // using Format
+    /// let format = Format::new(Scheme::Aasv, Encoding::B64); // using Format
     /// let ob2 = Ob::from_bytes(format, &key_bytes)?;
     /// # }
     /// # Ok(())
@@ -338,7 +338,7 @@ impl Ob {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(feature = "aasv")]
     /// # {
-    /// # use oboron:: Ob;
+    /// # use oboron::Ob;
     /// # let key = oboron::generate_key();
     /// let ob = Ob::new("aasv.b64", &key)?;
     /// let ot = ob.enc("secret data")?;
