@@ -1,7 +1,5 @@
 //! Integration tests for feature flag combinations
 
-use oboron::ObtextCodec;
-
 // Test that compiles with any feature combination
 #[test]
 fn test_available_schemes() {

@@ -39,7 +39,7 @@ macro_rules! impl_zcodec {
                 })
             }
 
-            fn key(&self) -> String {
+            pub fn key(&self) -> String {
                 use data_encoding::BASE64URL_NOPAD;
                 let mut key = [0u8; 64];
                 key[0..32].copy_from_slice(self.zkeychain.secret_bytes());
@@ -47,14 +47,14 @@ macro_rules! impl_zcodec {
             }
 
             #[cfg(feature = "hex-keys")]
-            fn key_hex(&self) -> String {
+            pub fn key_hex(&self) -> String {
                 let mut key = [0u8; 64];
                 key[0..32].copy_from_slice(self.zkeychain.secret_bytes());
                 hex::encode(&key)
             }
 
             #[cfg(feature = "bytes-keys")]
-            fn key_bytes(&self) -> &[u8; 64] {
+            pub fn key_bytes(&self) -> &[u8; 64] {
                 panic!("Z-tier schemes use 32-byte secrets, not 64-byte keys.  Use secret_bytes() instead.")
             }
         }

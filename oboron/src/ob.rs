@@ -308,7 +308,7 @@ impl Ob {
     /// # }
     /// ```
     #[inline]
-    fn key(&self) -> String {
+    pub fn key(&self) -> String {
         self.keychain.key_base64()
     }
 
@@ -331,7 +331,7 @@ impl Ob {
     /// ```
     #[cfg(feature = "hex-keys")]
     #[inline]
-    fn key_hex(&self) -> String {
+    pub fn key_hex(&self) -> String {
         self.keychain.key_hex()
     }
 
@@ -354,7 +354,7 @@ impl Ob {
     /// ```
     #[cfg(feature = "bytes-keys")]
     #[inline]
-    fn key_bytes(&self) -> &[u8; 64] {
+    pub fn key_bytes(&self) -> &[u8; 64] {
         self.keychain.key_bytes()
     }
 }

@@ -96,21 +96,21 @@ macro_rules! impl_codec {
 
             /// Get the key (default base64 format)
             #[inline]
-            fn key(&self) -> String {
+            pub fn key(&self) -> String {
                 self.keychain.key_base64()
             }
 
             /// Get the key in hex format
             #[inline]
             #[cfg(feature = "hex-keys")]
-            fn key_hex(&self) -> String {
+            pub fn key_hex(&self) -> String {
                 self.keychain.key_hex()
             }
 
             /// Get the key in raw bytes format
             #[inline]
             #[cfg(feature = "bytes-keys")]
-            fn key_bytes(&self) -> &[u8; 64] {
+            pub fn key_bytes(&self) -> &[u8; 64] {
                 self.keychain.key_bytes()
             }
         }
@@ -997,6 +997,29 @@ mod tests {
                     scheme, encoding
                 );
             }
+        }
+    }
+
+    #[test]
+    fn test_key_methods() {
+        let key = crate::generate_key();
+        let aasv = AasvC32::new(&key).unwrap();
+
+        // Exercise the key methods
+        let retrieved_key = aasv.key();
+        assert_eq!(retrieved_key, key);
+        assert_eq!(retrieved_key.len(), 86);
+
+        #[cfg(feature = "hex-keys")]
+        {
+            let key_hex = aasv.key_hex();
+            assert_eq!(key_hex.len(), 128);
+        }
+
+        #[cfg(feature = "bytes-keys")]
+        {
+            let key_bytes = aasv.key_bytes();
+            assert_eq!(key_bytes.len(), 64);
         }
     }
 }
