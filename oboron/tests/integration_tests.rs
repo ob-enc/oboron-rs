@@ -9,7 +9,7 @@ fn test_available_schemes() {
 
     #[cfg(feature = "zrbcx")]
     {
-        let ob = oboron::ZrbcxC32::new_keyless().unwrap();
+        let ob = oboron::ztier::ZrbcxC32::new_keyless().unwrap();
         let enc = ob.enc("test").unwrap();
         assert_eq!(ob.dec(&enc).unwrap(), "test");
     }

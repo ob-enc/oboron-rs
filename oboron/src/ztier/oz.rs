@@ -160,7 +160,7 @@ impl Oz {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(all(feature = "zrbcx", feature = "legacy"))]
     /// # {
-    /// # use oboron::Oz;
+    /// # use oboron::ztier::Oz;
     /// # use oboron::Scheme;
     /// # let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
     /// let mut oz = Oz::new("zrbcx.c32", secret)?;

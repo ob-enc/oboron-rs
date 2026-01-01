@@ -338,13 +338,6 @@ pub use codec::{ApgsB32, ApgsB64, ApgsC32, ApgsHex};
 pub use codec::{ApsvB32, ApsvB64, ApsvC32, ApsvHex};
 #[cfg(feature = "upbc")]
 pub use codec::{UpbcB32, UpbcB64, UpbcC32, UpbcHex};
-// Z-tier
-#[cfg(feature = "ztier")]
-pub use ztier::Oz;
-#[cfg(feature = "legacy")]
-pub use ztier::{LegacyB32, LegacyB64, LegacyC32, LegacyHex};
-#[cfg(feature = "zrbcx")]
-pub use ztier::{ZrbcxB32, ZrbcxB64, ZrbcxC32, ZrbcxHex};
 // Testing
 #[cfg(feature = "mock")]
 pub use codec::{Mock1B32, Mock1B64, Mock1C32, Mock1Hex};
@@ -353,10 +346,6 @@ pub use codec::{Mock2B32, Mock2B64, Mock2C32, Mock2Hex};
 
 // Re-export multi-format Oboron implementation
 pub use omnib::Omnib;
-
-// Z-tier multi-format implementation
-#[cfg(feature = "ztier")]
-pub use ztier::Omniz;
 
 /// Convenience prelude for common imports.
 ///

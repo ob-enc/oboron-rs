@@ -1,9 +1,9 @@
+#[cfg(feature = "zrbcx")]
+use oboron::ztier::ZrbcxB64;
 #[cfg(feature = "aags")]
 use oboron::AagsB64;
 #[cfg(feature = "upbc")]
 use oboron::UpbcB64;
-#[cfg(feature = "zrbcx")]
-use oboron::ZrbcxB64;
 #[cfg(feature = "aasv")]
 use oboron::{AasvB64, AasvC32, AasvHex};
 #[cfg(feature = "apgs")]

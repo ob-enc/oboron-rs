@@ -19,7 +19,7 @@ When you need deterministic, reversible identifiers with better
 performance than cryptographic hashes:
 
 ```rust
-use oboron::ZrbcxC32;
+use oboron::ztier::ZrbcxC32;
 let ob = ZrbcxC32::new_keyless();
 
 // Generate opaque ID from structured data

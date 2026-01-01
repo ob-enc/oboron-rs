@@ -6,7 +6,7 @@
 //! with legacy scheme. Use the LegacyC32 struct directly instead:
 //!
 //! ```ignore
-//! use oboron::LegacyC32;
+//! use oboron::ztier::LegacyC32;
 //!
 //! let ob = LegacyC32::new_keyless()?;
 //! let ot = ob.enc("test")?;
@@ -15,7 +15,7 @@
 
 #![cfg(feature = "legacy")]
 
-use oboron::{LegacyB64, LegacyC32, LegacyHex};
+use oboron::ztier::{LegacyB64, LegacyC32, LegacyHex};
 
 const TEST_SECRET: [u8; 32] = [
     0x38, 0x12, 0x84, 0x63, 0x3d, 0x02, 0xea, 0x5f, 0x35, 0xdf, 0x85, 0x96, 0xb5, 0xcc, 0x42, 0x18,

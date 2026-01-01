@@ -1,10 +1,10 @@
+#[cfg(feature = "zrbcx")]
+use oboron::ztier::ZrbcxC32;
 #[cfg(feature = "aags")]
 use oboron::AagsC32;
 use oboron::Omnib;
 #[cfg(feature = "upbc")]
 use oboron::UpbcC32;
-#[cfg(feature = "zrbcx")]
-use oboron::ZrbcxC32;
 
 #[test]
 #[cfg(feature = "zrbcx")]

@@ -1,6 +1,7 @@
 #![cfg(feature = "legacy")]
 
-use oboron::{LegacyB32, LegacyB64, LegacyC32, LegacyHex, Ob, ObtextCodec};
+use oboron::ztier::{LegacyB32, LegacyB64, LegacyC32, LegacyHex, Oz};
+use oboron::ObtextCodec;
 use serde::Deserialize;
 use std::fs;
 use std::path::PathBuf;
@@ -37,7 +38,7 @@ fn load_test_vectors() -> Vec<TestVector> {
     panic!("legacy-test-vectors.jsonl not found");
 }
 
-fn get_ob_for_format(format: &str) -> Box<dyn ObtextCodec> {
+fn get_oz_for_format(format: &str) -> Box<dyn ObtextCodec> {
     match format {
         "legacy:base32crockford" | "legacy.c32" => Box::new(LegacyC32::new_keyless().unwrap()),
         "legacy:base32rfc" | "legacy.b32" => Box::new(LegacyB32::new_keyless().unwrap()),
@@ -64,16 +65,16 @@ fn test_legacy_vectors() {
     for (index, vector) in vectors.iter().enumerate() {
         println!("Testing vector {}: format={}", index, vector.format);
 
-        let ob = match std::panic::catch_unwind(|| get_ob_for_format(&vector.format)) {
+        let oz = match std::panic::catch_unwind(|| get_oz_for_format(&vector.format)) {
             Ok(c) => c,
             Err(_) => {
-                println!("Panic while creating ob at vector {}", index);
-                panic!("Failed to create ob at vector {}", index);
+                println!("Panic while creating oz at vector {}", index);
+                panic!("Failed to create oz at vector {}", index);
             }
         };
 
         // Test encoding
-        let ot = match ob.enc(&vector.plaintext) {
+        let ot = match oz.enc(&vector.plaintext) {
             Ok(e) => e,
             Err(e) => {
                 println!("Failed to enc at vector {}: {}", index, e);
@@ -87,7 +88,7 @@ fn test_legacy_vectors() {
         }
 
         // Test strict decoding
-        let pt2 = match ob.dec(&vector.obtext) {
+        let pt2 = match oz.dec(&vector.obtext) {
             Ok(d) => d,
             Err(e) => {
                 println!("Failed to dec at vector {}: {}", index, e);
@@ -100,10 +101,10 @@ fn test_legacy_vectors() {
             continue;
         }
 
-        // Change the code to use Ob instead of Box<dyn ObtextCodec>
+        // Change the code to use Oz instead of Box<dyn ObtextCodec>
         // Test autodetection
-        let ob1 = Ob::new_keyless(&format!("{}", ob.format())).unwrap();
-        let autodetected = match ob1.autodec(&vector.obtext) {
+        let oz1 = Oz::new_keyless(&format!("{}", oz.format())).unwrap();
+        let autodetected = match oz1.autodec(&vector.obtext) {
             Ok(pt) => pt,
             Err(e) => {
                 eprintln!("Autodetection failed:  {}", e);
