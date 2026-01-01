@@ -21,6 +21,13 @@ macro_rules! impl_zcodec {
         }
 
         impl $name {
+            /// Create with a 43-character base64 secret string
+            pub fn new(secret: &str) -> Result<Self, Error> {
+                Ok(Self {
+                    zkeychain: ZKeychain::from_base64(secret)?,
+                })
+            }
+
             /// Create with hardcoded secret (testing/obfuscation only)
             #[cfg(feature = "keyless")]
             pub fn new_keyless() -> Result<Self, Error> {
@@ -33,29 +40,27 @@ macro_rules! impl_zcodec {
             #[allow(dead_code)]
             #[cfg(any(feature = "keyless", feature = "bytes-keys"))]
             pub(crate) fn from_bytes_internal(key_bytes: &[u8; 64]) -> Result<Self, Error> {
-                let secret:  [u8; 32] = key_bytes[0..32].try_into().unwrap();
+                let secret: [u8; 32] = key_bytes[0..32].try_into().unwrap();
                 Ok(Self {
                     zkeychain: ZKeychain::from_bytes(&secret)?,
                 })
             }
 
-            pub fn key(&self) -> String {
-                use data_encoding::BASE64URL_NOPAD;
-                let mut key = [0u8; 64];
-                key[0..32].copy_from_slice(self.zkeychain.secret_bytes());
-                BASE64URL_NOPAD.encode(&key)
+            #[inline]
+            pub fn secret(&self) -> String {
+                self.zkeychain.secret_base64()
             }
 
+            #[inline]
             #[cfg(feature = "hex-keys")]
-            pub fn key_hex(&self) -> String {
-                let mut key = [0u8; 64];
-                key[0..32].copy_from_slice(self.zkeychain.secret_bytes());
-                hex::encode(&key)
+            pub fn secret_hex(&self) -> String {
+                self.zkeychain.secret_hex()
             }
 
+            #[inline]
             #[cfg(feature = "bytes-keys")]
-            pub fn key_bytes(&self) -> &[u8; 64] {
-                panic!("Z-tier schemes use 32-byte secrets, not 64-byte keys.  Use secret_bytes() instead.")
+            pub fn secret_bytes(&self) -> &[u8; 32] {
+                self.zkeychain.secret_bytes()
             }
         }
 
@@ -83,7 +88,6 @@ macro_rules! impl_zcodec {
             fn encoding(&self) -> Encoding {
                 $encoding
             }
-
         }
 
         // Inherent methods (same as before)
@@ -111,18 +115,6 @@ macro_rules! impl_zcodec {
             #[inline]
             pub fn encoding(&self) -> Encoding {
                 <Self as ObtextCodec>::encoding(self)
-            }
-
-            #[inline]
-            pub fn secret(&self) -> String {
-                use data_encoding::BASE64URL_NOPAD;
-                BASE64URL_NOPAD.encode(self.zkeychain.secret_bytes())
-            }
-
-            #[cfg(feature = "bytes-keys")]
-            #[inline]
-            pub fn secret_bytes(&self) -> &[u8; 32] {
-                self.zkeychain.secret_bytes()
             }
         }
     };

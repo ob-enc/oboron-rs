@@ -53,24 +53,18 @@ macro_rules! impl_legacy_codec {
                 })
             }
 
-            pub fn key(&self) -> String {
-                use data_encoding::BASE64URL_NOPAD;
-                // For legacy (z-tier), return the 32-byte secret padded to 64 bytes
-                let mut key = [0u8; 64];
-                key[0..32].copy_from_slice(self.zkeychain.secret_bytes());
-                BASE64URL_NOPAD.encode(&key)
+            pub fn secret(&self) -> String {
+                self.zkeychain.secret_base64()
             }
 
             #[cfg(feature = "hex-keys")]
-            pub fn key_hex(&self) -> String {
-                let mut key = [0u8; 64];
-                key[0..32].copy_from_slice(self.zkeychain.secret_bytes());
-                hex::encode(&key)
+            pub fn secret_hex(&self) -> String {
+                self.zkeychain.secret_hex()
             }
 
             #[cfg(feature = "bytes-keys")]
-            pub fn key_bytes(&self) -> &[u8; 64] {
-                panic!("Legacy (z-tier) schemes use 32-byte secrets, not 64-byte keys.")
+            pub fn secret_bytes(&self) -> &[u8; 32] {
+                self.zkeychain.secret_bytes()
             }
         }
 
