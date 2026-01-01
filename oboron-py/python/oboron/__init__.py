@@ -9,6 +9,7 @@ adding proper inheritance and type checking support.
 
 from abc import ABC, abstractmethod
 from . import _oboron
+from . import formats  # Add this import
 
 __version__ = (_oboron.__version__
                if hasattr(_oboron, '__version__') else "1.0.0")
@@ -22,12 +23,12 @@ class OboronBase(ABC):
     subclasses, enabling isinstance() and issubclass() checks.
 
     Example:
-        >>> cipher = AasvC32(hex_key=key)
+        >>> cipher = AasvC32(key=key)
         >>> isinstance(cipher, OboronBase)
         True
 
-        >>> def process_cipher(cipher: OboronBase) -> str:
-        ...     return cipher.enc("hello")
+        >>> def process_cipher(cipher:  OboronBase) -> str:
+        ...     return cipher. enc("hello")
     """
 
     @abstractmethod
@@ -129,15 +130,17 @@ OboronBase.register(_oboron.Mock2B32)
 OboronBase.register(_oboron.Mock2B64)
 OboronBase.register(_oboron.Mock2Hex)
 
-# Flexible interface
+# Flexible interfaces
 OboronBase.register(_oboron.Ob)
+OboronBase.register(_oboron.Omnib)
 
 # ============================================================================
 # Re-export all classes and functions
 # ============================================================================
 
-# Main flexible interface
+# Main flexible interfaces
 Ob = _oboron.Ob
+Omnib = _oboron.Omnib
 
 # Aags variants
 AagsC32 = _oboron.AagsC32
@@ -215,6 +218,7 @@ __all__ = [
 
     # Main interfaces
     'Ob',
+    'Omnib',
 
     # Aags
     'AagsC32',
