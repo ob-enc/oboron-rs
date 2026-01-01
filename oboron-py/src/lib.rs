@@ -415,13 +415,13 @@ impl Ob {
 
     /// Encrypt+encode a plaintext string.
     ///
-    /// Args:
+    /// Args:  
     ///     plaintext: The plaintext string to encrypt+encode.
     ///
-    /// Returns:
+    /// Returns:  
     ///     The obtext string.
     ///
-    /// Raises:
+    /// Raises:  
     ///     ValueError: If encoding fails.
     fn enc(&self, plaintext: &str) -> PyResult<String> {
         self.inner
@@ -479,10 +479,10 @@ impl Ob {
 
     /// Change the scheme while keeping the current encoding.
     ///
-    /// Args:
+    /// Args:  
     ///     scheme: Scheme name like "aags", "apsv", "zrbcx", etc.  
     ///
-    /// Raises:
+    /// Raises:  
     ///     ValueError: If scheme is invalid.
     fn set_scheme(&mut self, scheme: &str) -> PyResult<()> {
         let scheme_enum = ::oboron::Scheme::from_str(scheme)
@@ -494,11 +494,11 @@ impl Ob {
 
     /// Change the encoding while keeping the current scheme.
     ///
-    /// Args:
+    /// Args:  
     ///     encoding: Encoding name: "b32", "b64", "c32", "hex".
     ///               Also accepts long forms: "base32rfc", "base64", "base32crockford", or "hex".
     ///
-    /// Raises:
+    /// Raises:  
     ///     ValueError: If encoding is invalid.
     fn set_encoding(&mut self, encoding: &str) -> PyResult<()> {
         let encoding_enum = ::oboron::Encoding::from_str(encoding)
