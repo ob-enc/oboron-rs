@@ -776,12 +776,12 @@ formats, requiring format specification in each operation:
 ```rust
 use oboron::{Omnib, ObtextCodec};
 
-let obm = Omnib::new(&key)?;
+let omb = Omnib::new(&key)?;
 
 // Format specification per operation
-let ot = obm.enc("test", "apsv.b64");
-let pt2 = obm.dec(&ot, "apsv.b64");
-let pt_other = obm.dec(&other, "aasv.c32");
+let ot = omb.enc("test", "apsv.b64");
+let pt2 = omb.dec(&ot, "apsv.b64");
+let pt_other = omb.dec(&other, "aasv.c32");
 ```
 
 **Autodecode:** While other interfaces perform *scheme* autodetection in
@@ -790,7 +790,7 @@ including encoding (`b32`, `c32`, `b64`, or `hex`).  Other structs decode
 only encodings matching their format.
 ```rust
 // Autodecode when format is unknown
-let pt2 = obm.autodec(&ot);
+let pt2 = omb.autodec(&ot);
 ```
 
 Note performance implications: autodetection uses trial-and-error across
@@ -814,9 +814,9 @@ let key = oboron::generate_key();
 let ob = Ob::new(AASV_B64, &key)?;
 
 // With Omnib (multi-format operations)
-let obm = Omnib::new(&key)?;
-let ot_b64 = obm.enc("data", AASV_B64)?;
-let ot_hex = obm.enc("data", AASV_HEX)?;
+let omb = Omnib::new(&key)?;
+let ot_b64 = omb.enc("data", AASV_B64)?;
+let ot_hex = omb.enc("data", AASV_HEX)?;
 ```
 
 Available constants:

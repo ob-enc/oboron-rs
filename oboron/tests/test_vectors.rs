@@ -40,7 +40,7 @@ fn test_all_vectors() {
     let vectors = load_test_vectors();
     println!("Loaded {} test vectors", vectors.len());
 
-    let obm = Omnib::new_keyless().expect("Failed to create Omnib");
+    let omb = Omnib::new_keyless().expect("Failed to create Omnib");
 
     for vector in vectors {
         let format = Format::from_str(&vector.format)
@@ -53,7 +53,7 @@ fn test_all_vectors() {
             // (encoding produces different output each time)
 
             // Test decoding with format
-            let pt2 = obm.dec(&vector.obtext, &vector.format).unwrap_or_else(|e| {
+            let pt2 = omb.dec(&vector.obtext, &vector.format).unwrap_or_else(|e| {
                 panic!(
                     "Failed to dec '{}' with format '{}': {:?}",
                     vector.obtext, vector.format, e
@@ -67,7 +67,7 @@ fn test_all_vectors() {
             );
 
             // Test autodetection
-            let autodetected = obm
+            let autodetected = omb
                 .autodec(&vector.obtext)
                 .unwrap_or_else(|e| panic!("Failed to autodetect '{}': {:?}", vector.obtext, e));
 
@@ -78,7 +78,7 @@ fn test_all_vectors() {
             );
 
             // Test that we can enc and then dec (roundtrip)
-            let new_ot = obm
+            let new_ot = omb
                 .enc(&vector.plaintext, &vector.format)
                 .unwrap_or_else(|e| {
                     panic!(
@@ -87,7 +87,7 @@ fn test_all_vectors() {
                     )
                 });
 
-            let roundtrip = obm.dec(&new_ot, &vector.format).unwrap_or_else(|e| {
+            let roundtrip = omb.dec(&new_ot, &vector.format).unwrap_or_else(|e| {
                 panic!(
                     "Failed to dec roundtrip '{}' with format '{}': {:?}",
                     new_ot, vector.format, e
@@ -103,7 +103,7 @@ fn test_all_vectors() {
             // For deterministic schemes, test both encoding and decoding
 
             // Test encoding
-            let ot = obm
+            let ot = omb
                 .enc(&vector.plaintext, &vector.format)
                 .unwrap_or_else(|e| {
                     panic!(
@@ -119,7 +119,7 @@ fn test_all_vectors() {
             );
 
             // Test decoding
-            let pt2 = obm.dec(&vector.obtext, &vector.format).unwrap_or_else(|e| {
+            let pt2 = omb.dec(&vector.obtext, &vector.format).unwrap_or_else(|e| {
                 panic!(
                     "Failed to dec '{}' with format '{}': {:?}",
                     vector.obtext, vector.format, e
@@ -133,7 +133,7 @@ fn test_all_vectors() {
             );
 
             // Test autodetection
-            let autodetected = obm
+            let autodetected = omb
                 .autodec(&vector.obtext)
                 .unwrap_or_else(|e| panic!("Failed to autodetect '{}': {:?}", vector.obtext, e));
 
