@@ -307,6 +307,8 @@ pub use constants::legacy_constants::*;
 // Testing
 #[cfg(feature = "mock")]
 pub use constants::mock_constants::*;
+#[cfg(feature = "zmock")]
+pub use constants::zmock_constants::*;
 
 #[cfg(feature = "aags")]
 pub use format::aags_formats::*;
@@ -326,6 +328,8 @@ pub use format::legacy_formats::*;
 // Testing
 #[cfg(feature = "mock")]
 pub use format::mock_formats::*;
+#[cfg(feature = "zmock")]
+pub use format::zmock_formats::*;
 
 // Conditionally export format-specific structs (scheme+encoding combinations)
 #[cfg(feature = "aags")]

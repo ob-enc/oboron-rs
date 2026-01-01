@@ -154,6 +154,14 @@ pub(crate) mod mock_constants {
     pub const MOCK2_HEX_STR: &str = "mock2.hex";
 }
 
+#[cfg(feature = "zmock")]
+pub(crate) mod zmock_constants {
+    pub const ZMOCK1_B32_STR: &str = "zmock1.b32";
+    pub const ZMOCK1_B64_STR: &str = "zmock1.b64";
+    pub const ZMOCK1_C32_STR: &str = "zmock1.c32";
+    pub const ZMOCK1_HEX_STR: &str = "zmock1.hex";
+}
+
 #[cfg(feature = "legacy")]
 pub(crate) mod legacy_constants {
     pub const LEGACY_C32_STR: &str = "legacy.c32";

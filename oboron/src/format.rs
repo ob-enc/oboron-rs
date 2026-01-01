@@ -101,6 +101,14 @@ pub(crate) mod mock_formats {
     pub const MOCK2_B64: Format = Format::new(Scheme::Mock2, Encoding::B64);
     pub const MOCK2_HEX: Format = Format::new(Scheme::Mock2, Encoding::Hex);
 }
+#[cfg(feature = "zmock")]
+pub(crate) mod zmock_formats {
+    use super::{Encoding, Format, Scheme};
+    pub const ZMOCK1_C32: Format = Format::new(Scheme::Zmock1, Encoding::C32);
+    pub const ZMOCK1_B32: Format = Format::new(Scheme::Zmock1, Encoding::B32);
+    pub const ZMOCK1_B64: Format = Format::new(Scheme::Zmock1, Encoding::B64);
+    pub const ZMOCK1_HEX: Format = Format::new(Scheme::Zmock1, Encoding::Hex);
+}
 
 impl Format {
     /// Parse format from compact string representation (e.g., "zrbcx.c32", "aags.b64")
@@ -183,6 +191,16 @@ impl Format {
             crate::MOCK2_B64_STR => mock_formats::MOCK2_B64,
             #[cfg(feature = "mock")]
             crate::MOCK2_HEX_STR => mock_formats::MOCK2_HEX,
+
+            // zmock1 variants
+            #[cfg(feature = "zmock")]
+            crate::ZMOCK1_C32_STR => zmock_formats::ZMOCK1_C32,
+            #[cfg(feature = "zmock")]
+            crate::ZMOCK1_B32_STR => zmock_formats::ZMOCK1_B32,
+            #[cfg(feature = "zmock")]
+            crate::ZMOCK1_B64_STR => zmock_formats::ZMOCK1_B64,
+            #[cfg(feature = "zmock")]
+            crate::ZMOCK1_HEX_STR => zmock_formats::ZMOCK1_HEX,
 
             // Legacy
 

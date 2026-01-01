@@ -30,7 +30,7 @@ use super::zkeychain::ZKeychain;
 /// # fn main() -> Result<(), oboron::Error> {
 /// # #[cfg(all(feature = "zrbcx", feature = "zmock"))]
 /// # {
-/// # use oboron:: ztier:: Omniz;
+/// # use oboron::ztier::Omniz;
 /// let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; // 43 chars
 /// let omz = Omniz::new(secret)?;
 ///
@@ -103,8 +103,8 @@ impl Omniz {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(feature = "zrbcx")]
     /// # {
-    /// # use oboron::ztier:: Omniz;
-    /// # use oboron: :{Format, Scheme, Encoding};
+    /// # use oboron::ztier::Omniz;
+    /// # use oboron::{Format, Scheme, Encoding};
     /// let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
     /// let omz = Omniz::new(secret)?;
     ///
@@ -169,9 +169,9 @@ impl Omniz {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(feature = "zrbcx")]
     /// # {
-    /// # use oboron::ztier:: Omniz;
+    /// # use oboron::ztier::Omniz;
     /// let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-    /// let omz = Omniz:: new(secret)?;
+    /// let omz = Omniz::new(secret)?;
     /// let ot = omz.enc("hello", "zrbcx.b64")?;
     /// let pt2 = omz.autodec(&ot)?;  // Autodetects zrbcx.b64
     /// assert_eq!(pt2, "hello");
@@ -191,7 +191,7 @@ impl Omniz {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(feature = "zrbcx")]
     /// # {
-    /// # use oboron:: ztier::Omniz;
+    /// # use oboron::ztier::Omniz;
     /// let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
     /// let omz = Omniz::new(secret)?;
     /// let retrieved = omz.secret();
