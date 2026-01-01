@@ -10,6 +10,7 @@
 mod constants;
 #[cfg(feature = "legacy")]
 mod legacy;
+mod omniz;
 mod oz;
 mod zcodec;
 mod zdec_auto;
@@ -25,6 +26,7 @@ pub use zcodec::{Zmock1B32, Zmock1B64, Zmock1C32, Zmock1Hex};
 #[cfg(feature = "zrbcx")]
 pub use zcodec::{ZrbcxB32, ZrbcxB64, ZrbcxC32, ZrbcxHex};
 
+pub use omniz::Omniz;
 pub use oz::Oz;
 
 #[cfg(feature = "zmock")]

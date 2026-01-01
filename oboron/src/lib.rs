@@ -354,6 +354,10 @@ pub use codec::{Mock2B32, Mock2B64, Mock2C32, Mock2Hex};
 // Re-export multi-format Oboron implementation
 pub use omnib::Omnib;
 
+// Z-tier multi-format implementation
+#[cfg(feature = "ztier")]
+pub use ztier::Omniz;
+
 /// Convenience prelude for common imports.
 ///
 /// Import everything you need with:
