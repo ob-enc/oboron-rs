@@ -25,17 +25,6 @@ pub trait ObtextCodec {
 
     /// Get the encoding used by this instance.
     fn encoding(&self) -> Encoding;
-
-    /// Get the base64 key used by this instance.
-    fn key(&self) -> String;
-
-    /// Get the hex key used by this instance.
-    #[cfg(feature = "hex-keys")]
-    fn key_hex(&self) -> String;
-
-    /// Get the key as bytes used by this instance.
-    #[cfg(feature = "bytes-keys")]
-    fn key_bytes(&self) -> &[u8; 64];
 }
 
 /// Macro to implement optimized ObtextCodec types with compile-time specialization.
@@ -104,6 +93,26 @@ macro_rules! impl_codec {
                     keychain: Keychain::from_bytes(key_bytes)?,
                 })
             }
+
+            /// Get the key (default base64 format)
+            #[inline]
+            fn key(&self) -> String {
+                self.keychain.key_base64()
+            }
+
+            /// Get the key in hex format
+            #[inline]
+            #[cfg(feature = "hex-keys")]
+            fn key_hex(&self) -> String {
+                self.keychain.key_hex()
+            }
+
+            /// Get the key in raw bytes format
+            #[inline]
+            #[cfg(feature = "bytes-keys")]
+            fn key_bytes(&self) -> &[u8; 64] {
+                self.keychain.key_bytes()
+            }
         }
 
         impl ObtextCodec for $name {
@@ -135,23 +144,6 @@ macro_rules! impl_codec {
             #[inline]
             fn encoding(&self) -> Encoding {
                 $encoding
-            }
-
-            #[inline]
-            fn key(&self) -> String {
-                self.keychain.key_base64()
-            }
-
-            #[inline]
-            #[cfg(feature = "hex-keys")]
-            fn key_hex(&self) -> String {
-                self.keychain.key_hex()
-            }
-
-            #[inline]
-            #[cfg(feature = "bytes-keys")]
-            fn key_bytes(&self) -> &[u8; 64] {
-                self.keychain.key_bytes()
             }
         }
 
@@ -185,24 +177,6 @@ macro_rules! impl_codec {
             #[inline]
             pub fn encoding(&self) -> Encoding {
                 <Self as ObtextCodec>::encoding(self)
-            }
-
-            /// Get the key as base64
-            #[inline]
-            pub fn key(&self) -> String {
-                <Self as ObtextCodec>::key(self)
-            }
-
-            #[cfg(feature = "hex-keys")]
-            #[inline]
-            pub fn key_hex(&self) -> String {
-                <Self as ObtextCodec>::key_hex(self)
-            }
-
-            #[cfg(feature = "bytes-keys")]
-            #[inline]
-            pub fn key_bytes(&self) -> &[u8; 64] {
-                <Self as ObtextCodec>::key_bytes(self)
             }
         }
     };
@@ -420,11 +394,6 @@ impl ObtextCodec for ObAny {
     delegate_to_inner!(fn format(&self) -> Format);
     delegate_to_inner!(fn scheme(&self) -> Scheme);
     delegate_to_inner!(fn encoding(&self) -> Encoding);
-    delegate_to_inner!(fn key(&self) -> String);
-    #[cfg(feature = "hex-keys")]
-    delegate_to_inner!(fn key_hex(&self) -> String);
-    #[cfg(feature = "bytes-keys")]
-    delegate_to_inner!(fn key_bytes(&self) -> &[u8; 64]);
 }
 
 // Inherent constructors for ObAny
@@ -604,6 +573,39 @@ impl ObAny {
             feature = "apsv",
         )))]
         compile_error!("At least one oboron scheme must be enabled");
+    }
+}
+
+// Delegate to ObtextCodec methods
+impl ObAny {
+    /// Encrypt and encode plaintext
+    #[inline]
+    pub fn enc(&self, plaintext: &str) -> Result<String, Error> {
+        <Self as ObtextCodec>::enc(self, plaintext)
+    }
+
+    /// Decode and decrypt obtext
+    #[inline]
+    pub fn dec(&self, obtext: &str) -> Result<String, Error> {
+        <Self as ObtextCodec>::dec(self, obtext)
+    }
+
+    /// Get the format
+    #[inline]
+    pub fn format(&self) -> Format {
+        <Self as ObtextCodec>::format(self)
+    }
+
+    /// Get the scheme
+    #[inline]
+    pub fn scheme(&self) -> Scheme {
+        <Self as ObtextCodec>::scheme(self)
+    }
+
+    /// Get the encoding
+    #[inline]
+    pub fn encoding(&self) -> Encoding {
+        <Self as ObtextCodec>::encoding(self)
     }
 }
 

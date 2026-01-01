@@ -7,7 +7,7 @@
 
 #[cfg(feature = "keyless")]
 use crate::constants::HARDCODED_SECRET_BYTES;
-use crate::{Encoding, Error, Format, ObtextCodec, Scheme};
+use crate::{format::IntoFormat, Encoding, Error, Format, ObtextCodec, Scheme};
 
 use super::zdec_auto;
 use super::zkeychain::ZKeychain;
@@ -325,6 +325,27 @@ impl Oz {
             format,
         })
     }
+
+    /// Get the secret as base64 (z-tier specific, 32 bytes)
+    #[inline]
+    pub fn secret(&self) -> String {
+        use data_encoding::BASE64URL_NOPAD;
+        BASE64URL_NOPAD.encode(self.zkeychain.secret_bytes())
+    }
+
+    /// Get the secret as hex (z-tier specific, 32 bytes)
+    #[inline]
+    #[cfg(feature = "hex-keys")]
+    pub fn secret_hex(&self) -> String {
+        self.zkeychain.secret_hex()
+    }
+
+    /// Get the secret as bytes (z-tier specific, 32 bytes)
+    #[inline]
+    #[cfg(feature = "bytes-keys")]
+    pub fn secret_bytes(&self) -> &[u8; 32] {
+        self.zkeychain.secret_bytes()
+    }
 }
 
 impl ObtextCodec for Oz {
@@ -348,27 +369,6 @@ impl ObtextCodec for Oz {
 
     fn encoding(&self) -> Encoding {
         self.format.encoding()
-    }
-
-    fn key(&self) -> String {
-        // For z-tier, pad the 32-byte secret to 64 bytes for compatibility
-        use data_encoding::BASE64URL_NOPAD;
-        let mut key = [0u8; 64];
-        key[0..32].copy_from_slice(self.zkeychain.secret_bytes());
-        BASE64URL_NOPAD.encode(&key)
-    }
-
-    #[cfg(feature = "hex-keys")]
-    fn key_hex(&self) -> String {
-        // For z-tier, pad the 32-byte secret to 64 bytes for compatibility
-        let mut key = [0u8; 64];
-        key[0..32].copy_from_slice(self.zkeychain.secret_bytes());
-        hex::encode(&key)
-    }
-
-    #[cfg(feature = "bytes-keys")]
-    fn key_bytes(&self) -> &[u8; 64] {
-        panic!("Z-tier schemes use 32-byte secrets, not 64-byte keys.  Use secret_bytes() instead.")
     }
 }
 
@@ -397,27 +397,6 @@ impl Oz {
     pub fn encoding(&self) -> Encoding {
         <Self as ObtextCodec>::encoding(self)
     }
-
-    /// Get the secret as base64 (z-tier specific, 32 bytes)
-    #[inline]
-    pub fn secret(&self) -> String {
-        use data_encoding::BASE64URL_NOPAD;
-        BASE64URL_NOPAD.encode(self.zkeychain.secret_bytes())
-    }
-
-    /// Get the secret as bytes (z-tier specific, 32 bytes)
-    #[inline]
-    #[cfg(feature = "bytes-keys")]
-    pub fn secret_bytes(&self) -> &[u8; 32] {
-        self.zkeychain.secret_bytes()
-    }
-
-    /// Get the secret as hex (z-tier specific, 32 bytes)
-    #[inline]
-    #[cfg(feature = "hex-keys")]
-    pub fn secret_hex(&self) -> String {
-        self.zkeychain.secret_hex()
-    }
 }
 
 /// Helper function to validate that a scheme is a z-tier scheme
@@ -431,54 +410,6 @@ fn validate_ztier_scheme(scheme: Scheme) -> Result<(), Error> {
         Scheme::Legacy => Ok(()),
         _ => Err(Error::InvalidScheme),
     }
-}
-
-/// Trait for types that can be converted into a Format.
-///
-/// This trait is sealed and only implemented for `&str`, `Format`, and `&Format`.
-pub trait IntoFormat: private::Sealed {
-    /// Convert into a Format, possibly returning an error.
-    fn into_format(self) -> Result<Format, Error>;
-}
-
-impl IntoFormat for Format {
-    fn into_format(self) -> Result<Format, Error> {
-        Ok(self)
-    }
-}
-
-impl IntoFormat for &Format {
-    fn into_format(self) -> Result<Format, Error> {
-        Ok(*self)
-    }
-}
-
-impl IntoFormat for &str {
-    fn into_format(self) -> Result<Format, Error> {
-        Format::from_str(self)
-    }
-}
-
-impl IntoFormat for String {
-    fn into_format(self) -> Result<Format, Error> {
-        Format::from_str(&self)
-    }
-}
-
-impl IntoFormat for &String {
-    fn into_format(self) -> Result<Format, Error> {
-        Format::from_str(self)
-    }
-}
-
-// Seal the trait to prevent external implementations
-mod private {
-    pub trait Sealed {}
-    impl Sealed for &str {}
-    impl Sealed for String {}
-    impl Sealed for &String {}
-    impl Sealed for super::Format {}
-    impl Sealed for &super::Format {}
 }
 
 #[cfg(test)]

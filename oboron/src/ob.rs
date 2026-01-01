@@ -288,6 +288,75 @@ impl Ob {
             format,
         })
     }
+
+    /// Get the key as a base64 string.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # fn main() -> Result<(), oboron::Error> {
+    /// # #[cfg(feature = "aasv")]
+    /// # {
+    /// # use oboron::Ob;
+    /// # let key = oboron::generate_key();
+    /// let ob = Ob::new("aasv.b64", &key)?;
+    /// let key_retrieved = ob.key();
+    /// assert_eq!(key_retrieved, key);
+    /// assert_eq!(key_retrieved.len(), 86); // 64 bytes = 86 base64 chars
+    /// # }
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[inline]
+    fn key(&self) -> String {
+        self.keychain.key_base64()
+    }
+
+    /// Get the key as a hex string.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # fn main() -> Result<(), oboron::Error> {
+    /// # #[cfg(all(feature = "aasv", feature = "hex-keys"))]
+    /// # {
+    /// # use oboron::Ob;
+    /// # let key = oboron::generate_key();
+    /// let ob = Ob::new("aasv.b64", &key)?;
+    /// let key_hex = ob.key_hex();
+    /// assert_eq!(key_hex.len(), 128); // 64 bytes = 128 hex chars
+    /// # }
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[cfg(feature = "hex-keys")]
+    #[inline]
+    fn key_hex(&self) -> String {
+        self.keychain.key_hex()
+    }
+
+    /// Get the key as raw bytes.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # fn main() -> Result<(), oboron::Error> {
+    /// # #[cfg(all(feature = "aasv", feature = "bytes-keys"))]
+    /// # {
+    /// # use oboron::Ob;
+    /// let key_bytes = oboron::generate_key_bytes();
+    /// let ob = Ob::from_bytes("aasv.b64", &key_bytes)?;
+    /// let retrieved = ob.key_bytes();
+    /// assert_eq!(retrieved, &key_bytes);
+    /// # }
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[cfg(feature = "bytes-keys")]
+    #[inline]
+    fn key_bytes(&self) -> &[u8; 64] {
+        self.keychain.key_bytes()
+    }
 }
 
 impl ObtextCodec for Ob {
@@ -311,20 +380,6 @@ impl ObtextCodec for Ob {
 
     fn encoding(&self) -> Encoding {
         self.format.encoding()
-    }
-
-    fn key(&self) -> String {
-        self.keychain.key_base64()
-    }
-
-    #[cfg(feature = "hex-keys")]
-    fn key_hex(&self) -> String {
-        self.keychain.key_hex()
-    }
-
-    #[cfg(feature = "bytes-keys")]
-    fn key_bytes(&self) -> &[u8; 64] {
-        self.keychain.key_bytes()
     }
 }
 
@@ -441,74 +496,5 @@ impl Ob {
     #[inline]
     pub fn encoding(&self) -> Encoding {
         <Self as ObtextCodec>::encoding(self)
-    }
-
-    /// Get the key as a base64 string.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(feature = "aasv")]
-    /// # {
-    /// # use oboron::Ob;
-    /// # let key = oboron::generate_key();
-    /// let ob = Ob::new("aasv.b64", &key)?;
-    /// let key_retrieved = ob.key();
-    /// assert_eq!(key_retrieved, key);
-    /// assert_eq!(key_retrieved.len(), 86); // 64 bytes = 86 base64 chars
-    /// # }
-    /// # Ok(())
-    /// # }
-    /// ```
-    #[inline]
-    pub fn key(&self) -> String {
-        <Self as ObtextCodec>::key(self)
-    }
-
-    /// Get the key as a hex string.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(all(feature = "aasv", feature = "hex-keys"))]
-    /// # {
-    /// # use oboron::Ob;
-    /// # let key = oboron::generate_key();
-    /// let ob = Ob::new("aasv.b64", &key)?;
-    /// let key_hex = ob.key_hex();
-    /// assert_eq!(key_hex.len(), 128); // 64 bytes = 128 hex chars
-    /// # }
-    /// # Ok(())
-    /// # }
-    /// ```
-    #[cfg(feature = "hex-keys")]
-    #[inline]
-    pub fn key_hex(&self) -> String {
-        <Self as ObtextCodec>::key_hex(self)
-    }
-
-    /// Get the key as raw bytes.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// # fn main() -> Result<(), oboron::Error> {
-    /// # #[cfg(all(feature = "aasv", feature = "bytes-keys"))]
-    /// # {
-    /// # use oboron::Ob;
-    /// let key_bytes = oboron::generate_key_bytes();
-    /// let ob = Ob::from_bytes("aasv.b64", &key_bytes)?;
-    /// let retrieved = ob.key_bytes();
-    /// assert_eq!(retrieved, &key_bytes);
-    /// # }
-    /// # Ok(())
-    /// # }
-    /// ```
-    #[cfg(feature = "bytes-keys")]
-    #[inline]
-    pub fn key_bytes(&self) -> &[u8; 64] {
-        <Self as ObtextCodec>::key_bytes(self)
     }
 }
