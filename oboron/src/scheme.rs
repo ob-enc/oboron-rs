@@ -23,7 +23,7 @@ pub enum Scheme {
     Mock1,
     #[cfg(feature = "mock")]
     Mock2,
-    #[cfg(feature = "mock")]
+    #[cfg(feature = "zmock")]
     Zmock1,
     // Legacy
     #[cfg(feature = "legacy")]
@@ -86,7 +86,7 @@ impl Scheme {
             Scheme::Mock1 => true,
             #[cfg(feature = "mock")]
             Scheme::Mock2 => true,
-            #[cfg(feature = "mock")]
+            #[cfg(feature = "zmock")]
             Scheme::Zmock1 => true,
             // Legacy
             #[cfg(feature = "legacy")]
@@ -120,7 +120,7 @@ impl Scheme {
             Scheme::Mock1 => constants::MOCK1_MARKER,
             #[cfg(feature = "mock")]
             Scheme::Mock2 => constants::MOCK2_MARKER,
-            #[cfg(feature = "mock")]
+            #[cfg(feature = "zmock")]
             Scheme::Zmock1 => constants::ZMOCK1_MARKER,
             // Legacy
             #[cfg(feature = "legacy")]
