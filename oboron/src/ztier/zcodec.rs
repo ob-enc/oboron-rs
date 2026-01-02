@@ -128,7 +128,7 @@ impl_zcodec!(ZrbcxHex, Scheme::Zrbcx, Encoding::Hex, "zrbcx.hex");
 
 // Zmock1 variants (z-tier testing scheme)
 #[cfg(feature = "zmock")]
-impl_zcodec!(Zmock1C32, Scheme::Zmock1, Encoding::C32, "zmock1. c32");
+impl_zcodec!(Zmock1C32, Scheme::Zmock1, Encoding::C32, "zmock1.c32");
 #[cfg(feature = "zmock")]
 impl_zcodec!(Zmock1B32, Scheme::Zmock1, Encoding::B32, "zmock1.b32");
 #[cfg(feature = "zmock")]
