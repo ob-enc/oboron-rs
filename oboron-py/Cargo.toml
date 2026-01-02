@@ -8,7 +8,7 @@ name = "_oboron"
 crate-type = ["cdylib"]
 
 [features]
-default = ["all-schemes", "legacy", "keyless", "legacy", "mock"]
+default = ["all-schemes", "ztier-schemes", "keyless", "legacy", "mock", "zmock"]
 
 legacy = ["oboron/legacy"]
 zrbcx = ["oboron/zrbcx"]
@@ -18,7 +18,10 @@ upbc = ["oboron/upbc"]
 apgs = ["oboron/apgs"]
 apsv = ["oboron/apsv"]
 mock = ["oboron/mock"]
-all-schemes = ["zrbcx", "upbc", "aags", "apgs", "aasv", "apsv"]
+zmock = ["oboron/zmock"]
+ztier = ["oboron/ztier"]
+all-schemes = ["aags", "apgs", "aasv", "apsv", "upbc"]
+ztier-schemes = ["zrbcx"]
 
 keyless = ["oboron/keyless"]
 

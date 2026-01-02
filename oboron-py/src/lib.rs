@@ -64,9 +64,8 @@ macro_rules! impl_codec_class {
             /// Raises:
             ///     ValueError: If the enc operation fails.
             fn enc(&self, plaintext: &str) -> PyResult<String> {
-                self.inner
-                    .enc(plaintext)
-                    .map_err(|e| PyValueError::new_err(format!("Enc operation failed: {}", e)))
+                let result = self.inner.enc(plaintext);
+                result.map_err(|e| PyValueError::new_err(format!("Enc operation failed: {}", e)))
             }
 
             /// Decode+decrypt an obtext string back to plaintext.
@@ -85,30 +84,6 @@ macro_rules! impl_codec_class {
                 result.map_err(|e| PyValueError::new_err(format!("Dec operation failed: {}", e)))
             }
 
-            /// Get the key used by this instance (as base64 string).
-            #[getter]
-            fn key(&self) -> String {
-                self.inner.key()
-            }
-
-            /// Get the key as bytes used by this instance.
-            #[getter]
-            fn key_bytes(&self, py: Python) -> PyResult<Py<PyBytes>> {
-                Ok(PyBytes::new_bound(py, self.inner.key_bytes()).into())
-            }
-
-            /// The scheme used by this instance.
-            #[getter]
-            fn scheme(&self) -> String {
-                self.inner.scheme().as_str().to_string()
-            }
-
-            /// The encoding format used by this instance.
-            #[getter]
-            fn encoding(&self) -> String {
-                self.inner.encoding().as_str().to_string()
-            }
-
             /// Get the current format string.
             ///
             /// Returns:
@@ -116,6 +91,159 @@ macro_rules! impl_codec_class {
             #[getter]
             fn format(&self) -> String {
                 format!("{}", self.inner.format())
+            }
+
+            /// The scheme used by this instance.
+            #[getter]
+            fn scheme(&self) -> String {
+                self.inner.scheme().to_string()
+            }
+
+            /// The encoding format used by this instance.
+            #[getter]
+            fn encoding(&self) -> String {
+                self.inner.encoding().to_string()
+            }
+
+            /// Get the key used by this instance (as base64 string).
+            #[getter]
+            fn key(&self) -> String {
+                self.inner.key()
+            }
+
+            /// Get the key as hex used by this instance.
+            #[getter]
+            fn key_hex(&self) -> String {
+                self.inner.key_hex()
+            }
+
+            /// Get the key as bytes used by this instance.
+            #[getter]
+            fn key_bytes(&self, py: Python) -> PyResult<Py<PyBytes>> {
+                Ok(PyBytes::new_bound(py, self.inner.key_bytes()).into())
+            }
+        }
+    };
+}
+
+macro_rules! impl_zcodec_class {
+    ($py_name:ident, $rust_type:ty, $doc:expr) => {
+        #[doc = $doc]
+        #[pyclass]
+        #[allow(non_camel_case_types)]
+        struct $py_name {
+            inner: $rust_type,
+        }
+
+        #[pymethods]
+        impl $py_name {
+            /// Create a new codec instance.
+            ///
+            /// Args:
+            ///     key:     43-character base64 string secret (256 bits).  Required if keyless=False.
+            ///     keyless: If True, uses the hardcoded secret (testing only, NOT SECURE).
+            ///
+            /// Returns:
+            ///     A new codec instance.
+            ///
+            /// Raises:
+            ///     ValueError: If key is invalid or both key and keyless are provided.
+            #[new]
+            #[pyo3(signature = (secret=None, keyless=false))]
+            fn new(secret: Option<String>, keyless: bool) -> PyResult<Self> {
+                let inner = match (secret, keyless) {
+                    (Some(secret), false) => <$rust_type>::new(&secret).map_err(|e| {
+                        PyValueError::new_err(format!("Failed to create codec: {}", e))
+                    })?,
+                    (None, true) => <$rust_type>::new_keyless().map_err(|e| {
+                        PyValueError::new_err(format!(
+                            "Failed to create codec with hardcoded secret: {}",
+                            e
+                        ))
+                    })?,
+                    (Some(_), true) => {
+                        return Err(PyValueError::new_err(
+                            "Cannot specify both secret and keyless=True",
+                        ));
+                    }
+                    (None, false) => {
+                        return Err(PyValueError::new_err(
+                            "Must provide either secret or set keyless=True",
+                        ));
+                    }
+                };
+
+                Ok(Self { inner })
+            }
+
+            /// Encrypt+encode a plaintext string.
+            ///
+            /// Args:
+            ///     plaintext: The plaintext string to encrypt+encode.
+            ///
+            /// Returns:
+            ///     The obtext string.
+            ///
+            /// Raises:
+            ///     ValueError: If the enc operation fails.
+            fn enc(&self, plaintext: &str) -> PyResult<String> {
+                let result = self.inner.enc(plaintext);
+                result.map_err(|e| PyValueError::new_err(format!("Enc operation failed: {}", e)))
+            }
+
+            /// Decode+decrypt an obtext string back to plaintext.
+            ///
+            /// Args:
+            ///     obtext: The encrypted+encoded string to decode+decrypt.
+            ///
+            /// Returns:
+            ///     The decoded+decrypted plaintext string.
+            ///
+            /// Raises:
+            ///     ValueError: If the dec operation fails
+            #[pyo3(signature = (obtext))]
+            fn dec(&self, obtext: &str) -> PyResult<String> {
+                let result = self.inner.dec(obtext);
+                result.map_err(|e| PyValueError::new_err(format!("Dec operation failed: {}", e)))
+            }
+
+            /// Get the current format string.
+            ///
+            /// Returns:
+            ///     Format string like "zrbcx.c32", "zrbcx.b32", etc.
+            #[getter]
+            fn format(&self) -> String {
+                format!("{}", self.inner.format())
+            }
+
+            /// The scheme used by this instance.
+            #[getter]
+            fn scheme(&self) -> String {
+                self.inner.scheme().to_string()
+            }
+
+            /// The encoding format used by this instance.
+            #[getter]
+            fn encoding(&self) -> String {
+                self.inner.encoding().to_string()
+            }
+
+            /// Get the secret used by this instance (as base64 string).
+            #[getter]
+            fn secret(&self) -> String {
+                self.inner.secret()
+            }
+
+            /// Get the secret as bytes used by this instance.
+            #[getter]
+            fn secret_hex(&self) -> String {
+                self.inner.secret_hex()
+            }
+
+            /// Get the secret as bytes used by this instance.
+            #[getter]
+            fn secret_bytes(&self, py: Python) -> PyResult<Py<PyBytes>> {
+                Ok(PyBytes::new_bound(py, self.inner.secret_bytes()).into())
             }
         }
     };
@@ -259,27 +387,27 @@ impl_codec_class!(
 // Zrbcx variants
 // -------------
 #[cfg(feature = "zrbcx")]
-impl_codec_class!(
+impl_zcodec_class!(
     ZrbcxB32,
-    ::oboron::ZrbcxB32,
+    ::oboron::ztier::ZrbcxB32,
     "Zrbcx codec (deterministic AES-CBC, constant IV) with B32 encoding "
 );
 #[cfg(feature = "zrbcx")]
-impl_codec_class!(
+impl_zcodec_class!(
     ZrbcxB64,
-    ::oboron::ZrbcxB64,
+    ::oboron::ztier::ZrbcxB64,
     "Zrbcx codec (deterministic AES-CBC, constant IV) with B64 encoding"
 );
 #[cfg(feature = "zrbcx")]
-impl_codec_class!(
+impl_zcodec_class!(
     ZrbcxC32,
-    ::oboron::ZrbcxC32,
+    ::oboron::ztier::ZrbcxC32,
     "Zrbcx codec (deterministic AES-CBC, constant IV) with C32 encoding"
 );
 #[cfg(feature = "zrbcx")]
-impl_codec_class!(
+impl_zcodec_class!(
     ZrbcxHex,
-    ::oboron::ZrbcxHex,
+    ::oboron::ztier::ZrbcxHex,
     "Zrbcx codec (deterministic AES-CBC, constant IV) with Hex encoding"
 );
 
@@ -331,36 +459,59 @@ impl_codec_class!(
     "Mock2 codec (reverse plaintext scheme, for testing) with Hex encoding"
 );
 
+// Zmock1 variants
+// -------------
+impl_zcodec_class!(
+    Zmock1B32,
+    ::oboron::ztier::Zmock1B32,
+    "Zmock1 codec (identity scheme, for testing) with B32 encoding"
+);
+impl_zcodec_class!(
+    Zmock1B64,
+    ::oboron::ztier::Zmock1B64,
+    "Zmock1 codec (identity scheme, for testing) with B64 encoding"
+);
+impl_zcodec_class!(
+    Zmock1C32,
+    ::oboron::ztier::Zmock1C32,
+    "Zmock1 codec (identity scheme, for testing) with C32 encoding"
+);
+impl_zcodec_class!(
+    Zmock1Hex,
+    ::oboron::ztier::Zmock1Hex,
+    "Zmock1 codec (identity scheme, for testing) with Hex encoding"
+);
+
 // Legacy - LEGACY variants
 // ----------------------
 #[cfg(feature = "legacy")]
-impl_codec_class!(
+impl_zcodec_class!(
     LegacyB32,
-    ::oboron::LegacyB32,
+    ::oboron::ztier::LegacyB32,
     "Legacy codec (deterministic AES-CBC, constant IV, custom padding) with B32 encoding\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
      For new projects, use Zrbcx or more secure schemes like Aags/Aasv."
 );
 #[cfg(feature = "legacy")]
-impl_codec_class!(
+impl_zcodec_class!(
     LegacyB64,
-    ::oboron::LegacyB64,
+    ::oboron::ztier::LegacyB64,
     "Legacy codec (deterministic AES-CBC, constant IV, custom padding) with B64 encoding\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
      For new projects, use Zrbcx or more secure schemes like Aags/Aasv."
 );
 #[cfg(feature = "legacy")]
-impl_codec_class!(
+impl_zcodec_class!(
     LegacyC32,
-    ::oboron::LegacyC32,
+    ::oboron::ztier::LegacyC32,
     "Legacy codec (deterministic AES-CBC, constant IV, custom padding) with C32 encoding\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
      For new projects, use Zrbcx or more secure schemes like Aags/Aasv."
 );
 #[cfg(feature = "legacy")]
-impl_codec_class!(
+impl_zcodec_class!(
     LegacyHex,
-    ::oboron::LegacyHex,
+    ::oboron::ztier::LegacyHex,
     "Legacy codec (deterministic AES-CBC, constant IV, custom padding) with Hex encoding\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
      For new projects, use Zrbcx or more secure schemes like Aags/Aasv."
@@ -424,9 +575,8 @@ impl Ob {
     /// Raises:  
     ///     ValueError: If encoding fails.
     fn enc(&self, plaintext: &str) -> PyResult<String> {
-        self.inner
-            .enc(plaintext)
-            .map_err(|e| PyValueError::new_err(format!("Enc operation failed: {}", e)))
+        let result = self.inner.enc(plaintext);
+        result.map_err(|e| PyValueError::new_err(format!("Enc operation failed: {}", e)))
     }
 
     /// Decode+decrypt an obtext string back to plaintext.  
@@ -459,15 +609,53 @@ impl Ob {
     /// Raises:  
     ///     ValueError: If the dec operation fails or format cannot be detected.
     fn autodec(&self, obtext: &str) -> PyResult<String> {
-        self.inner
-            .autodec(obtext)
-            .map_err(|e| PyValueError::new_err(format!("Autodec operation failed: {}", e)))
+        let result = self.inner.autodec(obtext);
+        result.map_err(|e| PyValueError::new_err(format!("Autodec operation failed: {}", e)))
+    }
+
+    /// Get the current format string.
+    ///
+    /// Returns:
+    ///     Format string like "aags.b64", "apgs.c32", "aasv.b32", etc.
+    #[getter]
+    fn format(&self) -> String {
+        format!("{}", self.inner.format())
+    }
+
+    /// The scheme used by this instance.
+    #[getter]
+    fn scheme(&self) -> String {
+        self.inner.scheme().to_string()
+    }
+
+    /// The encoding format used by this instance.
+    #[getter]
+    fn encoding(&self) -> String {
+        self.inner.encoding().to_string()
+    }
+
+    /// Get the key used by this instance (as base64 string).
+    #[getter]
+    fn key(&self) -> String {
+        self.inner.key()
+    }
+
+    /// Get the key as hex used by this instance.
+    #[getter]
+    fn key_hex(&self) -> String {
+        self.inner.key_hex()
+    }
+
+    /// Get the key as bytes used by this instance.
+    #[getter]
+    fn key_bytes(&self, py: Python) -> PyResult<Py<PyBytes>> {
+        Ok(PyBytes::new_bound(py, self.inner.key_bytes()).into())
     }
 
     /// Change the format (scheme + encoding).  
     ///
     /// Args:  
-    ///     format: Format string like "aags.b64", "apsv.hex", "zrbcx.c32", "zrbcx.b32", etc.
+    ///     format: Format string like "aags.b64", "apsv.hex", "apgs.c32", "aasv.b32", etc.
     ///
     /// Raises:  
     ///     ValueError: If format is invalid.
@@ -480,7 +668,7 @@ impl Ob {
     /// Change the scheme while keeping the current encoding.
     ///
     /// Args:  
-    ///     scheme: Scheme name like "aags", "apsv", "zrbcx", etc.  
+    ///     scheme: Scheme name like "aags", "apsv", "apgs", etc.  
     ///
     /// Raises:  
     ///     ValueError: If scheme is invalid.
@@ -506,39 +694,6 @@ impl Ob {
         self.inner
             .set_encoding(encoding_enum)
             .map_err(|e| PyValueError::new_err(format!("Failed to set encoding: {}", e)))
-    }
-
-    /// Get the current format string.
-    ///
-    /// Returns:
-    ///     Format string like "aags.b64", "zrbcx.c32", "zrbcx.b32", etc.
-    #[getter]
-    fn format(&self) -> String {
-        format!("{}", self.inner.format())
-    }
-
-    /// Get the key used by this instance (as base64 string).
-    #[getter]
-    fn key(&self) -> String {
-        self.inner.key()
-    }
-
-    /// Get the key as bytes used by this instance.
-    #[getter]
-    fn key_bytes(&self, py: Python) -> PyResult<Py<PyBytes>> {
-        Ok(PyBytes::new_bound(py, self.inner.key_bytes()).into())
-    }
-
-    /// The scheme used by this instance.
-    #[getter]
-    fn scheme(&self) -> String {
-        self.inner.scheme().to_string()
-    }
-
-    /// The encoding format used by this instance.
-    #[getter]
-    fn encoding(&self) -> String {
-        self.inner.encoding().to_string()
     }
 }
 
@@ -593,7 +748,7 @@ impl Omnib {
     ///
     /// Args:
     ///     plaintext: The plaintext string to encrypt+encode.
-    ///     format: Format string like "aags.b64", "apsv.hex", "zrbcx.c32", "zrbcx.b32", etc.
+    ///     format: Format string like "aags.b64", "apsv.hex", etc.
     ///
     /// Returns:
     ///     The obtext string.
@@ -601,16 +756,15 @@ impl Omnib {
     /// Raises:
     ///     ValueError: If the enc operation fails or format is invalid.
     fn enc(&self, plaintext: &str, format: &str) -> PyResult<String> {
-        self.inner
-            .enc(plaintext, format)
-            .map_err(|e| PyValueError::new_err(format!("Enc operation failed: {}", e)))
+        let result = self.inner.enc(plaintext, format);
+        result.map_err(|e| PyValueError::new_err(format!("Enc operation failed: {}", e)))
     }
 
     /// Decode+decrypt an obtext string with a specific format.
     ///
     /// Args:
     ///     obtext: The encrypted+encoded string to decode+decrypt.  
-    ///     format: Format string like "aags.b64", "apsv.hex", "zrbcx.c32", "zrbcx.b32", etc.
+    ///     format: Format string like "aags.b64", "apsv.hex", etc.
     ///
     /// Returns:
     ///     The decoded+decrypted plaintext string.
@@ -618,15 +772,14 @@ impl Omnib {
     /// Raises:
     ///     ValueError: If the dec operation fails or format is invalid.
     fn dec(&self, obtext: &str, format: &str) -> PyResult<String> {
-        self.inner
-            .dec(obtext, format)
-            .map_err(|e| PyValueError::new_err(format!("Dec operation failed: {}", e)))
+        let result = self.inner.dec(obtext, format);
+        result.map_err(|e| PyValueError::new_err(format!("Dec operation failed: {}", e)))
     }
 
     /// Decode+decrypt with automatic scheme and encoding detection.
     ///
     /// This is the only decoder that can automatically detect both the scheme
-    /// (aags, zrbcx, etc.) AND the encoding (b32, b64, c32, hex).
+    /// (aags, apsv, etc.) AND the encoding (b32, b64, c32, hex).
     ///
     /// Args:
     ///     obtext: The encrypted+encoded string to decode+decrypt.
@@ -637,15 +790,20 @@ impl Omnib {
     /// Raises:
     ///     ValueError: If the dec operation fails or format cannot be detected.
     fn autodec(&self, obtext: &str) -> PyResult<String> {
-        self.inner
-            .autodec(obtext)
-            .map_err(|e| PyValueError::new_err(format!("Autodec operation failed: {}", e)))
+        let result = self.inner.autodec(obtext);
+        result.map_err(|e| PyValueError::new_err(format!("Autodec operation failed: {}", e)))
     }
 
     /// Get the key used by this instance (as base64 string).
     #[getter]
     fn key(&self) -> String {
         self.inner.key()
+    }
+
+    /// Get the key as hex used by this instance.
+    #[getter]
+    fn key_hex(&self) -> String {
+        self.inner.key_hex()
     }
 
     /// Get the key as bytes used by this instance.
@@ -655,12 +813,310 @@ impl Omnib {
     }
 }
 
+// Z-tier schemes - Oz
+#[pyclass]
+struct Oz {
+    inner: ::oboron::ztier::Oz,
+}
+
+#[pymethods]
+impl Oz {
+    /// Create a new Oz instance.
+    ///
+    /// Args:
+    ///     format: Format string like "aags.b64", "apsv.hex", "zrbcx.c32", "zrbcx.b32", etc.
+    ///     key:     86-character base64 string key (512 bits). Required if keyless=False.
+    ///     keyless: If True, uses the hardcoded key (testing only, NOT SECURE).
+    ///
+    /// Returns:
+    ///     A new Oz instance.
+    ///
+    /// Raises:
+    ///     ValueError: If key or format is invalid.
+    #[new]
+    #[pyo3(signature = (format, key=None, keyless=false))]
+    fn new(format: &str, key: Option<String>, keyless: bool) -> PyResult<Self> {
+        let inner = match (key, keyless) {
+            (Some(key), false) => ::oboron::ztier::Oz::new(format, &key)
+                .map_err(|e| PyValueError::new_err(format!("Failed to create Oz: {}", e)))?,
+            (None, true) => ::oboron::ztier::Oz::new_keyless(format).map_err(|e| {
+                PyValueError::new_err(format!("Failed to create Oz with hardcoded key: {}", e))
+            })?,
+            (Some(_), true) => {
+                return Err(PyValueError::new_err(
+                    "Cannot specify both key and keyless=True",
+                ));
+            }
+            (None, false) => {
+                return Err(PyValueError::new_err(
+                    "Must provide either key or set keyless=True",
+                ));
+            }
+        };
+
+        Ok(Self { inner })
+    }
+
+    /// Encrypt+encode a plaintext string.
+    ///
+    /// Args:  
+    ///     plaintext: The plaintext string to encrypt+encode.
+    ///
+    /// Returns:  
+    ///     The obtext string.
+    ///
+    /// Raises:  
+    ///     ValueError: If encoding fails.
+    fn enc(&self, plaintext: &str) -> PyResult<String> {
+        let result = self.inner.enc(plaintext);
+        result.map_err(|e| PyValueError::new_err(format!("Enc operation failed: {}", e)))
+    }
+
+    /// Decode+decrypt an obtext string back to plaintext.  
+    ///
+    /// Args:  
+    ///     obtext: The encrypted+encoded string to decode.  
+    ///
+    /// Returns:  
+    ///     The decoded plaintext string.
+    ///
+    /// Raises:  
+    ///     ValueError: If the dec operation fails
+    #[pyo3(signature = (obtext))]
+    fn dec(&self, obtext: &str) -> PyResult<String> {
+        let result = self.inner.dec(obtext);
+        result.map_err(|e| PyValueError::new_err(format!("Dec operation failed: {}", e)))
+    }
+
+    /// Decode+decrypt with automatic scheme and encoding detection.
+    ///
+    /// This method tries to decode with the instance's encoding, and if that fails
+    /// it does full format autodetection (`Omnib.autodec()` functionality as failover)
+    ///
+    /// Args:  
+    ///     obtext: The encrypted+encoded string to decode+decrypt.
+    ///
+    /// Returns:  
+    ///     The decoded+decrypted plaintext string.
+    ///
+    /// Raises:  
+    ///     ValueError: If the dec operation fails or format cannot be detected.
+    fn autodec(&self, obtext: &str) -> PyResult<String> {
+        let result = self.inner.autodec(obtext);
+        result.map_err(|e| PyValueError::new_err(format!("Autodec operation failed: {}", e)))
+    }
+
+    /// Get the current format string.
+    ///
+    /// Returns:
+    ///     Format string like "zrbcx.hex", "zrbcx.c32", "zrbcx.b32", etc.
+    #[getter]
+    fn format(&self) -> String {
+        format!("{}", self.inner.format())
+    }
+
+    /// The scheme used by this instance.
+    #[getter]
+    fn scheme(&self) -> String {
+        self.inner.scheme().to_string()
+    }
+
+    /// The encoding format used by this instance.
+    #[getter]
+    fn encoding(&self) -> String {
+        self.inner.encoding().to_string()
+    }
+
+    /// Get the secret used by this instance (as base64 string).
+    #[getter]
+    fn secret(&self) -> String {
+        self.inner.secret()
+    }
+
+    /// Get the secret as hex used by this instance.
+    #[getter]
+    fn secret_hex(&self) -> String {
+        self.inner.secret_hex()
+    }
+
+    /// Get the secret as bytes used by this instance.
+    #[getter]
+    fn secret_bytes(&self, py: Python) -> PyResult<Py<PyBytes>> {
+        Ok(PyBytes::new_bound(py, self.inner.secret_bytes()).into())
+    }
+
+    /// Change the format (scheme + encoding).  
+    ///
+    /// Args:  
+    ///     format: Format string like "zrbcx.b64", "zrbcx.hex", "zrbcx.c32", "zrbcx.b32", etc.
+    ///
+    /// Raises:  
+    ///     ValueError: If format is invalid.
+    fn set_format(&mut self, format: &str) -> PyResult<()> {
+        self.inner
+            .set_format(format)
+            .map_err(|e| PyValueError::new_err(format!("Failed to set format: {}", e)))
+    }
+
+    /// Change the scheme while keeping the current encoding.
+    ///
+    /// Args:  
+    ///     scheme: Scheme name like "zrbcx", "zmock1", etc.  
+    ///
+    /// Raises:  
+    ///     ValueError: If scheme is invalid.
+    fn set_scheme(&mut self, scheme: &str) -> PyResult<()> {
+        let scheme_enum = ::oboron::Scheme::from_str(scheme)
+            .map_err(|e| PyValueError::new_err(format!("Invalid scheme: {}", e)))?;
+        self.inner
+            .set_scheme(scheme_enum)
+            .map_err(|e| PyValueError::new_err(format!("Failed to set scheme: {}", e)))
+    }
+
+    /// Change the encoding while keeping the current scheme.
+    ///
+    /// Args:  
+    ///     encoding: Encoding name: "b32", "b64", "c32", "hex".
+    ///               Also accepts long forms: "base32rfc", "base64", "base32crockford", or "hex".
+    ///
+    /// Raises:  
+    ///     ValueError: If encoding is invalid.
+    fn set_encoding(&mut self, encoding: &str) -> PyResult<()> {
+        let encoding_enum = ::oboron::Encoding::from_str(encoding)
+            .map_err(|e| PyValueError::new_err(format!("Invalid encoding: {}", e)))?;
+        self.inner
+            .set_encoding(encoding_enum)
+            .map_err(|e| PyValueError::new_err(format!("Failed to set encoding: {}", e)))
+    }
+}
+
+// Z-tier schemes - Omniz
+#[pyclass]
+struct Omniz {
+    inner: ::oboron::ztier::Omniz,
+}
+
+#[pymethods]
+impl Omniz {
+    /// Create a new Omniz instance.
+    ///
+    /// Args:
+    ///     secret:     43-character base64 string key (256 bits).  Required if keyless=False.
+    ///     keyless: If True, uses the hardcoded secret (testing only, NOT SECURE).
+    ///
+    /// Returns:
+    ///     A new Omniz instance.
+    ///
+    /// Raises:
+    ///     ValueError: If secret is invalid.
+    #[new]
+    #[pyo3(signature = (secret=None, keyless=false))]
+    fn new(secret: Option<String>, keyless: bool) -> PyResult<Self> {
+        let inner = match (secret, keyless) {
+            (Some(secret), false) => ::oboron::ztier::Omniz::new(&secret)
+                .map_err(|e| PyValueError::new_err(format!("Failed to create Omniz: {}", e)))?,
+            (None, true) => ::oboron::ztier::Omniz::new_keyless().map_err(|e| {
+                PyValueError::new_err(format!(
+                    "Failed to create Omniz with hardcoded secret: {}",
+                    e
+                ))
+            })?,
+            (Some(_), true) => {
+                return Err(PyValueError::new_err(
+                    "Cannot specify both secret and keyless=True",
+                ));
+            }
+            (None, false) => {
+                return Err(PyValueError::new_err(
+                    "Must provide either secret or set keyless=True",
+                ));
+            }
+        };
+
+        Ok(Self { inner })
+    }
+
+    /// Ecrypt+encode a plaintext string with a specific format.
+    ///
+    /// Args:
+    ///     plaintext: The plaintext string to encrypt+encode.
+    ///     format: Format string like "zrbcx.c32", "zrbcx.b32", etc.
+    ///
+    /// Returns:
+    ///     The obtext string.
+    ///
+    /// Raises:
+    ///     ValueError: If the enc operation fails or format is invalid.
+    fn enc(&self, plaintext: &str, format: &str) -> PyResult<String> {
+        let result = self.inner.enc(plaintext, format);
+        result.map_err(|e| PyValueError::new_err(format!("Enc operation failed: {}", e)))
+    }
+
+    /// Decode+decrypt an obtext string with a specific format.
+    ///
+    /// Args:
+    ///     obtext: The encrypted+encoded string to decode+decrypt.  
+    ///     format: Format string like "zrbcx.c32", "zrbcx.b32", etc.
+    ///
+    /// Returns:
+    ///     The decoded+decrypted plaintext string.
+    ///
+    /// Raises:
+    ///     ValueError: If the dec operation fails or format is invalid.
+    fn dec(&self, obtext: &str, format: &str) -> PyResult<String> {
+        let result = self.inner.dec(obtext, format);
+        result.map_err(|e| PyValueError::new_err(format!("Dec operation failed: {}", e)))
+    }
+
+    /// Decode+decrypt with automatic scheme and encoding detection.
+    ///
+    /// This is the only decoder that can automatically detect both the scheme
+    /// (zrbcx, zmock1, etc.) AND the encoding (b32, b64, c32, hex).
+    ///
+    /// Args:
+    ///     obtext: The encrypted+encoded string to decode+decrypt.
+    ///
+    /// Returns:
+    ///     The decoded+decrypted plaintext string.
+    ///
+    /// Raises:
+    ///     ValueError: If the dec operation fails or format cannot be detected.
+    fn autodec(&self, obtext: &str) -> PyResult<String> {
+        let result = self.inner.autodec(obtext);
+        result.map_err(|e| PyValueError::new_err(format!("Autodec operation failed: {}", e)))
+    }
+
+    /// Get the secret used by this instance (as base64 string).
+    fn secret(&self) -> String {
+        self.inner.secret()
+    }
+
+    /// Get the secret as hex used by this instance.
+    fn secret_hex(&self) -> String {
+        self.inner.secret_hex()
+    }
+
+    /// Get the key as bytes used by this instance.
+    fn secret_bytes(&self, py: Python) -> PyResult<Py<PyBytes>> {
+        Ok(PyBytes::new_bound(py, self.inner.secret_bytes()).into())
+    }
+}
+
+/// Generate a random 64-byte key as a base64 string.
+///
+/// Returns:
+///     A random 64-byte key as a 86-character base64 string.
+#[pyfunction]
+fn generate_key() -> PyResult<String> {
+    Ok(::oboron::generate_key())
+}
+
 /// Generate a random 64-byte key as a hex string.
 ///
 /// Returns:
 ///     A random 64-byte key as a 128-character hex string.
 #[pyfunction]
-fn generate_key() -> PyResult<String> {
+fn generate_key_hex() -> PyResult<String> {
     Ok(::oboron::generate_key())
 }
 
@@ -846,23 +1302,25 @@ fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
     // Mock variants
     #[cfg(feature = "mock")]
     {
-        // Mock2 variants
-        m.add_class::<Mock2C32>()?;
-        m.add_class::<Mock2B32>()?;
-        m.add_class::<Mock2B64>()?;
-        m.add_class::<Mock2Hex>()?;
-
         // Mock1 variants
         m.add_class::<Mock1C32>()?;
         m.add_class::<Mock1B32>()?;
         m.add_class::<Mock1B64>()?;
         m.add_class::<Mock1Hex>()?;
+        // Mock2 variants
+        m.add_class::<Mock2C32>()?;
+        m.add_class::<Mock2B32>()?;
+        m.add_class::<Mock2B64>()?;
+        m.add_class::<Mock2Hex>()?;
     }
 
     // Z-TIER =========================
     //
     // Main flexible interface
     m.add_class::<Oz>()?;
+
+    // Multi-format interface
+    m.add_class::<Omniz>()?;
 
     // Zrbcx variants
     #[cfg(feature = "zrbcx")]
@@ -871,6 +1329,16 @@ fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m.add_class::<ZrbcxB32>()?;
         m.add_class::<ZrbcxB64>()?;
         m.add_class::<ZrbcxHex>()?;
+    }
+
+    // Zmock variants
+    #[cfg(feature = "zmock")]
+    {
+        // Zmock1 variants
+        m.add_class::<Zmock1C32>()?;
+        m.add_class::<Zmock1B32>()?;
+        m.add_class::<Zmock1B64>()?;
+        m.add_class::<Zmock1Hex>()?;
     }
 
     // Legacy variants
@@ -886,6 +1354,7 @@ fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
 
     // Utility functions
     m.add_function(wrap_pyfunction!(generate_key, m)?)?;
+    m.add_function(wrap_pyfunction!(generate_key_hex, m)?)?;
     m.add_function(wrap_pyfunction!(generate_key_bytes, m)?)?;
 
     // Convenience functions

@@ -19,7 +19,7 @@ class OboronBase(ABC):
     """
     Abstract base class for all Oboron cipher implementations.
 
-    All cipher classes (AasvB32, ZrbcxB64, etc.) are registered as virtual
+    All cipher classes (AasvB32, AasvC32, etc.) are registered as virtual
     subclasses, enabling isinstance() and issubclass() checks.
 
     Example:
@@ -28,7 +28,7 @@ class OboronBase(ABC):
         True
 
         >>> def process_cipher(cipher:  OboronBase) -> str:
-        ...     return cipher. enc("hello")
+        ...     return cipher.enc("hello")
     """
 
     @abstractmethod
@@ -62,6 +62,12 @@ class OboronBase(ABC):
     @property
     @abstractmethod
     def key(self) -> str:
+        """Get the encryption key as a base64 string."""
+        ...
+
+    @property
+    @abstractmethod
+    def key_hex(self) -> str:
         """Get the encryption key as a hex string."""
         ...
 
@@ -106,18 +112,6 @@ OboronBase.register(_oboron.UpbcB32)
 OboronBase.register(_oboron.UpbcB64)
 OboronBase.register(_oboron.UpbcHex)
 
-# Zrbcx variants
-OboronBase.register(_oboron.ZrbcxC32)
-OboronBase.register(_oboron.ZrbcxB32)
-OboronBase.register(_oboron.ZrbcxB64)
-OboronBase.register(_oboron.ZrbcxHex)
-
-# Legacy variants
-OboronBase.register(_oboron.LegacyC32)
-OboronBase.register(_oboron.LegacyB32)
-OboronBase.register(_oboron.LegacyB64)
-OboronBase.register(_oboron.LegacyHex)
-
 # Mock1 variants (testing)
 OboronBase.register(_oboron.Mock1C32)
 OboronBase.register(_oboron.Mock1B32)
@@ -132,7 +126,6 @@ OboronBase.register(_oboron.Mock2Hex)
 
 # Flexible interfaces
 OboronBase.register(_oboron.Ob)
-OboronBase.register(_oboron.Omnib)
 
 # ============================================================================
 # Re-export all classes and functions
@@ -141,6 +134,7 @@ OboronBase.register(_oboron.Omnib)
 # Main flexible interfaces
 Ob = _oboron.Ob
 Omnib = _oboron.Omnib
+
 
 # Aags variants
 AagsC32 = _oboron.AagsC32
@@ -172,25 +166,13 @@ UpbcB32 = _oboron.UpbcB32
 UpbcB64 = _oboron.UpbcB64
 UpbcHex = _oboron.UpbcHex
 
-# Zrbcx variants
-ZrbcxC32 = _oboron.ZrbcxC32
-ZrbcxB32 = _oboron.ZrbcxB32
-ZrbcxB64 = _oboron.ZrbcxB64
-ZrbcxHex = _oboron.ZrbcxHex
-
-# Legacy variants (LEGACY)
-LegacyC32 = _oboron.LegacyC32
-LegacyB32 = _oboron.LegacyB32
-LegacyB64 = _oboron.LegacyB64
-LegacyHex = _oboron.LegacyHex
-
-# Mock1 variants (testing)
+# Mock1 (testing)
 Mock1C32 = _oboron.Mock1C32
 Mock1B32 = _oboron.Mock1B32
 Mock1B64 = _oboron.Mock1B64
 Mock1Hex = _oboron.Mock1Hex
 
-# Mock2 variants (testing)
+# Mock2 (testing)
 Mock2C32 = _oboron.Mock2C32
 Mock2B32 = _oboron.Mock2B32
 Mock2B64 = _oboron.Mock2B64
@@ -199,6 +181,7 @@ Mock2Hex = _oboron.Mock2Hex
 # Utility functions
 generate_key = _oboron.generate_key
 generate_key_bytes = _oboron.generate_key_bytes
+generate_key_hex = _oboron.generate_key_hex
 
 # Convenience functions
 enc = _oboron.enc
@@ -250,18 +233,6 @@ __all__ = [
     'UpbcB64',
     'UpbcHex',
 
-    # Zrbcx
-    'ZrbcxC32',
-    'ZrbcxB32',
-    'ZrbcxB64',
-    'ZrbcxHex',
-
-    # Legacy
-    'LegacyC32',
-    'LegacyB32',
-    'LegacyB64',
-    'LegacyHex',
-
     # Mock1 (testing)
     'Mock1C32',
     'Mock1B32',
@@ -280,6 +251,7 @@ __all__ = [
     # Utility functions
     'generate_key',
     'generate_key_bytes',
+    'generate_key_hex',
 
     # Convenience functions
     'enc',

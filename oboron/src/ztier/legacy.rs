@@ -39,7 +39,7 @@ macro_rules! impl_legacy_codec {
 
             /// Create from a 64-character hex secret string
             #[cfg(feature = "hex-keys")]
-            pub fn from_hex_key(secret_hex: &str) -> Result<Self, Error> {
+            pub fn from_hex_secret(secret_hex: &str) -> Result<Self, Error> {
                 Ok(Self {
                     zkeychain: ZKeychain::from_hex(secret_hex)?,
                 })
