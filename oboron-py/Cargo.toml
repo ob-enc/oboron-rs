@@ -21,7 +21,7 @@ mock = ["oboron/mock"]
 zmock = ["oboron/zmock"]
 ztier = ["oboron/ztier"]
 all-schemes = ["aags", "apgs", "aasv", "apsv", "upbc"]
-ztier-schemes = ["zrbcx"]
+ztier-schemes = ["zrbcx", "zmock"]
 
 keyless = ["oboron/keyless"]
 

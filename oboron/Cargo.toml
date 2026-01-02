@@ -50,7 +50,7 @@ aasv = ["aes-siv"]
 apsv = ["aes-siv"]
 # Testing only
 mock = []
-zmock = []
+zmock = ["ztier"]
 # Legacy
 legacy = ["aes", "cipher", "cbc", "ztier"]  # backward compatibility
 
