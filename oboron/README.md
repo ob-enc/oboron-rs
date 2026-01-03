@@ -735,10 +735,9 @@ names, for example:
 
 ### 2. Runtime Format Selection (`Ob`)
 
-When format specification at runtime is required but format changes are
-unnecessary, use the immutable `Ob`:
+When format specification at runtime is required, use `Ob`:
 ```rust
-use oboron::{Ob, ObtextCodec};
+use oboron::Ob;
 
 let key = env::var("OBORON_KEY")?;
 let ob = Ob::new("aasv.b64", &key)?;
@@ -747,18 +746,9 @@ let ot = ob.enc("hello")?;
 let pt2 = ob.dec(&ot)?;
 assert_eq!(pt2, "hello");
 ```
-
-The type `Ob` supports all formats, but the format is fixed at
-construction, providing intermediate flexibility between compile-time
-selection and full mutability.
-
-### 3. Mutable Runtime Format (`ObFlex`)
-
-Similar to `Ob` but with mutable format specification:
+The format can also be changed with mutable instances:
 ```rust
-use oboron::{ObFlex, ObtextCodec};
-
-let mut ob = ObFlex::new("aags.b64", &key)?;
+let mut ob = Ob::new("aags.b64", &key)?;
 let ot = ob.enc("hello")?; // aags.b64 obtext
 
 // Format modification
@@ -766,7 +756,23 @@ ob.set_format("apsv.hex")?;
 let ot_hex = ob.enc("world")?; // apsv.hex obtext
 ```
 
-### 4. Multiple Format Support (`Omnib`)
+`Ob` offers another advantage over fixed-format types like `AasvC32`:
+the `autodec()` method.
+```rust
+let ob = Ob::new("aasv.c32, &key);
+let pt2 = ob.autodec(&some_ot)
+```
+This method will decode the obtext in any format, as long as it was
+encrypted with the same key.
+
+Note:
+While `Omnib` (described below) also has an `autodec()` method, `Ob`'s
+variant will try the current encoding first (`c32` in the example above),
+before resorting to a heuristic logic combined with a trial and error
+guessing the encoding that `Omnib` uses exclusively, and will therefore
+have better performance than `Omnib::autodec()` if the encoding is known.
+
+### 3. Multiple Format Support (`Omnib`)
 
 `Omnib` differs in format management and provides comprehensive
 `autodec()` functionality.
@@ -774,7 +780,7 @@ let ot_hex = ob.enc("world")?; // apsv.hex obtext
 **Multi-Format Workflow:** Designed for simultaneous work with different
 formats, requiring format specification in each operation:
 ```rust
-use oboron::{Omnib, ObtextCodec};
+use oboron::Omnib;
 
 let omb = Omnib::new(&key)?;
 
@@ -782,23 +788,14 @@ let omb = Omnib::new(&key)?;
 let ot = omb.enc("test", "apsv.b64");
 let pt2 = omb.dec(&ot, "apsv.b64");
 let pt_other = omb.dec(&other, "aasv.c32");
-```
 
-**Autodecode:** While other interfaces perform *scheme* autodetection in
-`dec()` methods, only `Omnib` provides full format autodetection
-including encoding (`b32`, `c32`, `b64`, or `hex`).  Other structs decode
-only encodings matching their format.
-```rust
 // Autodecode when format is unknown
 let pt2 = omb.autodec(&ot);
 ```
 
 Note performance implications: autodetection uses trial-and-error across
 encodings, with worst-case performance ~3x slower than known-format dec
-operations. Meanwhile, scheme autodetection in other interfaces (e.g.,
-`Ob.dec()`, `ObFlex.dec()`, `AasvB64.dec()`) has zero overhead, as the
-scheme is detected based on the scheme marker in the payload, and the
-logic follows a direct path with no retries.
+operations.
 
 ### Using Format Constants
 
@@ -806,7 +803,7 @@ For type safety and discoverability, use the provided format constants
 instead of string literals:
 
 ```rust
-use oboron::{Ob, Omnib, ObtextCodec, AASV_B64, AASV_HEX};
+use oboron::{Ob, Omnib, AASV_B64, AASV_HEX};
 
 let key = oboron::generate_key();
 
@@ -836,7 +833,7 @@ string constants:
 use oboron::{Ob, Format, Scheme, Encoding};
 
 let format = Format::new(Scheme::Aasv, Encoding::B64);
-let ob = Ob::new_with_format(format, &key)?;
+let ob = Ob::new(format, &key)?;
 ```
 
 ### Typical Production Use
