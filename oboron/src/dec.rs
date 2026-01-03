@@ -51,7 +51,10 @@ pub(crate) fn dec_from_format(
     // Step 2: XOR the last two bytes with the first two to undo mixing
     let len = buffer.len();
     buffer[len - 1] ^= buffer[0];
-    buffer[len - 2] ^= buffer[1];
+    if len >= 4 {
+        // only XOR the other marker byte if we have >1B of ciphertext
+        buffer[len - 2] ^= buffer[1];
+    }
 
     // Step 3: Extract the 2-byte scheme marker from tail
     let scheme_marker = [buffer[len - 2], buffer[len - 1]];
