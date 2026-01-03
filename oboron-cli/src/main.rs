@@ -630,7 +630,7 @@ fn dec_command(
     let decd = if scheme_is_explicit {
         ob.dec(&text)?
     } else {
-        ob.dec_auto_scheme(&text)?
+        ob.autodec(&text)?
     };
 
     println!("{}", decd);
