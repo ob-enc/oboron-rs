@@ -67,6 +67,7 @@ fn test_legacy_custom_secret() {
 }
 
 #[test]
+#[cfg(feature = "bytes-keys")]
 fn test_legacy_different_secret_fails() {
     let secret1 = [1u8; 32];
     let secret2 = [2u8; 32];
@@ -83,6 +84,7 @@ fn test_legacy_different_secret_fails() {
 }
 
 #[test]
+#[cfg(feature = "bytes-keys")]
 fn test_legacy_all_encodings() {
     let pt = "encoding test";
     let secret = [42u8; 32];
@@ -149,11 +151,11 @@ fn test_legacy_empty_string_fails() {
 
 #[test]
 #[cfg(feature = "hex-keys")]
-fn test_legacy_hex_key() {
-    let hex_key = "00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff";
-    let pt = "hex key test";
+fn test_legacy_hex_secret() {
+    let hex_secret = "00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff";
+    let pt = "hex secret test";
 
-    let ob = LegacyC32::from_hex_key(hex_key).unwrap();
+    let ob = LegacyC32::from_hex_secret(hex_secret).unwrap();
     let ot = ob.enc(pt).unwrap();
     let pt2 = ob.dec(&ot).unwrap();
 
@@ -161,15 +163,15 @@ fn test_legacy_hex_key() {
 }
 
 #[test]
-fn test_legacy_invalid_hex_key() {
-    let invalid_hex = "not a hex string";
-    assert!(LegacyC32::new(invalid_hex).is_err());
+fn test_legacy_invalid_base64_secret() {
+    let invalid_base64 = "not a base64 string";
+    assert!(LegacyC32::new(invalid_base64).is_err());
 }
 
 #[test]
-fn test_legacy_short_hex_key() {
-    let short_hex = "00112233"; // Too short
-    assert!(LegacyC32::from_hex_key(short_hex).is_err());
+fn test_legacy_short_secret() {
+    let short_secret = "00112233"; // Too short
+    assert!(LegacyC32::new(short_secret).is_err());
 }
 
 #[test]

@@ -28,11 +28,13 @@ pub const SCHEME_MARKER_SIZE: usize = 2;
 //   - 000 (0): `mock` - testing
 //   - 001 (1): `a` - authenticated (secure)
 //   - 010 (2): `u` - unauthenticated (secure)
-//   - 111 (7): `z` - insecure/obfuscation
+//   - 110 (6): `z` - insecure/obfuscation
+//   - 111 (7): `zmock` - ztier testing
 // properties (4 bits): Scheme properties
 //   - 0000 (0): `p` - probabilistic
 //   - 0001 (1): `a` - deterministic avalanche
 //   - 0010 (2): `r` - deterministic referenceable / prefix-restricted avalanche
+//   - 0100 (4): 'd' - deterministic non-referenceable (no prefix-restricted avalanche)
 // algorithm (4 bits): Encryption algorithm
 //   - 0001 (1): CBC
 //   - 0010 (2): GCM-SIV
@@ -47,7 +49,7 @@ const fn make_marker(tier: u8, properties: u8, algorithm: u8) -> [u8; 2] {
 
 // `a`-tier - Secure, authenticated
 // ---------------------------------
-// aags: tier=001, properties=0001 (det-auth), algorithm=0010 (GCM-SIV)
+// aags: tier=001, properties=0001 (det/avalanche), algorithm=0010 (GCM-SIV)
 #[cfg(feature = "aags")]
 pub const AAGS_MARKER: [u8; 2] = make_marker(1, 1, 2);
 
@@ -55,7 +57,7 @@ pub const AAGS_MARKER: [u8; 2] = make_marker(1, 1, 2);
 #[cfg(feature = "apgs")]
 pub const APGS_MARKER: [u8; 2] = make_marker(1, 0, 2);
 
-// aasv: tier=001, properties=0001 (det-auth), algorithm=0011 (SIV)
+// aasv: tier=001, properties=0001 (det/avalanche), algorithm=0011 (SIV)
 #[cfg(feature = "aasv")]
 pub const AASV_MARKER: [u8; 2] = make_marker(1, 1, 3);
 
@@ -71,26 +73,26 @@ pub const UPBC_MARKER: [u8; 2] = make_marker(2, 0, 1);
 
 // `z`-tier - Not IND-CPA secure; obfuscation only
 // -----------------------------------------------
-// zrbcx:  tier=111, properties=0010 (det-reversed), algorithm=0001 (CBC)
+// zrbcx:  tier=110, properties=0010 (det/referenceable), algorithm=0001 (CBC)
 #[cfg(feature = "zrbcx")]
-pub const ZRBCX_MARKER: [u8; 2] = make_marker(7, 2, 1);
+pub const ZRBCX_MARKER: [u8; 2] = make_marker(6, 2, 1);
 
 // Tier mock - Testing (non-encrypted)
 // -----------------------------------
-// mock1:  tier=000, properties=0001 (det-auth), algorithm=0000 (none)
+// mock1:  tier=000, properties=0100 (det/non-ref), algorithm=1111 (identity)
 #[cfg(feature = "mock")]
-pub const MOCK1_MARKER: [u8; 2] = make_marker(0, 1, 0);
+pub const MOCK1_MARKER: [u8; 2] = make_marker(0, 4, 15);
 
-// mock2: tier=000, properties=0001 (det-auth), algorithm=0000 (none)
+// mock2: tier=000, properties=0100 (det/non-ref), algorithm=1110 (reversed)
 #[cfg(feature = "mock")]
-pub const MOCK2_MARKER: [u8; 2] = make_marker(0, 2, 0);
+pub const MOCK2_MARKER: [u8; 2] = make_marker(0, 4, 14);
 
 // Tier zmock - Z-tier Testing (non-encrypted)
 // -------------------------------------------
 
-// zmock1:  tier=110, properties=0001 (det-auth), algorithm=0000 (none)
+// zmock1:  tier=111, properties=0100 (det-unauth), algorithm=1111 (none)
 #[cfg(feature = "zmock")]
-pub const ZMOCK1_MARKER: [u8; 2] = make_marker(6, 1, 0);
+pub const ZMOCK1_MARKER: [u8; 2] = make_marker(7, 4, 15);
 
 // Format identifiers
 //
@@ -218,7 +220,7 @@ mod tests {
             assert_eq!(ext, 0, "Extension bit should be 0");
             assert_eq!(version, 0, "Version should be 0");
             assert_eq!(tier, 1, "AAGS tier should be 1 (authenticated)");
-            assert_eq!(properties, 1, "AAGS properties should be 1 (det-auth)");
+            assert_eq!(properties, 1, "AAGS properties should be 1 (det/avalanche)");
             assert_eq!(algorithm, 2, "AAGS algorithm should be 2 (GCM-SIV)");
         }
 
@@ -232,8 +234,11 @@ mod tests {
             let properties = (byte2 >> 4) & 0x0F;
             let algorithm = byte2 & 0x0F;
 
-            assert_eq!(tier, 7, "ZRBCX tier should be 7 (insecure)");
-            assert_eq!(properties, 2, "ZRBCX properties should be 2 (det-reversed)");
+            assert_eq!(tier, 6, "ZRBCX tier should be 6 (insecure)");
+            assert_eq!(
+                properties, 2,
+                "ZRBCX properties should be 2 (det/referenceable)"
+            );
             assert_eq!(algorithm, 1, "ZRBCX algorithm should be 1 (CBC)");
         }
     }
