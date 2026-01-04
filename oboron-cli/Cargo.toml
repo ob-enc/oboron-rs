@@ -16,6 +16,7 @@ default = ["all-schemes"]
 
 legacy = ["oboron/legacy"]
 zrbcx = ["oboron/zrbcx"]
+zmock = ["oboron/zmock"]
 aags = ["oboron/aags"]
 aasv = ["oboron/aasv"]
 upbc = ["oboron/upbc"]
@@ -25,17 +26,14 @@ mock = ["oboron/mock"]
 
 # Scheme categories
 # =================
-ob0x = ["zrbcx"] # insecure, not authenticated
-ob1x = []  # insecure, authenticated
-ob2x = ["upbc"]  # secure, not authenticated
-ob3x = ["aags", "apgs", "aasv", "apsv"]  # secure, authenticated
-ob7x = ["mock"]  # testing
-insecure-schemes = ["ob0x", "ob1x"]
-secure-schemes = ["ob2x", "ob3x"]
-authenticated-schemes = ["ob3x"]
-deterministic-schemes = ["zrbcx", "aags", "aasv"]
-probabilistic-schemes = ["upbc", "apgs", "apsv"]
-all-schemes = ["ob0x", "ob1x", "ob2x", "ob3x"]
+atier = ["aags", "apgs", "aasv", "apsv", "oboron/atier"]  # secure, authenticated
+utier = ["upbc", "oboron/utier"]  # secure, not authenticated
+ztier = ["zrbcx", "zmock", "legacy", "oboron/ztier"]
+secure-schemes = ["atier", "utier"]
+authenticated-schemes = ["atier"]
+deterministic-schemes = ["aags", "aasv"]
+probabilistic-schemes = ["apgs", "apsv", "upbc"]
+all-schemes = ["atier", "utier", "ztier"]
 
 [[bin]]
 name = "ob"

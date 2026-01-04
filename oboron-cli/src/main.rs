@@ -5,8 +5,8 @@ mod config;
 
 use anyhow::{Context, Result};
 use clap::{Args, Parser, Subcommand};
-use config::{load_profile, Config};
-use oboron::{Encoding, Format, ObtextCodec, Scheme};
+use config::Config;
+use oboron::{Encoding, Format, Scheme};
 use std::io::{self, Read};
 
 #[derive(Parser)]
@@ -47,12 +47,12 @@ struct SchemeFlags {
 
     /// Use aasv scheme (deterministic AES-SIV)
     #[cfg(feature = "aasv")]
-    #[arg(short = 's', long, alias = "32")]
+    #[arg(long, alias = "32")]
     aasv: bool,
 
     /// Use apsv scheme (probabilistic AES-SIV)
     #[cfg(feature = "apsv")]
-    #[arg(short = 'S', long, alias = "32p")]
+    #[arg(long, alias = "32p")]
     apsv: bool,
 
     /// Use mock1 scheme (testing, identity)
@@ -308,7 +308,7 @@ enum Commands {
         key: Option<String>,
 
         /// Z-tier secret (43 base64 chars, for z-tier schemes)
-        #[arg(short = 't', long)]
+        #[arg(short = 's', long)]
         secret: Option<String>,
 
         /// Use named key profile
@@ -344,7 +344,7 @@ enum Commands {
         key: Option<String>,
 
         /// Z-tier secret (43 base64 chars, for z-tier schemes)
-        #[arg(short = 't', long)]
+        #[arg(short = 's', long)]
         secret: Option<String>,
 
         /// Use named key profile
@@ -403,7 +403,7 @@ enum Commands {
         key: Option<String>,
 
         /// Z-tier secret (43 base64 chars)
-        #[arg(short = 't', long)]
+        #[arg(short = 's', long)]
         secret: Option<String>,
 
         /// Use named key profile
@@ -480,7 +480,7 @@ enum ProfileCommands {
         key: Option<String>,
 
         /// Z-tier secret (43 base64 chars)
-        #[arg(short = 't', long)]
+        #[arg(short = 's', long)]
         secret: Option<String>,
     },
     /// Delete a key profile
@@ -509,7 +509,7 @@ enum ProfileCommands {
         key: Option<String>,
 
         /// Z-tier secret (43 base64 chars)
-        #[arg(short = 't', long)]
+        #[arg(short = 's', long)]
         secret: Option<String>,
     },
 }
@@ -607,7 +607,15 @@ fn main() -> Result<()> {
 
 // Helper to check if scheme is z-tier
 fn is_ztier_scheme(scheme: Scheme) -> bool {
-    matches!(scheme, Scheme::Zrbcx | Scheme::Zmock1 | Scheme::Legacy)
+    match scheme {
+        #[cfg(feature = "zrbcx")]
+        Scheme::Zrbcx => true,
+        #[cfg(feature = "zmock")]
+        Scheme::Zmock1 => true,
+        #[cfg(feature = "legacy")]
+        Scheme::Legacy => true,
+        _ => false,
+    }
 }
 
 fn enc_command(
@@ -621,7 +629,7 @@ fn enc_command(
     // Get text from argument or stdin
     let text = get_text_input(text)?;
 
-    // Get config for key resolution
+    // Get config for key/secret resolution
     let cfg = config::load_config().ok();
 
     // Create format
@@ -689,7 +697,7 @@ fn dec_command(
     // Get text from argument or stdin
     let text = get_text_input(text)?;
 
-    // Get config for key resolution
+    // Get config for key/secret resolution
     let cfg = config::load_config().ok();
 
     // Create format
@@ -756,6 +764,7 @@ fn dec_command(
         };
         println!("{}", decd);
     }
+
     Ok(())
 }
 

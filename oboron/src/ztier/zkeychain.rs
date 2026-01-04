@@ -57,7 +57,6 @@ impl ZKeychain {
     /// Get the secret as raw bytes.
     #[inline]
     #[allow(dead_code)] // Used by Zob.key_bytes()
-    #[cfg(feature = "bytes-keys")]
     pub(crate) fn secret_bytes(&self) -> &[u8; 32] {
         &self.secret
     }
