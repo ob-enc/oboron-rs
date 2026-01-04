@@ -329,8 +329,7 @@ impl Oz {
     /// Get the secret as base64 (z-tier specific, 32 bytes)
     #[inline]
     pub fn secret(&self) -> String {
-        use data_encoding::BASE64URL_NOPAD;
-        BASE64URL_NOPAD.encode(self.zkeychain.secret_bytes())
+        self.zkeychain.secret_base64()
     }
 
     /// Get the secret as hex (z-tier specific, 32 bytes)

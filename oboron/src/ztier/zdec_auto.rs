@@ -3,7 +3,7 @@
 #![cfg(feature = "ztier")]
 
 use super::zkeychain::ZKeychain;
-use crate::{constants::SCHEME_MARKER_SIZE, error::Error, Encoding, Format, Scheme};
+use crate::{constants::SCHEME_MARKER_SIZE, error::Error, Encoding};
 
 #[cfg(feature = "zmock")]
 use super::zmock1::decrypt_zmock1;
@@ -14,6 +14,8 @@ use crate::{constants::ZRBCX_MARKER, decrypt_zrbcx};
 
 #[cfg(feature = "legacy")]
 use super::legacy::decrypt_legacy;
+#[cfg(feature = "legacy")]
+use crate::{Format, Scheme};
 
 /// Decode the given encoding, then decrypt autodetecting the z-tier scheme
 ///

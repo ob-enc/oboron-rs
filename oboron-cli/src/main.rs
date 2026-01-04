@@ -303,9 +303,13 @@ enum Commands {
         /// Plaintext string (reads from stdin if not provided)
         text: Option<String>,
 
-        /// Encryption key (86 base64 chars)
+        /// Encryption key (86 base64 chars, for non-ztier schemes)
         #[arg(short, long)]
         key: Option<String>,
+
+        /// Z-tier secret (43 base64 chars, for z-tier schemes)
+        #[arg(short = 't', long)]
+        secret: Option<String>,
 
         /// Use named key profile
         #[arg(short, long)]
@@ -315,7 +319,7 @@ enum Commands {
         #[arg(short = 'z', long)]
         keyless: bool,
 
-        /// Format specification (e.g., "zrbcx.b64", "aags.b32")
+        /// Format specification (e.g., "zrbcx. b64", "aags.b32")
         /// Cannot be combined with scheme or encoding flags
         #[arg(short, long)]
         format: Option<String>,
@@ -335,9 +339,13 @@ enum Commands {
         /// Obtext string (reads from stdin if not provided)
         text: Option<String>,
 
-        /// Encryption key (86 base64 chars)
+        /// Encryption key (86 base64 chars, for non-ztier schemes)
         #[arg(short, long)]
         key: Option<String>,
+
+        /// Z-tier secret (43 base64 chars, for z-tier schemes)
+        #[arg(short = 't', long)]
+        secret: Option<String>,
 
         /// Use named key profile
         #[arg(short, long)]
@@ -393,6 +401,10 @@ enum Commands {
         /// Encryption key (86 base64 chars)
         #[arg(short, long)]
         key: Option<String>,
+
+        /// Z-tier secret (43 base64 chars)
+        #[arg(short = 't', long)]
+        secret: Option<String>,
 
         /// Use named key profile
         #[arg(short, long)]
@@ -464,8 +476,12 @@ enum ProfileCommands {
         name: String,
 
         /// Encryption key (86 base64 chars)
-        #[arg(short, long, required = true)]
-        key: String,
+        #[arg(short, long)]
+        key: Option<String>,
+
+        /// Z-tier secret (43 base64 chars)
+        #[arg(short = 't', long)]
+        secret: Option<String>,
     },
     /// Delete a key profile
     #[command(visible_alias = "d")]
@@ -489,8 +505,12 @@ enum ProfileCommands {
         name: String,
 
         /// Encryption key (86 base64 chars)
-        #[arg(long, required = true)]
-        key: String,
+        #[arg(short, long)]
+        key: Option<String>,
+
+        /// Z-tier secret (43 base64 chars)
+        #[arg(short = 't', long)]
+        secret: Option<String>,
     },
 }
 
@@ -501,6 +521,7 @@ fn main() -> Result<()> {
         Commands::Enc {
             text,
             key,
+            secret,
             profile,
             keyless,
             format,
@@ -509,12 +530,13 @@ fn main() -> Result<()> {
         } => {
             let cfg = config::load_config().ok();
             let format_spec = FormatSpec::parse(format, &scheme, &encoding, cfg.as_ref())?;
-            enc_command(text, key, profile, keyless, format_spec)
+            enc_command(text, key, secret, profile, keyless, format_spec)
         }
 
         Commands::Dec {
             text,
             key,
+            secret,
             profile,
             keyless,
             format,
@@ -524,7 +546,15 @@ fn main() -> Result<()> {
             let cfg = config::load_config().ok();
             let scheme_is_explicit = scheme.is_set() || format.is_some();
             let format_spec = FormatSpec::parse(format, &scheme, &encoding, cfg.as_ref())?;
-            dec_command(text, key, profile, keyless, format_spec, scheme_is_explicit)
+            dec_command(
+                text,
+                key,
+                secret,
+                profile,
+                keyless,
+                format_spec,
+                scheme_is_explicit,
+            )
         }
 
         Commands::Init { name } => config::init_command(&name),
@@ -548,20 +578,25 @@ fn main() -> Result<()> {
             ProfileCommands::List => config::profile_list_command(),
             ProfileCommands::Show { name } => config::profile_show_command(name.as_deref()),
             ProfileCommands::Activate { name } => config::profile_activate_command(&name),
-            ProfileCommands::Create { name, key } => config::profile_create_command(&name, &key),
+            ProfileCommands::Create { name, key, secret } => {
+                config::profile_create_command(&name, key.as_deref(), secret.as_deref())
+            }
             ProfileCommands::Delete { name } => config::profile_delete_command(&name),
             ProfileCommands::Rename { old_name, new_name } => {
                 config::profile_rename_command(&old_name, &new_name)
             }
-            ProfileCommands::Set { name, key } => config::profile_set_command(&name, &key),
+            ProfileCommands::Set { name, key, secret } => {
+                config::profile_set_command(&name, key.as_deref(), secret.as_deref())
+            }
         },
 
         Commands::Key {
             key,
+            secret,
             profile,
             keyless,
             hex,
-        } => key_command(key, profile, keyless, hex),
+        } => key_command(key, secret, profile, keyless, hex),
 
         Commands::Completion { shell } => {
             completions::generate_completion(shell);
@@ -570,9 +605,15 @@ fn main() -> Result<()> {
     }
 }
 
+// Helper to check if scheme is z-tier
+fn is_ztier_scheme(scheme: Scheme) -> bool {
+    matches!(scheme, Scheme::Zrbcx | Scheme::Zmock1 | Scheme::Legacy)
+}
+
 fn enc_command(
     text: Option<String>,
     key: Option<String>,
+    secret: Option<String>,
     profile: Option<String>,
     keyless: bool,
     format_spec: FormatSpec,
@@ -586,24 +627,60 @@ fn enc_command(
     // Create format
     let format = format_spec.to_string();
 
+    // Determine if we need key or secret based on scheme
+    let is_ztier = is_ztier_scheme(format_spec.scheme);
+
     // Get ob instance
-    let ob = if keyless {
-        oboron::new_keyless(&format)?
+    if keyless {
+        // For keyless mode, use appropriate constructor based on scheme
+        if is_ztier {
+            #[cfg(feature = "ztier")]
+            {
+                let oz = oboron::ztier::Oz::new_keyless(&format)?;
+                let encd = oz.enc(&text)?;
+                println!("{}", encd);
+            }
+            #[cfg(not(feature = "ztier"))]
+            anyhow::bail!("Z-tier schemes not enabled in this build");
+        } else {
+            let ob = oboron::Ob::new_keyless(&format)?;
+            let encd = ob.enc(&text)?;
+            println!("{}", encd);
+        }
+    } else if is_ztier {
+        #[cfg(feature = "ztier")]
+        {
+            let b64_secret = get_secret(
+                secret.as_ref(),
+                key.as_ref(),
+                profile.as_deref(),
+                cfg.as_ref(),
+            )?;
+            let oz = oboron::ztier::Oz::new(&format, &b64_secret)?;
+            let encd = oz.enc(&text)?;
+            println!("{}", encd);
+        }
+        #[cfg(not(feature = "ztier"))]
+        anyhow::bail!("Z-tier schemes not enabled in this build");
     } else {
-        let b64_key = get_key(key.as_ref(), profile.as_deref(), cfg.as_ref())?;
-        oboron::new(&format, &b64_key)?
-    };
+        let b64_key = get_key(
+            key.as_ref(),
+            secret.as_ref(),
+            profile.as_deref(),
+            cfg.as_ref(),
+        )?;
+        let ob = oboron::Ob::new(&format, &b64_key)?;
+        let encd = ob.enc(&text)?;
+        println!("{}", encd);
+    }
 
-    // Encode
-    let encd = ob.enc(&text)?;
-
-    println!("{}", encd);
     Ok(())
 }
 
 fn dec_command(
     text: Option<String>,
     key: Option<String>,
+    secret: Option<String>,
     profile: Option<String>,
     keyless: bool,
     format_spec: FormatSpec,
@@ -618,22 +695,67 @@ fn dec_command(
     // Create format
     let format = format_spec.to_string();
 
-    // Get ob instance
-    let ob = if keyless {
-        oboron::Ob::new_keyless(&format)?
-    } else {
-        let b64_key = get_key(key.as_ref(), profile.as_deref(), cfg.as_ref())?;
-        oboron::Ob::new(&format, &b64_key)?
-    };
+    // Determine if we need key or secret based on scheme
+    let is_ztier = is_ztier_scheme(format_spec.scheme);
 
-    // Decode (strict if scheme was explicitly specified)
-    let decd = if scheme_is_explicit {
-        ob.dec(&text)?
+    // Get ob instance and decode
+    if keyless {
+        if is_ztier {
+            #[cfg(feature = "ztier")]
+            {
+                let oz = oboron::ztier::Oz::new_keyless(&format)?;
+                let decd = if scheme_is_explicit {
+                    oz.dec(&text)?
+                } else {
+                    oz.autodec(&text)?
+                };
+                println!("{}", decd);
+            }
+            #[cfg(not(feature = "ztier"))]
+            anyhow::bail!("Z-tier schemes not enabled in this build");
+        } else {
+            let ob = oboron::Ob::new_keyless(&format)?;
+            let decd = if scheme_is_explicit {
+                ob.dec(&text)?
+            } else {
+                ob.autodec(&text)?
+            };
+            println!("{}", decd);
+        }
+    } else if is_ztier {
+        #[cfg(feature = "ztier")]
+        {
+            let b64_secret = get_secret(
+                secret.as_ref(),
+                key.as_ref(),
+                profile.as_deref(),
+                cfg.as_ref(),
+            )?;
+            let oz = oboron::ztier::Oz::new(&format, &b64_secret)?;
+            let decd = if scheme_is_explicit {
+                oz.dec(&text)?
+            } else {
+                oz.autodec(&text)?
+            };
+            println!("{}", decd);
+        }
+        #[cfg(not(feature = "ztier"))]
+        anyhow::bail!("Z-tier schemes not enabled in this build");
     } else {
-        ob.autodec(&text)?
-    };
-
-    println!("{}", decd);
+        let b64_key = get_key(
+            key.as_ref(),
+            secret.as_ref(),
+            profile.as_deref(),
+            cfg.as_ref(),
+        )?;
+        let ob = oboron::Ob::new(&format, &b64_key)?;
+        let decd = if scheme_is_explicit {
+            ob.dec(&text)?
+        } else {
+            ob.autodec(&text)?
+        };
+        println!("{}", decd);
+    }
     Ok(())
 }
 
@@ -675,35 +797,196 @@ fn config_set_command(
 
 fn key_command(
     key: Option<String>,
+    secret: Option<String>,
     profile: Option<String>,
     keyless: bool,
     hex: bool,
 ) -> Result<()> {
     use data_encoding::{BASE64URL_NOPAD, HEXLOWER};
 
-    let b64_key = if keyless {
-        oboron::HARDCODED_KEY_BASE64.to_string()
-    } else {
-        // Get config for key resolution
-        let cfg = config::load_config().ok();
-        get_key(key.as_ref(), profile.as_deref(), cfg.as_ref())?
-    };
+    if keyless {
+        // Output hardcoded key
+        if hex {
+            let key_bytes = BASE64URL_NOPAD
+                .decode(oboron::HARDCODED_KEY_BASE64.as_bytes())
+                .context("Failed to decode hardcoded key")?;
+            let hex_key = HEXLOWER.encode(&key_bytes);
+            println!("{}", hex_key);
+        } else {
+            println!("{}", oboron::HARDCODED_KEY_BASE64);
+        }
+        return Ok(());
+    }
 
-    if hex {
-        // Decode base64 to bytes, then encode as hex
-        let key_bytes = BASE64URL_NOPAD
-            .decode(b64_key.as_bytes())
-            .context("Failed to decode base64 key")?;
-        let hex_key = HEXLOWER.encode(&key_bytes);
-        println!("{}", hex_key);
+    // Get config for resolution
+    let cfg = config::load_config().ok();
+
+    // Try to get key or secret (whichever is available)
+    if let Some(k) = key {
+        if hex {
+            let key_bytes = BASE64URL_NOPAD
+                .decode(k.as_bytes())
+                .context("Failed to decode base64 key")?;
+            let hex_key = HEXLOWER.encode(&key_bytes);
+            println!("{}", hex_key);
+        } else {
+            println!("{}", k);
+        }
+    } else if let Some(s) = secret {
+        if hex {
+            let secret_bytes = BASE64URL_NOPAD
+                .decode(s.as_bytes())
+                .context("Failed to decode base64 secret")?;
+            let hex_secret = HEXLOWER.encode(&secret_bytes);
+            println!("{}", hex_secret);
+        } else {
+            println!("{}", s);
+        }
+    } else if let Some(prof) = profile
+        .as_deref()
+        .or_else(|| cfg.as_ref().map(|c| c.profile.as_str()))
+    {
+        let profile = config::load_profile(prof)?;
+        if let Some(k) = &profile.key {
+            println!(
+                "Key:     {}",
+                if hex {
+                    let key_bytes = BASE64URL_NOPAD.decode(k.as_bytes())?;
+                    HEXLOWER.encode(&key_bytes)
+                } else {
+                    k.clone()
+                }
+            );
+        }
+        if let Some(s) = &profile.secret {
+            println!(
+                "Secret: {}",
+                if hex {
+                    let secret_bytes = BASE64URL_NOPAD.decode(s.as_bytes())?;
+                    HEXLOWER.encode(&secret_bytes)
+                } else {
+                    s.clone()
+                }
+            );
+        }
     } else {
-        // Output base64 key as-is
-        println!("{}", b64_key);
+        anyhow::bail!(
+            "No key/secret specified:  provide --key, --secret, --profile, or run 'ob init'"
+        );
     }
 
     Ok(())
 }
 
+fn get_key(
+    key: Option<&String>,
+    _secret: Option<&String>, // For potential fallback
+    profile: Option<&str>,
+    config: Option<&Config>,
+) -> Result<String> {
+    // Check for explicit key flag (highest priority)
+    if let Some(key_str) = key {
+        validate_base64_key(key_str)?;
+        return Ok(key_str.clone());
+    }
+
+    // Check for explicit profile flag or config default
+    let profile_name = profile.or_else(|| config.map(|c| c.profile.as_str()));
+
+    if let Some(name) = profile_name {
+        let profile = config::load_profile(name)?;
+        if let Some(k) = &profile.key {
+            validate_base64_key(k)?;
+            return Ok(k.clone());
+        }
+        // If profile has no key, that's an error for non-ztier schemes
+        anyhow::bail!("Profile '{}' has no key", name);
+    }
+
+    Err(anyhow::anyhow!(
+        "No key specified:  provide --key, --profile <name>, or run 'ob init' to create config"
+    ))
+}
+
+fn get_secret(
+    secret: Option<&String>,
+    _key: Option<&String>, // For potential fallback
+    profile: Option<&str>,
+    config: Option<&Config>,
+) -> Result<String> {
+    // Check for explicit secret flag (highest priority)
+    if let Some(secret_str) = secret {
+        validate_base64_secret(secret_str)?;
+        return Ok(secret_str.clone());
+    }
+
+    // Check for explicit profile flag or config default
+    let profile_name = profile.or_else(|| config.map(|c| c.profile.as_str()));
+
+    if let Some(name) = profile_name {
+        let profile = config::load_profile(name)?;
+        if let Some(s) = &profile.secret {
+            validate_base64_secret(s)?;
+            return Ok(s.clone());
+        }
+        // If profile has no secret, that's an error for z-tier schemes
+        anyhow::bail!("Profile '{}' has no secret", name);
+    }
+
+    Err(anyhow::anyhow!(
+        "No secret specified: provide --secret, --profile <name>, or run 'ob init' to create config"
+    ))
+}
+
+fn validate_base64_key(key_str: &str) -> Result<()> {
+    // Check length
+    if key_str.len() != 86 {
+        return Err(anyhow::anyhow!(
+            "Key must be 86 base64 chars, got {} chars",
+            key_str.len()
+        ));
+    }
+
+    // Validate base64 encoding and length
+    use data_encoding::BASE64URL_NOPAD;
+    let key_bytes = BASE64URL_NOPAD
+        .decode(key_str.as_bytes())
+        .context("Invalid key base64 encoding")?;
+
+    if key_bytes.len() != 64 {
+        return Err(anyhow::anyhow!(
+            "Key must decode to 64 bytes, got {} bytes",
+            key_bytes.len()
+        ));
+    }
+
+    Ok(())
+}
+
+fn validate_base64_secret(secret_str: &str) -> Result<()> {
+    // Check length
+    if secret_str.len() != 43 {
+        return Err(anyhow::anyhow!(
+            "Secret must be 43 base64 chars, got {} chars",
+            secret_str.len()
+        ));
+    }
+
+    // Validate base64 encoding and length
+    use data_encoding::BASE64URL_NOPAD;
+    let secret_bytes = BASE64URL_NOPAD
+        .decode(secret_str.as_bytes())
+        .context("Invalid secret base64 encoding")?;
+
+    if secret_bytes.len() != 32 {
+        return Err(anyhow::anyhow!(
+            "Secret must decode to 32 bytes, got {} bytes",
+            secret_bytes.len()
+        ));
+    }
+
+    Ok(())
+}
 fn get_text_input(text: Option<String>) -> Result<String> {
     match text {
         Some(t) => Ok(t),
@@ -755,64 +1038,30 @@ fn get_encoding(encoding_override: Option<Encoding>, config: Option<&Config>) ->
     ))
 }
 
-fn get_key(key: Option<&String>, profile: Option<&str>, config: Option<&Config>) -> Result<String> {
-    // Check for explicit key flag (highest priority)
-    if let Some(key_str) = key {
-        // Validate key format
-        validate_base64_key(key_str)?;
-        return Ok(key_str.clone());
-    }
-
-    // Check for explicit profile flag
-    let profile_name = if let Some(name) = profile {
-        Some(name)
-    } else if let Some(cfg) = config {
-        Some(cfg.profile.as_str())
-    } else {
-        None
-    };
-
-    if let Some(name) = profile_name {
-        let profile = load_profile(name)?;
-        // Validate key format
-        validate_base64_key(&profile.key)?;
-        return Ok(profile.key);
-    }
-
-    Err(anyhow::anyhow!(
-        "No key specified: provide --key, --profile <profile>, or run 'ob init' to create config"
-    ))
-}
-
-fn validate_base64_key(key_str: &str) -> Result<()> {
-    // Check length
-    if key_str.len() != 86 {
-        return Err(anyhow::anyhow!(
-            "Key must be {} base64 chars, got {} chars",
-            86,
-            key_str.len()
-        ));
-    }
-
-    // Validate base64 encoding and length
-    use data_encoding::BASE64URL_NOPAD;
-    let key_bytes = BASE64URL_NOPAD
-        .decode(key_str.as_bytes())
-        .context("Invalid key base64 encoding")?;
-
-    if key_bytes.len() != 64 {
-        return Err(anyhow::anyhow!(
-            "Key must decode to 64 bytes, got {} bytes",
-            key_bytes.len()
-        ));
-    }
-
-    Ok(())
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_validate_base64_secret_valid() {
+        let secret_str = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+        assert!(validate_base64_secret(&secret_str).is_ok());
+    }
+
+    #[test]
+    fn test_validate_base64_secret_wrong_length() {
+        let secret_str = "AAAAAAAAAAAAAAAAAAAAAAAA";
+        assert!(validate_base64_secret(&secret_str).is_err());
+    }
+
+    #[test]
+    fn test_is_ztier_scheme() {
+        #[cfg(feature = "zrbcx")]
+        assert!(is_ztier_scheme(Scheme::Zrbcx));
+
+        #[cfg(feature = "aasv")]
+        assert!(!is_ztier_scheme(Scheme::Aasv));
+    }
 
     #[test]
     #[cfg(feature = "mock")]

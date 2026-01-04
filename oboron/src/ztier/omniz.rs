@@ -90,7 +90,9 @@ impl Omniz {
     /// ```
     #[cfg(feature = "keyless")]
     pub fn new_keyless() -> Result<Self, Error> {
-        Self::from_bytes(&HARDCODED_SECRET_BYTES)
+        Ok(Self {
+            zkeychain: ZKeychain::from_bytes(&HARDCODED_SECRET_BYTES)?,
+        })
     }
 
     /// Encrypt and encode plaintext with the specified format.

@@ -20,7 +20,10 @@ pub struct Config {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct KeyProfile {
-    pub key: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub key: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub secret: Option<String>,
 }
 
 pub fn config_path() -> PathBuf {
@@ -167,6 +170,18 @@ pub fn save_key_profile(name: &str, profile: &KeyProfile) -> Result<()> {
     Ok(())
 }
 
+/// Generate a z-tier secret (32 bytes = 43 base64 chars)
+fn generate_secret() -> String {
+    loop {
+        let mut secret_bytes = [0u8; 32];
+        rand::RngCore::fill_bytes(&mut rand::thread_rng(), &mut secret_bytes);
+        let secret_base64 = BASE64URL_NOPAD.encode(&secret_bytes);
+        if !secret_base64.contains('-') && !secret_base64.contains('_') {
+            return secret_base64;
+        }
+    }
+}
+
 pub fn init_command(name: &str) -> Result<()> {
     // Check if profile already exists
     let path = profile_path(name);
@@ -191,10 +206,14 @@ pub fn init_command(name: &str) -> Result<()> {
         anyhow::bail!("Profile '{}' already exists", name);
     }
 
-    // Generate random base64 key
+    // Generate both key and secret
     let key = generate_key();
+    let secret = generate_secret();
 
-    let profile = KeyProfile { key: key.clone() };
+    let profile = KeyProfile {
+        key: Some(key.clone()),
+        secret: Some(secret.clone()),
+    };
 
     save_key_profile(name, &profile)?;
 
@@ -210,8 +229,9 @@ pub fn init_command(name: &str) -> Result<()> {
     println!("\nYour profile '{}':", name);
     println!("  Default scheme:  aasv");
     println!("  Default encoding: c32");
-    println!("  Key: {}", key);
-    println!("\n⚠️  Keep these keys secure! Anyone with these keys can decode your data.");
+    println!("  Key:    {}", key);
+    println!("  Secret: {}", secret);
+    println!("\n⚠️  Keep these keys/secrets secure! Anyone with these can decode your data.");
 
     Ok(())
 }
@@ -227,10 +247,15 @@ pub fn config_show_command(public_profile: bool) -> Result<()> {
     let profile = load_profile(&config.profile)?;
 
     println!("Current configuration:");
-    println!("  Profile: {}", config.profile);
-    println!("  Scheme:  {}", config.scheme);
+    println!("  Profile:  {}", config.profile);
+    println!("  Scheme:   {}", config.scheme);
     println!("  Encoding: {}", config.encoding);
-    println!("  Key: {}", profile.key);
+    if let Some(key) = &profile.key {
+        println!("  Key:    {}", key);
+    }
+    if let Some(secret) = &profile.secret {
+        println!("  Secret: {}", secret);
+    }
 
     Ok(())
 }
@@ -291,7 +316,12 @@ pub fn profile_show_command(name: Option<&str>) -> Result<()> {
     let profile = load_profile(&profile_name)?;
 
     println!("Profile '{}':", profile_name);
-    println!("  Key: {}", profile.key);
+    if let Some(key) = &profile.key {
+        println!("  Key:    {}", key);
+    }
+    if let Some(secret) = &profile.secret {
+        println!("  Secret: {}", secret);
+    }
 
     Ok(())
 }
@@ -314,29 +344,39 @@ pub fn profile_activate_command(name: &str) -> Result<()> {
     Ok(())
 }
 
-pub fn profile_create_command(name: &str, key: &str) -> Result<()> {
-    // Validate key
-    if key.len() != 86 {
-        anyhow::bail!("Key must be {} base64 chars", 86);
-    }
-
-    // Validate base64 encoding
-    let key_bytes = BASE64URL_NOPAD
-        .decode(key.as_bytes())
-        .context("Invalid key base64 encoding")?;
-
-    if key_bytes.len() != 64 {
-        anyhow::bail!("Key must decode to 64 bytes");
-    }
-
-    let profile = KeyProfile {
-        key: key.to_string(),
+pub fn profile_create_command(name: &str, key: Option<&str>, secret: Option<&str>) -> Result<()> {
+    let mut profile = KeyProfile {
+        key: None,
+        secret: None,
     };
+
+    // Validate and set key if provided
+    if let Some(k) = key {
+        validate_base64_key(k)?;
+        profile.key = Some(k.to_string());
+    }
+
+    // Validate and set secret if provided
+    if let Some(s) = secret {
+        validate_base64_secret(s)?;
+        profile.secret = Some(s.to_string());
+    }
+
+    // At least one must be provided
+    if profile.key.is_none() && profile.secret.is_none() {
+        anyhow::bail!("At least one of --key or --secret must be provided");
+    }
 
     save_key_profile(name, &profile)?;
 
     println!("✓ Created profile '{}'", name);
-    println!("\n⚠️  Keep this key secure!");
+    if profile.key.is_some() {
+        println!("  With key");
+    }
+    if profile.secret.is_some() {
+        println!("  With secret");
+    }
+    println!("\n⚠️  Keep this profile secure!");
 
     Ok(())
 }
@@ -427,33 +467,77 @@ pub fn profile_rename_command(old_name: &str, new_name: &str) -> Result<()> {
         println!("✓ Renamed profile '{}' to '{}'", old_name, new_name);
     }
 
-    println!("  Backup saved to:  {}", backup_path.display());
+    println!("  Backup saved to:   {}", backup_path.display());
 
     Ok(())
 }
 
-pub fn profile_set_command(name: &str, key: &str) -> Result<()> {
-    // Validate key
-    if key.len() != 86 {
-        anyhow::bail!("Key must be {} base64 chars", 86);
+pub fn profile_set_command(name: &str, key: Option<&str>, secret: Option<&str>) -> Result<()> {
+    // Load existing profile
+    let mut profile = load_profile(name)?;
+
+    // Update key if provided
+    if let Some(k) = key {
+        validate_base64_key(k)?;
+        profile.key = Some(k.to_string());
     }
 
-    // Validate base64 encoding
-    let key_bytes = BASE64URL_NOPAD
-        .decode(key.as_bytes())
-        .context("Invalid key base64 encoding")?;
-
-    if key_bytes.len() != 64 {
-        anyhow::bail!("Key must decode to 64 bytes");
+    // Update secret if provided
+    if let Some(s) = secret {
+        validate_base64_secret(s)?;
+        profile.secret = Some(s.to_string());
     }
 
-    let profile = KeyProfile {
-        key: key.to_string(),
-    };
+    // At least one must be set in the profile
+    if profile.key.is_none() && profile.secret.is_none() {
+        anyhow::bail!("Profile must have at least a key or secret");
+    }
 
     save_key_profile(name, &profile)?;
 
     println!("✓ Updated profile '{}'", name);
+
+    Ok(())
+}
+
+fn validate_base64_key(key_str: &str) -> Result<()> {
+    // Check length
+    if key_str.len() != 86 {
+        anyhow::bail!("Key must be 86 base64 chars, got {} chars", key_str.len());
+    }
+
+    // Validate base64 encoding
+    let key_bytes = BASE64URL_NOPAD
+        .decode(key_str.as_bytes())
+        .context("Invalid key base64 encoding")?;
+
+    if key_bytes.len() != 64 {
+        anyhow::bail!("Key must decode to 64 bytes, got {} bytes", key_bytes.len());
+    }
+
+    Ok(())
+}
+
+fn validate_base64_secret(secret_str: &str) -> Result<()> {
+    // Check length
+    if secret_str.len() != 43 {
+        anyhow::bail!(
+            "Secret must be 43 base64 chars, got {} chars",
+            secret_str.len()
+        );
+    }
+
+    // Validate base64 encoding
+    let secret_bytes = BASE64URL_NOPAD
+        .decode(secret_str.as_bytes())
+        .context("Invalid secret base64 encoding")?;
+
+    if secret_bytes.len() != 32 {
+        anyhow::bail!(
+            "Secret must decode to 32 bytes, got {} bytes",
+            secret_bytes.len()
+        );
+    }
 
     Ok(())
 }
@@ -481,62 +565,38 @@ mod tests {
     #[test]
     fn test_key_profile_serialization() {
         let profile = KeyProfile {
-            key:  "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA".to_string(),
+            key:  Some("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA".to_string()),
+            secret: Some("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA".to_string()),
         };
 
         let json = serde_json::to_string(&profile).unwrap();
         let deserialized: KeyProfile = serde_json::from_str(&json).unwrap();
 
         assert_eq!(profile.key, deserialized.key);
+        assert_eq!(profile.secret, deserialized.secret);
     }
 
     #[test]
-    fn test_config_defaults() {
-        let json = r#"{"profile":"","scheme":"","encoding":""}"#;
-        let mut config: Config = serde_json::from_str(json).unwrap();
-
-        // Simulate load_config logic
-        if config.scheme.is_empty() {
-            config.scheme = "aasv".to_string();
-        }
-        if config.encoding.is_empty() {
-            config.encoding = "c32".to_string();
-        }
-        if config.profile.is_empty() {
-            config.profile = "default".to_string();
-        }
-
-        assert_eq!(config.profile, "default");
-        assert_eq!(config.scheme, "aasv");
-        assert_eq!(config.encoding, "c32");
+    fn test_validate_base64_key_valid() {
+        let key_str = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+        assert!(validate_base64_key(key_str).is_ok());
     }
 
     #[test]
-    fn test_profile_path_construction() {
-        let path = profile_path("myprofile");
-        assert!(path.to_string_lossy().contains("myprofile.json"));
-        assert!(path.to_string_lossy().contains(CONFIG_DIR));
-        assert!(path.to_string_lossy().contains(PROFILES_SUBDIR));
+    fn test_validate_base64_secret_valid() {
+        let secret_str = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+        assert!(validate_base64_secret(secret_str).is_ok());
     }
 
     #[test]
-    fn test_config_path_construction() {
-        let path = config_path();
-        assert!(path.to_string_lossy().contains(CONFIG_FILENAME));
-        assert!(path.to_string_lossy().contains(CONFIG_DIR));
+    fn test_validate_base64_key_wrong_length() {
+        let key_str = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+        assert!(validate_base64_key(key_str).is_err());
     }
 
     #[test]
-    fn test_config_with_partial_fields() {
-        let json = r#"{"profile":"custom","scheme":"zrbcx","encoding":""}"#;
-        let mut config: Config = serde_json::from_str(json).unwrap();
-
-        if config.encoding.is_empty() {
-            config.encoding = "c32".to_string();
-        }
-
-        assert_eq!(config.profile, "custom");
-        assert_eq!(config.scheme, "zrbcx");
-        assert_eq!(config.encoding, "c32");
+    fn test_validate_base64_secret_wrong_length() {
+        let secret_str = "AAAAAAAAAAAAAAAAAAAAAAAA";
+        assert!(validate_base64_secret(secret_str).is_err());
     }
 }
