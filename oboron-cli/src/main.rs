@@ -1511,7 +1511,7 @@ mod tests {
     #[test]
     fn test_get_key_from_base64_string() {
         let key_str = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA".to_string();
-        let result = get_key(Some(&key_str), None, None);
+        let result = get_key(Some(&key_str), None, None, None);
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), key_str);
     }
