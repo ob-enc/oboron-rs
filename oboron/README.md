@@ -71,11 +71,11 @@ then save the key as an environment variable.
 Use AasvC32 (a secure scheme, 256-bit encrypted with AES-SIV, encoded
 using Crockford's base32 variant) for enc/dec:
 ```rust
-use oboron::{AasvC32, ObtextCodec};
+use oboron::AasvC32;
 
 let key = env::var("OBORON_KEY")?; // get the key
 
-let ob = AasvC32::new(&key)?; // create ObtextCodec instance
+let ob = AasvC32::new(&key)?; // create codec instance
 
 let ot = ob.enc("hello, world")?; // encrypt+encode
 let pt2 = ob.dec(&ot)?; // decode+decrypt
@@ -124,6 +124,7 @@ Formats are represented by compact identifiers, either:
   `ob:` (URI-like syntax), or
 - `{scheme}.{encoding}`, when the context is clear and the namespace
   prefix is not necessary.
+- *`oboron` API does not use the `ob:` namespace prefix*
 
 For example:
 - `ob:aasv.c32` - `ob:aasv` scheme, Crockford base32 encoding
@@ -192,7 +193,7 @@ ID prefix:
 - **`z` - obfuscation tier** (e.g., `ob:zrbcx`)
   - *Not cryptographically secure* - for non-security use only
   - Deterministic obfuscation with constant IV
-  - *Not enabled by default* - requires explicit feature flag
+  - *Not enabled by default* - requires explicit `ztier` feature flag
   - See [Z_TIER.md](Z_TIER.md) for details and warnings
 
 **Important Security Notes:**
@@ -204,8 +205,6 @@ ID prefix:
 The second letter of the scheme ID further describe the properties of the
 scheme:
 - `.a..` - avalanche, deterministic (e.g., `ob:aasv`, `ob:aags`)
-- `.r..` - referenceable / prefix-restricted avalanche, deterministic
-  (e.g., `zrbcx`)
 - `.p..` - probabilistic: (e.g.,
   `ob:apsv`, `ob:apgs`, `ob:upbc`)
 
@@ -223,14 +222,13 @@ used:
 
 Summary table:
 
-| Scheme     | Algorithm   | Deterministic? | Authenticated? | Notes |
-| :--------- | :---------- | :------------- | :------------- | :---- |
-| `ob:aags`  | AES-GCM-SIV | Yes            | Yes            |       |
-| `ob:aasv`  | AES-SIV     | Yes            | Yes            |       |
-| `ob:apgs`  | AES-GCM-SIV | No             | Yes            |       |
-| `ob:apsv`  | AES-SIV     | No             | Yes            |       |
+| Scheme     | Algorithm   | Deterministic? | Authenticated? | Notes                              |
+| :--------- | :---------- | :------------- | :------------- | :--------------------------------- |
+| `ob:aags`  | AES-GCM-SIV | Yes            | Yes            |                                    |
+| `ob:aasv`  | AES-SIV     | Yes            | Yes            |                                    |
+| `ob:apgs`  | AES-GCM-SIV | No             | Yes            |                                    |
+| `ob:apsv`  | AES-SIV     | No             | Yes            |                                    |
 | `ob:upbc`  | AES-CBC     | No             | No             | Unauthenticated - use with caution |
-| `ob:zrbcx` | AES-CBC     | Yes            | No             | **Obfuscation only** - see [Z_TIER.md](Z_TIER.md) |
 
 Key Concepts:
 * *Deterministic:* Same input (key + plaintext) always produces same
@@ -266,7 +264,7 @@ security guarantees. However, note the following:
 > Oboron uses the strongest standard encryption with its 512-bit key.
 > AES-GCM-SIV, AES-SIV, and AES-CBC all use 256-bit encryption (AES-SIV
 > uses a 512-bit key for two instance layers, but each is 256-bit encryption.)
-> 
+>
 > *Note*: this does not apply to the `z`-tier, which is intended for
 > obfuscation, not encryption, and prioritizes performance over security.
 > Thus `zrbcx`, for example, uses 128-bit AES-CBC encryption.
@@ -274,9 +272,9 @@ security guarantees. However, note the following:
 ### Secure Defaults
 
 Oboron presets (default features) only include secure authenticated
-schemes (`a`-tier).  Schemes that lack authentication (`u`-tier) or
-IND-CPA-level security standard (`z`-tier) must be explicitly enabled via
-Cargo features.
+schemes (`a`-tier) and IND-CPA secure unauthenticated schemes (`u`-tier).
+Schemes that lack IND-CPA-level security standard (`z`-tier) must be
+explicitly enabled via Cargo features.
 
 The same holds for the `keyless` feature: while it is handy for
 development and quick obfuscation (using a hard-coded key), this feature
@@ -329,21 +327,23 @@ The first step gives a transformed ciphertext:
 - `[ciphertext'] = [prefix_restr(ciphertext)]` - prefix-restructured
   ciphertext for schemes with `x` suffix (e.g., `zrbcx`),
 - `[ciphertext'] = [ciphertext]` for all other schemes (no change).
+Prefix-restructuring is not applied in schemes naturally exhibiting the
+avalanche property (`a`-tier) or probabilistic schemes (e.g. `ob:upbc`).
 
-The second step is achieved by appending a single byte marker to the
+The second step is achieved by appending a two-byte marker to the
 payload prior to encoding.
 
 - `[payload] = [ciphertext'][marker]`
 
-This marker byte is the result of an XOR operation on a constant byte
-identifier for the scheme (e.g., `oboron::constants::ZRBCX_BYTE = 0x02`),
-and the first byte of the transformed ciphertext (`ciphertext'[0]`).
+This marker is the result of an XOR operation on a constant two-byte
+identifier for the scheme (e.g., `oboron::constants::AASV_MARKER`),
+and the first two byte of the transformed ciphertext (`ciphertext'[..2]`).
 
-- `marker = ciphertext'[0] XOR scheme-byte`
+- `marker = ciphertext'[0..2] XOR scheme-marker`
 
 The purpose of this XOR is entropy mix-in: by using the constant scheme
-byte directly, all obtexts in deterministic schemes would have a constant
-suffix.
+marker directly, all obtexts in deterministic schemes would have a
+constant suffix.
 
 
 ### Padding Design
@@ -715,7 +715,7 @@ clarity.
 Use fixed-format types when formats are known at compile time for optimal
 performance and type safety:
 ```rust
-use oboron::{ApgsB64, ObtextCodec};
+use oboron::ApgsB64;
 
 let key = env::var("OBORON_KEY")?;
 let apgs = ApgsB64::new(&key)?;
@@ -842,7 +842,7 @@ For compile-time known schemes and encodings, however, static types
 provide optimal performance, concise syntax, and strongest type
 guarantees:
 ```rust
-use oboron::{AasvB64, ObtextCodec};
+use oboron::AasvB64;
 let ob = AasvB64::new(&key)?;
 let ot = ob.enc("secret")?;
 ```
@@ -860,11 +860,7 @@ consistent interface:
   scheme detection
 - `scheme() -> Scheme` - Current scheme
 - `encoding() -> Encoding` - Current encoding
-- `key() -> String` - Base64 key access
-- `key_hex() -> String` - Hex key access (gated by `hex-keys` feature,
-  not enabled by default)
-- `key_bytes() -> &[u8; 64]` - Raw key bytes access (gated by
-  `bytes-keys` feature, not enabled by default)
+- `format() -> Format` - Current format (scheme + encoding)
 
 ### Working with Keys
 
