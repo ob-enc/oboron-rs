@@ -578,8 +578,8 @@ mod tests {
 
     #[test]
     fn test_validate_base64_key_valid() {
-        let key_str = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-        assert!(validate_base64_key(key_str).is_ok());
+        let key_str = oboron::generate_key();
+        assert!(validate_base64_key(&key_str).is_ok());
     }
 
     #[test]
