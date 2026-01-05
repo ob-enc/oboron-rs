@@ -813,15 +813,15 @@ impl Omnib {
     }
 }
 
-// Z-tier schemes - Oz
+// Z-tier schemes - Obz
 #[pyclass]
-struct Oz {
-    inner: ::oboron::ztier::Oz,
+struct Obz {
+    inner: ::oboron::ztier::Obz,
 }
 
 #[pymethods]
-impl Oz {
-    /// Create a new Oz instance.
+impl Obz {
+    /// Create a new Obz instance.
     ///
     /// Args:
     ///     format: Format string like "aags.b64", "apsv.hex", "zrbcx.c32", "zrbcx.b32", etc.
@@ -829,7 +829,7 @@ impl Oz {
     ///     keyless: If True, uses the hardcoded key (testing only, NOT SECURE).
     ///
     /// Returns:
-    ///     A new Oz instance.
+    ///     A new Obz instance.
     ///
     /// Raises:
     ///     ValueError: If key or format is invalid.
@@ -837,10 +837,10 @@ impl Oz {
     #[pyo3(signature = (format, key=None, keyless=false))]
     fn new(format: &str, key: Option<String>, keyless: bool) -> PyResult<Self> {
         let inner = match (key, keyless) {
-            (Some(key), false) => ::oboron::ztier::Oz::new(format, &key)
-                .map_err(|e| PyValueError::new_err(format!("Failed to create Oz: {}", e)))?,
-            (None, true) => ::oboron::ztier::Oz::new_keyless(format).map_err(|e| {
-                PyValueError::new_err(format!("Failed to create Oz with hardcoded key: {}", e))
+            (Some(key), false) => ::oboron::ztier::Obz::new(format, &key)
+                .map_err(|e| PyValueError::new_err(format!("Failed to create Obz: {}", e)))?,
+            (None, true) => ::oboron::ztier::Obz::new_keyless(format).map_err(|e| {
+                PyValueError::new_err(format!("Failed to create Obz with hardcoded key: {}", e))
             })?,
             (Some(_), true) => {
                 return Err(PyValueError::new_err(
@@ -1345,7 +1345,7 @@ fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
     // Z-TIER =========================
     //
     // Main flexible interface
-    m.add_class::<Oz>()?;
+    m.add_class::<Obz>()?;
 
     // Multi-format interface
     m.add_class::<Omniz>()?;

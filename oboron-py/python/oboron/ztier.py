@@ -1,7 +1,7 @@
 from . import _oboron
 
 # Z-tier interfaces
-Oz = _oboron.Oz
+Obz = _oboron.Obz
 Omniz = _oboron.Omniz
 
 # Zrbcx variants
@@ -24,7 +24,7 @@ Zmock1Hex = _oboron.Zmock1Hex
 
 __all__ = [
     # Z-tier interfaces
-    'Oz',
+    'Obz',
     'Omniz',
 
     # Zrbcx
