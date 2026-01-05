@@ -270,6 +270,11 @@ pub use keygen::generate_key;
 pub use keygen::generate_key_bytes;
 #[cfg(feature = "hex-keys")]
 pub use keygen::generate_key_hex;
+pub use keygen::generate_secret;
+#[cfg(feature = "bytes-keys")]
+pub use keygen::generate_secret_bytes;
+#[cfg(feature = "hex-keys")]
+pub use keygen::generate_secret_hex;
 
 // Re-export core types
 pub use encoding::Encoding;

@@ -182,6 +182,9 @@ Mock2Hex = _oboron.Mock2Hex
 generate_key = _oboron.generate_key
 generate_key_bytes = _oboron.generate_key_bytes
 generate_key_hex = _oboron.generate_key_hex
+generate_secret = _oboron.generate_secret
+generate_secret_bytes = _oboron.generate_secret_bytes
+generate_secret_hex = _oboron.generate_secret_hex
 
 # Convenience functions
 enc = _oboron.enc

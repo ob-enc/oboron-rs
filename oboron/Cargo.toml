@@ -102,6 +102,10 @@ crate-type = ["rlib"]  # Standard Rust library crate (WASM compatible)
 name = "keygen"
 path = "src/bin/keygen.rs"
 
+[[bin]]
+name = "secretgen"
+path = "src/bin/secretgen.rs"
+
 [dev-dependencies]
 oboron = { path = ".", features = ["dev"]}
 criterion = { version = "0.5", features = ["html_reports"] }

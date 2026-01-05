@@ -1130,6 +1130,34 @@ fn generate_key_bytes(py: Python) -> PyResult<Py<PyBytes>> {
     Ok(PyBytes::new_bound(py, &key).into())
 }
 
+/// Generate a random 32-byte secret as a base64 string.
+///
+/// Returns:
+///     A random 64-byte key as a 43-character base64 string.
+#[pyfunction]
+fn generate_secret() -> PyResult<String> {
+    Ok(::oboron::generate_secret())
+}
+
+/// Generate a random 32-byte secret as a hex string.
+///
+/// Returns:
+///     A random 32-byte key as a 64-character hex string.
+#[pyfunction]
+fn generate_secret_hex() -> PyResult<String> {
+    Ok(::oboron::generate_secret())
+}
+
+/// Generate a random 32-byte secret as bytes.
+///
+/// Returns:
+///     A random 32-byte secret as bytes.
+#[pyfunction]
+fn generate_secret_bytes(py: Python) -> PyResult<Py<PyBytes>> {
+    let secret = ::oboron::generate_secret_bytes();
+    Ok(PyBytes::new_bound(py, &secret).into())
+}
+
 // ============================================================================
 // Convenience Functions
 // ============================================================================
@@ -1356,6 +1384,9 @@ fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(generate_key, m)?)?;
     m.add_function(wrap_pyfunction!(generate_key_hex, m)?)?;
     m.add_function(wrap_pyfunction!(generate_key_bytes, m)?)?;
+    m.add_function(wrap_pyfunction!(generate_secret, m)?)?;
+    m.add_function(wrap_pyfunction!(generate_secret_hex, m)?)?;
+    m.add_function(wrap_pyfunction!(generate_secret_bytes, m)?)?;
 
     // Convenience functions
     m.add_function(wrap_pyfunction!(enc, m)?)?;
