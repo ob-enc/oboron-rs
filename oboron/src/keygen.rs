@@ -83,7 +83,7 @@ pub fn generate_key_hex() -> String {
 /// # Examples
 ///
 /// ```
-/// use oboron::generate_key;
+/// use oboron::generate_secret;
 ///
 /// let secret = generate_secret();
 /// assert_eq!(secret.len(), 43);
@@ -117,9 +117,9 @@ pub fn generate_secret() -> String {
 #[cfg(feature = "bytes-keys")]
 pub fn generate_secret_bytes() -> [u8; 32] {
     let decoded = BASE64URL_NOPAD
-        .decode(generate_key().as_bytes())
+        .decode(generate_secret().as_bytes())
         .expect("Failed to decode base64");
-    decoded.try_into().expect("Decoded key is not 64 bytes")
+    decoded.try_into().expect("Decoded key is not 32 bytes")
 }
 
 /// Generate a cryptographically secure random 32-byte key and return it as a hex string.

@@ -1,4 +1,4 @@
-//! Oz - Flexible z-tier codec with runtime format selection
+//! Obz - Flexible z-tier codec with runtime format selection
 //!
 //! ⚠️ **WARNING**: Z-tier schemes provide NO cryptographic security.
 //! Use only for obfuscation, never for actual encryption.
@@ -14,7 +14,7 @@ use super::zkeychain::ZKeychain;
 
 /// A flexible z-tier codec with runtime format selection.
 ///
-/// `Oz` is the z-tier equivalent of `Ob`, allowing runtime format selection
+/// `Obz` is the z-tier equivalent of `Ob`, allowing runtime format selection
 /// for obfuscation-only schemes (zrbcx, legacy).
 ///
 /// **WARNING**: Z-tier schemes provide NO cryptographic security.
@@ -28,11 +28,11 @@ use super::zkeychain::ZKeychain;
 /// # fn main() -> Result<(), oboron::Error> {
 /// # #[cfg(feature = "zrbcx")]
 /// # {
-/// # use oboron::ztier::Oz;
+/// # use oboron::ztier::Obz;
 /// # let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; // 43 chars
-/// let oz = Oz::new("zrbcx.b64", secret)?;
-/// let ot = oz.enc("hello")?;
-/// let pt2 = oz.dec(&ot)?;
+/// let obz = Obz::new("zrbcx.b64", secret)?;
+/// let ot = obz.enc("hello")?;
+/// let pt2 = obz.dec(&ot)?;
 /// assert_eq!(pt2, "hello");
 /// # }
 /// # Ok(())
@@ -45,32 +45,32 @@ use super::zkeychain::ZKeychain;
 /// # fn main() -> Result<(), oboron::Error> {
 /// # #[cfg(all(feature = "zrbcx", feature = "zmock"))]
 /// # {
-/// # use oboron::ztier::Oz;
+/// # use oboron::ztier::Obz;
 /// # use oboron::{Scheme, Encoding, Format};
 /// # let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-/// let mut oz = Oz::new("zrbcx.c32", secret)?;
-/// let ot1 = oz.enc("hello")?;
+/// let mut obz = Obz::new("zrbcx.c32", secret)?;
+/// let ot1 = obz.enc("hello")?;
 ///
 /// // Change format at runtime
-/// oz.set_scheme(Scheme::Zmock1)?;
-/// let ot2 = oz.enc("hello")?; // now zmock1.c32
+/// obz.set_scheme(Scheme::Zmock1)?;
+/// let ot2 = obz.enc("hello")?; // now zmock1.c32
 ///
 /// // Change encoding
-/// oz.set_encoding(Encoding::B64)?; // now zmock1.b64
+/// obz.set_encoding(Encoding::B64)?; // now zmock1.b64
 ///
 /// // Set entire format at once
-/// oz.set_format("zrbcx.hex")?; // now zrbcx.hex
+/// obz.set_format("zrbcx.hex")?; // now zrbcx.hex
 /// # }
 /// # Ok(())
 /// # }
 /// ```
-pub struct Oz {
+pub struct Obz {
     zkeychain: ZKeychain,
     format: Format,
 }
 
-impl Oz {
-    /// Create a new Oz with the specified format and base64 secret.
+impl Obz {
+    /// Create a new Obz with the specified format and base64 secret.
     ///
     /// Accepts either a format string (`&str`) or a `Format` instance.
     ///
@@ -80,15 +80,15 @@ impl Oz {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(feature = "zrbcx")]
     /// # {
-    /// # use oboron::ztier::Oz;
+    /// # use oboron::ztier::Obz;
     /// # use oboron::{Format, Scheme, Encoding};
     /// # let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
     /// // Using format string
-    /// let oz1 = Oz::new("zrbcx.b64", secret)?;
+    /// let obz1 = Obz::new("zrbcx.b64", secret)?;
     ///
     /// // Using Format instance
     /// let format = Format::new(Scheme::Zrbcx, Encoding::B64);
-    /// let oz2 = Oz::new(format, secret)?;
+    /// let obz2 = Obz::new(format, secret)?;
     /// # }
     /// # Ok(())
     /// # }
@@ -110,11 +110,11 @@ impl Oz {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(feature = "zrbcx")]
     /// # {
-    /// # use oboron::ztier::Oz;
+    /// # use oboron::ztier::Obz;
     /// # use oboron::{Scheme, Encoding};
     /// # let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-    /// let oz = Oz::new("zrbcx.b64", secret)?;
-    /// let format = oz.format();
+    /// let obz = Obz::new("zrbcx.b64", secret)?;
+    /// let format = obz.format();
     /// assert_eq!(format.scheme(), Scheme::Zrbcx);
     /// assert_eq!(format.encoding(), Encoding::B64);
     /// # }
@@ -135,12 +135,12 @@ impl Oz {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(all(feature = "zrbcx", feature = "legacy"))]
     /// # {
-    /// # use oboron::ztier::Oz;
+    /// # use oboron::ztier::Obz;
     /// # use oboron::{Format, Scheme, Encoding};
     /// # let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-    /// let mut oz = Oz::new("zrbcx.c32", secret)?;
-    /// oz.set_format("legacy.b64")?; // switch using string
-    /// oz.set_format(Format::new(Scheme::Zrbcx, Encoding::Hex))?; // switch using Format
+    /// let mut obz = Obz::new("zrbcx.c32", secret)?;
+    /// obz.set_format("legacy.b64")?; // switch using string
+    /// obz.set_format(Format::new(Scheme::Zrbcx, Encoding::Hex))?; // switch using Format
     /// # }
     /// # Ok(())
     /// # }
@@ -160,11 +160,11 @@ impl Oz {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(all(feature = "zrbcx", feature = "legacy"))]
     /// # {
-    /// # use oboron::ztier::Oz;
+    /// # use oboron::ztier::Obz;
     /// # use oboron::Scheme;
     /// # let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-    /// let mut oz = Oz::new("zrbcx.c32", secret)?;
-    /// oz.set_scheme(Scheme::Legacy)?; // switch to legacy, keeping c32 encoding
+    /// let mut obz = Obz::new("zrbcx.c32", secret)?;
+    /// obz.set_scheme(Scheme::Legacy)?; // switch to legacy, keeping c32 encoding
     /// # }
     /// # Ok(())
     /// # }
@@ -183,11 +183,11 @@ impl Oz {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(feature = "zrbcx")]
     /// # {
-    /// # use oboron::ztier::Oz;
+    /// # use oboron::ztier::Obz;
     /// # use oboron::Encoding;
     /// # let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-    /// let mut oz = Oz::new("zrbcx.c32", secret)?;
-    /// oz.set_encoding(Encoding::B64)?; // switch to b64, keeping zrbcx scheme
+    /// let mut obz = Obz::new("zrbcx.c32", secret)?;
+    /// obz.set_encoding(Encoding::B64)?; // switch to b64, keeping zrbcx scheme
     /// # }
     /// # Ok(())
     /// # }
@@ -208,11 +208,11 @@ impl Oz {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(all(feature = "zrbcx"))]
     /// # {
-    /// # use oboron::ztier::Oz;
+    /// # use oboron::ztier::Obz;
     /// # let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-    /// let mut oz = Oz::new("zrbcx.b64", secret)?;
-    /// let ot = oz.enc("test")?;
-    /// let pt2 = oz.autodec(&ot)?;
+    /// let mut obz = Obz::new("zrbcx.b64", secret)?;
+    /// let ot = obz.enc("test")?;
+    /// let pt2 = obz.autodec(&ot)?;
     /// assert_eq!(pt2, "test");
     /// # }
     /// # Ok(())
@@ -231,7 +231,7 @@ impl Oz {
 
     // Alt constructors ================================================
 
-    /// Create a new Oz with hardcoded secret (testing only).
+    /// Create a new Obz with hardcoded secret (testing only).
     ///
     /// Accepts either a format string (`&str`) or a `Format` instance.
     ///
@@ -241,14 +241,14 @@ impl Oz {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(all(feature = "zrbcx", feature = "keyless"))]
     /// # {
-    /// # use oboron::ztier::Oz;
+    /// # use oboron::ztier::Obz;
     /// # use oboron::{Format, Scheme, Encoding};
     /// // Using format string
-    /// let oz1 = Oz::new_keyless("zrbcx.c32")?;
+    /// let obz1 = Obz::new_keyless("zrbcx.c32")?;
     ///
     /// // Using Format instance
     /// let format = Format::new(Scheme::Zrbcx, Encoding::C32);
-    /// let oz2 = Oz::new_keyless(format)?;
+    /// let obz2 = Obz::new_keyless(format)?;
     /// # }
     /// # Ok(())
     /// # }
@@ -263,7 +263,7 @@ impl Oz {
         })
     }
 
-    /// Create a new Oz with the specified format and hex secret.
+    /// Create a new Obz with the specified format and hex secret.
     ///
     /// Accepts either a format string (`&str`) or a `Format` instance.
     ///
@@ -273,15 +273,15 @@ impl Oz {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(all(feature = "zrbcx", feature = "hex-keys"))]
     /// # {
-    /// # use oboron::ztier::Oz;
+    /// # use oboron::ztier::Obz;
     /// # use oboron::{Format, Scheme, Encoding};
     /// let secret_hex = "0". repeat(64); // 32 bytes as hex
     /// // Using format string
-    /// let oz1 = Oz::from_hex_key("zrbcx.b64", &secret_hex)?;
+    /// let obz1 = Obz::from_hex_key("zrbcx.b64", &secret_hex)?;
     ///
     /// // Using Format instance
     /// let format = Format::new(Scheme::Zrbcx, Encoding::B64);
-    /// let oz2 = Oz::from_hex_key(format, &secret_hex)?;
+    /// let obz2 = Obz::from_hex_key(format, &secret_hex)?;
     /// # }
     /// # Ok(())
     /// # }
@@ -296,7 +296,7 @@ impl Oz {
         })
     }
 
-    /// Create a new Oz from the specified format and raw secret bytes.
+    /// Create a new Obz from the specified format and raw secret bytes.
     ///
     /// Accepts either a format string (`&str`) or a `Format` instance.
     ///
@@ -306,12 +306,12 @@ impl Oz {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(all(feature = "zrbcx", feature = "bytes-keys"))]
     /// # {
-    /// # use oboron::ztier::Oz;
+    /// # use oboron::ztier::Obz;
     /// # use oboron::{Format, Scheme, Encoding};
     /// let secret_bytes = [0u8; 32];
-    /// let oz1 = Oz::from_bytes("zrbcx.b64", &secret_bytes)?; // using format string
+    /// let obz1 = Obz::from_bytes("zrbcx.b64", &secret_bytes)?; // using format string
     /// let format = Format::new(Scheme::Zrbcx, Encoding::B64); // using Format
-    /// let oz2 = Oz::from_bytes(format, &secret_bytes)?;
+    /// let obz2 = Obz::from_bytes(format, &secret_bytes)?;
     /// # }
     /// # Ok(())
     /// # }
@@ -347,7 +347,7 @@ impl Oz {
     }
 }
 
-impl ObtextCodec for Oz {
+impl ObtextCodec for Obz {
     fn enc(&self, plaintext: &str) -> Result<String, Error> {
         let extracted_key = self.zkeychain.extract_secret(self.scheme())?;
         crate::enc::enc_to_format(plaintext, self.format, extracted_key)
@@ -372,7 +372,7 @@ impl ObtextCodec for Oz {
 }
 
 // Add inherent methods that delegate to trait methods
-impl Oz {
+impl Obz {
     /// Encrypt and encode plaintext
     #[inline]
     pub fn enc(&self, plaintext: &str) -> Result<String, Error> {
@@ -417,49 +417,49 @@ mod tests {
 
     #[test]
     #[cfg(feature = "zrbcx")]
-    fn test_oz_basic() {
+    fn test_obz_basic() {
         let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; // 43 chars
-        let oz = Oz::new("zrbcx.b64", secret).unwrap();
+        let obz = Obz::new("zrbcx.b64", secret).unwrap();
 
         let plaintext = "hello world";
-        let ot = oz.enc(plaintext).unwrap();
-        let pt2 = oz.dec(&ot).unwrap();
+        let ot = obz.enc(plaintext).unwrap();
+        let pt2 = obz.dec(&ot).unwrap();
 
         assert_eq!(pt2, plaintext);
     }
 
     #[test]
     #[cfg(feature = "zrbcx")]
-    fn test_oz_format_switching() {
+    fn test_obz_format_switching() {
         let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-        let mut oz = Oz::new("zrbcx.c32", secret).unwrap();
+        let mut obz = Obz::new("zrbcx.c32", secret).unwrap();
 
-        assert_eq!(oz.encoding(), Encoding::C32);
+        assert_eq!(obz.encoding(), Encoding::C32);
 
-        oz.set_encoding(Encoding::B64).unwrap();
-        assert_eq!(oz.encoding(), Encoding::B64);
+        obz.set_encoding(Encoding::B64).unwrap();
+        assert_eq!(obz.encoding(), Encoding::B64);
     }
 
     #[test]
     #[cfg(all(feature = "zrbcx", feature = "legacy"))]
-    fn test_oz_scheme_switching() {
+    fn test_obz_scheme_switching() {
         let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-        let mut oz = Oz::new("zrbcx.b64", secret).unwrap();
+        let mut obz = Obz::new("zrbcx.b64", secret).unwrap();
 
-        assert_eq!(oz.scheme(), Scheme::Zrbcx);
+        assert_eq!(obz.scheme(), Scheme::Zrbcx);
 
-        oz.set_scheme(Scheme::Legacy).unwrap();
-        assert_eq!(oz.scheme(), Scheme::Legacy);
+        obz.set_scheme(Scheme::Legacy).unwrap();
+        assert_eq!(obz.scheme(), Scheme::Legacy);
     }
 
     #[test]
     #[cfg(feature = "zrbcx")]
-    fn test_oz_rejects_non_ztier_scheme() {
+    fn test_obz_rejects_non_ztier_scheme() {
         let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 
         #[cfg(feature = "aasv")]
         {
-            let result = Oz::new("aasv.b64", secret);
+            let result = Obz::new("aasv.b64", secret);
             assert!(result.is_err());
         }
     }

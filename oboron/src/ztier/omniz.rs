@@ -15,7 +15,7 @@ use super::zkeychain::ZKeychain;
 /// A z-tier codec implementation that takes format on enc operation and autodetects on dec operation.
 ///
 /// This is the z-tier equivalent of `Omnib`, working with 32-byte secrets instead of 64-byte keys.
-/// Unlike other implementations (Oz, ZrbcxC32, etc.) it does not have a format stored internally.
+/// Unlike other implementations (Obz, ZrbcxC32, etc.) it does not have a format stored internally.
 ///
 /// This struct allows specifying the format (scheme + encoding) at enc call time,
 /// and automatically detects both scheme and encoding on dec calls.
