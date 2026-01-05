@@ -31,7 +31,7 @@ fn test_enc_keyless() {
     let mut cmd = Command::cargo_bin("ob").unwrap();
     cmd.env("HOME", test_home.as_os_str())
         .arg("enc")
-        .arg("-z")
+        .arg("-K")
         .arg("--aasv")
         .arg("--b32")
         .arg("test123")
@@ -48,7 +48,7 @@ fn test_enc_keyless_apsv() {
     let mut cmd = Command::cargo_bin("ob").unwrap();
     cmd.env("HOME", test_home.as_os_str())
         .arg("enc")
-        .arg("-z")
+        .arg("-K")
         .arg("--apsv")
         .arg("--b32")
         .arg("test123")
@@ -68,7 +68,7 @@ fn test_enc_dec_roundtrip_keyless() {
     let enc_output = enc_cmd
         .env("HOME", test_home.as_os_str())
         .arg("enc")
-        .arg("-z")
+        .arg("-K")
         .arg("--apsv")
         .arg("--b32")
         .arg("hello_world")
@@ -87,7 +87,7 @@ fn test_enc_dec_roundtrip_keyless() {
     dec_cmd
         .env("HOME", test_home.as_os_str())
         .arg("dec")
-        .arg("-z")
+        .arg("-K")
         .arg("--apsv")
         .arg("--b32")
         .arg(&encd)
@@ -218,7 +218,6 @@ fn test_enc_dec_with_explicit_key_aags() {
     cleanup_test_home(&test_home);
 }
 
-#[cfg(feature = "zrbcx")]
 #[cfg(feature = "aags")]
 #[cfg(feature = "aasv")]
 #[cfg(feature = "upbc")]
@@ -227,13 +226,13 @@ fn test_enc_dec_with_explicit_key_aags() {
 #[test]
 fn test_enc_different_schemes() {
     let test_home = test_home_dir();
-    let schemes = vec!["--zrbcx", "--aags", "--aasv", "--upbc", "--apgs", "--apsv"];
+    let schemes = vec!["--aags", "--aasv", "--upbc", "--apgs", "--apsv"];
 
     for scheme in schemes {
         let mut cmd = Command::cargo_bin("ob").unwrap();
         cmd.env("HOME", test_home.as_os_str())
             .arg("enc")
-            .arg("-z")
+            .arg("-K")
             .arg(scheme)
             .arg("--b32")
             .arg("test")
@@ -244,7 +243,7 @@ fn test_enc_different_schemes() {
     cleanup_test_home(&test_home);
 }
 
-#[cfg(feature = "zrbcx")]
+#[cfg(feature = "aasv")]
 #[test]
 fn test_enc_different_encodings() {
     let test_home = test_home_dir();
@@ -254,8 +253,8 @@ fn test_enc_different_encodings() {
         let mut cmd = Command::cargo_bin("ob").unwrap();
         cmd.env("HOME", test_home.as_os_str())
             .arg("enc")
-            .arg("-z")
-            .arg("--zrbcx")
+            .arg("-K")
+            .arg("--aasv")
             .arg(encoding)
             .arg("test")
             .assert()
@@ -265,19 +264,19 @@ fn test_enc_different_encodings() {
     cleanup_test_home(&test_home);
 }
 
-#[cfg(feature = "zrbcx")]
+#[cfg(feature = "apsv")]
 #[cfg(feature = "aags")]
 #[cfg(feature = "aasv")]
 #[test]
 fn test_enc_with_format_string() {
     let test_home = test_home_dir();
-    let formats = vec!["zrbcx.b32", "aags.b64", "aasv.hex"];
+    let formats = vec!["apsv.b32", "aags.b64", "aasv.hex"];
 
     for format in formats {
         let mut cmd = Command::cargo_bin("ob").unwrap();
         cmd.env("HOME", test_home.as_os_str())
             .arg("enc")
-            .arg("-z")
+            .arg("-K")
             .arg("--format")
             .arg(format)
             .arg("test_format")
