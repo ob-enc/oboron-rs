@@ -1,4 +1,4 @@
-//! Omniz - Multi-format z-tier codec with runtime format selection
+//! Omnibz - Multi-format z-tier codec with runtime format selection
 //!
 //! ⚠️ **WARNING**: Z-tier schemes provide NO cryptographic security.
 //! Use only for obfuscation, never for actual encryption.
@@ -30,9 +30,9 @@ use super::zkeychain::ZKeychain;
 /// # fn main() -> Result<(), oboron::Error> {
 /// # #[cfg(all(feature = "zrbcx", feature = "zmock"))]
 /// # {
-/// # use oboron::ztier::Omniz;
+/// # use oboron::ztier::Omnibz;
 /// let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; // 43 chars
-/// let omz = Omniz::new(secret)?;
+/// let omz = Omnibz::new(secret)?;
 ///
 /// // Encode with explicit format
 /// let ot1 = omz.enc("hello", "zrbcx.c32")?;
@@ -47,12 +47,12 @@ use super::zkeychain::ZKeychain;
 /// # Ok(())
 /// # }
 /// ```
-pub struct Omniz {
+pub struct Omnibz {
     zkeychain: ZKeychain,
 }
 
-impl Omniz {
-    /// Create a new Omniz instance with a base64 secret.
+impl Omnibz {
+    /// Create a new Omnibz instance with a base64 secret.
     ///
     /// # Examples
     ///
@@ -60,9 +60,9 @@ impl Omniz {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(feature = "zrbcx")]
     /// # {
-    /// # use oboron::ztier::Omniz;
+    /// # use oboron::ztier::Omnibz;
     /// let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; // 43 chars
-    /// let omz = Omniz::new(secret)?;
+    /// let omz = Omnibz::new(secret)?;
     /// # }
     /// # Ok(())
     /// # }
@@ -73,7 +73,7 @@ impl Omniz {
         })
     }
 
-    /// Create a new Omniz instance with hardcoded secret (testing only).
+    /// Create a new Omnibz instance with hardcoded secret (testing only).
     ///
     /// # Examples
     ///
@@ -81,8 +81,8 @@ impl Omniz {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(all(feature = "zrbcx", feature = "keyless"))]
     /// # {
-    /// # use oboron::ztier::Omniz;
-    /// let omz = Omniz::new_keyless()?;
+    /// # use oboron::ztier::Omnibz;
+    /// let omz = Omnibz::new_keyless()?;
     /// let ot = omz.enc("test", "zrbcx.b64")?;
     /// # }
     /// # Ok(())
@@ -105,10 +105,10 @@ impl Omniz {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(feature = "zrbcx")]
     /// # {
-    /// # use oboron::ztier::Omniz;
+    /// # use oboron::ztier::Omnibz;
     /// # use oboron::{Format, Scheme, Encoding};
     /// let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-    /// let omz = Omniz::new(secret)?;
+    /// let omz = Omnibz::new(secret)?;
     ///
     /// // Using format string
     /// let ot1 = omz.enc("hello", "zrbcx.b64")?;
@@ -137,10 +137,10 @@ impl Omniz {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(feature = "zrbcx")]
     /// # {
-    /// # use oboron::ztier::Omniz;
+    /// # use oboron::ztier::Omnibz;
     /// # use oboron::{Format, Scheme, Encoding};
     /// let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-    /// let omz = Omniz::new(secret)?;
+    /// let omz = Omnibz::new(secret)?;
     /// let ot = omz.enc("test", "zrbcx.b64")?;
     ///
     /// // Using format string
@@ -171,9 +171,9 @@ impl Omniz {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(feature = "zrbcx")]
     /// # {
-    /// # use oboron::ztier::Omniz;
+    /// # use oboron::ztier::Omnibz;
     /// let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-    /// let omz = Omniz::new(secret)?;
+    /// let omz = Omnibz::new(secret)?;
     /// let ot = omz.enc("hello", "zrbcx.b64")?;
     /// let pt2 = omz.autodec(&ot)?;  // Autodetects zrbcx.b64
     /// assert_eq!(pt2, "hello");
@@ -193,9 +193,9 @@ impl Omniz {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(feature = "zrbcx")]
     /// # {
-    /// # use oboron::ztier::Omniz;
+    /// # use oboron::ztier::Omnibz;
     /// let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-    /// let omz = Omniz::new(secret)?;
+    /// let omz = Omnibz::new(secret)?;
     /// let retrieved = omz.secret();
     /// assert_eq!(retrieved, secret);
     /// assert_eq!(retrieved.len(), 43);
@@ -215,9 +215,9 @@ impl Omniz {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(all(feature = "zrbcx", feature = "hex-keys"))]
     /// # {
-    /// # use oboron::ztier::Omniz;
+    /// # use oboron::ztier::Omnibz;
     /// let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-    /// let omz = Omniz::new(secret)?;
+    /// let omz = Omnibz::new(secret)?;
     /// let secret_hex = omz.secret_hex();
     /// assert_eq!(secret_hex.len(), 64); // 32 bytes = 64 hex chars
     /// # }
@@ -237,9 +237,9 @@ impl Omniz {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(all(feature = "zrbcx", feature = "bytes-keys"))]
     /// # {
-    /// # use oboron::ztier::Omniz;
+    /// # use oboron::ztier::Omnibz;
     /// let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-    /// let omz = Omniz::new(secret)?;
+    /// let omz = Omnibz::new(secret)?;
     /// let secret_bytes = omz.secret_bytes();
     /// assert_eq!(secret_bytes.len(), 32);
     /// # }
@@ -253,7 +253,7 @@ impl Omniz {
 
     // Alt input constructors ==========================================
 
-    /// Create a new Omniz instance with a hex secret (64 chars).
+    /// Create a new Omnibz instance with a hex secret (64 chars).
     ///
     /// # Examples
     ///
@@ -261,9 +261,9 @@ impl Omniz {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(all(feature = "zrbcx", feature = "hex-keys"))]
     /// # {
-    /// # use oboron::ztier::Omniz;
+    /// # use oboron::ztier::Omnibz;
     /// let secret_hex = "0".repeat(64); // 32 bytes as hex
-    /// let omz = Omniz::from_secret_hex(&secret_hex)?;
+    /// let omz = Omnibz::from_secret_hex(&secret_hex)?;
     /// # }
     /// # Ok(())
     /// # }
@@ -275,7 +275,7 @@ impl Omniz {
         })
     }
 
-    /// Create a new Omniz instance from raw secret bytes (32 bytes).
+    /// Create a new Omnibz instance from raw secret bytes (32 bytes).
     ///
     /// # Examples
     ///
@@ -283,9 +283,9 @@ impl Omniz {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(all(feature = "zrbcx", feature = "bytes-keys"))]
     /// # {
-    /// # use oboron::ztier::Omniz;
+    /// # use oboron::ztier::Omnibz;
     /// let secret_bytes = [0u8; 32];
-    /// let omz = Omniz::from_bytes(&secret_bytes)?;
+    /// let omz = Omnibz::from_bytes(&secret_bytes)?;
     /// # }
     /// # Ok(())
     /// # }
@@ -317,9 +317,9 @@ mod tests {
 
     #[test]
     #[cfg(feature = "zrbcx")]
-    fn test_omniz_basic() {
+    fn test_omnibz_basic() {
         let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; // 43 chars
-        let omz = Omniz::new(secret).unwrap();
+        let omz = Omnibz::new(secret).unwrap();
 
         let plaintext = "hello world";
         let ot = omz.enc(plaintext, "zrbcx.b64").unwrap();
@@ -330,9 +330,9 @@ mod tests {
 
     #[test]
     #[cfg(feature = "zrbcx")]
-    fn test_omniz_autodec() {
+    fn test_omnibz_autodec() {
         let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-        let omz = Omniz::new(secret).unwrap();
+        let omz = Omnibz::new(secret).unwrap();
 
         let plaintext = "test data";
         let ot = omz.enc(plaintext, "zrbcx.c32").unwrap();
@@ -343,9 +343,9 @@ mod tests {
 
     #[test]
     #[cfg(all(feature = "zrbcx", feature = "zmock"))]
-    fn test_omniz_multiple_formats() {
+    fn test_omnibz_multiple_formats() {
         let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-        let omz = Omniz::new(secret).unwrap();
+        let omz = Omnibz::new(secret).unwrap();
 
         let plaintext = "multi format test";
 
@@ -361,9 +361,9 @@ mod tests {
 
     #[test]
     #[cfg(feature = "zrbcx")]
-    fn test_omniz_secret_methods() {
+    fn test_omnibz_secret_methods() {
         let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-        let omz = Omniz::new(secret).unwrap();
+        let omz = Omnibz::new(secret).unwrap();
 
         let retrieved = omz.secret();
         assert_eq!(retrieved, secret);
@@ -384,8 +384,8 @@ mod tests {
 
     #[test]
     #[cfg(all(feature = "zrbcx", feature = "keyless"))]
-    fn test_omniz_keyless() {
-        let omz = Omniz::new_keyless().unwrap();
+    fn test_omnibz_keyless() {
+        let omz = Omnibz::new_keyless().unwrap();
 
         let plaintext = "keyless test";
         let ot = omz.enc(plaintext, "zrbcx.b64").unwrap();
@@ -396,9 +396,9 @@ mod tests {
 
     #[test]
     #[cfg(all(feature = "zrbcx", feature = "hex-keys"))]
-    fn test_omniz_from_hex() {
+    fn test_omnibz_from_hex() {
         let secret_hex = "0".repeat(64);
-        let omz = Omniz::from_secret_hex(&secret_hex).unwrap();
+        let omz = Omnibz::from_secret_hex(&secret_hex).unwrap();
 
         let plaintext = "hex secret test";
         let ot = omz.enc(plaintext, "zrbcx.b64").unwrap();
@@ -409,9 +409,9 @@ mod tests {
 
     #[test]
     #[cfg(all(feature = "zrbcx", feature = "bytes-keys"))]
-    fn test_omniz_from_bytes() {
+    fn test_omnibz_from_bytes() {
         let secret_bytes = [0u8; 32];
-        let omz = Omniz::from_bytes(&secret_bytes).unwrap();
+        let omz = Omnibz::from_bytes(&secret_bytes).unwrap();
 
         let plaintext = "bytes secret test";
         let ot = omz.enc(plaintext, "zrbcx.b64").unwrap();
@@ -422,9 +422,9 @@ mod tests {
 
     #[test]
     #[cfg(feature = "zrbcx")]
-    fn test_omniz_rejects_non_ztier_scheme() {
+    fn test_omnibz_rejects_non_ztier_scheme() {
         let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-        let omz = Omniz::new(secret).unwrap();
+        let omz = Omnibz::new(secret).unwrap();
 
         #[cfg(feature = "aasv")]
         {

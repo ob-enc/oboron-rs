@@ -11,7 +11,7 @@ mod constants;
 #[cfg(feature = "legacy")]
 mod legacy;
 mod obz;
-mod omniz;
+mod omnibz;
 mod zcodec;
 mod zdec_auto;
 mod zkeychain;
@@ -27,7 +27,7 @@ pub use zcodec::{Zmock1B32, Zmock1B64, Zmock1C32, Zmock1Hex};
 pub use zcodec::{ZrbcxB32, ZrbcxB64, ZrbcxC32, ZrbcxHex};
 
 pub use obz::Obz;
-pub use omniz::Omniz;
+pub use omnibz::Omnibz;
 
 #[cfg(feature = "zmock")]
 pub(crate) use zmock1::{decrypt_zmock1, encrypt_zmock1};

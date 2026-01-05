@@ -990,22 +990,22 @@ impl Obz {
     }
 }
 
-// Z-tier schemes - Omniz
+// Z-tier schemes - Omnibz
 #[pyclass]
-struct Omniz {
-    inner: ::oboron::ztier::Omniz,
+struct Omnibz {
+    inner: ::oboron::ztier::Omnibz,
 }
 
 #[pymethods]
-impl Omniz {
-    /// Create a new Omniz instance.
+impl Omnibz {
+    /// Create a new Omnibz instance.
     ///
     /// Args:
     ///     secret:     43-character base64 string key (256 bits).  Required if keyless=False.
     ///     keyless: If True, uses the hardcoded secret (testing only, NOT SECURE).
     ///
     /// Returns:
-    ///     A new Omniz instance.
+    ///     A new Omnibz instance.
     ///
     /// Raises:
     ///     ValueError: If secret is invalid.
@@ -1013,11 +1013,11 @@ impl Omniz {
     #[pyo3(signature = (secret=None, keyless=false))]
     fn new(secret: Option<String>, keyless: bool) -> PyResult<Self> {
         let inner = match (secret, keyless) {
-            (Some(secret), false) => ::oboron::ztier::Omniz::new(&secret)
-                .map_err(|e| PyValueError::new_err(format!("Failed to create Omniz: {}", e)))?,
-            (None, true) => ::oboron::ztier::Omniz::new_keyless().map_err(|e| {
+            (Some(secret), false) => ::oboron::ztier::Omnibz::new(&secret)
+                .map_err(|e| PyValueError::new_err(format!("Failed to create Omnibz: {}", e)))?,
+            (None, true) => ::oboron::ztier::Omnibz::new_keyless().map_err(|e| {
                 PyValueError::new_err(format!(
-                    "Failed to create Omniz with hardcoded secret: {}",
+                    "Failed to create Omnibz with hardcoded secret: {}",
                     e
                 ))
             })?,
@@ -1348,7 +1348,7 @@ fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<Obz>()?;
 
     // Multi-format interface
-    m.add_class::<Omniz>()?;
+    m.add_class::<Omnibz>()?;
 
     // Zrbcx variants
     #[cfg(feature = "zrbcx")]
