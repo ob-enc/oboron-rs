@@ -2,7 +2,7 @@
 name = "oboron-cli"
 version = "1.0.0-beta.5"
 edition = "2021"
-rust-version = "1.74.0"
+rust-version = "1.77.0"
 authors = ["Bojan Đuričković"]
 license = "MIT"
 repository = "https://github.com/ob-enc/oboron-rs"
@@ -25,9 +25,8 @@ apsv = ["oboron/apsv"]
 mock = ["oboron/mock"]
 
 # Scheme categories
-# =================
-atier = ["aags", "apgs", "aasv", "apsv", "oboron/atier"]  # secure, authenticated
-utier = ["upbc", "oboron/utier"]  # secure, not authenticated
+atier = ["aags", "apgs", "aasv", "apsv", "oboron/atier"]
+utier = ["upbc", "oboron/utier"]
 ztier = ["zrbcx", "zmock", "legacy", "oboron/ztier"]
 secure-schemes = ["atier", "utier"]
 authenticated-schemes = ["atier"]
@@ -38,6 +37,11 @@ all-schemes = ["atier", "utier", "ztier"]
 [[bin]]
 name = "ob"
 path = "src/main.rs"
+
+[[bin]]
+name = "obz"
+path = "src/obz_main.rs"
+required-features = ["ztier"]
 
 [dependencies]
 oboron = { version = "1.0.0-beta.5", path = "../oboron", features=["keyless"] }

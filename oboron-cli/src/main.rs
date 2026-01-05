@@ -1,4 +1,4 @@
-//! CLI application for oboron
+//! CLI application for oboron secure schemes (a-tier and u-tier)
 
 mod completions;
 mod config;
@@ -11,26 +11,14 @@ use std::io::{self, Read};
 
 #[derive(Parser)]
 #[command(name = "ob")]
-#[command(version, about = "Reversible hash-like references", long_about = None)]
+#[command(version, about = "Reversible hash-like references (secure schemes)", long_about = None)]
 struct Cli {
     #[command(subcommand)]
     command: Commands,
 }
 
-/// Scheme selection flags (mutually exclusive)
 #[derive(Args, Debug)]
 struct SchemeFlags {
-    /// Use legacy scheme (legacy AES-CBC)
-    #[cfg(feature = "legacy")]
-    #[arg(short = '0', long, alias = "00")]
-    legacy: bool,
-
-    /// Use zrbcx scheme (optimized AES-CBC)
-    #[cfg(feature = "zrbcx")]
-    #[arg(short = 'b', long, alias = "01")]
-    zrbcx: bool,
-
-    /// Use upbc scheme (probabilistic AES-CBC)
     #[cfg(feature = "upbc")]
     #[arg(short = 'B', long, alias = "21p")]
     upbc: bool,
@@ -67,32 +55,10 @@ struct SchemeFlags {
 }
 
 impl SchemeFlags {
-    /// Convert flags to Option<Scheme>, returning error if multiple are set
-    #[cfg(any(
-        feature = "zrbcx",
-        feature = "upbc",
-        feature = "aags",
-        feature = "apgs",
-        feature = "aasv",
-        feature = "apsv",
-        feature = "mock",
-        feature = "mock",
-        feature = "legacy"
-    ))]
     fn to_scheme(&self) -> Result<Option<Scheme>> {
         let mut count = 0;
         let mut scheme = None;
 
-        #[cfg(feature = "legacy")]
-        if self.legacy {
-            count += 1;
-            scheme = Some(Scheme::Legacy);
-        }
-        #[cfg(feature = "zrbcx")]
-        if self.zrbcx {
-            count += 1;
-            scheme = Some(Scheme::Zrbcx);
-        }
         #[cfg(feature = "upbc")]
         if self.upbc {
             count += 1;
@@ -136,41 +102,21 @@ impl SchemeFlags {
         Ok(scheme)
     }
 
-    /// Check if any scheme flag is set
-    #[cfg(any(
-        feature = "zrbcx",
-        feature = "upbc",
-        feature = "aags",
-        feature = "apgs",
-        feature = "aasv",
-        feature = "apsv",
-        feature = "mock",
-        feature = "mock",
-        feature = "legacy"
-    ))]
     fn is_set(&self) -> bool {
-        #[cfg(feature = "legacy")]
-        if self.legacy {
-            return true;
-        }
-        #[cfg(feature = "zrbcx")]
-        if self.zrbcx {
+        #[cfg(feature = "upbc")]
+        if self.upbc {
             return true;
         }
         #[cfg(feature = "aags")]
         if self.aags {
             return true;
         }
-        #[cfg(feature = "aasv")]
-        if self.aasv {
-            return true;
-        }
-        #[cfg(feature = "upbc")]
-        if self.upbc {
-            return true;
-        }
         #[cfg(feature = "apgs")]
         if self.apgs {
+            return true;
+        }
+        #[cfg(feature = "aasv")]
+        if self.aasv {
             return true;
         }
         #[cfg(feature = "apsv")]
@@ -185,11 +131,10 @@ impl SchemeFlags {
         if self.mock2 {
             return true;
         }
-        return false;
+        false
     }
 }
 
-/// Encoding selection flags (mutually exclusive)
 #[derive(Args, Debug)]
 struct EncodingFlags {
     /// Use c32 encoding
@@ -263,19 +208,16 @@ impl FormatSpec {
     ) -> Result<Self> {
         // Check for conflicts between --format and individual flags
         if format_str.is_some() && scheme_flags.is_set() {
-            anyhow::bail!(
-                "Cannot use --format together with scheme flags (--legacy, --zrbcx, etc.)"
-            );
+            anyhow::bail!("Cannot use --format together with scheme flags");
         }
         if format_str.is_some() && encoding_flags.is_set() {
-            anyhow::bail!(
-                "Cannot use --format together with encoding flags (--c32, --b32, --b64, --hex)"
-            );
+            anyhow::bail!("Cannot use --format together with encoding flags");
         }
 
         // Parse --format if provided
         if let Some(fmt_str) = format_str {
             let format = Format::from_str(&fmt_str).map_err(|e| anyhow::anyhow!("{}", e))?;
+            validate_secure_scheme(format.scheme())?;
             return Ok(Self {
                 scheme: format.scheme(),
                 encoding: format.encoding(),
@@ -307,16 +249,12 @@ enum Commands {
         #[arg(short, long)]
         key: Option<String>,
 
-        /// Z-tier secret (43 base64 chars, for z-tier schemes)
-        #[arg(short = 's', long)]
-        secret: Option<String>,
-
         /// Use named key profile
         #[arg(short, long)]
         profile: Option<String>,
 
         /// Use hardcoded key (INSECURE - testing only)
-        #[arg(short = 'z', long)]
+        #[arg(short = 'K', long)]
         keyless: bool,
 
         /// Format specification (e.g., "zrbcx. b64", "aags.b32")
@@ -343,16 +281,12 @@ enum Commands {
         #[arg(short, long)]
         key: Option<String>,
 
-        /// Z-tier secret (43 base64 chars, for z-tier schemes)
-        #[arg(short = 's', long)]
-        secret: Option<String>,
-
         /// Use named key profile
         #[arg(short, long)]
         profile: Option<String>,
 
         /// Use hardcoded key (INSECURE - testing only)
-        #[arg(short = 'z', long)]
+        #[arg(short = 'K', long)]
         keyless: bool,
 
         /// Format specification (e.g., "zrbcx.b64", "aags.b32")
@@ -384,7 +318,7 @@ enum Commands {
         command: Option<ConfigCommands>,
 
         /// Use hardcoded key (INSECURE - testing only)
-        #[arg(short = 'z', long)]
+        #[arg(short = 'K', long)]
         keyless: bool,
     },
 
@@ -402,16 +336,12 @@ enum Commands {
         #[arg(short, long)]
         key: Option<String>,
 
-        /// Z-tier secret (43 base64 chars)
-        #[arg(short = 's', long)]
-        secret: Option<String>,
-
         /// Use named key profile
         #[arg(short, long)]
         profile: Option<String>,
 
         /// Use hardcoded key (INSECURE - testing only)
-        #[arg(short = 'z', long)]
+        #[arg(short = 'K', long)]
         keyless: bool,
 
         /// Output key as hex instead of base64
@@ -431,7 +361,7 @@ enum ConfigCommands {
     /// Show current configuration
     Show {
         /// Use hardcoded key
-        #[arg(short = 'z', long)]
+        #[arg(short = 'K', long)]
         keyless: bool,
     },
     /// Set configuration values
@@ -478,10 +408,6 @@ enum ProfileCommands {
         /// Encryption key (86 base64 chars)
         #[arg(short, long)]
         key: Option<String>,
-
-        /// Z-tier secret (43 base64 chars)
-        #[arg(short = 's', long)]
-        secret: Option<String>,
     },
     /// Delete a key profile
     #[command(visible_alias = "d")]
@@ -507,10 +433,6 @@ enum ProfileCommands {
         /// Encryption key (86 base64 chars)
         #[arg(short, long)]
         key: Option<String>,
-
-        /// Z-tier secret (43 base64 chars)
-        #[arg(short = 's', long)]
-        secret: Option<String>,
     },
 }
 
@@ -521,7 +443,6 @@ fn main() -> Result<()> {
         Commands::Enc {
             text,
             key,
-            secret,
             profile,
             keyless,
             format,
@@ -530,13 +451,12 @@ fn main() -> Result<()> {
         } => {
             let cfg = config::load_config().ok();
             let format_spec = FormatSpec::parse(format, &scheme, &encoding, cfg.as_ref())?;
-            enc_command(text, key, secret, profile, keyless, format_spec)
+            enc_command(text, key, profile, keyless, format_spec)
         }
 
         Commands::Dec {
             text,
             key,
-            secret,
             profile,
             keyless,
             format,
@@ -546,15 +466,7 @@ fn main() -> Result<()> {
             let cfg = config::load_config().ok();
             let scheme_is_explicit = scheme.is_set() || format.is_some();
             let format_spec = FormatSpec::parse(format, &scheme, &encoding, cfg.as_ref())?;
-            dec_command(
-                text,
-                key,
-                secret,
-                profile,
-                keyless,
-                format_spec,
-                scheme_is_explicit,
-            )
+            dec_command(text, key, profile, keyless, format_spec, scheme_is_explicit)
         }
 
         Commands::Init { name } => config::init_command(&name),
@@ -578,25 +490,24 @@ fn main() -> Result<()> {
             ProfileCommands::List => config::profile_list_command(),
             ProfileCommands::Show { name } => config::profile_show_command(name.as_deref()),
             ProfileCommands::Activate { name } => config::profile_activate_command(&name),
-            ProfileCommands::Create { name, key, secret } => {
-                config::profile_create_command(&name, key.as_deref(), secret.as_deref())
+            ProfileCommands::Create { name, key } => {
+                config::profile_create_command(&name, key.as_deref())
             }
             ProfileCommands::Delete { name } => config::profile_delete_command(&name),
             ProfileCommands::Rename { old_name, new_name } => {
                 config::profile_rename_command(&old_name, &new_name)
             }
-            ProfileCommands::Set { name, key, secret } => {
-                config::profile_set_command(&name, key.as_deref(), secret.as_deref())
+            ProfileCommands::Set { name, key } => {
+                config::profile_set_command(&name, key.as_deref())
             }
         },
 
         Commands::Key {
             key,
-            secret,
             profile,
             keyless,
             hex,
-        } => key_command(key, secret, profile, keyless, hex),
+        } => key_command(key, profile, keyless, hex),
 
         Commands::Completion { shell } => {
             completions::generate_completion(shell);
@@ -605,23 +516,9 @@ fn main() -> Result<()> {
     }
 }
 
-// Helper to check if scheme is z-tier
-fn is_ztier_scheme(scheme: Scheme) -> bool {
-    match scheme {
-        #[cfg(feature = "zrbcx")]
-        Scheme::Zrbcx => true,
-        #[cfg(feature = "zmock")]
-        Scheme::Zmock1 => true,
-        #[cfg(feature = "legacy")]
-        Scheme::Legacy => true,
-        _ => false,
-    }
-}
-
 fn enc_command(
     text: Option<String>,
     key: Option<String>,
-    secret: Option<String>,
     profile: Option<String>,
     keyless: bool,
     format_spec: FormatSpec,
@@ -635,48 +532,13 @@ fn enc_command(
     // Create format
     let format = format_spec.to_string();
 
-    // Determine if we need key or secret based on scheme
-    let is_ztier = is_ztier_scheme(format_spec.scheme);
-
     // Get ob instance
     if keyless {
-        // For keyless mode, use appropriate constructor based on scheme
-        if is_ztier {
-            #[cfg(feature = "ztier")]
-            {
-                let oz = oboron::ztier::Oz::new_keyless(&format)?;
-                let encd = oz.enc(&text)?;
-                println!("{}", encd);
-            }
-            #[cfg(not(feature = "ztier"))]
-            anyhow::bail!("Z-tier schemes not enabled in this build");
-        } else {
-            let ob = oboron::Ob::new_keyless(&format)?;
-            let encd = ob.enc(&text)?;
-            println!("{}", encd);
-        }
-    } else if is_ztier {
-        #[cfg(feature = "ztier")]
-        {
-            let b64_secret = get_secret(
-                secret.as_ref(),
-                key.as_ref(),
-                profile.as_deref(),
-                cfg.as_ref(),
-            )?;
-            let oz = oboron::ztier::Oz::new(&format, &b64_secret)?;
-            let encd = oz.enc(&text)?;
-            println!("{}", encd);
-        }
-        #[cfg(not(feature = "ztier"))]
-        anyhow::bail!("Z-tier schemes not enabled in this build");
+        let ob = oboron::Ob::new_keyless(&format)?;
+        let encd = ob.enc(&text)?;
+        println!("{}", encd);
     } else {
-        let b64_key = get_key(
-            key.as_ref(),
-            secret.as_ref(),
-            profile.as_deref(),
-            cfg.as_ref(),
-        )?;
+        let b64_key = get_key(key.as_ref(), profile.as_deref(), cfg.as_ref())?;
         let ob = oboron::Ob::new(&format, &b64_key)?;
         let encd = ob.enc(&text)?;
         println!("{}", encd);
@@ -688,7 +550,6 @@ fn enc_command(
 fn dec_command(
     text: Option<String>,
     key: Option<String>,
-    secret: Option<String>,
     profile: Option<String>,
     keyless: bool,
     format_spec: FormatSpec,
@@ -703,59 +564,17 @@ fn dec_command(
     // Create format
     let format = format_spec.to_string();
 
-    // Determine if we need key or secret based on scheme
-    let is_ztier = is_ztier_scheme(format_spec.scheme);
-
     // Get ob instance and decode
     if keyless {
-        if is_ztier {
-            #[cfg(feature = "ztier")]
-            {
-                let oz = oboron::ztier::Oz::new_keyless(&format)?;
-                let decd = if scheme_is_explicit {
-                    oz.dec(&text)?
-                } else {
-                    oz.autodec(&text)?
-                };
-                println!("{}", decd);
-            }
-            #[cfg(not(feature = "ztier"))]
-            anyhow::bail!("Z-tier schemes not enabled in this build");
+        let ob = oboron::Ob::new_keyless(&format)?;
+        let decd = if scheme_is_explicit {
+            ob.dec(&text)?
         } else {
-            let ob = oboron::Ob::new_keyless(&format)?;
-            let decd = if scheme_is_explicit {
-                ob.dec(&text)?
-            } else {
-                ob.autodec(&text)?
-            };
-            println!("{}", decd);
-        }
-    } else if is_ztier {
-        #[cfg(feature = "ztier")]
-        {
-            let b64_secret = get_secret(
-                secret.as_ref(),
-                key.as_ref(),
-                profile.as_deref(),
-                cfg.as_ref(),
-            )?;
-            let oz = oboron::ztier::Oz::new(&format, &b64_secret)?;
-            let decd = if scheme_is_explicit {
-                oz.dec(&text)?
-            } else {
-                oz.autodec(&text)?
-            };
-            println!("{}", decd);
-        }
-        #[cfg(not(feature = "ztier"))]
-        anyhow::bail!("Z-tier schemes not enabled in this build");
+            ob.autodec(&text)?
+        };
+        println!("{}", decd);
     } else {
-        let b64_key = get_key(
-            key.as_ref(),
-            secret.as_ref(),
-            profile.as_deref(),
-            cfg.as_ref(),
-        )?;
+        let b64_key = get_key(key.as_ref(), profile.as_deref(), cfg.as_ref())?;
         let ob = oboron::Ob::new(&format, &b64_key)?;
         let decd = if scheme_is_explicit {
             ob.dec(&text)?
@@ -775,12 +594,13 @@ fn config_set_command(
 ) -> Result<()> {
     let mut config = config::load_config().unwrap_or(Config {
         profile: "default".to_string(),
-        scheme: "mock1".to_string(),
+        scheme: "aasv".to_string(),
         encoding: "c32".to_string(),
     });
 
     // Update scheme if provided
     if let Some(scheme) = scheme_override {
+        validate_secure_scheme(scheme)?;
         config.scheme = scheme.to_string();
     }
 
@@ -797,8 +617,8 @@ fn config_set_command(
     config::save_config(&config)?;
 
     println!("✓ Configuration updated");
-    println!("  Profile: {}", config.profile);
-    println!("  Scheme:  {}", config.scheme);
+    println!("  Profile:  {}", config.profile);
+    println!("  Scheme:   {}", config.scheme);
     println!("  Encoding: {}", config.encoding);
 
     Ok(())
@@ -806,7 +626,6 @@ fn config_set_command(
 
 fn key_command(
     key: Option<String>,
-    secret: Option<String>,
     profile: Option<String>,
     keyless: bool,
     hex: bool,
@@ -830,7 +649,6 @@ fn key_command(
     // Get config for resolution
     let cfg = config::load_config().ok();
 
-    // Try to get key or secret (whichever is available)
     if let Some(k) = key {
         if hex {
             let key_bytes = BASE64URL_NOPAD
@@ -841,16 +659,6 @@ fn key_command(
         } else {
             println!("{}", k);
         }
-    } else if let Some(s) = secret {
-        if hex {
-            let secret_bytes = BASE64URL_NOPAD
-                .decode(s.as_bytes())
-                .context("Failed to decode base64 secret")?;
-            let hex_secret = HEXLOWER.encode(&secret_bytes);
-            println!("{}", hex_secret);
-        } else {
-            println!("{}", s);
-        }
     } else if let Some(prof) = profile
         .as_deref()
         .or_else(|| cfg.as_ref().map(|c| c.profile.as_str()))
@@ -858,7 +666,7 @@ fn key_command(
         let profile = config::load_profile(prof)?;
         if let Some(k) = &profile.key {
             println!(
-                "Key:     {}",
+                "{}",
                 if hex {
                     let key_bytes = BASE64URL_NOPAD.decode(k.as_bytes())?;
                     HEXLOWER.encode(&key_bytes)
@@ -867,39 +675,19 @@ fn key_command(
                 }
             );
         }
-        if let Some(s) = &profile.secret {
-            println!(
-                "Secret: {}",
-                if hex {
-                    let secret_bytes = BASE64URL_NOPAD.decode(s.as_bytes())?;
-                    HEXLOWER.encode(&secret_bytes)
-                } else {
-                    s.clone()
-                }
-            );
-        }
     } else {
-        anyhow::bail!(
-            "No key/secret specified:  provide --key, --secret, --profile, or run 'ob init'"
-        );
+        anyhow::bail!("No key specified:  provide --key, --profile, or run 'ob init'");
     }
 
     Ok(())
 }
 
-fn get_key(
-    key: Option<&String>,
-    _secret: Option<&String>, // For potential fallback
-    profile: Option<&str>,
-    config: Option<&Config>,
-) -> Result<String> {
-    // Check for explicit key flag (highest priority)
+fn get_key(key: Option<&String>, profile: Option<&str>, config: Option<&Config>) -> Result<String> {
     if let Some(key_str) = key {
         validate_base64_key(key_str)?;
         return Ok(key_str.clone());
     }
 
-    // Check for explicit profile flag or config default
     let profile_name = profile.or_else(|| config.map(|c| c.profile.as_str()));
 
     if let Some(name) = profile_name {
@@ -908,42 +696,11 @@ fn get_key(
             validate_base64_key(k)?;
             return Ok(k.clone());
         }
-        // If profile has no key, that's an error for non-ztier schemes
         anyhow::bail!("Profile '{}' has no key", name);
     }
 
     Err(anyhow::anyhow!(
-        "No key specified:  provide --key, --profile <name>, or run 'ob init' to create config"
-    ))
-}
-
-fn get_secret(
-    secret: Option<&String>,
-    _key: Option<&String>, // For potential fallback
-    profile: Option<&str>,
-    config: Option<&Config>,
-) -> Result<String> {
-    // Check for explicit secret flag (highest priority)
-    if let Some(secret_str) = secret {
-        validate_base64_secret(secret_str)?;
-        return Ok(secret_str.clone());
-    }
-
-    // Check for explicit profile flag or config default
-    let profile_name = profile.or_else(|| config.map(|c| c.profile.as_str()));
-
-    if let Some(name) = profile_name {
-        let profile = config::load_profile(name)?;
-        if let Some(s) = &profile.secret {
-            validate_base64_secret(s)?;
-            return Ok(s.clone());
-        }
-        // If profile has no secret, that's an error for z-tier schemes
-        anyhow::bail!("Profile '{}' has no secret", name);
-    }
-
-    Err(anyhow::anyhow!(
-        "No secret specified: provide --secret, --profile <name>, or run 'ob init' to create config"
+        "No key specified: provide --key, --profile, or run 'ob init'"
     ))
 }
 
@@ -972,30 +729,6 @@ fn validate_base64_key(key_str: &str) -> Result<()> {
     Ok(())
 }
 
-fn validate_base64_secret(secret_str: &str) -> Result<()> {
-    // Check length
-    if secret_str.len() != 43 {
-        return Err(anyhow::anyhow!(
-            "Secret must be 43 base64 chars, got {} chars",
-            secret_str.len()
-        ));
-    }
-
-    // Validate base64 encoding and length
-    use data_encoding::BASE64URL_NOPAD;
-    let secret_bytes = BASE64URL_NOPAD
-        .decode(secret_str.as_bytes())
-        .context("Invalid secret base64 encoding")?;
-
-    if secret_bytes.len() != 32 {
-        return Err(anyhow::anyhow!(
-            "Secret must decode to 32 bytes, got {} bytes",
-            secret_bytes.len()
-        ));
-    }
-
-    Ok(())
-}
 fn get_text_input(text: Option<String>) -> Result<String> {
     match text {
         Some(t) => Ok(t),
@@ -1016,17 +749,20 @@ fn get_text_input(text: Option<String>) -> Result<String> {
 fn get_scheme(scheme_override: Option<Scheme>, config: Option<&Config>) -> Result<Scheme> {
     // Explicit flag takes precedence
     if let Some(scheme) = scheme_override {
+        validate_secure_scheme(scheme)?;
         return Ok(scheme);
     }
 
     // Fall back to config
     if let Some(cfg) = config {
-        return Scheme::from_str(&cfg.scheme).map_err(|e| anyhow::anyhow!("{}", e));
+        let scheme = Scheme::from_str(&cfg.scheme).map_err(|e| anyhow::anyhow!("{}", e))?;
+        validate_secure_scheme(scheme)?;
+        return Ok(scheme);
     }
 
     // No override and no config - error
     Err(anyhow::anyhow!(
-        "scheme not specified: run 'ob init' or use a scheme flag (e.g., --aasv) or --format"
+        "scheme not specified: run 'ob init' or use a scheme flag or --format"
     ))
 }
 
@@ -1043,504 +779,29 @@ fn get_encoding(encoding_override: Option<Encoding>, config: Option<&Config>) ->
 
     // No override and no config - error
     Err(anyhow::anyhow!(
-        "encoding not specified: run 'ob init' or use an encoding flag (e.g., --b32) or --format"
+        "encoding not specified: run 'ob init' or use an encoding flag or --format"
     ))
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_validate_base64_secret_valid() {
-        let secret_str = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-        assert!(validate_base64_secret(&secret_str).is_ok());
-    }
-
-    #[test]
-    fn test_validate_base64_secret_wrong_length() {
-        let secret_str = "AAAAAAAAAAAAAAAAAAAAAAAA";
-        assert!(validate_base64_secret(&secret_str).is_err());
-    }
-
-    #[test]
-    fn test_is_ztier_scheme() {
-        #[cfg(feature = "zrbcx")]
-        assert!(is_ztier_scheme(Scheme::Zrbcx));
-
+fn validate_secure_scheme(scheme: Scheme) -> Result<()> {
+    match scheme {
+        #[cfg(feature = "aags")]
+        Scheme::Aags => Ok(()),
+        #[cfg(feature = "apgs")]
+        Scheme::Apgs => Ok(()),
         #[cfg(feature = "aasv")]
-        assert!(!is_ztier_scheme(Scheme::Aasv));
-    }
-
-    #[test]
-    #[cfg(feature = "mock")]
-    fn test_scheme_flags_to_scheme_single() {
-        #[cfg(not(any(
-            feature = "zrbcx",
-            feature = "upbc",
-            feature = "aags",
-            feature = "apgs",
-            feature = "aasv",
-            feature = "apsv",
-            feature = "mock",
-            feature = "mock",
-            feature = "legacy"
-        )))]
-        compile_error!("At least one oboron scheme must be enabled");
-        let flags = SchemeFlags {
-            #[cfg(feature = "legacy")]
-            legacy: false,
-            #[cfg(feature = "zrbcx")]
-            zrbcx: false,
-            #[cfg(feature = "upbc")]
-            upbc: false,
-            #[cfg(feature = "aags")]
-            aags: false,
-            #[cfg(feature = "apgs")]
-            apgs: false,
-            #[cfg(feature = "aasv")]
-            aasv: false,
-            #[cfg(feature = "apsv")]
-            apsv: false,
-            #[cfg(feature = "mock")]
-            mock1: true,
-            #[cfg(feature = "mock")]
-            mock2: false,
-        };
-        assert_eq!(flags.to_scheme().unwrap(), Some(Scheme::Mock1));
-    }
-
-    #[test]
-    #[cfg(feature = "aasv")]
-    #[cfg(feature = "apsv")]
-    fn test_scheme_flags_to_scheme_multiple_errors() {
-        #[cfg(not(any(
-            feature = "zrbcx",
-            feature = "upbc",
-            feature = "aags",
-            feature = "apgs",
-            feature = "aasv",
-            feature = "apsv",
-            feature = "mock",
-            feature = "mock",
-            feature = "legacy"
-        )))]
-        compile_error!("At least one oboron scheme must be enabled");
-        let flags = SchemeFlags {
-            #[cfg(feature = "legacy")]
-            legacy: false,
-            #[cfg(feature = "zrbcx")]
-            zrbcx: false,
-            #[cfg(feature = "upbc")]
-            upbc: false,
-            #[cfg(feature = "aags")]
-            aags: false,
-            #[cfg(feature = "apgs")]
-            apgs: false,
-            #[cfg(feature = "aasv")]
-            aasv: true,
-            #[cfg(feature = "apsv")]
-            apsv: true,
-            #[cfg(feature = "mock")]
-            mock1: false,
-            #[cfg(feature = "mock")]
-            mock2: false,
-        };
-        assert!(flags.to_scheme().is_err());
-    }
-
-    #[test]
-    fn test_scheme_flags_to_scheme_none() {
-        #[cfg(not(any(
-            feature = "zrbcx",
-            feature = "upbc",
-            feature = "aags",
-            feature = "apgs",
-            feature = "aasv",
-            feature = "apsv",
-            feature = "mock",
-            feature = "mock",
-            feature = "legacy"
-        )))]
-        compile_error!("At least one oboron scheme must be enabled");
-        let flags = SchemeFlags {
-            #[cfg(feature = "legacy")]
-            legacy: false,
-            #[cfg(feature = "zrbcx")]
-            zrbcx: false,
-            #[cfg(feature = "upbc")]
-            upbc: false,
-            #[cfg(feature = "aags")]
-            aags: false,
-            #[cfg(feature = "apgs")]
-            apgs: false,
-            #[cfg(feature = "aasv")]
-            aasv: false,
-            #[cfg(feature = "apsv")]
-            apsv: false,
-            #[cfg(feature = "mock")]
-            mock1: false,
-            #[cfg(feature = "mock")]
-            mock2: false,
-        };
-        assert_eq!(flags.to_scheme().unwrap(), None);
-    }
-
-    #[test]
-    fn test_encoding_flags_to_encoding_single() {
-        let flags = EncodingFlags {
-            c32: false,
-            b32: false,
-            b64: true,
-            hex: false,
-        };
-        assert_eq!(flags.to_encoding().unwrap(), Some(Encoding::B64));
-    }
-
-    #[test]
-    fn test_encoding_flags_to_encoding_multiple_errors() {
-        let flags = EncodingFlags {
-            c32: false,
-            b32: true,
-            b64: true,
-            hex: false,
-        };
-        assert!(flags.to_encoding().is_err());
-    }
-
-    #[test]
-    #[cfg(feature = "mock")]
-    fn test_format_spec_from_format_string() {
-        let config = Config {
-            profile: "test".to_string(),
-            scheme: "mock1".to_string(),
-            encoding: "b32".to_string(),
-        };
-
-        #[cfg(not(any(
-            feature = "zrbcx",
-            feature = "upbc",
-            feature = "aags",
-            feature = "apgs",
-            feature = "aasv",
-            feature = "apsv",
-            feature = "mock",
-            feature = "mock",
-            feature = "legacy"
-        )))]
-        compile_error!("At least one oboron scheme must be enabled");
-        let scheme_flags = SchemeFlags {
-            #[cfg(feature = "legacy")]
-            legacy: false,
-            #[cfg(feature = "zrbcx")]
-            zrbcx: false,
-            #[cfg(feature = "upbc")]
-            upbc: false,
-            #[cfg(feature = "aags")]
-            aags: false,
-            #[cfg(feature = "apgs")]
-            apgs: false,
-            #[cfg(feature = "aasv")]
-            aasv: false,
-            #[cfg(feature = "apsv")]
-            apsv: false,
-            #[cfg(feature = "mock")]
-            mock1: false,
-            #[cfg(feature = "mock")]
-            mock2: false,
-        };
-        let encoding_flags = EncodingFlags {
-            c32: false,
-            b32: false,
-            b64: false,
-            hex: false,
-        };
-
-        let result = FormatSpec::parse(
-            Some("mock1.b64".to_string()),
-            &scheme_flags,
-            &encoding_flags,
-            Some(&config),
-        )
-        .unwrap();
-
-        assert_eq!(result.scheme, Scheme::Mock1);
-        assert_eq!(result.encoding, Encoding::B64);
-    }
-
-    #[test]
-    #[cfg(feature = "mock")]
-    fn test_format_spec_conflicts_with_scheme_flag() {
-        #[cfg(not(any(
-            feature = "zrbcx",
-            feature = "upbc",
-            feature = "aags",
-            feature = "apgs",
-            feature = "aasv",
-            feature = "apsv",
-            feature = "mock",
-            feature = "mock",
-            feature = "legacy"
-        )))]
-        compile_error!("At least one oboron scheme must be enabled");
-        let scheme_flags = SchemeFlags {
-            #[cfg(feature = "legacy")]
-            legacy: false,
-            #[cfg(feature = "zrbcx")]
-            zrbcx: false,
-            #[cfg(feature = "upbc")]
-            upbc: false,
-            #[cfg(feature = "aags")]
-            aags: false,
-            #[cfg(feature = "apgs")]
-            apgs: false,
-            #[cfg(feature = "aasv")]
-            aasv: false,
-            #[cfg(feature = "apsv")]
-            apsv: false,
-            #[cfg(feature = "mock")]
-            mock1: true,
-            #[cfg(feature = "mock")]
-            mock2: false,
-        };
-        let encoding_flags = EncodingFlags {
-            c32: false,
-            b32: false,
-            b64: false,
-            hex: false,
-        };
-
-        let result = FormatSpec::parse(
-            Some("mock1.b64".to_string()),
-            &scheme_flags,
-            &encoding_flags,
-            None,
-        );
-
-        assert!(result.is_err());
-        assert!(result
-            .unwrap_err()
-            .to_string()
-            .contains("Cannot use --format together with scheme"));
-    }
-
-    #[test]
-    fn test_format_spec_conflicts_with_encoding_flag() {
-        #[cfg(not(any(
-            feature = "zrbcx",
-            feature = "upbc",
-            feature = "aags",
-            feature = "apgs",
-            feature = "aasv",
-            feature = "apsv",
-            feature = "mock",
-            feature = "mock",
-            feature = "legacy"
-        )))]
-        compile_error!("At least one oboron scheme must be enabled");
-        let scheme_flags = SchemeFlags {
-            #[cfg(feature = "legacy")]
-            legacy: false,
-            #[cfg(feature = "zrbcx")]
-            zrbcx: false,
-            #[cfg(feature = "upbc")]
-            upbc: false,
-            #[cfg(feature = "aags")]
-            aags: false,
-            #[cfg(feature = "apgs")]
-            apgs: false,
-            #[cfg(feature = "aasv")]
-            aasv: false,
-            #[cfg(feature = "apsv")]
-            apsv: false,
-            #[cfg(feature = "mock")]
-            mock1: false,
-            #[cfg(feature = "mock")]
-            mock2: false,
-        };
-        let encoding_flags = EncodingFlags {
-            c32: false,
-            b32: false,
-            b64: true,
-            hex: false,
-        };
-
-        let result = FormatSpec::parse(
-            Some("mock1.b64".to_string()),
-            &scheme_flags,
-            &encoding_flags,
-            None,
-        );
-
-        assert!(result.is_err());
-        assert!(result
-            .unwrap_err()
-            .to_string()
-            .contains("Cannot use --format together with encoding"));
-    }
-
-    #[test]
-    #[cfg(feature = "mock")]
-    fn test_format_spec_from_flags() {
-        let config = Config {
-            profile: "test".to_string(),
-            scheme: "mock2".to_string(),
-            encoding: "b32".to_string(),
-        };
-
-        #[cfg(not(any(
-            feature = "zrbcx",
-            feature = "upbc",
-            feature = "aags",
-            feature = "apgs",
-            feature = "aasv",
-            feature = "apsv",
-            feature = "mock",
-            feature = "mock",
-            feature = "legacy"
-        )))]
-        compile_error!("At least one oboron scheme must be enabled");
-        let scheme_flags = SchemeFlags {
-            #[cfg(feature = "legacy")]
-            legacy: false,
-            #[cfg(feature = "zrbcx")]
-            zrbcx: false,
-            #[cfg(feature = "upbc")]
-            upbc: false,
-            #[cfg(feature = "aags")]
-            aags: false,
-            #[cfg(feature = "apgs")]
-            apgs: false,
-            #[cfg(feature = "aasv")]
-            aasv: false,
-            #[cfg(feature = "apsv")]
-            apsv: false,
-            #[cfg(feature = "mock")]
-            mock1: true,
-            #[cfg(feature = "mock")]
-            mock2: false,
-        };
-        let encoding_flags = EncodingFlags {
-            c32: false,
-            b32: false,
-            b64: true,
-            hex: false,
-        };
-
-        let result =
-            FormatSpec::parse(None, &scheme_flags, &encoding_flags, Some(&config)).unwrap();
-
-        assert_eq!(result.scheme, Scheme::Mock1);
-        assert_eq!(result.encoding, Encoding::B64);
-    }
-
-    #[test]
-    #[cfg(feature = "mock")]
-    fn test_format_spec_from_config() {
-        let config = Config {
-            profile: "test".to_string(),
-            scheme: "mock1".to_string(),
-            encoding: "hex".to_string(),
-        };
-
-        #[cfg(not(any(
-            feature = "zrbcx",
-            feature = "upbc",
-            feature = "aags",
-            feature = "apgs",
-            feature = "aasv",
-            feature = "apsv",
-            feature = "mock",
-            feature = "mock",
-            feature = "legacy"
-        )))]
-        compile_error!("At least one oboron scheme must be enabled");
-        let scheme_flags = SchemeFlags {
-            #[cfg(feature = "legacy")]
-            legacy: false,
-            #[cfg(feature = "zrbcx")]
-            zrbcx: false,
-            #[cfg(feature = "upbc")]
-            upbc: false,
-            #[cfg(feature = "aags")]
-            aags: false,
-            #[cfg(feature = "apgs")]
-            apgs: false,
-            #[cfg(feature = "aasv")]
-            aasv: false,
-            #[cfg(feature = "apsv")]
-            apsv: false,
-            #[cfg(feature = "mock")]
-            mock1: false,
-            #[cfg(feature = "mock")]
-            mock2: false,
-        };
-        let encoding_flags = EncodingFlags {
-            c32: false,
-            b32: false,
-            b64: false,
-            hex: false,
-        };
-
-        let result =
-            FormatSpec::parse(None, &scheme_flags, &encoding_flags, Some(&config)).unwrap();
-
-        assert_eq!(result.scheme, Scheme::Mock1);
-        assert_eq!(result.encoding, Encoding::Hex);
-    }
-
-    #[test]
-    #[cfg(feature = "mock")]
-    fn test_get_scheme_from_override() {
-        let result = get_scheme(Some(Scheme::Mock1), None);
-        assert_eq!(result.unwrap(), Scheme::Mock1);
-    }
-
-    #[test]
-    #[cfg(feature = "mock")]
-    fn test_get_scheme_from_config() {
-        let config = Config {
-            profile: "test".to_string(),
-            scheme: "mock1".to_string(),
-            encoding: "b32".to_string(),
-        };
-        let result = get_scheme(None, Some(&config));
-        assert_eq!(result.unwrap(), Scheme::Mock1);
-    }
-
-    #[test]
-    fn test_get_key_from_base64_string() {
-        let key_str = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA".to_string();
-        let result = get_key(Some(&key_str), None, None, None);
-        assert!(result.is_ok());
-        assert_eq!(result.unwrap(), key_str);
-    }
-
-    #[test]
-    fn test_validate_base64_key_valid() {
-        let key_str = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-        assert!(validate_base64_key(&key_str).is_ok());
-    }
-
-    #[test]
-    fn test_validate_base64_key_wrong_length() {
-        let key_str = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-        assert!(validate_base64_key(&key_str).is_err());
-    }
-
-    #[test]
-    fn test_validate_base64_key_invalid_encoding() {
-        let mut key_str = "A".repeat(85);
-        key_str.push('!'); // Invalid base64 character
-        assert!(validate_base64_key(&key_str).is_err());
-    }
-    #[test]
-    #[cfg(feature = "aasv")]
-    fn test_format_spec_to_string() {
-        let spec = FormatSpec {
-            scheme: Scheme::Aasv,
-            encoding: Encoding::B64,
-        };
-        assert_eq!(spec.to_string(), "aasv.b64");
+        Scheme::Aasv => Ok(()),
+        #[cfg(feature = "apsv")]
+        Scheme::Apsv => Ok(()),
+        #[cfg(feature = "upbc")]
+        Scheme::Upbc => Ok(()),
+        #[cfg(feature = "mock")]
+        Scheme::Mock1 => Ok(()),
+        #[cfg(feature = "mock")]
+        Scheme::Mock2 => Ok(()),
+        _ => Err(anyhow:: anyhow!(
+            "Invalid secure scheme: {}.  Use ob for secure schemes (aags, aasv, etc.) or obz for z-tier schemes",
+            scheme.as_str()
+        )),
     }
 }
