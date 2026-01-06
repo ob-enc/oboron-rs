@@ -80,13 +80,10 @@ pub(crate) fn enc_to_format(
     payload.extend_from_slice(&ciphertext);
     payload.extend_from_slice(&marker);
 
-    // Step 3: XOR the scheme marker bytes with the first two bytes for entropy
+    // Step 3: XOR the scheme marker bytes with the first byte for entropy
     let len = payload.len();
     payload[len - 1] ^= payload[0];
-    if len >= 4 {
-        // only XOR the other marker byte if we have >1B of ciphertext
-        payload[len - 2] ^= payload[1];
-    }
+    payload[len - 2] ^= payload[0];
 
     // Step 4: Encode to specified format
     match format.encoding() {

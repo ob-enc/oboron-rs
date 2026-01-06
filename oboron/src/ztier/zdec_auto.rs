@@ -56,7 +56,7 @@ pub(crate) fn dec_any_scheme_ztier(
     // Step 2: XOR the last two bytes with the first two to undo mixing
     let len = buffer.len();
     buffer[len - 1] ^= buffer[0];
-    buffer[len - 2] ^= buffer[1];
+    buffer[len - 2] ^= buffer[0];
 
     // Step 3: Extract 2-byte scheme marker from end
     let scheme_marker = [buffer[len - 2], buffer[len - 1]];
@@ -98,7 +98,7 @@ fn bytes_to_string(plaintext_bytes: Vec<u8>) -> Result<String, Error> {
 
     #[cfg(not(feature = "unchecked-utf8"))]
     {
-        String::from_utf8(plaintext_bytes).map_err(|_| Error::DecryptionFailed)
+        String::from_utf8(plaintext_bytes).map_err(|_| Error::InvalidUtf8)
     }
 }
 

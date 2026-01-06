@@ -18,6 +18,8 @@ pub enum Error {
     InvalidB32,
     #[error("invalid base32crockford encoding")]
     InvalidC32,
+    #[error("invalid UTF-8")]
+    InvalidUtf8,
 
     // Format/scheme errors
     // --------------------
@@ -49,9 +51,6 @@ pub enum Error {
     InvalidBlockLength,
     #[error("decoding failed: scheme marker mismatch")]
     SchemeMarkerMismatch,
-    #[error("decoding failed: scheme byte mismatch")]
-    #[deprecated(since = "1.0.0", note = "Use SchemeMarkerMismatch instead")]
-    SchemeByteMismatch,
     #[cfg(feature = "legacy")]
     #[error("legacy fallback produced invalid output (likely encoding mismatch)")]
     InvalidLegacyOutput,

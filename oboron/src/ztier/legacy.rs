@@ -115,7 +115,7 @@ macro_rules! impl_legacy_codec {
 
                 #[cfg(not(feature = "unchecked-utf8"))]
                 {
-                    String::from_utf8(plaintext_bytes).map_err(|_| Error::DecryptionFailed)
+                    String::from_utf8(plaintext_bytes).map_err(|_| Error::InvalidUtf8)
                 }
             }
 
