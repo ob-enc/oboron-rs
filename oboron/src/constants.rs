@@ -25,6 +25,9 @@ pub const SCHEME_MARKER_SIZE: usize = 2;
 // Byte 1: [ext:1][version:4][tier:3]
 // Byte 2: [properties:4][algorithm:4]
 //
+// Note: During encoding, both marker bytes are XORed with the first ciphertext byte
+// for entropy mixing. This ensures the marker appears random even for short payloads.
+//
 // ext (1 bit): Extension flag (0 = no extension, 1 = more bytes follow)
 // version (4 bits): Format version (0000 = v0)
 // tier (3 bits): Security tier
@@ -93,7 +96,7 @@ pub const MOCK2_MARKER: [u8; 2] = make_marker(0, 4, 14);
 // Tier zmock - Z-tier Testing (non-encrypted)
 // -------------------------------------------
 
-// zmock1:  tier=111, properties=0100 (det-unauth), algorithm=1111 (none)
+// zmock1:  tier=111, properties=0100 (det/non-ref), algorithm=1111 (none)
 #[cfg(feature = "zmock")]
 pub const ZMOCK1_MARKER: [u8; 2] = make_marker(7, 4, 15);
 
