@@ -332,10 +332,6 @@ enum Commands {
     /// Output the encryption key
     #[command(visible_alias = "k")]
     Key {
-        /// Encryption key (86 base64 chars)
-        #[arg(short, long)]
-        key: Option<String>,
-
         /// Use named key profile
         #[arg(short, long)]
         profile: Option<String>,
@@ -503,11 +499,10 @@ fn main() -> Result<()> {
         },
 
         Commands::Key {
-            key,
             profile,
             keyless,
             hex,
-        } => key_command(key, profile, keyless, hex),
+        } => key_command(profile, keyless, hex),
 
         Commands::Completion { shell } => {
             completions::generate_completion(shell);
@@ -624,12 +619,7 @@ fn config_set_command(
     Ok(())
 }
 
-fn key_command(
-    key: Option<String>,
-    profile: Option<String>,
-    keyless: bool,
-    hex: bool,
-) -> Result<()> {
+fn key_command(profile: Option<String>, keyless: bool, hex: bool) -> Result<()> {
     use data_encoding::{BASE64URL_NOPAD, HEXLOWER};
 
     if keyless {
@@ -649,17 +639,7 @@ fn key_command(
     // Get config for resolution
     let cfg = config::load_config().ok();
 
-    if let Some(k) = key {
-        if hex {
-            let key_bytes = BASE64URL_NOPAD
-                .decode(k.as_bytes())
-                .context("Failed to decode base64 key")?;
-            let hex_key = HEXLOWER.encode(&key_bytes);
-            println!("{}", hex_key);
-        } else {
-            println!("{}", k);
-        }
-    } else if let Some(prof) = profile
+    if let Some(prof) = profile
         .as_deref()
         .or_else(|| cfg.as_ref().map(|c| c.profile.as_str()))
     {
@@ -676,7 +656,7 @@ fn key_command(
             );
         }
     } else {
-        anyhow::bail!("No key specified:  provide --key, --profile, or run 'ob init'");
+        anyhow::bail!("No key specified:  provide --profile, or run 'ob init'");
     }
 
     Ok(())
