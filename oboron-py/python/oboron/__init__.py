@@ -8,18 +8,30 @@ adding proper inheritance and type checking support.
 """
 
 from abc import ABC, abstractmethod
+from typing import Protocol
 from . import _oboron
-from . import formats  # Add this import
+from . import formats
 
 __version__ = (_oboron.__version__
                if hasattr(_oboron, '__version__') else "1.0.0")
 
 
+class ObtextCodec(Protocol):
+    def enc(self, plaintext: str) -> str: ...
+    def dec(self, obtext: str) -> str: ...
+    @property
+    def format(self) -> str: ...
+    @property
+    def scheme(self) -> str: ...
+    @property
+    def encoding(self) -> str: ...
+
+
 class OboronBase(ABC):
     """
-    Abstract base class for all Oboron cipher implementations.
+    Abstract base class for all Oboron codec implementations.
 
-    All cipher classes (AasvB32, AasvC32, etc.) are registered as virtual
+    All codec classes (AasvB32, AasvC32, etc.) are registered as virtual
     subclasses, enabling isinstance() and issubclass() checks.
 
     Example:
@@ -180,11 +192,8 @@ Mock2Hex = _oboron.Mock2Hex
 
 # Utility functions
 generate_key = _oboron.generate_key
-generate_key_bytes = _oboron.generate_key_bytes
 generate_key_hex = _oboron.generate_key_hex
-generate_secret = _oboron.generate_secret
-generate_secret_bytes = _oboron.generate_secret_bytes
-generate_secret_hex = _oboron.generate_secret_hex
+generate_key_bytes = _oboron.generate_key_bytes
 
 # Convenience functions
 enc = _oboron.enc
@@ -253,8 +262,8 @@ __all__ = [
 
     # Utility functions
     'generate_key',
-    'generate_key_bytes',
     'generate_key_hex',
+    'generate_key_bytes',
 
     # Convenience functions
     'enc',

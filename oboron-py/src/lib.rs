@@ -1117,7 +1117,7 @@ fn generate_key() -> PyResult<String> {
 ///     A random 64-byte key as a 128-character hex string.
 #[pyfunction]
 fn generate_key_hex() -> PyResult<String> {
-    Ok(::oboron::generate_key())
+    Ok(::oboron::generate_key_hex())
 }
 
 /// Generate a random 64-byte key as bytes.
@@ -1145,7 +1145,7 @@ fn generate_secret() -> PyResult<String> {
 ///     A random 32-byte key as a 64-character hex string.
 #[pyfunction]
 fn generate_secret_hex() -> PyResult<String> {
-    Ok(::oboron::generate_secret())
+    Ok(::oboron::generate_secret_hex())
 }
 
 /// Generate a random 32-byte secret as bytes.
