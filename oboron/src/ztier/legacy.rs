@@ -169,6 +169,7 @@ impl_legacy_codec!(LegacyB64, Encoding::B64, "legacy.b64");
 impl_legacy_codec!(LegacyHex, Encoding::Hex, "legacy.hex");
 
 /// Encrypt plaintext bytes using legacy AES-CBC
+#[inline(always)]
 pub(crate) fn encrypt_legacy(secret: &[u8; 32], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
     use aes::Aes128;
     use cbc::cipher::{BlockEncryptMut, KeyIvInit};
@@ -200,6 +201,7 @@ pub(crate) fn encrypt_legacy(secret: &[u8; 32], plaintext_bytes: &[u8]) -> Resul
 }
 
 /// Decrypt ciphertext using legacy AES-CBC
+#[inline(always)]
 pub(crate) fn decrypt_legacy(secret: &[u8; 32], data: &[u8]) -> Result<Vec<u8>, Error> {
     use aes::Aes128;
     use cbc::cipher::{BlockDecryptMut, KeyIvInit};

@@ -13,6 +13,7 @@ const MIN_PAYLOAD_LEN: usize = NONCE_SIZE + 1 + TAG_SIZE; // 29
 /// Encrypt plaintext bytes using probabilistic AES-GCM-SIV (apgs scheme).
 /// Returns raw ciphertext bytes with nonce prepended and authentication tag appended.
 /// Structure: [nonce][ciphertext+tag]
+#[inline(always)]
 pub fn encrypt(key: &[u8; 32], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
     if plaintext_bytes.is_empty() {
         return Err(Error::EmptyPlaintext);
@@ -41,6 +42,7 @@ pub fn encrypt(key: &[u8; 32], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error>
 
 /// Decrypt ciphertext using probabilistic AES-GCM-SIV (apgs scheme).
 /// Expects data structure: [nonce][ciphertext+tag].  Returns plaintext bytes after authentication verification.
+#[inline(always)]
 pub fn decrypt(key: &[u8; 32], data: &[u8]) -> Result<Vec<u8>, Error> {
     // Minimum: 12 byte nonce + 1 byte plaintext + 16 byte tag = 29 bytes
     if data.len() < MIN_PAYLOAD_LEN {

@@ -8,6 +8,7 @@ const TAG_SIZE: usize = 16;
 
 /// Encrypt plaintext bytes using probabilistic AES-SIV (apsv scheme).
 /// Returns raw ciphertext bytes with nonce prepended and authentication tag included.  Structure: [nonce][ciphertext+tag].
+#[inline(always)]
 pub fn encrypt(key: &[u8; 64], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
     if plaintext_bytes.is_empty() {
         return Err(Error::EmptyPlaintext);
@@ -35,6 +36,7 @@ pub fn encrypt(key: &[u8; 64], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error>
 
 /// Decrypt ciphertext using probabilistic AES-SIV (apsv scheme).
 /// Expects data structure: [nonce][ciphertext+tag].  Returns plaintext bytes after authentication verification.
+#[inline(always)]
 pub fn decrypt(key: &[u8; 64], data: &[u8]) -> Result<Vec<u8>, Error> {
     // Minimum: 16 byte nonce + 1 byte plaintext + 16 byte tag = 33 bytes
     if data.len() < 33 {

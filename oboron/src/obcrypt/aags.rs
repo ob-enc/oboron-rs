@@ -10,7 +10,7 @@ const MIN_DATA_LEN: usize = 17; // Minimum:  1 byte ciphertext + 16 byte tag = 1
 
 /// Encrypt plaintext bytes using deterministic AES-GCM-SIV (aags scheme).
 /// Returns raw ciphertext bytes with authentication tag (deterministic with zero nonce).
-#[inline]
+#[inline(always)]
 pub fn encrypt(key: &[u8; 32], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
     if plaintext_bytes.is_empty() {
         return Err(Error::EmptyPlaintext);
@@ -30,7 +30,7 @@ pub fn encrypt(key: &[u8; 32], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error>
 
 /// Decrypt ciphertext using deterministic AES-GCM-SIV (aags scheme).
 /// Returns plaintext bytes after authentication verification.
-#[inline]
+#[inline(always)]
 pub fn decrypt(key: &[u8; 32], data: &[u8]) -> Result<Vec<u8>, Error> {
     if data.len() < MIN_DATA_LEN {
         return Err(Error::PayloadTooShort);

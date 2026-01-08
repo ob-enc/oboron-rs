@@ -13,6 +13,7 @@ const IV_SIZE: usize = 16;
 
 /// Encrypt plaintext bytes using probabilistic AES-CBC (upbc scheme).
 /// Returns raw ciphertext bytes with appended IV.  Structure: [IV][ciphertext].
+#[inline(always)]
 pub fn encrypt(key: &[u8; 32], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
     if plaintext_bytes.is_empty() {
         return Err(Error::EmptyPlaintext);
@@ -47,6 +48,7 @@ pub fn encrypt(key: &[u8; 32], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error>
 
 /// Decrypt ciphertext using probabilistic AES-CBC (upbc scheme).
 /// Expects data structure: [IV][ciphertext].  Returns plaintext bytes with padding removed.
+#[inline(always)]
 pub fn decrypt(key: &[u8; 32], data: &[u8]) -> Result<Vec<u8>, Error> {
     // Minimum: 16 bytes ciphertext + 16 bytes IV = 32 bytes
     if data.len() < 32 {

@@ -61,7 +61,7 @@ impl Keychain {
 
     // Key extraction ==================================================
 
-    #[inline]
+    #[inline(always)]
     pub(crate) fn extract_key(&self, scheme: Scheme) -> Result<ExtractedKey<'_>, Error> {
         match scheme {
             #[cfg(feature = "aags")]
