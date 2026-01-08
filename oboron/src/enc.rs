@@ -35,6 +35,7 @@ use crate::encrypt_zmock1;
 /// 2. Append 2-byte scheme marker to ciphertext payload
 /// 3. XOR marker bytes with first two payload bytes for entropy
 /// 4. Encode to specified format
+#[inline]
 pub(crate) fn enc_to_format(
     plaintext: &str,
     format: Format,
@@ -45,7 +46,7 @@ pub(crate) fn enc_to_format(
     }
 
     // Step 1: Encrypt using scheme-specific function
-    let ciphertext = match (format.scheme(), extracted_key) {
+    let mut ciphertext = match (format.scheme(), extracted_key) {
         #[cfg(feature = "aags")]
         (Scheme::Aags, ExtractedKey::Key32(k)) => encrypt_aags(k, plaintext.as_bytes())?,
         #[cfg(feature = "apgs")]
@@ -74,24 +75,19 @@ pub(crate) fn enc_to_format(
         _ => return Err(Error::InvalidKeyLength),
     };
 
-    // Step 2: Build payload with 2-byte scheme marker appended
+    // Step 2 & 3: Append marker and XOR in one pass (optimized)
     let marker = format.scheme().marker();
-    let mut payload = Vec::with_capacity(ciphertext.len() + SCHEME_MARKER_SIZE);
-    payload.extend_from_slice(&ciphertext);
-    payload.extend_from_slice(&marker);
-
-    // Step 3: XOR the scheme marker bytes with the first byte for entropy
-    let len = payload.len();
-    payload[len - 1] ^= payload[0];
-    payload[len - 2] ^= payload[0];
+    let first_byte = ciphertext[0];
+    ciphertext.push(marker[0] ^ first_byte);
+    ciphertext.push(marker[1] ^ first_byte);
 
     // Step 4: Encode to specified format
-    match format.encoding() {
-        Encoding::C32 => Ok(BASE32_CROCKFORD.encode(&payload)),
-        Encoding::B32 => Ok(BASE32_RFC.encode(&payload)),
-        Encoding::B64 => Ok(BASE64URL_NOPAD.encode(&payload)),
-        Encoding::Hex => Ok(HEXLOWER.encode(&payload)),
-    }
+    Ok(match format.encoding() {
+        Encoding::C32 => BASE32_CROCKFORD.encode(&ciphertext),
+        Encoding::B32 => BASE32_RFC.encode(&ciphertext),
+        Encoding::B64 => BASE64URL_NOPAD.encode(&ciphertext),
+        Encoding::Hex => HEXLOWER.encode(&ciphertext),
+    })
 }
 
 #[cfg(test)]

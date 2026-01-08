@@ -36,6 +36,7 @@ use crate::decrypt_zmock1;
 /// 3. Extract and verify 2-byte scheme marker
 /// 4. Call scheme-specific decrypt function (handles any scheme-specific transformations like reversal)
 /// 5. Convert to UTF-8 string
+#[inline]
 pub(crate) fn dec_from_format(
     obtext: &str,
     format: Format,
@@ -48,21 +49,20 @@ pub(crate) fn dec_from_format(
         return Err(Error::PayloadTooShort);
     }
 
-    // Step 2: XOR the last two bytes with the first to undo mixing
+    // Step 2 & 3: XOR and extract marker in optimized way
     let len = buffer.len();
-    buffer[len - 1] ^= buffer[0];
-    buffer[len - 2] ^= buffer[0];
-
-    // Step 3: Extract the 2-byte scheme marker from tail
-    let scheme_marker = [buffer[len - 2], buffer[len - 1]];
-    buffer.truncate(len - SCHEME_MARKER_SIZE);
+    let first_byte = buffer[0];
+    let scheme_marker = [buffer[len - 2] ^ first_byte, buffer[len - 1] ^ first_byte];
 
     // Validate scheme marker
     if scheme_marker != format.scheme().marker() {
         return Err(Error::SchemeMarkerMismatch);
     }
 
-    // Step 4:  Decrypt using scheme-specific function
+    // Truncate to remove marker
+    buffer.truncate(len - SCHEME_MARKER_SIZE);
+
+    // Step 4: Decrypt using scheme-specific function
     let plaintext_bytes = match (format.scheme(), extracted_key) {
         #[cfg(feature = "aags")]
         (Scheme::Aags, ExtractedKey::Key32(k)) => decrypt_aags(k, &buffer)?,
@@ -107,13 +107,14 @@ pub(crate) fn dec_from_format(
 }
 
 /// Decode text encoding to raw bytes.
+#[inline]
 pub(crate) fn decode_obtext_to_payload(obtext: &str, encoding: Encoding) -> Result<Vec<u8>, Error> {
     match encoding {
         Encoding::B32 => BASE32_RFC
-            .decode(&obtext.as_bytes())
+            .decode(obtext.as_bytes())
             .map_err(|_| Error::InvalidB32),
         Encoding::C32 => BASE32_CROCKFORD
-            .decode(&obtext.as_bytes())
+            .decode(obtext.as_bytes())
             .map_err(|_| Error::InvalidC32),
         Encoding::B64 => BASE64URL_NOPAD
             .decode(obtext.as_bytes())
