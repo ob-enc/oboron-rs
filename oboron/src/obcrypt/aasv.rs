@@ -16,8 +16,9 @@ pub fn encrypt(key: &[u8; 64], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error>
     let mut cipher = Aes256Siv::new(key.into());
 
     // Use empty headers for deterministic encryption
+    let headers: &[&[u8]] = &[];
     cipher
-        .encrypt(&[], plaintext_bytes)
+        .encrypt(headers, plaintext_bytes)
         .map_err(|_| Error::EncryptionFailed)
 }
 
@@ -33,7 +34,8 @@ pub fn decrypt(key: &[u8; 64], data: &[u8]) -> Result<Vec<u8>, Error> {
     let mut cipher = Aes256Siv::new(key.into());
 
     // Use empty headers (same as encryption)
+    let headers: &[&[u8]] = &[];
     cipher
-        .decrypt(&[], data)
+        .decrypt(headers, data)
         .map_err(|_| Error::DecryptionFailed)
 }

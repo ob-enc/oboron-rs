@@ -1,6 +1,5 @@
 use crate::{
     base32::{BASE32_CROCKFORD, BASE32_RFC},
-    constants::SCHEME_MARKER_SIZE,
     error::Error,
     Encoding, ExtractedKey, Format, Scheme,
 };
@@ -33,7 +32,7 @@ use crate::encrypt_zmock1;
 /// Steps:
 /// 1. Call scheme-specific encrypt function (handles any scheme-specific transformations like reversal)
 /// 2. Append 2-byte scheme marker to ciphertext payload
-/// 3. XOR marker bytes with first two payload bytes for entropy
+/// 3. XOR marker bytes with first payload byte for entropy
 /// 4. Encode to specified format
 #[inline]
 pub(crate) fn enc_to_format(
