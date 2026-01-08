@@ -41,11 +41,11 @@ jobs:
           - all-cbc-schemes
           - all-gcm-schemes
           - all-siv-schemes
-          - insecure-schemes
           - deterministic-schemes
           - probabilistic-schemes
-          - authenticated-schemes
-          - all-schemes
+          - atier
+          - utier
+          - ztier
           - keyless
           - hex-keys
           - bytes-keys
