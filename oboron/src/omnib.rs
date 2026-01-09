@@ -112,7 +112,13 @@ impl Omnib {
                 let key32 = self.keychain.get_key32(scheme)?;
                 return crate::enc::enc_to_format_32(plaintext, format, key32);
             }
-            _ => return Err(Error::InvalidScheme),
+            // Z-tier schemes are not supported in Ob (use Obz instead)
+            #[cfg(feature = "zrbcx")]
+            Scheme::Zrbcx => Err(Error::InvalidScheme),
+            #[cfg(feature = "zmock")]
+            Scheme::Zmock1 => Err(Error::InvalidScheme),
+            #[cfg(feature = "legacy")]
+            Scheme::Legacy => Err(Error::InvalidScheme),
         }
     }
 
@@ -174,7 +180,13 @@ impl Omnib {
                 let key32 = self.keychain.get_key32(scheme)?;
                 return crate::dec::dec_from_format_32(obtext, format, key32);
             }
-            _ => return Err(Error::InvalidScheme),
+            // Z-tier schemes are not supported in Ob (use Obz instead)
+            #[cfg(feature = "zrbcx")]
+            Scheme::Zrbcx => Err(Error::InvalidScheme),
+            #[cfg(feature = "zmock")]
+            Scheme::Zmock1 => Err(Error::InvalidScheme),
+            #[cfg(feature = "legacy")]
+            Scheme::Legacy => Err(Error::InvalidScheme),
         }
     }
 
