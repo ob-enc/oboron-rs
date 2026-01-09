@@ -11,11 +11,6 @@ keywords = ["encryption", "obfuscation", "encoding", "base32", "identifiers"]
 categories = ["cryptography", "encoding"]
 readme = "README.md"
 
-[profile.release]
-opt-level = "z"
-lto = true
-codegen-units = 1
-
 [features]
 # Default: Secure, production-ready defaults
 default = ["std"]
@@ -119,6 +114,11 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 sha2 = "0.10"
 jsonwebtoken = "9.3"
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
 
 [[test]]
 name = "test_mock1"
