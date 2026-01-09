@@ -120,6 +120,9 @@ opt-level = "z"
 lto = true
 codegen-units = 1
 
+[profile.bench]
+inherits = "release"
+
 [[test]]
 name = "test_mock1"
 path = "tests/test_mock1.rs"
