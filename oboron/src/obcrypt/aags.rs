@@ -5,6 +5,8 @@ use aes_gcm_siv::{
     Aes256GcmSiv, Nonce,
 };
 
+const KEY_OFFSET: usize = 32;
+const KEY_LEN: usize = 32;
 const NONCE_SIZE: usize = 12;
 const MIN_DATA_LEN: usize = 17;
 
@@ -16,8 +18,8 @@ pub fn encrypt(master_key: &[u8; 64], plaintext_bytes: &[u8]) -> Result<Vec<u8>,
         return Err(Error::EmptyPlaintext);
     }
 
-    // Extract key directly - no function call overhead
-    let key: &[u8; 32] = unsafe { &*(master_key[32..64].as_ptr() as *const [u8; 32]) };
+    let key_slice = &master_key[KEY_OFFSET..KEY_OFFSET + KEY_LEN];
+    let key: &[u8; 32] = key_slice.try_into().unwrap();
 
     let cipher = Aes256GcmSiv::new(key.into());
     let nonce = Nonce::from([0u8; NONCE_SIZE]);
