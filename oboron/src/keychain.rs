@@ -72,14 +72,16 @@ impl Keychain {
                 const MOCK_KEY: [u8; 32] = [0u8; 32];
                 Ok(&MOCK_KEY)
             }
-            #[cfg(feature = "zrbcx")]
-            Scheme::Zrbcx => Err(Error::InvalidScheme),
-            #[cfg(feature = "zmock")]
-            Scheme::Zmock1 => Err(Error::InvalidScheme),
+            // Other schemes use 64-byte keys -> get_key64
             #[cfg(feature = "aasv")]
             Scheme::Aasv => Err(Error::InvalidKeyLength),
             #[cfg(feature = "apsv")]
             Scheme::Apsv => Err(Error::InvalidKeyLength),
+            // Z-tier uses ZKeychain, not Keychain
+            #[cfg(feature = "zrbcx")]
+            Scheme::Zrbcx => Err(Error::InvalidScheme),
+            #[cfg(feature = "zmock")]
+            Scheme::Zmock1 => Err(Error::InvalidScheme),
             #[cfg(feature = "legacy")]
             Scheme::Legacy => Err(Error::InvalidScheme),
         }
@@ -93,7 +95,22 @@ impl Keychain {
             Scheme::Aasv => Ok(&self.key),
             #[cfg(feature = "apsv")]
             Scheme::Apsv => Ok(&self.key),
-            _ => Err(Error::InvalidKeyLength),
+            // Other schemes use 32-byte keys -> get_key32
+            #[cfg(feature = "aags")]
+            Scheme::Aags => Err(Error::InvalidKeyLength),
+            #[cfg(feature = "apgs")]
+            Scheme::Apgs => Err(Error::InvalidKeyLength),
+            #[cfg(feature = "upbc")]
+            Scheme::Upbc => Err(Error::InvalidKeyLength),
+            #[cfg(feature = "mock")]
+            Scheme::Mock1 | Scheme::Mock2 => Err(Error::InvalidKeyLength),
+            // Z-tier uses ZKeychain, not Keychain
+            #[cfg(feature = "zrbcx")]
+            Scheme::Zrbcx => Err(Error::InvalidScheme),
+            #[cfg(feature = "zmock")]
+            Scheme::Zmock1 => Err(Error::InvalidScheme),
+            #[cfg(feature = "legacy")]
+            Scheme::Legacy => Err(Error::InvalidScheme),
         }
     }
 
