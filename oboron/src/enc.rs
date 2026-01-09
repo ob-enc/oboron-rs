@@ -20,10 +20,6 @@ use crate::encrypt_mock1;
 use crate::encrypt_mock2;
 #[cfg(feature = "upbc")]
 use crate::encrypt_upbc;
-#[cfg(feature = "zmock")]
-use crate::encrypt_zmock1;
-#[cfg(feature = "zrbcx")]
-use crate::encrypt_zrbcx;
 
 /// Generic encoding pipeline - takes full 64-byte key, obcrypt functions extract what they need
 ///
@@ -54,14 +50,15 @@ pub(crate) fn enc_to_format(
         Scheme::Apsv => encrypt_apsv(master_key, plaintext.as_bytes())?,
         #[cfg(feature = "upbc")]
         Scheme::Upbc => encrypt_upbc(master_key, plaintext.as_bytes())?,
-        #[cfg(feature = "zrbcx")]
-        Scheme::Zrbcx => encrypt_zrbcx(master_key, plaintext.as_bytes())?,
         #[cfg(feature = "mock")]
         Scheme::Mock1 => encrypt_mock1(master_key, plaintext.as_bytes())?,
         #[cfg(feature = "mock")]
         Scheme::Mock2 => encrypt_mock2(master_key, plaintext.as_bytes())?,
+        // Z-tier
+        #[cfg(feature = "zrbcx")]
+        Scheme::Zrbcx => unreachable!("ztier uses separate path"),
         #[cfg(feature = "zmock")]
-        Scheme::Zmock1 => encrypt_zmock1(master_key, plaintext.as_bytes())?,
+        Scheme::Zmock1 => unreachable!("ztier uses separate path"),
         #[cfg(feature = "legacy")]
         Scheme::Legacy => unreachable!("legacy uses separate path"),
     };

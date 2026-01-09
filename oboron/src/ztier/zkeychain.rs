@@ -2,7 +2,7 @@
 
 #![cfg(feature = "ztier")]
 
-use crate::{Error, Scheme};
+use crate::Error;
 use data_encoding::BASE64URL_NOPAD;
 
 /// Keychain for z-tier schemes (obfuscation-only, 32-byte secrets)

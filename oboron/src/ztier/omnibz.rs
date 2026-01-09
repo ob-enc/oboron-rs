@@ -123,8 +123,8 @@ impl Omnibz {
     pub fn enc(&self, plaintext: &str, format: impl IntoFormat) -> Result<String, Error> {
         let format = format.into_format()?;
         validate_ztier_scheme(format.scheme())?;
-        let extracted_secret = self.zkeychain.extract_secret(format.scheme())?;
-        crate::enc::enc_to_format_32(plaintext, format, extracted_secret)
+        // Pass full 32-byte secret - z-tier enc function uses it directly
+        crate::ztier::enc_to_format_ztier(plaintext, format, self.zkeychain.master_secret())
     }
 
     /// Decode and decrypt obtext with the specified format.
@@ -156,8 +156,8 @@ impl Omnibz {
     pub fn dec(&self, obtext: &str, format: impl IntoFormat) -> Result<String, Error> {
         let format = format.into_format()?;
         validate_ztier_scheme(format.scheme())?;
-        let extracted_secret = self.zkeychain.extract_secret(format.scheme())?;
-        crate::dec::dec_from_format_32(obtext, format, extracted_secret)
+        // Pass full 32-byte secret - z-tier dec function uses it directly
+        crate::ztier::dec_from_format_ztier(obtext, format, self.zkeychain.master_secret())
     }
 
     /// Decode+decrypt with automatic scheme and encoding detection.

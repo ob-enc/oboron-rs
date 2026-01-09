@@ -21,10 +21,6 @@ use crate::decrypt_mock1;
 use crate::decrypt_mock2;
 #[cfg(feature = "upbc")]
 use crate::decrypt_upbc;
-#[cfg(feature = "zmock")]
-use crate::decrypt_zmock1;
-#[cfg(feature = "zrbcx")]
-use crate::decrypt_zrbcx;
 
 /// Generic decoding pipeline - takes full 64-byte key, obcrypt functions extract what they need
 ///
@@ -72,14 +68,15 @@ pub(crate) fn dec_from_format(
         Scheme::Apsv => decrypt_apsv(master_key, &buffer)?,
         #[cfg(feature = "upbc")]
         Scheme::Upbc => decrypt_upbc(master_key, &buffer)?,
-        #[cfg(feature = "zrbcx")]
-        Scheme::Zrbcx => decrypt_zrbcx(master_key, &buffer)?,
         #[cfg(feature = "mock")]
         Scheme::Mock1 => decrypt_mock1(master_key, &buffer)?,
         #[cfg(feature = "mock")]
         Scheme::Mock2 => decrypt_mock2(master_key, &buffer)?,
+        // Z-tier
+        #[cfg(feature = "zrbcx")]
+        Scheme::Zrbcx => unreachable!("ztier uses separate path"),
         #[cfg(feature = "zmock")]
-        Scheme::Zmock1 => decrypt_zmock1(master_key, &buffer)?,
+        Scheme::Zmock1 => unreachable!("ztier uses separate path"),
         #[cfg(feature = "legacy")]
         Scheme::Legacy => unreachable!("legacy uses separate path"),
     };
