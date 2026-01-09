@@ -8,6 +8,7 @@ use crate::Error;
 
 /// "Encrypt" plaintext bytes using identity scheme (mock1).
 /// Returns the input unchanged (no actual encryption).
+#[inline]
 pub fn encrypt(_key: &[u8; 64], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
     if plaintext_bytes.is_empty() {
         return Err(Error::EmptyPlaintext);
@@ -18,6 +19,7 @@ pub fn encrypt(_key: &[u8; 64], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error
 
 /// "Decrypt" ciphertext bytes using identity scheme (mock1).
 /// Returns the input unchanged (no actual decryption).
+#[inline]
 pub fn decrypt(_key: &[u8; 64], data: &[u8]) -> Result<Vec<u8>, Error> {
     if data.is_empty() {
         return Err(Error::EmptyPayload);

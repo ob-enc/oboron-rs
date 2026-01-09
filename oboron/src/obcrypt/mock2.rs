@@ -9,6 +9,7 @@ use crate::Error;
 
 /// "Encrypt" plaintext bytes using reverse scheme (mock2).   
 /// Simply returns the reversed bytes (no actual encryption).
+#[inline]
 pub fn encrypt(_key: &[u8; 64], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
     if plaintext_bytes.is_empty() {
         return Err(Error::EmptyPlaintext);
@@ -20,6 +21,7 @@ pub fn encrypt(_key: &[u8; 64], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error
 
 /// "Decrypt" ciphertext bytes using reverse scheme (mock2).
 /// Simply reverses the bytes back (no actual decryption).
+#[inline]
 pub fn decrypt(_key: &[u8; 64], data: &[u8]) -> Result<Vec<u8>, Error> {
     if data.is_empty() {
         return Err(Error::EmptyPayload);

@@ -6,7 +6,7 @@ use rand::RngCore;
 const NONCE_SIZE: usize = 16;
 const TAG_SIZE: usize = 16;
 
-#[inline(always)]
+#[inline]
 pub fn encrypt(key: &[u8; 64], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
     if plaintext_bytes.is_empty() {
         return Err(Error::EmptyPlaintext);
@@ -27,7 +27,7 @@ pub fn encrypt(key: &[u8; 64], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error>
     Ok(buffer)
 }
 
-#[inline(always)]
+#[inline]
 pub fn decrypt(key: &[u8; 64], data: &[u8]) -> Result<Vec<u8>, Error> {
     if data.len() < 33 {
         return Err(Error::PayloadTooShort);

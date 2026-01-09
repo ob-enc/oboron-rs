@@ -11,7 +11,7 @@ type Aes256CbcDec = Decryptor<Aes256>;
 
 const IV_SIZE: usize = 16;
 
-#[inline(always)]
+#[inline]
 pub fn encrypt(master_key: &[u8; 64], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
     if plaintext_bytes.is_empty() {
         return Err(Error::EmptyPlaintext);
@@ -39,7 +39,7 @@ pub fn encrypt(master_key: &[u8; 64], plaintext_bytes: &[u8]) -> Result<Vec<u8>,
     Ok(buffer)
 }
 
-#[inline(always)]
+#[inline]
 pub fn decrypt(master_key: &[u8; 64], data: &[u8]) -> Result<Vec<u8>, Error> {
     if data.len() < 32 {
         return Err(Error::PayloadTooShort);
