@@ -5,11 +5,6 @@ pub struct Keychain {
     key: [u8; 64],
 }
 
-pub(crate) enum ExtractedKey<'a> {
-    Key32(&'a [u8; 32]),
-    Key64(&'a [u8; 64]),
-}
-
 impl Keychain {
     /// Create a new Keychain from a 64-byte key.
     #[inline]
@@ -59,32 +54,46 @@ impl Keychain {
         hex::encode(&self.key)
     }
 
-    // Key extraction ==================================================
+    // Direct key extraction - returns raw slices, no enum
+    // ====================================================
 
+    /// Get 32-byte key for schemes that need it
     #[inline(always)]
-    pub(crate) fn extract_key(&self, scheme: Scheme) -> Result<ExtractedKey<'_>, Error> {
+    pub(crate) fn get_key32(&self, scheme: Scheme) -> Result<&[u8; 32], Error> {
         match scheme {
             #[cfg(feature = "aags")]
-            Scheme::Aags => Ok(ExtractedKey::Key32(self.aags())),
+            Scheme::Aags => Ok(unsafe { &*(self.key[32..64].as_ptr() as *const [u8; 32]) }),
             #[cfg(feature = "apgs")]
-            Scheme::Apgs => Ok(ExtractedKey::Key32(self.apgs())),
-            #[cfg(feature = "aasv")]
-            Scheme::Aasv => Ok(ExtractedKey::Key64(self.aasv())),
-            #[cfg(feature = "apsv")]
-            Scheme::Apsv => Ok(ExtractedKey::Key64(self.apsv())),
+            Scheme::Apgs => Ok(unsafe { &*(self.key[32..64].as_ptr() as *const [u8; 32]) }),
             #[cfg(feature = "upbc")]
-            Scheme::Upbc => Ok(ExtractedKey::Key32(self.upbc())),
+            Scheme::Upbc => Ok(unsafe { &*(self.key[8..40].as_ptr() as *const [u8; 32]) }),
             #[cfg(feature = "mock")]
-            Scheme::Mock1 => Ok(ExtractedKey::Key32(self.mock1())),
-            #[cfg(feature = "mock")]
-            Scheme::Mock2 => Ok(ExtractedKey::Key32(self.mock2())),
-            // Z-tier schemes should use ZKeychain, not Keychain
+            Scheme::Mock1 | Scheme::Mock2 => {
+                const MOCK_KEY: [u8; 32] = [0u8; 32];
+                Ok(&MOCK_KEY)
+            }
             #[cfg(feature = "zrbcx")]
             Scheme::Zrbcx => Err(Error::InvalidScheme),
             #[cfg(feature = "zmock")]
             Scheme::Zmock1 => Err(Error::InvalidScheme),
+            #[cfg(feature = "aasv")]
+            Scheme::Aasv => Err(Error::InvalidKeyLength),
+            #[cfg(feature = "apsv")]
+            Scheme::Apsv => Err(Error::InvalidKeyLength),
             #[cfg(feature = "legacy")]
             Scheme::Legacy => Err(Error::InvalidScheme),
+        }
+    }
+
+    /// Get 64-byte key for schemes that need it
+    #[inline(always)]
+    pub(crate) fn get_key64(&self, scheme: Scheme) -> Result<&[u8; 64], Error> {
+        match scheme {
+            #[cfg(feature = "aasv")]
+            Scheme::Aasv => Ok(&self.key),
+            #[cfg(feature = "apsv")]
+            Scheme::Apsv => Ok(&self.key),
+            _ => Err(Error::InvalidKeyLength),
         }
     }
 
@@ -92,16 +101,14 @@ impl Keychain {
     #[inline(always)]
     #[cfg(feature = "aags")]
     pub(crate) fn aags(&self) -> &[u8; 32] {
-        // SAFETY: slice is guaranteed to be 32 bytes
-        unsafe { &*(self.key[32..64].as_ptr() as *const [u8; 32]) }
+        self.key[32..64].try_into().unwrap()
     }
 
     // apgs key - AES-256 key for AES-GCM-SIV (second 32 bytes)
     #[inline(always)]
     #[cfg(feature = "apgs")]
     pub(crate) fn apgs(&self) -> &[u8; 32] {
-        // SAFETY: slice is guaranteed to be 32 bytes
-        unsafe { &*(self.key[32..64].as_ptr() as *const [u8; 32]) }
+        self.key[32..64].try_into().unwrap()
     }
 
     // aasv key - Double AES-256 key for AES-SIV (all 64 bytes)
@@ -120,29 +127,24 @@ impl Keychain {
         &self.key
     }
 
-    // upbc key - AES-256 key for AES-CBC (bytes 8-40)
+    // upbc key - AES-128 key for AES-CBC (first 16 bytes)
     #[inline(always)]
     #[cfg(any(feature = "upbc"))]
     pub(crate) fn upbc(&self) -> &[u8; 32] {
-        // SAFETY: slice is guaranteed to be 32 bytes
-        unsafe { &*(self.key[8..40].as_ptr() as *const [u8; 32]) }
+        self.key[8..40].try_into().unwrap()
     }
 
     // mock1 - no actual key needed
     #[inline(always)]
     #[cfg(any(feature = "mock"))]
     pub(crate) fn mock1(&self) -> &[u8; 32] {
-        // Return a const reference to avoid allocation
-        const MOCK_KEY: [u8; 32] = [0u8; 32];
-        &MOCK_KEY
+        &[0u8; 32]
     }
 
     // mock2 - no actual key needed
     #[inline(always)]
     #[cfg(any(feature = "mock"))]
     pub(crate) fn mock2(&self) -> &[u8; 32] {
-        // Return a const reference to avoid allocation
-        const MOCK_KEY: [u8; 32] = [0u8; 32];
-        &MOCK_KEY
+        &[0u8; 32]
     }
 }

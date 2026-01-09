@@ -2,7 +2,7 @@
 
 #![cfg(feature = "ztier")]
 
-use crate::{Error, ExtractedKey, Scheme};
+use crate::{Error, Scheme};
 use data_encoding::BASE64URL_NOPAD;
 
 /// Keychain for z-tier schemes (obfuscation-only, 32-byte secrets)
@@ -74,14 +74,14 @@ impl ZKeychain {
 
     #[inline]
     #[allow(dead_code)]
-    pub(crate) fn extract_secret(&self, scheme: Scheme) -> Result<ExtractedKey<'_>, Error> {
+    pub(crate) fn extract_secret(&self, scheme: Scheme) -> Result<&[u8; 32], Error> {
         match scheme {
             #[cfg(feature = "zrbcx")]
-            Scheme::Zrbcx => Ok(ExtractedKey::Key32(self.zrbcx())),
+            Scheme::Zrbcx => Ok(self.zrbcx()),
             #[cfg(feature = "zmock")]
-            Scheme::Zmock1 => Ok(ExtractedKey::Key32(self.zmock1())),
+            Scheme::Zmock1 => Ok(self.zmock1()),
             #[cfg(feature = "legacy")]
-            Scheme::Legacy => Ok(ExtractedKey::Key32(self.legacy())),
+            Scheme::Legacy => Ok(self.legacy()),
             // other schemes should use Keychain, not ZKeychain
             #[cfg(feature = "aags")]
             Scheme::Aags => Err(Error::InvalidScheme),

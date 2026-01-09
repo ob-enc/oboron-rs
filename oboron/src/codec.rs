@@ -27,7 +27,7 @@ pub trait ObtextCodec {
     fn encoding(&self) -> Encoding;
 }
 
-/// Macro to implement optimized ObtextCodec types with compile-time specialization.
+/// Macro for 32-byte key schemes (aags, apgs, upbc, mock1, mock2)
 ///
 /// This macro generates a complete ObtextCodec implementation with all overhead eliminated:
 /// - No runtime scheme matching
@@ -35,12 +35,15 @@ pub trait ObtextCodec {
 /// - Direct function calls to encrypt/decrypt
 /// - Encoding functions called directly (no dispatch)
 /// - All constants baked in at compile time
-macro_rules! impl_codec {
+macro_rules! impl_codec_32 {
     (
-        $name:ident,           // Type name (e.g., AasvC32)
-        $scheme:expr,          // Scheme constant (e.g., Scheme::Aasv)
-        $encoding:expr,        // Encoding constant (e.g., Encoding::C32)
-        $format_str:expr       // Format string for docs (e.g., "aasv.c32")
+        $name: ident,
+        $scheme: expr,
+        $encoding:expr,
+        $format_str:expr,
+        $encrypt_fn:path,
+        $decrypt_fn: path,
+        $key_extract: ident
     ) => {
         #[doc = concat!("ObtextCodec implementation for ", $format_str, " format.\n\n")]
         #[doc = concat!("Corresponds to format string: `\"", $format_str, "\"`")]
@@ -116,32 +119,77 @@ macro_rules! impl_codec {
         }
 
         impl ObtextCodec for $name {
-            #[inline]
+            #[inline(always)]
             fn enc(&self, plaintext: &str) -> Result<String, Error> {
-                let format = Format::new($scheme, $encoding);
-                let extracted_key = self.keychain.extract_key($scheme)?;
-                crate::enc::enc_to_format(plaintext, format, extracted_key)
+                if plaintext.is_empty() {
+                    return Err(Error::EmptyPlaintext);
+                }
+
+                // Direct key extraction - no enum wrapper
+                let key = self.keychain.$key_extract();
+
+                // Encrypt directly
+                let mut ciphertext = $encrypt_fn(key, plaintext.as_bytes())?;
+
+                // Append marker and XOR
+                let marker = $scheme.marker();
+                let first_byte = ciphertext[0];
+                ciphertext.push(marker[0] ^ first_byte);
+                ciphertext.push(marker[1] ^ first_byte);
+
+                // Encode - compile-time dispatch
+                Ok(encode_bytes(&ciphertext, $encoding))
             }
 
-            #[inline]
+            #[inline(always)]
             fn dec(&self, obtext: &str) -> Result<String, Error> {
-                // Decode with known encoding - direct call
-                let format = Format::new($scheme, $encoding);
-                let extracted_key = self.keychain.extract_key(format.scheme())?;
-                crate::dec::dec_from_format(obtext, format, extracted_key)
+                // Decode
+                let mut buffer = decode_bytes(obtext, $encoding)?;
+
+                if buffer.len() < 2 {
+                    return Err(Error::PayloadTooShort);
+                }
+
+                // XOR and extract marker
+                let len = buffer.len();
+                let first_byte = buffer[0];
+                let scheme_marker = [buffer[len - 2] ^ first_byte, buffer[len - 1] ^ first_byte];
+
+                // Validate marker
+                if scheme_marker != $scheme.marker() {
+                    return Err(Error::SchemeMarkerMismatch);
+                }
+
+                buffer.truncate(len - 2);
+
+                // Direct key extraction - no enum wrapper
+                let key = self.keychain.$key_extract();
+
+                // Decrypt directly
+                let plaintext_bytes = $decrypt_fn(key, &buffer)?;
+
+                // Convert to string
+                #[cfg(feature = "unchecked-utf8")]
+                {
+                    Ok(unsafe { String::from_utf8_unchecked(plaintext_bytes) })
+                }
+                #[cfg(not(feature = "unchecked-utf8"))]
+                {
+                    String::from_utf8(plaintext_bytes).map_err(|_| Error::InvalidUtf8)
+                }
             }
 
-            #[inline]
+            #[inline(always)]
             fn format(&self) -> Format {
                 Format::new($scheme, $encoding)
             }
 
-            #[inline]
+            #[inline(always)]
             fn scheme(&self) -> Scheme {
                 $scheme
             }
 
-            #[inline]
+            #[inline(always)]
             fn encoding(&self) -> Encoding {
                 $encoding
             }
@@ -150,31 +198,31 @@ macro_rules! impl_codec {
         // Add inherent methods that delegate to trait methods
         impl $name {
             /// Encrypt and encode plaintext
-            #[inline]
+            #[inline(always)]
             pub fn enc(&self, plaintext: &str) -> Result<String, Error> {
                 <Self as ObtextCodec>::enc(self, plaintext)
             }
 
             /// Decode and decrypt obtext (no scheme autodetection)
-            #[inline]
+            #[inline(always)]
             pub fn dec(&self, obtext: &str) -> Result<String, Error> {
                 <Self as ObtextCodec>::dec(self, obtext)
             }
 
             /// Get the format
-            #[inline]
+            #[inline(always)]
             pub fn format(&self) -> Format {
                 <Self as ObtextCodec>::format(self)
             }
 
             /// Get the scheme
-            #[inline]
+            #[inline(always)]
             pub fn scheme(&self) -> Scheme {
                 <Self as ObtextCodec>::scheme(self)
             }
 
             /// Get the encoding
-            #[inline]
+            #[inline(always)]
             pub fn encoding(&self) -> Encoding {
                 <Self as ObtextCodec>::encoding(self)
             }
@@ -182,79 +230,525 @@ macro_rules! impl_codec {
     };
 }
 
-// Generate all scheme+encoding combinations using the optimized macro
+/// Macro for 64-byte key schemes (aasv, apsv)
+macro_rules! impl_codec_64 {
+    (
+        $name:ident,
+        $scheme:expr,
+        $encoding:expr,
+        $format_str:expr,
+        $encrypt_fn:path,
+        $decrypt_fn:path,
+        $key_extract: ident
+    ) => {
+        #[doc = concat!("ObtextCodec implementation for ", $format_str, " format.\n\n")]
+        #[doc = concat!("Corresponds to format string: `\"", $format_str, "\"`")]
+        #[allow(non_camel_case_types)]
+        pub struct $name {
+            keychain: Keychain,
+        }
 
-// aags variants
+        impl $name {
+            /// Create a new instance with a 86-character base64 string key.
+            #[inline]
+            pub fn new(key: &str) -> Result<Self, Error> {
+                Ok(Self {
+                    keychain: Keychain::from_base64(key)?,
+                })
+            }
+
+            /// Create a new instance from a 64-byte key.
+            #[inline]
+            #[cfg(any(feature = "keyless", feature = "bytes-keys"))]
+            fn from_bytes_internal(key_bytes: &[u8; 64]) -> Result<Self, Error> {
+                Ok(Self {
+                    keychain: Keychain::from_bytes(key_bytes)?,
+                })
+            }
+
+            /// Create a new instance with hardcoded key (testing only).
+            #[inline]
+            #[cfg(feature = "keyless")]
+            pub fn new_keyless() -> Result<Self, Error> {
+                Ok(Self {
+                    keychain: Keychain::from_bytes(&HARDCODED_KEY_BYTES)?,
+                })
+            }
+
+            /// Create a new instance with a 128-character hex string key.
+            #[inline]
+            #[cfg(feature = "hex-keys")]
+            pub fn from_hex_key(key_hex: &str) -> Result<Self, Error> {
+                Ok(Self {
+                    keychain: Keychain::from_hex(key_hex)?,
+                })
+            }
+
+            /// Create a new instance from a 64-byte key.
+            #[inline]
+            #[cfg(feature = "bytes-keys")]
+            pub fn from_bytes(key_bytes: &[u8; 64]) -> Result<Self, Error> {
+                Ok(Self {
+                    keychain: Keychain::from_bytes(key_bytes)?,
+                })
+            }
+
+            /// Get the key (default base64 format)
+            #[inline]
+            pub fn key(&self) -> String {
+                self.keychain.key_base64()
+            }
+
+            /// Get the key in hex format
+            #[inline]
+            #[cfg(feature = "hex-keys")]
+            pub fn key_hex(&self) -> String {
+                self.keychain.key_hex()
+            }
+
+            /// Get the key in raw bytes format
+            #[inline]
+            #[cfg(feature = "bytes-keys")]
+            pub fn key_bytes(&self) -> &[u8; 64] {
+                self.keychain.key_bytes()
+            }
+        }
+
+        impl ObtextCodec for $name {
+            #[inline(always)]
+            fn enc(&self, plaintext: &str) -> Result<String, Error> {
+                if plaintext.is_empty() {
+                    return Err(Error::EmptyPlaintext);
+                }
+
+                // Direct key extraction - no enum wrapper
+                let key = self.keychain.$key_extract();
+
+                // Encrypt directly
+                let mut ciphertext = $encrypt_fn(key, plaintext.as_bytes())?;
+
+                // Append marker and XOR
+                let marker = $scheme.marker();
+                let first_byte = ciphertext[0];
+                ciphertext.push(marker[0] ^ first_byte);
+                ciphertext.push(marker[1] ^ first_byte);
+
+                // Encode - compile-time dispatch
+                Ok(encode_bytes(&ciphertext, $encoding))
+            }
+
+            #[inline(always)]
+            fn dec(&self, obtext: &str) -> Result<String, Error> {
+                // Decode
+                let mut buffer = decode_bytes(obtext, $encoding)?;
+
+                if buffer.len() < 2 {
+                    return Err(Error::PayloadTooShort);
+                }
+
+                // XOR and extract marker
+                let len = buffer.len();
+                let first_byte = buffer[0];
+                let scheme_marker = [buffer[len - 2] ^ first_byte, buffer[len - 1] ^ first_byte];
+
+                // Validate marker
+                if scheme_marker != $scheme.marker() {
+                    return Err(Error::SchemeMarkerMismatch);
+                }
+
+                buffer.truncate(len - 2);
+
+                // Direct key extraction - no enum wrapper
+                let key = self.keychain.$key_extract();
+
+                // Decrypt directly
+                let plaintext_bytes = $decrypt_fn(key, &buffer)?;
+
+                // Convert to string
+                #[cfg(feature = "unchecked-utf8")]
+                {
+                    Ok(unsafe { String::from_utf8_unchecked(plaintext_bytes) })
+                }
+                #[cfg(not(feature = "unchecked-utf8"))]
+                {
+                    String::from_utf8(plaintext_bytes).map_err(|_| Error::InvalidUtf8)
+                }
+            }
+
+            #[inline(always)]
+            fn format(&self) -> Format {
+                Format::new($scheme, $encoding)
+            }
+
+            #[inline(always)]
+            fn scheme(&self) -> Scheme {
+                $scheme
+            }
+
+            #[inline(always)]
+            fn encoding(&self) -> Encoding {
+                $encoding
+            }
+        }
+
+        impl $name {
+            /// Encrypt and encode plaintext
+            #[inline(always)]
+            pub fn enc(&self, plaintext: &str) -> Result<String, Error> {
+                <Self as ObtextCodec>::enc(self, plaintext)
+            }
+
+            /// Decode and decrypt obtext (no scheme autodetection)
+            #[inline(always)]
+            pub fn dec(&self, obtext: &str) -> Result<String, Error> {
+                <Self as ObtextCodec>::dec(self, obtext)
+            }
+
+            /// Get the format
+            #[inline(always)]
+            pub fn format(&self) -> Format {
+                <Self as ObtextCodec>::format(self)
+            }
+
+            /// Get the scheme
+            #[inline(always)]
+            pub fn scheme(&self) -> Scheme {
+                <Self as ObtextCodec>::scheme(self)
+            }
+
+            /// Get the encoding
+            #[inline(always)]
+            pub fn encoding(&self) -> Encoding {
+                <Self as ObtextCodec>::encoding(self)
+            }
+        }
+    };
+}
+
+// Helper functions for encoding/decoding with compile-time dispatch
+#[inline(always)]
+fn encode_bytes(bytes: &[u8], encoding: Encoding) -> String {
+    match encoding {
+        Encoding::C32 => crate::base32::BASE32_CROCKFORD.encode(bytes),
+        Encoding::B32 => crate::base32::BASE32_RFC.encode(bytes),
+        Encoding::B64 => data_encoding::BASE64URL_NOPAD.encode(bytes),
+        Encoding::Hex => data_encoding::HEXLOWER.encode(bytes),
+    }
+}
+
+#[inline(always)]
+fn decode_bytes(text: &str, encoding: Encoding) -> Result<Vec<u8>, Error> {
+    match encoding {
+        Encoding::C32 => crate::base32::BASE32_CROCKFORD
+            .decode(text.as_bytes())
+            .map_err(|_| Error::InvalidC32),
+        Encoding::B32 => crate::base32::BASE32_RFC
+            .decode(text.as_bytes())
+            .map_err(|_| Error::InvalidB32),
+        Encoding::B64 => data_encoding::BASE64URL_NOPAD
+            .decode(text.as_bytes())
+            .map_err(|_| Error::InvalidB64),
+        Encoding::Hex => data_encoding::HEXLOWER
+            .decode(text.as_bytes())
+            .map_err(|_| Error::InvalidHex),
+    }
+}
+
+// Generate all scheme+encoding combinations
+
+// aags variants (32-byte key)
 #[cfg(feature = "aags")]
-impl_codec!(AagsB32, Scheme::Aags, Encoding::B32, "aags.b32");
+impl_codec_32!(
+    AagsC32,
+    Scheme::Aags,
+    Encoding::C32,
+    "aags. c32",
+    crate::encrypt_aags,
+    crate::decrypt_aags,
+    aags
+);
 #[cfg(feature = "aags")]
-impl_codec!(AagsC32, Scheme::Aags, Encoding::C32, "aags.c32");
+impl_codec_32!(
+    AagsB32,
+    Scheme::Aags,
+    Encoding::B32,
+    "aags. b32",
+    crate::encrypt_aags,
+    crate::decrypt_aags,
+    aags
+);
 #[cfg(feature = "aags")]
-impl_codec!(AagsB64, Scheme::Aags, Encoding::B64, "aags.b64");
+impl_codec_32!(
+    AagsB64,
+    Scheme::Aags,
+    Encoding::B64,
+    "aags.b64",
+    crate::encrypt_aags,
+    crate::decrypt_aags,
+    aags
+);
 #[cfg(feature = "aags")]
-impl_codec!(AagsHex, Scheme::Aags, Encoding::Hex, "aags.hex");
+impl_codec_32!(
+    AagsHex,
+    Scheme::Aags,
+    Encoding::Hex,
+    "aags.hex",
+    crate::encrypt_aags,
+    crate::decrypt_aags,
+    aags
+);
 
-// aasv variants
+// aasv variants (64-byte key)
 #[cfg(feature = "aasv")]
-impl_codec!(AasvB32, Scheme::Aasv, Encoding::B32, "aasv.b32");
+impl_codec_64!(
+    AasvC32,
+    Scheme::Aasv,
+    Encoding::C32,
+    "aasv.c32",
+    crate::encrypt_aasv,
+    crate::decrypt_aasv,
+    aasv
+);
 #[cfg(feature = "aasv")]
-impl_codec!(AasvC32, Scheme::Aasv, Encoding::C32, "aasv.c32");
+impl_codec_64!(
+    AasvB32,
+    Scheme::Aasv,
+    Encoding::B32,
+    "aasv.b32",
+    crate::encrypt_aasv,
+    crate::decrypt_aasv,
+    aasv
+);
 #[cfg(feature = "aasv")]
-impl_codec!(AasvB64, Scheme::Aasv, Encoding::B64, "aasv.b64");
+impl_codec_64!(
+    AasvB64,
+    Scheme::Aasv,
+    Encoding::B64,
+    "aasv.b64",
+    crate::encrypt_aasv,
+    crate::decrypt_aasv,
+    aasv
+);
 #[cfg(feature = "aasv")]
-impl_codec!(AasvHex, Scheme::Aasv, Encoding::Hex, "aasv.hex");
+impl_codec_64!(
+    AasvHex,
+    Scheme::Aasv,
+    Encoding::Hex,
+    "aasv.hex",
+    crate::encrypt_aasv,
+    crate::decrypt_aasv,
+    aasv
+);
 
-// apgs variants
+// apgs variants (32-byte key)
 #[cfg(feature = "apgs")]
-impl_codec!(ApgsB32, Scheme::Apgs, Encoding::B32, "apgs.b32");
+impl_codec_32!(
+    ApgsC32,
+    Scheme::Apgs,
+    Encoding::C32,
+    "apgs.c32",
+    crate::encrypt_apgs,
+    crate::decrypt_apgs,
+    apgs
+);
 #[cfg(feature = "apgs")]
-impl_codec!(ApgsC32, Scheme::Apgs, Encoding::C32, "apgs.c32");
+impl_codec_32!(
+    ApgsB32,
+    Scheme::Apgs,
+    Encoding::B32,
+    "apgs.b32",
+    crate::encrypt_apgs,
+    crate::decrypt_apgs,
+    apgs
+);
 #[cfg(feature = "apgs")]
-impl_codec!(ApgsB64, Scheme::Apgs, Encoding::B64, "apgs.b64");
+impl_codec_32!(
+    ApgsB64,
+    Scheme::Apgs,
+    Encoding::B64,
+    "apgs.b64",
+    crate::encrypt_apgs,
+    crate::decrypt_apgs,
+    apgs
+);
 #[cfg(feature = "apgs")]
-impl_codec!(ApgsHex, Scheme::Apgs, Encoding::Hex, "apgs.hex");
+impl_codec_32!(
+    ApgsHex,
+    Scheme::Apgs,
+    Encoding::Hex,
+    "apgs.hex",
+    crate::encrypt_apgs,
+    crate::decrypt_apgs,
+    apgs
+);
 
-// apsv variants
+// apsv variants (64-byte key)
 #[cfg(feature = "apsv")]
-impl_codec!(ApsvB32, Scheme::Apsv, Encoding::B32, "apsv.b32");
+impl_codec_64!(
+    ApsvC32,
+    Scheme::Apsv,
+    Encoding::C32,
+    "apsv.c32",
+    crate::encrypt_apsv,
+    crate::decrypt_apsv,
+    apsv
+);
 #[cfg(feature = "apsv")]
-impl_codec!(ApsvC32, Scheme::Apsv, Encoding::C32, "apsv.c32");
+impl_codec_64!(
+    ApsvB32,
+    Scheme::Apsv,
+    Encoding::B32,
+    "apsv.b32",
+    crate::encrypt_apsv,
+    crate::decrypt_apsv,
+    apsv
+);
 #[cfg(feature = "apsv")]
-impl_codec!(ApsvB64, Scheme::Apsv, Encoding::B64, "apsv.b64");
+impl_codec_64!(
+    ApsvB64,
+    Scheme::Apsv,
+    Encoding::B64,
+    "apsv.b64",
+    crate::encrypt_apsv,
+    crate::decrypt_apsv,
+    apsv
+);
 #[cfg(feature = "apsv")]
-impl_codec!(ApsvHex, Scheme::Apsv, Encoding::Hex, "apsv.hex");
+impl_codec_64!(
+    ApsvHex,
+    Scheme::Apsv,
+    Encoding::Hex,
+    "apsv.hex",
+    crate::encrypt_apsv,
+    crate::decrypt_apsv,
+    apsv
+);
 
-// upbc variants
+// upbc variants (32-byte key)
 #[cfg(feature = "upbc")]
-impl_codec!(UpbcB32, Scheme::Upbc, Encoding::B32, "upbc.b32");
+impl_codec_32!(
+    UpbcC32,
+    Scheme::Upbc,
+    Encoding::C32,
+    "upbc.c32",
+    crate::encrypt_upbc,
+    crate::decrypt_upbc,
+    upbc
+);
 #[cfg(feature = "upbc")]
-impl_codec!(UpbcC32, Scheme::Upbc, Encoding::C32, "upbc.c32");
+impl_codec_32!(
+    UpbcB32,
+    Scheme::Upbc,
+    Encoding::B32,
+    "upbc.b32",
+    crate::encrypt_upbc,
+    crate::decrypt_upbc,
+    upbc
+);
 #[cfg(feature = "upbc")]
-impl_codec!(UpbcB64, Scheme::Upbc, Encoding::B64, "upbc.b64");
+impl_codec_32!(
+    UpbcB64,
+    Scheme::Upbc,
+    Encoding::B64,
+    "upbc.b64",
+    crate::encrypt_upbc,
+    crate::decrypt_upbc,
+    upbc
+);
 #[cfg(feature = "upbc")]
-impl_codec!(UpbcHex, Scheme::Upbc, Encoding::Hex, "upbc.hex");
+impl_codec_32!(
+    UpbcHex,
+    Scheme::Upbc,
+    Encoding::Hex,
+    "upbc.hex",
+    crate::encrypt_upbc,
+    crate::decrypt_upbc,
+    upbc
+);
 
-// Testing
+// mock1 variants (32-byte key)
+#[cfg(feature = "mock")]
+impl_codec_32!(
+    Mock1C32,
+    Scheme::Mock1,
+    Encoding::C32,
+    "mock1.c32",
+    crate::encrypt_mock1,
+    crate::decrypt_mock1,
+    mock1
+);
+#[cfg(feature = "mock")]
+impl_codec_32!(
+    Mock1B32,
+    Scheme::Mock1,
+    Encoding::B32,
+    "mock1.b32",
+    crate::encrypt_mock1,
+    crate::decrypt_mock1,
+    mock1
+);
+#[cfg(feature = "mock")]
+impl_codec_32!(
+    Mock1B64,
+    Scheme::Mock1,
+    Encoding::B64,
+    "mock1.b64",
+    crate::encrypt_mock1,
+    crate::decrypt_mock1,
+    mock1
+);
+#[cfg(feature = "mock")]
+impl_codec_32!(
+    Mock1Hex,
+    Scheme::Mock1,
+    Encoding::Hex,
+    "mock1.hex",
+    crate::encrypt_mock1,
+    crate::decrypt_mock1,
+    mock1
+);
 
-// mock1 (identity scheme)
+// mock2 variants (32-byte key)
 #[cfg(feature = "mock")]
-impl_codec!(Mock1B32, Scheme::Mock1, Encoding::B32, "mock1.b32");
+impl_codec_32!(
+    Mock2C32,
+    Scheme::Mock2,
+    Encoding::C32,
+    "mock2.c32",
+    crate::encrypt_mock2,
+    crate::decrypt_mock2,
+    mock2
+);
 #[cfg(feature = "mock")]
-impl_codec!(Mock1C32, Scheme::Mock1, Encoding::C32, "mock1.c32");
+impl_codec_32!(
+    Mock2B32,
+    Scheme::Mock2,
+    Encoding::B32,
+    "mock2.b32",
+    crate::encrypt_mock2,
+    crate::decrypt_mock2,
+    mock2
+);
 #[cfg(feature = "mock")]
-impl_codec!(Mock1B64, Scheme::Mock1, Encoding::B64, "mock1.b64");
+impl_codec_32!(
+    Mock2B64,
+    Scheme::Mock2,
+    Encoding::B64,
+    "mock2.b64",
+    crate::encrypt_mock2,
+    crate::decrypt_mock2,
+    mock2
+);
 #[cfg(feature = "mock")]
-impl_codec!(Mock1Hex, Scheme::Mock1, Encoding::Hex, "mock1.hex");
-
-// mock2 (reverse scheme)
-#[cfg(feature = "mock")]
-impl_codec!(Mock2B32, Scheme::Mock2, Encoding::B32, "mock2.b32");
-#[cfg(feature = "mock")]
-impl_codec!(Mock2C32, Scheme::Mock2, Encoding::C32, "mock2.c32");
-#[cfg(feature = "mock")]
-impl_codec!(Mock2B64, Scheme::Mock2, Encoding::B64, "mock2.b64");
-#[cfg(feature = "mock")]
-impl_codec!(Mock2Hex, Scheme::Mock2, Encoding::Hex, "mock2.hex");
+impl_codec_32!(
+    Mock2Hex,
+    Scheme::Mock2,
+    Encoding::Hex,
+    "mock2.hex",
+    crate::encrypt_mock2,
+    crate::decrypt_mock2,
+    mock2
+);
 
 /// Type-erased ObtextCodec encoder that can hold any scheme+encoding combination.
 ///

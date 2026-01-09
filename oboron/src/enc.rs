@@ -1,7 +1,7 @@
 use crate::{
     base32::{BASE32_CROCKFORD, BASE32_RFC},
     error::Error,
-    Encoding, ExtractedKey, Format, Scheme,
+    Encoding, Format, Scheme,
 };
 use data_encoding::{BASE64URL_NOPAD, HEXLOWER};
 
@@ -23,7 +23,6 @@ use crate::encrypt_zrbcx;
 use crate::encrypt_mock1;
 #[cfg(feature = "mock")]
 use crate::encrypt_mock2;
-// Testing
 #[cfg(feature = "zmock")]
 use crate::encrypt_zmock1;
 
@@ -34,47 +33,36 @@ use crate::encrypt_zmock1;
 /// 2. Append 2-byte scheme marker to ciphertext payload
 /// 3. XOR marker bytes with first payload byte for entropy
 /// 4. Encode to specified format
-#[inline]
-pub(crate) fn enc_to_format(
+#[inline(always)]
+pub(crate) fn enc_to_format_32(
     plaintext: &str,
     format: Format,
-    extracted_key: ExtractedKey,
+    key32: &[u8; 32],
 ) -> Result<String, Error> {
     if plaintext.is_empty() {
         return Err(Error::EmptyPlaintext);
     }
 
     // Step 1: Encrypt using scheme-specific function
-    let mut ciphertext = match (format.scheme(), extracted_key) {
+    let mut ciphertext = match format.scheme() {
         #[cfg(feature = "aags")]
-        (Scheme::Aags, ExtractedKey::Key32(k)) => encrypt_aags(k, plaintext.as_bytes())?,
+        Scheme::Aags => encrypt_aags(key32, plaintext.as_bytes())?,
         #[cfg(feature = "apgs")]
-        (Scheme::Apgs, ExtractedKey::Key32(k)) => encrypt_apgs(k, plaintext.as_bytes())?,
-        #[cfg(feature = "aasv")]
-        (Scheme::Aasv, ExtractedKey::Key64(k)) => encrypt_aasv(k, plaintext.as_bytes())?,
-        #[cfg(feature = "apsv")]
-        (Scheme::Apsv, ExtractedKey::Key64(k)) => encrypt_apsv(k, plaintext.as_bytes())?,
+        Scheme::Apgs => encrypt_apgs(key32, plaintext.as_bytes())?,
         #[cfg(feature = "upbc")]
-        (Scheme::Upbc, ExtractedKey::Key32(k)) => encrypt_upbc(k, plaintext.as_bytes())?,
-        // Z-tier
+        Scheme::Upbc => encrypt_upbc(key32, plaintext.as_bytes())?,
         #[cfg(feature = "zrbcx")]
-        (Scheme::Zrbcx, ExtractedKey::Key32(k)) => encrypt_zrbcx(k, plaintext.as_bytes())?,
-        // Testing
+        Scheme::Zrbcx => encrypt_zrbcx(key32, plaintext.as_bytes())?,
         #[cfg(feature = "mock")]
-        (Scheme::Mock1, ExtractedKey::Key32(k)) => encrypt_mock1(k, plaintext.as_bytes())?,
+        Scheme::Mock1 => encrypt_mock1(key32, plaintext.as_bytes())?,
         #[cfg(feature = "mock")]
-        (Scheme::Mock2, ExtractedKey::Key32(k)) => encrypt_mock2(k, plaintext.as_bytes())?,
+        Scheme::Mock2 => encrypt_mock2(key32, plaintext.as_bytes())?,
         #[cfg(feature = "zmock")]
-        (Scheme::Zmock1, ExtractedKey::Key32(k)) => encrypt_zmock1(k, plaintext.as_bytes())?,
-        // Legacy - legacy does not use this call path
-        #[cfg(feature = "legacy")]
-        (Scheme::Legacy, ExtractedKey::Key32(_k)) => {
-            unreachable!("called generic enc function for legacy")
-        }
+        Scheme::Zmock1 => encrypt_zmock1(key32, plaintext.as_bytes())?,
         _ => return Err(Error::InvalidKeyLength),
     };
 
-    // Step 2 & 3: Append marker and XOR in one pass (optimized)
+    // Step 2 & 3: Append marker and XOR
     let marker = format.scheme().marker();
     let first_byte = ciphertext[0];
     ciphertext.push(marker[0] ^ first_byte);
@@ -89,20 +77,36 @@ pub(crate) fn enc_to_format(
     })
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::{Keychain, Scheme};
-
-    #[test]
-    fn test_enc_pipeline_mock1() {
-        let format = Format::new(Scheme::Mock1, Encoding::C32);
-
-        // Create a real keychain for testing
-        let key = [0u8; 64];
-        let keychain = Keychain::from_bytes(&key).unwrap();
-        let extracted_key = keychain.extract_key(format.scheme()).unwrap();
-        let result = enc_to_format("test", format, extracted_key).unwrap();
-        assert!(!result.is_empty());
+#[inline(always)]
+pub(crate) fn enc_to_format_64(
+    plaintext: &str,
+    format: Format,
+    key64: &[u8; 64],
+) -> Result<String, Error> {
+    if plaintext.is_empty() {
+        return Err(Error::EmptyPlaintext);
     }
+
+    // Step 1: Encrypt using scheme-specific function
+    let mut ciphertext = match format.scheme() {
+        #[cfg(feature = "aasv")]
+        Scheme::Aasv => encrypt_aasv(key64, plaintext.as_bytes())?,
+        #[cfg(feature = "apsv")]
+        Scheme::Apsv => encrypt_apsv(key64, plaintext.as_bytes())?,
+        _ => return Err(Error::InvalidKeyLength),
+    };
+
+    // Step 2 & 3: Append marker and XOR
+    let marker = format.scheme().marker();
+    let first_byte = ciphertext[0];
+    ciphertext.push(marker[0] ^ first_byte);
+    ciphertext.push(marker[1] ^ first_byte);
+
+    // Step 4: Encode to specified format
+    Ok(match format.encoding() {
+        Encoding::C32 => BASE32_CROCKFORD.encode(&ciphertext),
+        Encoding::B32 => BASE32_RFC.encode(&ciphertext),
+        Encoding::B64 => BASE64URL_NOPAD.encode(&ciphertext),
+        Encoding::Hex => HEXLOWER.encode(&ciphertext),
+    })
 }

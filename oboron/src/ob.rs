@@ -361,13 +361,31 @@ impl Ob {
 
 impl ObtextCodec for Ob {
     fn enc(&self, plaintext: &str) -> Result<String, Error> {
-        let extracted_key = self.keychain.extract_key(self.scheme())?;
-        crate::enc::enc_to_format(plaintext, self.format, extracted_key)
+        let scheme = self.format.scheme();
+        match scheme {
+            Scheme::Aags | Scheme::Apgs | Scheme::Upbc => {
+                let key32 = self.keychain.get_key32(scheme)?;
+                return crate::enc::enc_to_format_32(plaintext, self.format, key32);
+            }
+            Scheme::Aasv | Scheme::Apsv => {
+                let key64 = self.keychain.get_key64(scheme)?;
+                return crate::enc::enc_to_format_64(plaintext, self.format, key64);
+            }
+        }
     }
 
     fn dec(&self, obtext: &str) -> Result<String, Error> {
-        let extracted_key = self.keychain.extract_key(self.scheme())?;
-        crate::dec::dec_from_format(obtext, self.format, extracted_key)
+        let scheme = self.format.scheme();
+        match scheme {
+            Scheme::Aags | Scheme::Apgs | Scheme::Upbc => {
+                let key32 = self.keychain.get_key32(scheme)?;
+                return crate::dec::dec_from_format_32(obtext, self.format, key32);
+            }
+            Scheme::Aasv | Scheme::Apsv => {
+                let key64 = self.keychain.get_key64(scheme)?;
+                return crate::dec::dec_from_format_64(obtext, self.format, key64);
+            }
+        }
     }
 
     fn format(&self) -> Format {

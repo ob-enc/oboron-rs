@@ -1,6 +1,6 @@
 #[cfg(feature = "keyless")]
 use crate::constants::HARDCODED_KEY_BYTES;
-use crate::{format::IntoFormat, Error, Keychain};
+use crate::{format::IntoFormat, Error, Keychain, Scheme};
 
 /// An ObtextCodec implementation that takes format on enc operation and autodetects on dec operation.
 /// Unlike all other implementations (Ob, ZrbcxC32, .. .) it does not have
@@ -80,8 +80,17 @@ impl Omnib {
     #[inline]
     pub fn enc(&self, plaintext: &str, format: impl IntoFormat) -> Result<String, Error> {
         let format = format.into_format()?;
-        let extracted_key = self.keychain.extract_key(format.scheme())?;
-        crate::enc::enc_to_format(plaintext, format, extracted_key)
+        let scheme = format.scheme();
+        match scheme {
+            Scheme::Aags | Scheme::Apgs | Scheme::Upbc => {
+                let key32 = self.keychain.get_key32(scheme)?;
+                return crate::enc::enc_to_format_32(plaintext, format, key32);
+            }
+            Scheme::Aasv | Scheme::Apsv => {
+                let key64 = self.keychain.get_key64(scheme)?;
+                return crate::enc::enc_to_format_64(plaintext, format, key64);
+            }
+        }
     }
 
     /// Decode and decrypt obtext with the specified format.
@@ -110,8 +119,17 @@ impl Omnib {
     #[inline]
     pub fn dec(&self, obtext: &str, format: impl IntoFormat) -> Result<String, Error> {
         let format = format.into_format()?;
-        let extracted_key = self.keychain.extract_key(format.scheme())?;
-        crate::dec::dec_from_format(obtext, format, extracted_key)
+        let scheme = format.scheme();
+        match scheme {
+            Scheme::Aags | Scheme::Apgs | Scheme::Upbc => {
+                let key32 = self.keychain.get_key32(scheme)?;
+                return crate::dec::dec_from_format_32(obtext, format, key32);
+            }
+            Scheme::Aasv | Scheme::Apsv => {
+                let key64 = self.keychain.get_key64(scheme)?;
+                return crate::dec::dec_from_format_64(obtext, format, key64);
+            }
+        }
     }
 
     /// Decode+decrypt with automatic scheme and encoding detection.
