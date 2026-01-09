@@ -80,12 +80,16 @@ pub(crate) fn dec_from_format_32(
         Scheme::Mock2 => decrypt_mock2(key32, &buffer)?,
         #[cfg(feature = "zmock")]
         Scheme::Zmock1 => decrypt_zmock1(key32, &buffer)?,
-        // Legacy - legacy does not use this call path
+        // 64-byte key schemes use enc_to_format_64
+        #[cfg(feature = "aasv")]
+        Scheme::Aasv => return Err(Error::InvalidKeyLength),
+        #[cfg(feature = "apsv")]
+        Scheme::Apsv => return Err(Error::InvalidKeyLength),
+        // Legacy does not use this call path (separate implementation)
         #[cfg(feature = "legacy")]
         Scheme::Legacy => {
             unreachable!("called generic dec function for legacy")
         }
-        _ => return Err(Error::InvalidKeyLength),
     };
 
     // Step 5: Convert to string
@@ -142,7 +146,26 @@ pub(crate) fn dec_from_format_64(
         Scheme::Aasv => decrypt_aasv(key64, &buffer)?,
         #[cfg(feature = "apsv")]
         Scheme::Apsv => decrypt_apsv(key64, &buffer)?,
-        _ => return Err(Error::InvalidKeyLength),
+        // 32-byte key schemes use enc_to_format_32
+        #[cfg(feature = "aags")]
+        Scheme::Aags => return Err(Error::InvalidKeyLength),
+        #[cfg(feature = "apgs")]
+        Scheme::Apgs => return Err(Error::InvalidKeyLength),
+        #[cfg(feature = "upbc")]
+        Scheme::Upbc => return Err(Error::InvalidKeyLength),
+        // Z-tier
+        #[cfg(feature = "zrbcx")]
+        Scheme::Zrbcx => return Err(Error::InvalidKeyLength),
+        // Testing
+        #[cfg(feature = "mock")]
+        Scheme::Mock1 | Scheme::Mock2 => return Err(Error::InvalidKeyLength),
+        #[cfg(feature = "zmock")]
+        Scheme::Zmock1 => return Err(Error::InvalidKeyLength),
+        // Legacy does not use this call path (separate implementation)
+        #[cfg(feature = "legacy")]
+        Scheme::Legacy => {
+            unreachable!("called generic dec function for legacy")
+        }
     };
 
     // Step 5: Convert to string
