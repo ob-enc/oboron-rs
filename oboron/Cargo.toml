@@ -134,6 +134,10 @@ name = "ob"
 harness = false
 
 [[bench]]
+name = "obz"
+harness = false
+
+[[bench]]
 name = "omnib"
 harness = false
 
