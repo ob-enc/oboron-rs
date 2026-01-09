@@ -83,14 +83,12 @@ macro_rules! impl_zcodec {
         impl ObtextCodec for $name {
             fn enc(&self, plaintext: &str) -> Result<String, Error> {
                 let format = Format::new($scheme, $encoding);
-                let secret = self.zkeychain.extract_secret($scheme)?;
-                crate::enc::enc_to_format_32(plaintext, format, secret)
+                crate::ztier::enc_to_format_ztier(plaintext, format, self.zkeychain.master_secret())
             }
 
             fn dec(&self, obtext: &str) -> Result<String, Error> {
                 let format = Format::new($scheme, $encoding);
-                let secret = self.zkeychain.extract_secret($scheme)?;
-                crate::dec::dec_from_format_32(obtext, format, secret)
+                crate::ztier::dec_from_format_ztier(obtext, format, self.zkeychain.master_secret())
             }
 
             fn format(&self) -> Format {

@@ -125,11 +125,7 @@ macro_rules! impl_codec_32 {
                     return Err(Error::EmptyPlaintext);
                 }
 
-                // Direct key extraction - no enum wrapper
-                let key = self.keychain.$key_extract();
-
-                // Encrypt directly
-                let mut ciphertext = $encrypt_fn(key, plaintext.as_bytes())?;
+                let mut ciphertext = $encrypt_fn(self.keychain.master_key(), plaintext.as_bytes())?;
 
                 // Append marker and XOR
                 let marker = $scheme.marker();
@@ -162,11 +158,8 @@ macro_rules! impl_codec_32 {
 
                 buffer.truncate(len - 2);
 
-                // Direct key extraction - no enum wrapper
-                let key = self.keychain.$key_extract();
-
                 // Decrypt directly
-                let plaintext_bytes = $decrypt_fn(key, &buffer)?;
+                let plaintext_bytes = $decrypt_fn(self.keychain.master_key(), &buffer)?;
 
                 // Convert to string
                 #[cfg(feature = "unchecked-utf8")]
@@ -321,11 +314,7 @@ macro_rules! impl_codec_64 {
                     return Err(Error::EmptyPlaintext);
                 }
 
-                // Direct key extraction - no enum wrapper
-                let key = self.keychain.$key_extract();
-
-                // Encrypt directly
-                let mut ciphertext = $encrypt_fn(key, plaintext.as_bytes())?;
+                let mut ciphertext = $encrypt_fn(self.keychain.master_key(), plaintext.as_bytes())?;
 
                 // Append marker and XOR
                 let marker = $scheme.marker();
@@ -358,11 +347,8 @@ macro_rules! impl_codec_64 {
 
                 buffer.truncate(len - 2);
 
-                // Direct key extraction - no enum wrapper
-                let key = self.keychain.$key_extract();
-
                 // Decrypt directly
-                let plaintext_bytes = $decrypt_fn(key, &buffer)?;
+                let plaintext_bytes = $decrypt_fn(self.keychain.master_key(), &buffer)?;
 
                 // Convert to string
                 #[cfg(feature = "unchecked-utf8")]

@@ -41,20 +41,20 @@ pub fn dec_any_scheme(
     // Step 4: Match scheme marker and decrypt with available SECURE schemes only
     let plaintext_bytes = match scheme_marker {
         #[cfg(feature = "upbc")]
-        UPBC_MARKER => decrypt_upbc(keychain.upbc(), &buffer)?,
+        UPBC_MARKER => decrypt_upbc(keychain.master_key(), &buffer)?,
         #[cfg(feature = "aags")]
-        AAGS_MARKER => decrypt_aags(keychain.aags(), &buffer)?,
+        AAGS_MARKER => decrypt_aags(keychain.master_key(), &buffer)?,
         #[cfg(feature = "apgs")]
-        APGS_MARKER => decrypt_apgs(keychain.apgs(), &buffer)?,
+        APGS_MARKER => decrypt_apgs(keychain.master_key(), &buffer)?,
         #[cfg(feature = "aasv")]
-        AASV_MARKER => decrypt_aasv(keychain.aasv(), &buffer)?,
+        AASV_MARKER => decrypt_aasv(keychain.master_key(), &buffer)?,
         #[cfg(feature = "apsv")]
-        APSV_MARKER => decrypt_apsv(keychain.apsv(), &buffer)?,
+        APSV_MARKER => decrypt_apsv(keychain.master_key(), &buffer)?,
         // Testing
         #[cfg(feature = "mock")]
-        MOCK1_MARKER => decrypt_mock1(keychain.mock1(), &buffer)?,
+        MOCK1_MARKER => decrypt_mock1(keychain.master_key(), &buffer)?,
         #[cfg(feature = "mock")]
-        MOCK2_MARKER => decrypt_mock2(keychain.mock2(), &buffer)?,
+        MOCK2_MARKER => decrypt_mock2(keychain.master_key(), &buffer)?,
         _ => {
             // Unknown scheme marker - no fallback for secure schemes
             return Err(Error::UnknownScheme);

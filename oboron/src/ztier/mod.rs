@@ -13,12 +13,17 @@ mod legacy;
 mod obz;
 mod omnibz;
 mod zcodec;
+mod zdec;
 mod zdec_auto;
+mod zenc;
 mod zkeychain;
 #[cfg(feature = "zmock")]
 mod zmock1;
 #[cfg(feature = "zrbcx")]
 mod zrbcx;
+
+pub(crate) use zdec::dec_from_format_ztier;
+pub(crate) use zenc::enc_to_format_ztier;
 
 // Re-export public types
 #[cfg(feature = "zmock")]

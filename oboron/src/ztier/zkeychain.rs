@@ -1,4 +1,4 @@
-//! Keychain for z-tier schemes (32-byte secrets, obfuscation-only)
+//!  Keychain for z-tier schemes (32-byte secrets, obfuscation-only)
 
 #![cfg(feature = "ztier")]
 
@@ -7,7 +7,7 @@ use data_encoding::BASE64URL_NOPAD;
 
 /// Keychain for z-tier schemes (obfuscation-only, 32-byte secrets)
 ///
-/// **WARNING**:  Z-tier schemes provide NO cryptographic security.
+/// **WARNING**: Z-tier schemes provide NO cryptographic security.
 /// Use only for obfuscation, never for actual encryption.
 pub(crate) struct ZKeychain {
     secret: [u8; 32],
@@ -24,7 +24,7 @@ impl ZKeychain {
 
     /// Create a new ZKeychain from a 43-character base64 string secret.
     #[inline]
-    #[allow(dead_code)] // Used by Zob constructors
+    #[allow(dead_code)] // Used by Obz constructors
     pub(crate) fn from_base64(secret_base64: &str) -> Result<Self, Error> {
         let secret: [u8; 32] = BASE64URL_NOPAD
             .decode(secret_base64.as_bytes())
@@ -37,7 +37,7 @@ impl ZKeychain {
 
     /// Create a new ZKeychain from a 64-character hex string.
     #[inline]
-    #[allow(dead_code)] // Used by Zob constructors
+    #[allow(dead_code)] // Used by Obz constructors
     #[cfg(feature = "hex-keys")]
     pub(crate) fn from_hex(secret_hex: &str) -> Result<Self, Error> {
         let secret_bytes: [u8; 32] = hex::decode(secret_hex)?
@@ -49,73 +49,52 @@ impl ZKeychain {
 
     /// Get the secret as base64 string.
     #[inline]
-    #[allow(dead_code)] // Used by Zob.key() method
+    #[allow(dead_code)] // Used by Obz.key() method
     pub(crate) fn secret_base64(&self) -> String {
         BASE64URL_NOPAD.encode(&self.secret)
     }
 
     /// Get the secret as raw bytes.
     #[inline]
-    #[allow(dead_code)] // Used by Zob.key_bytes()
+    #[allow(dead_code)] // Used by Obz.key_bytes()
+    #[cfg(feature = "bytes-keys")]
     pub(crate) fn secret_bytes(&self) -> &[u8; 32] {
         &self.secret
     }
 
     /// Get the secret as hex string.
     #[inline]
-    #[allow(dead_code)] // Used by Zob.key_hex()
+    #[allow(dead_code)] // Used by Obz.key_hex()
     #[cfg(feature = "hex-keys")]
     pub(crate) fn secret_hex(&self) -> String {
         hex::encode(&self.secret)
     }
 
-    // Secret extraction for specific schemes
-    // ========================================
-
-    #[inline]
-    #[allow(dead_code)]
-    pub(crate) fn extract_secret(&self, scheme: Scheme) -> Result<&[u8; 32], Error> {
-        match scheme {
-            #[cfg(feature = "zrbcx")]
-            Scheme::Zrbcx => Ok(self.zrbcx()),
-            #[cfg(feature = "zmock")]
-            Scheme::Zmock1 => Ok(self.zmock1()),
-            #[cfg(feature = "legacy")]
-            Scheme::Legacy => Ok(self.legacy()),
-            // other schemes should use Keychain, not ZKeychain
-            #[cfg(feature = "aags")]
-            Scheme::Aags => Err(Error::InvalidScheme),
-            #[cfg(feature = "apgs")]
-            Scheme::Apgs => Err(Error::InvalidScheme),
-            #[cfg(feature = "aasv")]
-            Scheme::Aasv => Err(Error::InvalidScheme),
-            #[cfg(feature = "apsv")]
-            Scheme::Apsv => Err(Error::InvalidScheme),
-            #[cfg(feature = "upbc")]
-            Scheme::Upbc => Err(Error::InvalidScheme),
-            #[cfg(feature = "mock")]
-            Scheme::Mock1 => Err(Error::InvalidScheme),
-            #[cfg(feature = "mock")]
-            Scheme::Mock2 => Err(Error::InvalidScheme),
-        }
+    /// Get the secret as raw bytes. (internal)
+    #[inline(always)]
+    pub(crate) fn master_secret(&self) -> &[u8; 32] {
+        &self.secret
     }
 
-    /// Get secret for zrbcx scheme (all 32 bytes)
-    #[inline]
+    // Direct secret accessors for z-tier schemes
+    // ===========================================
+
+    /// Get secret for zrbcx scheme (returns full 32-byte secret)
+    #[inline(always)]
     #[cfg(feature = "zrbcx")]
     pub(crate) fn zrbcx(&self) -> &[u8; 32] {
         &self.secret
     }
 
-    /// Get secret for zmock1 scheme (all 32 bytes)
-    #[inline]
+    /// Get secret for zmock1 scheme (returns full 32-byte secret)
+    #[inline(always)]
     #[cfg(feature = "zmock")]
     pub(crate) fn zmock1(&self) -> &[u8; 32] {
         &self.secret
     }
 
-    /// Get secret for legacy scheme (all 32 bytes)
-    #[inline]
+    /// Get secret for legacy scheme (returns full 32-byte secret)
+    #[inline(always)]
     #[cfg(feature = "legacy")]
     #[allow(dead_code)] // Used by zdec_auto fallback
     pub(crate) fn legacy(&self) -> &[u8; 32] {

@@ -6,43 +6,41 @@ use aes_gcm_siv::{
 };
 
 const NONCE_SIZE: usize = 12;
-const MIN_DATA_LEN: usize = 17; // Minimum:  1 byte ciphertext + 16 byte tag = 17 bytes
+const MIN_DATA_LEN: usize = 17;
 
 /// Encrypt plaintext bytes using deterministic AES-GCM-SIV (aags scheme).
-/// Returns raw ciphertext bytes with authentication tag (deterministic with zero nonce).
+/// Takes the full 64-byte key and extracts the second 32 bytes internally.
 #[inline(always)]
-pub fn encrypt(key: &[u8; 32], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
+pub fn encrypt(master_key: &[u8; 64], plaintext_bytes: &[u8]) -> Result<Vec<u8>, Error> {
     if plaintext_bytes.is_empty() {
         return Err(Error::EmptyPlaintext);
     }
 
-    // Create AES-GCM-SIV cipher
-    let cipher = Aes256GcmSiv::new(key.into());
+    // Extract key directly - no function call overhead
+    let key: &[u8; 32] = unsafe { &*(master_key[32..64].as_ptr() as *const [u8; 32]) };
 
-    // Use zero nonce for deterministic encryption
+    let cipher = Aes256GcmSiv::new(key.into());
     let nonce = Nonce::from([0u8; NONCE_SIZE]);
 
-    // Encrypt (produces ciphertext + 16-byte authentication tag)
     cipher
         .encrypt(&nonce, plaintext_bytes)
         .map_err(|_| Error::EncryptionFailed)
 }
 
 /// Decrypt ciphertext using deterministic AES-GCM-SIV (aags scheme).
-/// Returns plaintext bytes after authentication verification.
+/// Takes the full 64-byte key and extracts the second 32 bytes internally.
 #[inline(always)]
-pub fn decrypt(key: &[u8; 32], data: &[u8]) -> Result<Vec<u8>, Error> {
+pub fn decrypt(master_key: &[u8; 64], data: &[u8]) -> Result<Vec<u8>, Error> {
     if data.len() < MIN_DATA_LEN {
         return Err(Error::PayloadTooShort);
     }
 
-    // Create AES-GCM-SIV cipher
-    let cipher = Aes256GcmSiv::new(key.into());
+    // Extract key directly - no function call overhead
+    let key: &[u8; 32] = unsafe { &*(master_key[32..64].as_ptr() as *const [u8; 32]) };
 
-    // Use zero nonce (same as encryption)
+    let cipher = Aes256GcmSiv::new(key.into());
     let nonce = Nonce::from([0u8; NONCE_SIZE]);
 
-    // Decrypt and verify
     cipher
         .decrypt(&nonce, data)
         .map_err(|_| Error::DecryptionFailed)

@@ -42,7 +42,7 @@ use crate::{format::IntoFormat, Encoding, Error, Format, Keychain, ObtextCodec, 
 ///
 /// // Change format at runtime
 /// ob.set_scheme(Scheme::Mock1)?;
-/// let ot2 = ob.enc("hello")?; // mock1. c32 format
+/// let ot2 = ob.enc("hello")?; // mock1.c32 format
 ///
 /// // Change encoding
 /// ob.set_encoding(Encoding::B64)?; // now mock1.b64
@@ -104,7 +104,7 @@ impl Ob {
     /// # let key = oboron::generate_key();
     /// let mut ob = Ob::new("aasv.c32", &key)?;
     /// ob.set_format("mock1.b64")?; // switch using string
-    /// ob.set_format(Format::new(Scheme::Mock2, Encoding::Hex))?; // switch using Format
+    /// ob.set_format(Format::new(Scheme::Mock2, Encoding:: Hex))?; // switch using Format
     /// # }
     /// # Ok(())
     /// # }
@@ -167,7 +167,7 @@ impl Ob {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(all(feature = "aasv", feature = "mock"))]
     /// # {
-    /// # use oboron::Ob;
+    /// # use oboron:: Ob;
     /// # let key = oboron::generate_key();
     /// let mut ob = Ob::new("aasv.b64", &key)?;
     /// let ot = ob.enc("test")?;
@@ -178,7 +178,7 @@ impl Ob {
     /// assert_eq!(pt2, "test");
     ///
     /// // Works even with different encoding (slower fallback path)
-    /// ob.set_encoding(oboron::Encoding::Hex)?;
+    /// ob.set_encoding(oboron::Encoding:: Hex)?;
     /// let pt3 = ob.autodec(&ot)?; // Falls back to full autodetection
     /// assert_eq!(pt3, "test");
     /// # }
@@ -216,7 +216,7 @@ impl Ob {
     ///
     /// // Using Format instance
     /// let format = Format::new(Scheme::Aasv, Encoding::C32);
-    /// let ob2 = Ob::new_keyless(format)?;
+    /// let ob2 = Ob:: new_keyless(format)?;
     /// # }
     /// # Ok(())
     /// # }
@@ -274,7 +274,7 @@ impl Ob {
     /// # use oboron::{Ob, Format, Scheme, Encoding};
     /// let key_bytes = oboron::generate_key_bytes();
     /// let ob1 = Ob::from_bytes("aasv.b64", &key_bytes)?; // using format string
-    /// let format = Format::new(Scheme::Aasv, Encoding::B64); // using Format
+    /// let format = Format::new(Scheme:: Aasv, Encoding:: B64); // using Format
     /// let ob2 = Ob::from_bytes(format, &key_bytes)?;
     /// # }
     /// # Ok(())
@@ -297,7 +297,7 @@ impl Ob {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(feature = "aasv")]
     /// # {
-    /// # use oboron::Ob;
+    /// # use oboron:: Ob;
     /// # let key = oboron::generate_key();
     /// let ob = Ob::new("aasv.b64", &key)?;
     /// let key_retrieved = ob.key();
@@ -324,7 +324,7 @@ impl Ob {
     /// # let key = oboron::generate_key();
     /// let ob = Ob::new("aasv.b64", &key)?;
     /// let key_hex = ob.key_hex();
-    /// assert_eq!(key_hex.len(), 128); // 64 bytes = 128 hex chars
+    /// assert_eq!(key_hex. len(), 128); // 64 bytes = 128 hex chars
     /// # }
     /// # Ok(())
     /// # }
@@ -361,89 +361,11 @@ impl Ob {
 
 impl ObtextCodec for Ob {
     fn enc(&self, plaintext: &str) -> Result<String, Error> {
-        let scheme = self.format.scheme();
-        match scheme {
-            #[cfg(feature = "aags")]
-            Scheme::Aags => {
-                let key32 = self.keychain.get_key32(scheme)?;
-                return crate::enc::enc_to_format_32(plaintext, self.format, key32);
-            }
-            #[cfg(feature = "apgs")]
-            Scheme::Apgs => {
-                let key32 = self.keychain.get_key32(scheme)?;
-                return crate::enc::enc_to_format_32(plaintext, self.format, key32);
-            }
-            #[cfg(feature = "aasv")]
-            Scheme::Aasv => {
-                let key64 = self.keychain.get_key64(scheme)?;
-                return crate::enc::enc_to_format_64(plaintext, self.format, key64);
-            }
-            #[cfg(feature = "apsv")]
-            Scheme::Apsv => {
-                let key64 = self.keychain.get_key64(scheme)?;
-                return crate::enc::enc_to_format_64(plaintext, self.format, key64);
-            }
-            #[cfg(feature = "upbc")]
-            Scheme::Upbc => {
-                let key32 = self.keychain.get_key32(scheme)?;
-                return crate::enc::enc_to_format_32(plaintext, self.format, key32);
-            }
-            #[cfg(feature = "mock")]
-            Scheme::Mock1 | Scheme::Mock2 => {
-                let key32 = self.keychain.get_key32(scheme)?;
-                return crate::enc::enc_to_format_32(plaintext, self.format, key32);
-            }
-            // Z-tier schemes are not supported in Ob (use Obz instead)
-            #[cfg(feature = "zrbcx")]
-            Scheme::Zrbcx => Err(Error::InvalidScheme),
-            #[cfg(feature = "zmock")]
-            Scheme::Zmock1 => Err(Error::InvalidScheme),
-            #[cfg(feature = "legacy")]
-            Scheme::Legacy => Err(Error::InvalidScheme),
-        }
+        crate::enc::enc_to_format(plaintext, self.format, self.keychain.master_key())
     }
 
     fn dec(&self, obtext: &str) -> Result<String, Error> {
-        let scheme = self.format.scheme();
-        match scheme {
-            #[cfg(feature = "aags")]
-            Scheme::Aags => {
-                let key32 = self.keychain.get_key32(scheme)?;
-                return crate::dec::dec_from_format_32(obtext, self.format, key32);
-            }
-            #[cfg(feature = "apgs")]
-            Scheme::Apgs => {
-                let key32 = self.keychain.get_key32(scheme)?;
-                return crate::dec::dec_from_format_32(obtext, self.format, key32);
-            }
-            #[cfg(feature = "aasv")]
-            Scheme::Aasv => {
-                let key64 = self.keychain.get_key64(scheme)?;
-                return crate::dec::dec_from_format_64(obtext, self.format, key64);
-            }
-            #[cfg(feature = "apsv")]
-            Scheme::Apsv => {
-                let key64 = self.keychain.get_key64(scheme)?;
-                return crate::dec::dec_from_format_64(obtext, self.format, key64);
-            }
-            #[cfg(feature = "upbc")]
-            Scheme::Upbc => {
-                let key32 = self.keychain.get_key32(scheme)?;
-                return crate::dec::dec_from_format_32(obtext, self.format, key32);
-            }
-            #[cfg(feature = "mock")]
-            Scheme::Mock1 | Scheme::Mock2 => {
-                let key32 = self.keychain.get_key32(scheme)?;
-                return crate::dec::dec_from_format_32(obtext, self.format, key32);
-            }
-            // Z-tier schemes are not supported in Ob (use Obz instead)
-            #[cfg(feature = "zrbcx")]
-            Scheme::Zrbcx => Err(Error::InvalidScheme),
-            #[cfg(feature = "zmock")]
-            Scheme::Zmock1 => Err(Error::InvalidScheme),
-            #[cfg(feature = "legacy")]
-            Scheme::Legacy => Err(Error::InvalidScheme),
-        }
+        crate::dec::dec_from_format(obtext, self.format, self.keychain.master_key())
     }
 
     fn format(&self) -> Format {
@@ -469,7 +391,7 @@ impl Ob {
     /// # fn main() -> Result<(), oboron::Error> {
     /// # #[cfg(feature = "aasv")]
     /// # {
-    /// # use oboron::Ob;
+    /// # use oboron:: Ob;
     /// # let key = oboron::generate_key();
     /// let ob = Ob::new("aasv.b64", &key)?;
     /// let ot = ob.enc("secret data")?;
@@ -542,7 +464,7 @@ impl Ob {
     /// # {
     /// # use oboron::{Ob, Scheme};
     /// # let key = oboron::generate_key();
-    /// let ob = Ob::new("aasv.b64", &key)?;
+    /// let ob = Ob:: new("aasv.b64", &key)?;
     /// assert_eq!(ob.scheme(), Scheme::Aasv);
     /// # }
     /// # Ok(())
@@ -563,7 +485,7 @@ impl Ob {
     /// # {
     /// # use oboron::{Ob, Encoding};
     /// # let key = oboron::generate_key();
-    /// let ob = Ob::new("aasv.b64", &key)?;
+    /// let ob = Ob:: new("aasv.b64", &key)?;
     /// assert_eq!(ob.encoding(), Encoding::B64);
     /// # }
     /// # Ok(())

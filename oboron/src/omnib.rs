@@ -1,6 +1,6 @@
 #[cfg(feature = "keyless")]
 use crate::constants::HARDCODED_KEY_BYTES;
-use crate::{format::IntoFormat, Error, Keychain, Scheme};
+use crate::{format::IntoFormat, Error, Keychain};
 
 /// An ObtextCodec implementation that takes format on enc operation and autodetects on dec operation.
 /// Unlike all other implementations (Ob, ZrbcxC32, .. .) it does not have
@@ -80,46 +80,7 @@ impl Omnib {
     #[inline]
     pub fn enc(&self, plaintext: &str, format: impl IntoFormat) -> Result<String, Error> {
         let format = format.into_format()?;
-        let scheme = format.scheme();
-        match scheme {
-            #[cfg(feature = "aags")]
-            Scheme::Aags => {
-                let key32 = self.keychain.get_key32(scheme)?;
-                return crate::enc::enc_to_format_32(plaintext, format, key32);
-            }
-            #[cfg(feature = "apgs")]
-            Scheme::Apgs => {
-                let key32 = self.keychain.get_key32(scheme)?;
-                return crate::enc::enc_to_format_32(plaintext, format, key32);
-            }
-            #[cfg(feature = "aasv")]
-            Scheme::Aasv => {
-                let key64 = self.keychain.get_key64(scheme)?;
-                return crate::enc::enc_to_format_64(plaintext, format, key64);
-            }
-            #[cfg(feature = "apsv")]
-            Scheme::Apsv => {
-                let key64 = self.keychain.get_key64(scheme)?;
-                return crate::enc::enc_to_format_64(plaintext, format, key64);
-            }
-            #[cfg(feature = "upbc")]
-            Scheme::Upbc => {
-                let key32 = self.keychain.get_key32(scheme)?;
-                return crate::enc::enc_to_format_32(plaintext, format, key32);
-            }
-            #[cfg(feature = "mock")]
-            Scheme::Mock1 | Scheme::Mock2 => {
-                let key32 = self.keychain.get_key32(scheme)?;
-                return crate::enc::enc_to_format_32(plaintext, format, key32);
-            }
-            // Z-tier schemes are not supported in Ob (use Obz instead)
-            #[cfg(feature = "zrbcx")]
-            Scheme::Zrbcx => Err(Error::InvalidScheme),
-            #[cfg(feature = "zmock")]
-            Scheme::Zmock1 => Err(Error::InvalidScheme),
-            #[cfg(feature = "legacy")]
-            Scheme::Legacy => Err(Error::InvalidScheme),
-        }
+        crate::enc::enc_to_format(plaintext, format, self.keychain.master_key())
     }
 
     /// Decode and decrypt obtext with the specified format.
@@ -148,46 +109,7 @@ impl Omnib {
     #[inline]
     pub fn dec(&self, obtext: &str, format: impl IntoFormat) -> Result<String, Error> {
         let format = format.into_format()?;
-        let scheme = format.scheme();
-        match scheme {
-            #[cfg(feature = "aags")]
-            Scheme::Aags => {
-                let key32 = self.keychain.get_key32(scheme)?;
-                return crate::dec::dec_from_format_32(obtext, format, key32);
-            }
-            #[cfg(feature = "apgs")]
-            Scheme::Apgs => {
-                let key32 = self.keychain.get_key32(scheme)?;
-                return crate::dec::dec_from_format_32(obtext, format, key32);
-            }
-            #[cfg(feature = "aasv")]
-            Scheme::Aasv => {
-                let key64 = self.keychain.get_key64(scheme)?;
-                return crate::dec::dec_from_format_64(obtext, format, key64);
-            }
-            #[cfg(feature = "apsv")]
-            Scheme::Apsv => {
-                let key64 = self.keychain.get_key64(scheme)?;
-                return crate::dec::dec_from_format_64(obtext, format, key64);
-            }
-            #[cfg(feature = "upbc")]
-            Scheme::Upbc => {
-                let key32 = self.keychain.get_key32(scheme)?;
-                return crate::dec::dec_from_format_32(obtext, format, key32);
-            }
-            #[cfg(feature = "mock")]
-            Scheme::Mock1 | Scheme::Mock2 => {
-                let key32 = self.keychain.get_key32(scheme)?;
-                return crate::dec::dec_from_format_32(obtext, format, key32);
-            }
-            // Z-tier schemes are not supported in Ob (use Obz instead)
-            #[cfg(feature = "zrbcx")]
-            Scheme::Zrbcx => Err(Error::InvalidScheme),
-            #[cfg(feature = "zmock")]
-            Scheme::Zmock1 => Err(Error::InvalidScheme),
-            #[cfg(feature = "legacy")]
-            Scheme::Legacy => Err(Error::InvalidScheme),
-        }
+        crate::dec::dec_from_format(obtext, format, self.keychain.master_key())
     }
 
     /// Decode+decrypt with automatic scheme and encoding detection.
