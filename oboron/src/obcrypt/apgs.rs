@@ -6,6 +6,8 @@ use aes_gcm_siv::{
 };
 use rand::RngCore;
 
+const KEY_OFFSET: usize = 32;
+const KEY_LEN: usize = 32;
 const NONCE_SIZE: usize = 12;
 const TAG_SIZE: usize = 16;
 const MIN_PAYLOAD_LEN: usize = NONCE_SIZE + 1 + TAG_SIZE;
@@ -16,8 +18,8 @@ pub fn encrypt(master_key: &[u8; 64], plaintext_bytes: &[u8]) -> Result<Vec<u8>,
         return Err(Error::EmptyPlaintext);
     }
 
-    // Extract key inline
-    let key: &[u8; 32] = unsafe { &*(master_key[32..64].as_ptr() as *const [u8; 32]) };
+    let key_slice = &master_key[KEY_OFFSET..KEY_OFFSET + KEY_LEN];
+    let key: &[u8; 32] = key_slice.try_into().unwrap();
 
     let ciphertext_len = plaintext_bytes.len() + TAG_SIZE;
     let mut buffer = Vec::with_capacity(NONCE_SIZE + ciphertext_len);
@@ -41,8 +43,8 @@ pub fn decrypt(master_key: &[u8; 64], data: &[u8]) -> Result<Vec<u8>, Error> {
         return Err(Error::PayloadTooShort);
     }
 
-    // Extract key inline
-    let key: &[u8; 32] = unsafe { &*(master_key[32..64].as_ptr() as *const [u8; 32]) };
+    let key_slice = &master_key[KEY_OFFSET..KEY_OFFSET + KEY_LEN];
+    let key: &[u8; 32] = key_slice.try_into().unwrap();
 
     let nonce_bytes = &data[..NONCE_SIZE];
     let ciphertext_with_tag = &data[NONCE_SIZE..];

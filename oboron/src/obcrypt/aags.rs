@@ -37,8 +37,8 @@ pub fn decrypt(master_key: &[u8; 64], data: &[u8]) -> Result<Vec<u8>, Error> {
         return Err(Error::PayloadTooShort);
     }
 
-    // Extract key directly - no function call overhead
-    let key: &[u8; 32] = unsafe { &*(master_key[32..64].as_ptr() as *const [u8; 32]) };
+    let key_slice = &master_key[KEY_OFFSET..KEY_OFFSET + KEY_LEN];
+    let key: &[u8; 32] = key_slice.try_into().unwrap();
 
     let cipher = Aes256GcmSiv::new(key.into());
     let nonce = Nonce::from([0u8; NONCE_SIZE]);

@@ -9,6 +9,8 @@ use rand::RngCore;
 type Aes256CbcEnc = Encryptor<Aes256>;
 type Aes256CbcDec = Decryptor<Aes256>;
 
+const KEY_OFFSET: usize = 8;
+const KEY_LEN: usize = 32;
 const IV_SIZE: usize = 16;
 
 #[inline]
@@ -17,8 +19,8 @@ pub fn encrypt(master_key: &[u8; 64], plaintext_bytes: &[u8]) -> Result<Vec<u8>,
         return Err(Error::EmptyPlaintext);
     }
 
-    // Extract key inline (bytes 8-40)
-    let key: &[u8; 32] = unsafe { &*(master_key[8..40].as_ptr() as *const [u8; 32]) };
+    let key_slice = &master_key[KEY_OFFSET..KEY_OFFSET + KEY_LEN];
+    let key: &[u8; 32] = key_slice.try_into().unwrap();
 
     let data_len = plaintext_bytes.len();
     let padding_size = (AES_BLOCK_SIZE - (data_len % AES_BLOCK_SIZE)) % AES_BLOCK_SIZE;
@@ -45,8 +47,8 @@ pub fn decrypt(master_key: &[u8; 64], data: &[u8]) -> Result<Vec<u8>, Error> {
         return Err(Error::PayloadTooShort);
     }
 
-    // Extract key inline (bytes 8-40)
-    let key: &[u8; 32] = unsafe { &*(master_key[8..40].as_ptr() as *const [u8; 32]) };
+    let key_slice = &master_key[KEY_OFFSET..KEY_OFFSET + KEY_LEN];
+    let key: &[u8; 32] = key_slice.try_into().unwrap();
 
     let iv = &data[..IV_SIZE];
     let ciphertext = &data[IV_SIZE..];
