@@ -44,7 +44,7 @@ pub(crate) fn enc_to_format_32(
     }
 
     // Step 1: Encrypt using scheme-specific function
-    let mut ciphertext = match format.scheme() {
+    let mut ciphertext: Vec<u8> = match format.scheme() {
         #[cfg(feature = "aags")]
         Scheme::Aags => encrypt_aags(key32, plaintext.as_bytes())?,
         #[cfg(feature = "apgs")]
@@ -99,7 +99,7 @@ pub(crate) fn enc_to_format_64(
     }
 
     // Step 1: Encrypt using scheme-specific function
-    let mut ciphertext = match format.scheme() {
+    let mut ciphertext: Vec<u8> = match format.scheme() {
         #[cfg(feature = "aasv")]
         Scheme::Aasv => encrypt_aasv(key64, plaintext.as_bytes())?,
         #[cfg(feature = "apsv")]
