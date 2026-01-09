@@ -11,6 +11,11 @@ keywords = ["encryption", "obfuscation", "encoding", "base32", "identifiers"]
 categories = ["cryptography", "encoding"]
 readme = "README.md"
 
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+
 [features]
 # Default: Secure, production-ready defaults
 default = ["std"]
