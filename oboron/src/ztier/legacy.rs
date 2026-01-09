@@ -76,7 +76,7 @@ macro_rules! impl_legacy_codec {
                 }
 
                 // Encrypt using legacy AES-CBC
-                let ciphertext = encrypt_legacy(self.zkeychain.secret_bytes(), plaintext_bytes)?;
+                let ciphertext = encrypt_legacy(self.zkeychain.master_secret(), plaintext_bytes)?;
 
                 // Encode based on encoding type
                 match $encoding {
@@ -105,7 +105,7 @@ macro_rules! impl_legacy_codec {
                 };
 
                 // Decrypt using legacy AES-CBC
-                let plaintext_bytes = decrypt_legacy(self.zkeychain.secret_bytes(), &ciphertext)?;
+                let plaintext_bytes = decrypt_legacy(self.zkeychain.master_secret(), &ciphertext)?;
 
                 // Convert to string
                 #[cfg(feature = "unchecked-utf8")]

@@ -10,10 +10,10 @@ Crockford base32 encoding (e.g., `AagsC32`).
 
 | Scheme | 8B Enc   | 8B Dec   | 16B Enc  | 16B Dec  |
 |--------|----------|----------|----------|----------|
-| zrbcx   | 131.5 ns | 125.9 ns | 128.3 ns | 122.3 ns |
+| zrbcx  | 131.5 ns | 125.9 ns | 128.3 ns | 122.3 ns |
 | aags   | 421.8 ns | 434.7 ns | 424.3 ns | 439.7 ns |
 | aasv   | 322.7 ns | 366.4 ns | 321.7 ns | 365.9 ns |
-| upbc  | 150.7 ns | 142.3 ns | 165.1 ns | 140.5 ns |
+| upbc   | 150.7 ns | 142.3 ns | 165.1 ns | 140.5 ns |
 
 ## `enc()` Performance
 
