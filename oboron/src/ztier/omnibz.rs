@@ -124,7 +124,7 @@ impl Omnibz {
         let format = format.into_format()?;
         validate_ztier_scheme(format.scheme())?;
         let extracted_secret = self.zkeychain.extract_secret(format.scheme())?;
-        crate::enc::enc_to_format(plaintext, format, extracted_secret)
+        crate::enc::enc_to_format_32(plaintext, format, extracted_secret)
     }
 
     /// Decode and decrypt obtext with the specified format.
@@ -157,7 +157,7 @@ impl Omnibz {
         let format = format.into_format()?;
         validate_ztier_scheme(format.scheme())?;
         let extracted_secret = self.zkeychain.extract_secret(format.scheme())?;
-        crate::dec::dec_from_format(obtext, format, extracted_secret)
+        crate::dec::dec_from_format_32(obtext, format, extracted_secret)
     }
 
     /// Decode+decrypt with automatic scheme and encoding detection.

@@ -350,12 +350,12 @@ impl Obz {
 impl ObtextCodec for Obz {
     fn enc(&self, plaintext: &str) -> Result<String, Error> {
         let extracted_key = self.zkeychain.extract_secret(self.scheme())?;
-        crate::enc::enc_to_format(plaintext, self.format, extracted_key)
+        crate::enc::enc_to_format_32(plaintext, self.format, extracted_key)
     }
 
     fn dec(&self, obtext: &str) -> Result<String, Error> {
         let extracted_key = self.zkeychain.extract_secret(self.format.scheme())?;
-        crate::dec::dec_from_format(obtext, self.format, extracted_key)
+        crate::dec::dec_from_format_32(obtext, self.format, extracted_key)
     }
 
     fn format(&self) -> Format {
