@@ -31,9 +31,9 @@ fn test_enc_keyless() {
     let mut cmd = Command::cargo_bin("ob").unwrap();
     cmd.env("HOME", test_home.as_os_str())
         .arg("enc")
-        .arg("-z")
-        .arg("--ob32")
-        .arg("--base32rfc")
+        .arg("-K")
+        .arg("--aasv")
+        .arg("--b32")
         .arg("test123")
         .assert()
         .success()
@@ -41,16 +41,16 @@ fn test_enc_keyless() {
     cleanup_test_home(&test_home);
 }
 
-#[cfg(feature = "ob32p")]
+#[cfg(feature = "apsv")]
 #[test]
-fn test_enc_keyless_ob32p() {
+fn test_enc_keyless_apsv() {
     let test_home = test_home_dir();
     let mut cmd = Command::cargo_bin("ob").unwrap();
     cmd.env("HOME", test_home.as_os_str())
         .arg("enc")
-        .arg("-z")
-        .arg("--ob32p")
-        .arg("--base32rfc")
+        .arg("-K")
+        .arg("--apsv")
+        .arg("--b32")
         .arg("test123")
         .assert()
         .success()
@@ -58,7 +58,7 @@ fn test_enc_keyless_ob32p() {
     cleanup_test_home(&test_home);
 }
 
-#[cfg(feature = "ob32p")]
+#[cfg(feature = "apsv")]
 #[test]
 fn test_enc_dec_roundtrip_keyless() {
     let test_home = test_home_dir();
@@ -68,9 +68,9 @@ fn test_enc_dec_roundtrip_keyless() {
     let enc_output = enc_cmd
         .env("HOME", test_home.as_os_str())
         .arg("enc")
-        .arg("-z")
-        .arg("--ob32p")
-        .arg("--base32rfc")
+        .arg("-K")
+        .arg("--apsv")
+        .arg("--b32")
         .arg("hello_world")
         .output()
         .unwrap();
@@ -87,9 +87,9 @@ fn test_enc_dec_roundtrip_keyless() {
     dec_cmd
         .env("HOME", test_home.as_os_str())
         .arg("dec")
-        .arg("-z")
-        .arg("--ob32p")
-        .arg("--base32rfc")
+        .arg("-K")
+        .arg("--apsv")
+        .arg("--b32")
         .arg(&encd)
         .assert()
         .success()
@@ -107,8 +107,8 @@ fn test_enc_with_explicit_key() {
         .arg("enc")
         .arg("--key")
         .arg(TEST_KEY_B64)
-        .arg("--ob32")
-        .arg("--base32rfc")
+        .arg("--aasv")
+        .arg("--b32")
         .arg("test_data")
         .assert()
         .success()
@@ -117,9 +117,9 @@ fn test_enc_with_explicit_key() {
     cleanup_test_home(&test_home);
 }
 
-#[cfg(feature = "ob32p")]
+#[cfg(feature = "apsv")]
 #[test]
-fn test_enc_with_explicit_key_ob32p() {
+fn test_enc_with_explicit_key_apsv() {
     let test_home = test_home_dir();
 
     let mut cmd = Command::cargo_bin("ob").unwrap();
@@ -127,8 +127,8 @@ fn test_enc_with_explicit_key_ob32p() {
         .arg("enc")
         .arg("--key")
         .arg(TEST_KEY_B64)
-        .arg("--ob32p")
-        .arg("--base32rfc")
+        .arg("--apsv")
+        .arg("--b32")
         .arg("test_data")
         .assert()
         .success()
@@ -141,15 +141,15 @@ fn test_enc_with_explicit_key_ob32p() {
 fn test_enc_dec_with_explicit_key() {
     let test_home = test_home_dir();
 
-    // Encode with ob31
+    // Encode with aags
     let mut enc_cmd = Command::cargo_bin("ob").unwrap();
     let enc_output = enc_cmd
         .env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("--key")
         .arg(TEST_KEY_B64_ALT)
-        .arg("--ob32")
-        .arg("--base32rfc")
+        .arg("--aasv")
+        .arg("--b32")
         .arg("sensitive_data")
         .output()
         .unwrap();
@@ -167,8 +167,8 @@ fn test_enc_dec_with_explicit_key() {
         .arg("dec")
         .arg("--key")
         .arg(TEST_KEY_B64_ALT)
-        .arg("--ob32") // Use same scheme as enc
-        .arg("--base32rfc")
+        .arg("--aasv") // Use same scheme as enc
+        .arg("--b32")
         .arg(&encd)
         .assert()
         .success()
@@ -177,20 +177,20 @@ fn test_enc_dec_with_explicit_key() {
     cleanup_test_home(&test_home);
 }
 
-#[cfg(feature = "ob31")]
+#[cfg(feature = "aags")]
 #[test]
-fn test_enc_dec_with_explicit_key_ob31() {
+fn test_enc_dec_with_explicit_key_aags() {
     let test_home = test_home_dir();
 
-    // Encode with ob31
+    // Encode with aags
     let mut enc_cmd = Command::cargo_bin("ob").unwrap();
     let enc_output = enc_cmd
         .env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("--key")
         .arg(TEST_KEY_B64_ALT)
-        .arg("--ob31")
-        .arg("--base32rfc")
+        .arg("--aags")
+        .arg("--b32")
         .arg("sensitive_data")
         .output()
         .unwrap();
@@ -208,8 +208,8 @@ fn test_enc_dec_with_explicit_key_ob31() {
         .arg("dec")
         .arg("--key")
         .arg(TEST_KEY_B64_ALT)
-        .arg("--ob31") // Use same scheme as enc
-        .arg("--base32rfc")
+        .arg("--aags") // Use same scheme as enc
+        .arg("--b32")
         .arg(&encd)
         .assert()
         .success()
@@ -218,26 +218,23 @@ fn test_enc_dec_with_explicit_key_ob31() {
     cleanup_test_home(&test_home);
 }
 
-#[cfg(feature = "ob01")]
-#[cfg(feature = "ob31")]
-#[cfg(feature = "ob32")]
-#[cfg(feature = "ob21p")]
-#[cfg(feature = "ob31p")]
-#[cfg(feature = "ob32p")]
+#[cfg(feature = "aags")]
+#[cfg(feature = "aasv")]
+#[cfg(feature = "upbc")]
+#[cfg(feature = "apgs")]
+#[cfg(feature = "apsv")]
 #[test]
 fn test_enc_different_schemes() {
     let test_home = test_home_dir();
-    let schemes = vec![
-        "--ob01", "--ob31", "--ob32", "--ob21p", "--ob31p", "--ob32p",
-    ];
+    let schemes = vec!["--aags", "--aasv", "--upbc", "--apgs", "--apsv"];
 
     for scheme in schemes {
         let mut cmd = Command::cargo_bin("ob").unwrap();
         cmd.env("HOME", test_home.as_os_str())
             .arg("enc")
-            .arg("-z")
+            .arg("-K")
             .arg(scheme)
-            .arg("--base32rfc")
+            .arg("--b32")
             .arg("test")
             .assert()
             .success();
@@ -246,18 +243,18 @@ fn test_enc_different_schemes() {
     cleanup_test_home(&test_home);
 }
 
-#[cfg(feature = "ob01")]
+#[cfg(feature = "aasv")]
 #[test]
 fn test_enc_different_encodings() {
     let test_home = test_home_dir();
-    let encodings = vec!["--base32rfc", "--base64", "--hex"];
+    let encodings = vec!["--b32", "--b64", "--hex"];
 
     for encoding in encodings {
         let mut cmd = Command::cargo_bin("ob").unwrap();
         cmd.env("HOME", test_home.as_os_str())
             .arg("enc")
-            .arg("-z")
-            .arg("--ob01")
+            .arg("-K")
+            .arg("--aasv")
             .arg(encoding)
             .arg("test")
             .assert()
@@ -267,19 +264,19 @@ fn test_enc_different_encodings() {
     cleanup_test_home(&test_home);
 }
 
-#[cfg(feature = "ob01")]
-#[cfg(feature = "ob31")]
-#[cfg(feature = "ob32")]
+#[cfg(feature = "apsv")]
+#[cfg(feature = "aags")]
+#[cfg(feature = "aasv")]
 #[test]
 fn test_enc_with_format_string() {
     let test_home = test_home_dir();
-    let formats = vec!["ob01:b32", "ob31:b64", "ob32:hex"];
+    let formats = vec!["apsv.b32", "aags.b64", "aasv.hex"];
 
     for format in formats {
         let mut cmd = Command::cargo_bin("ob").unwrap();
         cmd.env("HOME", test_home.as_os_str())
             .arg("enc")
-            .arg("-z")
+            .arg("-K")
             .arg("--format")
             .arg(format)
             .arg("test_format")

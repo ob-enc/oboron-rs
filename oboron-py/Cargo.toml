@@ -1,6 +1,6 @@
 [package]
 name = "oboron-py"
-version = "0.1.0"
+version = "1.0.0-rc.1"
 edition = "2021"
 
 [lib]
@@ -8,27 +8,25 @@ name = "_oboron"
 crate-type = ["cdylib"]
 
 [features]
-default = ["all-schemes", "legacy", "experimental", "keyless", "legacy", "ob70"]
+default = ["all-schemes", "ztier-schemes", "keyless", "legacy", "mock", "zmock"]
 
-ob00 = ["oboron/ob00"]
-ob01 = ["oboron/ob01"]
-ob31 = ["oboron/ob31"]
-ob32 = ["oboron/ob32"]
-ob21p = ["oboron/ob21p"]
-ob31p = ["oboron/ob31p"]
-ob32p = ["oboron/ob32p"]
-ob70 = ["oboron/ob70"]
-ob71 = ["oboron/ob71"]
-all-schemes = ["ob01", "ob21p", "ob31", "ob31p", "ob32", "ob32p"]
+legacy = ["oboron/legacy"]
+zrbcx = ["oboron/zrbcx"]
+aags = ["oboron/aags"]
+aasv = ["oboron/aasv"]
+upbc = ["oboron/upbc"]
+apgs = ["oboron/apgs"]
+apsv = ["oboron/apsv"]
+mock = ["oboron/mock"]
+zmock = ["oboron/zmock"]
+ztier = ["oboron/ztier"]
+all-schemes = ["aags", "apgs", "aasv", "apsv", "upbc"]
+ztier-schemes = ["zrbcx", "zmock"]
 
 keyless = ["oboron/keyless"]
 
-# Feature groups
-legacy = ["ob00"]  # For compatibility/testing
-experimental = []  # Experimental algorithms
-
 [dependencies]
-oboron = { version = "0.3", path = "../oboron", default-features = false, features=["full"] }
+oboron = { version = "1.0.0-rc.1", path = "../oboron", default-features = false, features=["full", "bytes-keys"] }
 pyo3 = { version = "0.22", features = ["extension-module"] }
 hex = "0.4"
 

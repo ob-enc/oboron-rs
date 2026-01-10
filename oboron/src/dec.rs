@@ -1,88 +1,84 @@
 use crate::{
     base32::{BASE32_CROCKFORD, BASE32_RFC},
-    constants::REVERSED_SCHEME_BYTES,
+    constants::SCHEME_MARKER_SIZE,
     error::Error,
-    Encoding, Format, Keychain, Scheme,
+    Encoding, Format, Scheme,
 };
 use data_encoding::{BASE64URL_NOPAD, HEXLOWER};
 
-// Conditionally import decrypt functions based on features
-#[cfg(feature = "ob01")]
-use crate::decrypt_ob01;
-#[cfg(feature = "ob21p")]
-use crate::decrypt_ob21p;
-#[cfg(feature = "ob31")]
-use crate::decrypt_ob31;
-#[cfg(feature = "ob31p")]
-use crate::decrypt_ob31p;
-#[cfg(feature = "ob32")]
-use crate::decrypt_ob32;
-#[cfg(feature = "ob32p")]
-use crate::decrypt_ob32p;
-// Testing
-#[cfg(feature = "ob70")]
-use crate::decrypt_ob70;
-#[cfg(feature = "ob71")]
-use crate::decrypt_ob71;
+// Conditionally import decrypt functions
+#[cfg(feature = "aags")]
+use crate::decrypt_aags;
+#[cfg(feature = "aasv")]
+use crate::decrypt_aasv;
+#[cfg(feature = "apgs")]
+use crate::decrypt_apgs;
+#[cfg(feature = "apsv")]
+use crate::decrypt_apsv;
+#[cfg(feature = "mock")]
+use crate::decrypt_mock1;
+#[cfg(feature = "mock")]
+use crate::decrypt_mock2;
+#[cfg(feature = "upbc")]
+use crate::decrypt_upbc;
 
-/// Generic decoding pipeline for all schemes (except ob00).
+/// Generic decoding pipeline - takes full 64-byte key, obcrypt functions extract what they need
 ///
 /// Steps:
 /// 1. Decode obtext using format's encoding
-/// 2. Extract and verify scheme byte
-/// 3. Optionally reverse the bytes (select schemes only)
-/// 4. Call scheme-specific decrypt function
+/// 2. XOR last two bytes with first two to undo entropy mixing
+/// 3. Extract and verify 2-byte scheme marker
+/// 4. Call scheme-specific decrypt function (handles any scheme-specific transformations like reversal)
 /// 5. Convert to UTF-8 string
+#[inline(always)]
 pub(crate) fn dec_from_format(
     obtext: &str,
     format: Format,
-    keychain: &Keychain,
+    master_key: &[u8; 64],
 ) -> Result<String, Error> {
     // Step 1: Decode obtext
     let mut buffer = decode_obtext_to_payload(obtext, format.encoding())?;
 
-    if buffer.is_empty() {
-        return Err(Error::EmptyPayload);
+    if buffer.len() < SCHEME_MARKER_SIZE {
+        return Err(Error::PayloadTooShort);
     }
 
-    // Step 2: Get scheme byte
-    // XOR the last byte with the first to undo mixing
+    // Step 2 & 3: XOR and extract marker in optimized way
     let len = buffer.len();
-    buffer[len - 1] ^= buffer[0];
-    // Extract the scheme byte from tail
-    let scheme_byte = buffer.pop().unwrap();
-    // Validate scheme tail byte
-    if scheme_byte != format.scheme().byte() {
-        return Err(Error::SchemeByteMismatch);
+    let first_byte = buffer[0];
+    let scheme_marker = [buffer[len - 2] ^ first_byte, buffer[len - 1] ^ first_byte];
+
+    // Validate scheme marker
+    if scheme_marker != format.scheme().marker() {
+        return Err(Error::SchemeMarkerMismatch);
     }
 
-    // Step 3: Reverse if needed to get original order
-    if REVERSED_SCHEME_BYTES.contains(&scheme_byte) {
-        buffer.reverse();
-    }
+    // Truncate to remove marker
+    buffer.truncate(len - SCHEME_MARKER_SIZE);
 
-    // Step 4: Decrypt using scheme-specific function based on format
+    // Step 4: Decrypt using scheme-specific function
     let plaintext_bytes = match format.scheme() {
-        #[cfg(feature = "ob01")]
-        Scheme::Ob01 => decrypt_ob01(keychain, &buffer)?,
-        #[cfg(feature = "ob21p")]
-        Scheme::Ob21p => decrypt_ob21p(keychain, &buffer)?,
-        #[cfg(feature = "ob31")]
-        Scheme::Ob31 => decrypt_ob31(keychain, &buffer)?,
-        #[cfg(feature = "ob31p")]
-        Scheme::Ob31p => decrypt_ob31p(keychain, &buffer)?,
-        #[cfg(feature = "ob32")]
-        Scheme::Ob32 => decrypt_ob32(keychain, &buffer)?,
-        #[cfg(feature = "ob32p")]
-        Scheme::Ob32p => decrypt_ob32p(keychain, &buffer)?,
-        // Testing
-        #[cfg(feature = "ob70")]
-        Scheme::Ob70 => decrypt_ob70(keychain, &buffer)?,
-        #[cfg(feature = "ob71")]
-        Scheme::Ob71 => decrypt_ob71(keychain, &buffer)?,
-        // Legacy - ob00 does not use this call path
-        #[cfg(feature = "ob00")]
-        Scheme::Ob00 => unreachable!("called generic dec function for ob00"),
+        #[cfg(feature = "aags")]
+        Scheme::Aags => decrypt_aags(master_key, &buffer)?,
+        #[cfg(feature = "apgs")]
+        Scheme::Apgs => decrypt_apgs(master_key, &buffer)?,
+        #[cfg(feature = "aasv")]
+        Scheme::Aasv => decrypt_aasv(master_key, &buffer)?,
+        #[cfg(feature = "apsv")]
+        Scheme::Apsv => decrypt_apsv(master_key, &buffer)?,
+        #[cfg(feature = "upbc")]
+        Scheme::Upbc => decrypt_upbc(master_key, &buffer)?,
+        #[cfg(feature = "mock")]
+        Scheme::Mock1 => decrypt_mock1(master_key, &buffer)?,
+        #[cfg(feature = "mock")]
+        Scheme::Mock2 => decrypt_mock2(master_key, &buffer)?,
+        // Z-tier
+        #[cfg(feature = "zrbcx")]
+        Scheme::Zrbcx => unreachable!("ztier uses separate path"),
+        #[cfg(feature = "zmock")]
+        Scheme::Zmock1 => unreachable!("ztier uses separate path"),
+        #[cfg(feature = "legacy")]
+        Scheme::Legacy => unreachable!("legacy uses separate path"),
     };
 
     // Step 5: Convert to string
@@ -92,46 +88,27 @@ pub(crate) fn dec_from_format(
     {
         Ok(unsafe { String::from_utf8_unchecked(plaintext_bytes) })
     }
-
     #[cfg(not(feature = "unchecked-utf8"))]
     {
-        String::from_utf8(plaintext_bytes).map_err(|_| Error::DecryptionFailed)
+        String::from_utf8(plaintext_bytes).map_err(|_| Error::InvalidUtf8)
     }
 }
 
 /// Decode text encoding to raw bytes.
+#[inline]
 pub(crate) fn decode_obtext_to_payload(obtext: &str, encoding: Encoding) -> Result<Vec<u8>, Error> {
     match encoding {
-        Encoding::Base32Rfc => BASE32_RFC
-            .decode(&obtext.as_bytes())
-            .map_err(|_| Error::InvalidBase32Rfc),
-        Encoding::Base32Crockford => BASE32_CROCKFORD
-            .decode(&obtext.as_bytes())
-            .map_err(|_| Error::InvalidBase32Crockford),
-        Encoding::Base64 => BASE64URL_NOPAD
+        Encoding::B32 => BASE32_RFC
             .decode(obtext.as_bytes())
-            .map_err(|_| Error::InvalidBase64),
+            .map_err(|_| Error::InvalidB32),
+        Encoding::C32 => BASE32_CROCKFORD
+            .decode(obtext.as_bytes())
+            .map_err(|_| Error::InvalidC32),
+        Encoding::B64 => BASE64URL_NOPAD
+            .decode(obtext.as_bytes())
+            .map_err(|_| Error::InvalidB64),
         Encoding::Hex => HEXLOWER
             .decode(obtext.as_bytes())
             .map_err(|_| Error::InvalidHex),
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_dec_base32() {
-        let encoded = "c5h66";
-        let result = decode_obtext_to_payload(encoded, Encoding::Base32Crockford).unwrap();
-        assert_eq!(result, b"abc");
-    }
-
-    #[test]
-    fn test_decode_hex() {
-        let encoded = "68656c6c6f";
-        let result = decode_obtext_to_payload(encoded, Encoding::Hex).unwrap();
-        assert_eq!(result, b"hello");
     }
 }

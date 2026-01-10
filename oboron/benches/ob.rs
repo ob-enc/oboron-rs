@@ -1,5 +1,5 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use oboron::{Ob, Oboron};
+use oboron::Ob;
 use serde::Deserialize;
 use std::fs;
 use std::path::PathBuf;
@@ -95,15 +95,27 @@ fn run_ob_benchmarks(c: &mut Criterion) {
                     });
                 }
             }
-            "dec_strict" => {
+            "dec" => {
                 if let Some(precompute) = spec.precompute {
                     // Precompute and set format outside timed loop
                     let ot = precompute_value(&precompute, &ob);
                     bench_count += 1;
 
-                    // Only the dec_strict operation is timed
+                    // Only the dec operation is timed
                     c.bench_function(&spec.id, |b| {
-                        b.iter(|| ob.dec_strict(black_box(&ot)).unwrap());
+                        b.iter(|| ob.dec(black_box(&ot)).unwrap());
+                    });
+                }
+            }
+            "autodec" => {
+                if let Some(precompute) = spec.precompute {
+                    // Precompute and set format outside timed loop
+                    let ot = precompute_value(&precompute, &ob);
+                    bench_count += 1;
+
+                    // Only the dec operation is timed
+                    c.bench_function(&spec.id, |b| {
+                        b.iter(|| ob.autodec(black_box(&ot)).unwrap());
                     });
                 }
             }

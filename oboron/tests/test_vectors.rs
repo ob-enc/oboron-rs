@@ -1,4 +1,4 @@
-use oboron::{Format, ObMulti};
+use oboron::{Format, Omnib};
 use serde::Deserialize;
 use std::fs;
 use std::path::PathBuf;
@@ -23,7 +23,7 @@ fn load_test_vectors() -> Vec<TestVector> {
     for path in &possible_paths {
         if path.exists() {
             println!("Found test vectors at: {:?}", path);
-            let data = fs::read_to_string(path).expect("Failed to read test-vectors. jsonl");
+            let data = fs::read_to_string(path).expect("Failed to read test-vectors.jsonl");
             return data
                 .lines()
                 .filter(|line| !line.trim().is_empty())
@@ -40,7 +40,7 @@ fn test_all_vectors() {
     let vectors = load_test_vectors();
     println!("Loaded {} test vectors", vectors.len());
 
-    let ob = ObMulti::new_keyless().expect("Failed to create ObMulti");
+    let omb = Omnib::new_keyless().expect("Failed to create Omnib");
 
     for vector in vectors {
         let format = Format::from_str(&vector.format)
@@ -53,7 +53,7 @@ fn test_all_vectors() {
             // (encoding produces different output each time)
 
             // Test decoding with format
-            let decd = ob.dec(&vector.obtext, &vector.format).unwrap_or_else(|e| {
+            let pt2 = omb.dec(&vector.obtext, &vector.format).unwrap_or_else(|e| {
                 panic!(
                     "Failed to dec '{}' with format '{}': {:?}",
                     vector.obtext, vector.format, e
@@ -61,13 +61,13 @@ fn test_all_vectors() {
             });
 
             assert_eq!(
-                decd, vector.plaintext,
+                pt2, vector.plaintext,
                 "Decoding mismatch for '{}' with format '{}'\nExpected: {}\nGot: {}",
-                vector.obtext, vector.format, vector.plaintext, decd
+                vector.obtext, vector.format, vector.plaintext, pt2
             );
 
             // Test autodetection
-            let autodetected = ob
+            let autodetected = omb
                 .autodec(&vector.obtext)
                 .unwrap_or_else(|e| panic!("Failed to autodetect '{}': {:?}", vector.obtext, e));
 
@@ -78,7 +78,7 @@ fn test_all_vectors() {
             );
 
             // Test that we can enc and then dec (roundtrip)
-            let new_encd = ob
+            let new_ot = omb
                 .enc(&vector.plaintext, &vector.format)
                 .unwrap_or_else(|e| {
                     panic!(
@@ -87,10 +87,10 @@ fn test_all_vectors() {
                     )
                 });
 
-            let roundtrip = ob.dec(&new_encd, &vector.format).unwrap_or_else(|e| {
+            let roundtrip = omb.dec(&new_ot, &vector.format).unwrap_or_else(|e| {
                 panic!(
                     "Failed to dec roundtrip '{}' with format '{}': {:?}",
-                    new_encd, vector.format, e
+                    new_ot, vector.format, e
                 )
             });
 
@@ -103,7 +103,7 @@ fn test_all_vectors() {
             // For deterministic schemes, test both encoding and decoding
 
             // Test encoding
-            let encd = ob
+            let ot = omb
                 .enc(&vector.plaintext, &vector.format)
                 .unwrap_or_else(|e| {
                     panic!(
@@ -113,13 +113,13 @@ fn test_all_vectors() {
                 });
 
             assert_eq!(
-                encd, vector.obtext,
+                ot, vector.obtext,
                 "Encoding mismatch for '{}' with format '{}'\nExpected: {}\nGot: {}",
-                vector.plaintext, vector.format, vector.obtext, encd
+                vector.plaintext, vector.format, vector.obtext, ot
             );
 
             // Test decoding
-            let decd = ob.dec(&vector.obtext, &vector.format).unwrap_or_else(|e| {
+            let pt2 = omb.dec(&vector.obtext, &vector.format).unwrap_or_else(|e| {
                 panic!(
                     "Failed to dec '{}' with format '{}': {:?}",
                     vector.obtext, vector.format, e
@@ -127,13 +127,13 @@ fn test_all_vectors() {
             });
 
             assert_eq!(
-                decd, vector.plaintext,
+                pt2, vector.plaintext,
                 "Decoding mismatch for '{}' with format '{}'\nExpected: {}\nGot: {}",
-                vector.obtext, vector.format, vector.plaintext, decd
+                vector.obtext, vector.format, vector.plaintext, pt2
             );
 
             // Test autodetection
-            let autodetected = ob
+            let autodetected = omb
                 .autodec(&vector.obtext)
                 .unwrap_or_else(|e| panic!("Failed to autodetect '{}': {:?}", vector.obtext, e));
 

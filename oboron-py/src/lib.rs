@@ -1,10 +1,9 @@
-use ::oboron::Oboron;
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use pyo3::types::PyBytes;
 
-/// Macro to generate Python wrapper classes for Oboron schemes with specific encoding
-macro_rules! impl_cipher_class {
+/// Macro to generate Python wrapper classes for fixed-format ObtextCodec types
+macro_rules! impl_codec_class {
     ($py_name:ident, $rust_type:ty, $doc:expr) => {
         #[doc = $doc]
         #[pyclass]
@@ -15,14 +14,14 @@ macro_rules! impl_cipher_class {
 
         #[pymethods]
         impl $py_name {
-            /// Create a new cipher instance.
+            /// Create a new codec instance.
             ///
             /// Args:
-            ///     key:     86-character base64 string key (512 bits).  Optional if keyless=True.
+            ///     key:     86-character base64 string key (512 bits).  Required if keyless=False.
             ///     keyless: If True, uses the hardcoded key (testing only, NOT SECURE).
             ///
             /// Returns:
-            ///     A new cipher instance.
+            ///     A new codec instance.
             ///
             /// Raises:
             ///     ValueError: If key is invalid or both key and keyless are provided.
@@ -31,11 +30,11 @@ macro_rules! impl_cipher_class {
             fn new(key: Option<String>, keyless: bool) -> PyResult<Self> {
                 let inner = match (key, keyless) {
                     (Some(key), false) => <$rust_type>::new(&key).map_err(|e| {
-                        PyValueError::new_err(format!("Failed to create cipher: {}", e))
+                        PyValueError::new_err(format!("Failed to create codec: {}", e))
                     })?,
                     (None, true) => <$rust_type>::new_keyless().map_err(|e| {
                         PyValueError::new_err(format!(
-                            "Failed to create cipher with hardcoded key: {}",
+                            "Failed to create codec with hardcoded key: {}",
                             e
                         ))
                     })?,
@@ -65,33 +64,45 @@ macro_rules! impl_cipher_class {
             /// Raises:
             ///     ValueError: If the enc operation fails.
             fn enc(&self, plaintext: &str) -> PyResult<String> {
-                self.inner
-                    .enc(plaintext)
-                    .map_err(|e| PyValueError::new_err(format!("Enc operation failed: {}", e)))
+                let result = self.inner.enc(plaintext);
+                result.map_err(|e| PyValueError::new_err(format!("Enc operation failed: {}", e)))
             }
 
             /// Decode+decrypt an obtext string back to plaintext.
             ///
             /// Args:
             ///     obtext: The encrypted+encoded string to decode+decrypt.
-            ///     strict: If True, only decrypt using this instance's scheme (no scheme autodetection).
-            ///             If False (default), automatically detects the scheme used for
-            ///             encryption.
             ///
             /// Returns:
             ///     The decoded+decrypted plaintext string.
             ///
             /// Raises:
-            ///     ValueError: If the dec operation fails, or if strict=True and the ciphertext
-            ///                 was created with a different scheme.
-            #[pyo3(signature = (obtext, strict=false))]
-            fn dec(&self, obtext: &str, strict: bool) -> PyResult<String> {
-                let result = if strict {
-                    self.inner.dec_strict(obtext)
-                } else {
-                    self.inner.dec(obtext)
-                };
+            ///     ValueError: If the dec operation fails
+            #[pyo3(signature = (obtext))]
+            fn dec(&self, obtext: &str) -> PyResult<String> {
+                let result = self.inner.dec(obtext);
                 result.map_err(|e| PyValueError::new_err(format!("Dec operation failed: {}", e)))
+            }
+
+            /// Get the current format string.
+            ///
+            /// Returns:
+            ///     Format string like "zrbcx.c32", "zrbcx.b32", "aags.b64", etc.
+            #[getter]
+            fn format(&self) -> String {
+                format!("{}", self.inner.format())
+            }
+
+            /// The scheme used by this instance.
+            #[getter]
+            fn scheme(&self) -> String {
+                self.inner.scheme().to_string()
+            }
+
+            /// The encoding format used by this instance.
+            #[getter]
+            fn encoding(&self) -> String {
+                self.inner.encoding().to_string()
             }
 
             /// Get the key used by this instance (as base64 string).
@@ -100,334 +111,419 @@ macro_rules! impl_cipher_class {
                 self.inner.key()
             }
 
+            /// Get the key as hex used by this instance.
+            #[getter]
+            fn key_hex(&self) -> String {
+                self.inner.key_hex()
+            }
+
             /// Get the key as bytes used by this instance.
             #[getter]
             fn key_bytes(&self, py: Python) -> PyResult<Py<PyBytes>> {
                 Ok(PyBytes::new_bound(py, self.inner.key_bytes()).into())
             }
+        }
+    };
+}
+
+macro_rules! impl_zcodec_class {
+    ($py_name:ident, $rust_type:ty, $doc:expr) => {
+        #[doc = $doc]
+        #[pyclass]
+        #[allow(non_camel_case_types)]
+        struct $py_name {
+            inner: $rust_type,
+        }
+
+        #[pymethods]
+        impl $py_name {
+            /// Create a new codec instance.
+            ///
+            /// Args:
+            ///     key:     43-character base64 string secret (256 bits).  Required if keyless=False.
+            ///     keyless: If True, uses the hardcoded secret (testing only, NOT SECURE).
+            ///
+            /// Returns:
+            ///     A new codec instance.
+            ///
+            /// Raises:
+            ///     ValueError: If key is invalid or both key and keyless are provided.
+            #[new]
+            #[pyo3(signature = (secret=None, keyless=false))]
+            fn new(secret: Option<String>, keyless: bool) -> PyResult<Self> {
+                let inner = match (secret, keyless) {
+                    (Some(secret), false) => <$rust_type>::new(&secret).map_err(|e| {
+                        PyValueError::new_err(format!("Failed to create codec: {}", e))
+                    })?,
+                    (None, true) => <$rust_type>::new_keyless().map_err(|e| {
+                        PyValueError::new_err(format!(
+                            "Failed to create codec with hardcoded secret: {}",
+                            e
+                        ))
+                    })?,
+                    (Some(_), true) => {
+                        return Err(PyValueError::new_err(
+                            "Cannot specify both secret and keyless=True",
+                        ));
+                    }
+                    (None, false) => {
+                        return Err(PyValueError::new_err(
+                            "Must provide either secret or set keyless=True",
+                        ));
+                    }
+                };
+
+                Ok(Self { inner })
+            }
+
+            /// Encrypt+encode a plaintext string.
+            ///
+            /// Args:
+            ///     plaintext: The plaintext string to encrypt+encode.
+            ///
+            /// Returns:
+            ///     The obtext string.
+            ///
+            /// Raises:
+            ///     ValueError: If the enc operation fails.
+            fn enc(&self, plaintext: &str) -> PyResult<String> {
+                let result = self.inner.enc(plaintext);
+                result.map_err(|e| PyValueError::new_err(format!("Enc operation failed: {}", e)))
+            }
+
+            /// Decode+decrypt an obtext string back to plaintext.
+            ///
+            /// Args:
+            ///     obtext: The encrypted+encoded string to decode+decrypt.
+            ///
+            /// Returns:
+            ///     The decoded+decrypted plaintext string.
+            ///
+            /// Raises:
+            ///     ValueError: If the dec operation fails
+            #[pyo3(signature = (obtext))]
+            fn dec(&self, obtext: &str) -> PyResult<String> {
+                let result = self.inner.dec(obtext);
+                result.map_err(|e| PyValueError::new_err(format!("Dec operation failed: {}", e)))
+            }
+
+            /// Get the current format string.
+            ///
+            /// Returns:
+            ///     Format string like "zrbcx.c32", "zrbcx.b32", etc.
+            #[getter]
+            fn format(&self) -> String {
+                format!("{}", self.inner.format())
+            }
 
             /// The scheme used by this instance.
             #[getter]
             fn scheme(&self) -> String {
-                format!("{:?}", self.inner.scheme())
+                self.inner.scheme().to_string()
             }
 
             /// The encoding format used by this instance.
             #[getter]
             fn encoding(&self) -> String {
-                format!("{:?}", self.inner.encoding())
+                self.inner.encoding().to_string()
+            }
+
+            /// Get the secret used by this instance (as base64 string).
+            #[getter]
+            fn secret(&self) -> String {
+                self.inner.secret()
+            }
+
+            /// Get the secret as bytes used by this instance.
+            #[getter]
+            fn secret_hex(&self) -> String {
+                self.inner.secret_hex()
+            }
+
+            /// Get the secret as bytes used by this instance.
+            #[getter]
+            fn secret_bytes(&self, py: Python) -> PyResult<Py<PyBytes>> {
+                Ok(PyBytes::new_bound(py, self.inner.secret_bytes()).into())
             }
         }
     };
 }
 
-// Ob00 - LEGACY variants
+// Aags variants
+// -------------
+#[cfg(feature = "aags")]
+impl_codec_class!(
+    AagsB32,
+    ::oboron::AagsB32,
+    "Aags codec (deterministic AES-GCM-SIV) with B32 encoding "
+);
+#[cfg(feature = "aags")]
+impl_codec_class!(
+    AagsB64,
+    ::oboron::AagsB64,
+    "Aags codec (deterministic AES-GCM-SIV) with B64 encoding"
+);
+#[cfg(feature = "aags")]
+impl_codec_class!(
+    AagsC32,
+    ::oboron::AagsC32,
+    "Aags codec (deterministic AES-GCM-SIV) with C32 encoding"
+);
+#[cfg(feature = "aags")]
+impl_codec_class!(
+    AagsHex,
+    ::oboron::AagsHex,
+    "Aags codec (deterministic AES-GCM-SIV) with Hex encoding"
+);
+
+// Aasv variants
+// -------------
+#[cfg(feature = "aasv")]
+impl_codec_class!(
+    AasvB32,
+    ::oboron::AasvB32,
+    "Aasv codec (deterministic AES-SIV, nonce-misuse resistant) with B32 encoding"
+);
+#[cfg(feature = "aasv")]
+impl_codec_class!(
+    AasvB64,
+    ::oboron::AasvB64,
+    "Aasv codec (deterministic AES-SIV, nonce-misuse resistant) with B64 encoding"
+);
+#[cfg(feature = "aasv")]
+impl_codec_class!(
+    AasvC32,
+    ::oboron::AasvC32,
+    "Aasv codec (deterministic AES-SIV, nonce-misuse resistant) with C32 encoding"
+);
+#[cfg(feature = "aasv")]
+impl_codec_class!(
+    AasvHex,
+    ::oboron::AasvHex,
+    "Aasv codec (deterministic AES-SIV, nonce-misuse resistant) with Hex encoding"
+);
+
+// Apgs variants
+// --------------
+#[cfg(feature = "apgs")]
+impl_codec_class!(
+    ApgsB32,
+    ::oboron::ApgsB32,
+    "Apgs codec (probabilistic AES-GCM-SIV) with B32 encoding"
+);
+#[cfg(feature = "apgs")]
+impl_codec_class!(
+    ApgsB64,
+    ::oboron::ApgsB64,
+    "Apgs codec (probabilistic AES-GCM-SIV) with B64 encoding"
+);
+#[cfg(feature = "apgs")]
+impl_codec_class!(
+    ApgsC32,
+    ::oboron::ApgsC32,
+    "Apgs codec (probabilistic AES-GCM-SIV) with C32 encoding"
+);
+#[cfg(feature = "apgs")]
+impl_codec_class!(
+    ApgsHex,
+    ::oboron::ApgsHex,
+    "Apgs codec (probabilistic AES-GCM-SIV) with Hex encoding"
+);
+
+// Apsv variants
+// --------------
+#[cfg(feature = "apsv")]
+impl_codec_class!(
+    ApsvB32,
+    ::oboron::ApsvB32,
+    "Apsv codec (probabilistic AES-SIV) with B32 encoding"
+);
+#[cfg(feature = "apsv")]
+impl_codec_class!(
+    ApsvB64,
+    ::oboron::ApsvB64,
+    "Apsv codec (probabilistic AES-SIV) with B64 encoding"
+);
+#[cfg(feature = "apsv")]
+impl_codec_class!(
+    ApsvC32,
+    ::oboron::ApsvC32,
+    "Apsv codec (probabilistic AES-SIV) with C32 encoding"
+);
+#[cfg(feature = "apsv")]
+impl_codec_class!(
+    ApsvHex,
+    ::oboron::ApsvHex,
+    "Apsv codec (probabilistic AES-SIV) with Hex encoding"
+);
+
+// Upbc variants
+// ------------
+#[cfg(feature = "upbc")]
+impl_codec_class!(
+    UpbcB32,
+    ::oboron::UpbcB32,
+    "Upbc codec (probabilistic AES-CBC) with B32 encoding"
+);
+#[cfg(feature = "upbc")]
+impl_codec_class!(
+    UpbcB64,
+    ::oboron::UpbcB64,
+    "Upbc codec (probabilistic AES-CBC) with B64 encoding"
+);
+#[cfg(feature = "upbc")]
+impl_codec_class!(
+    UpbcC32,
+    ::oboron::UpbcC32,
+    "Upbc codec (probabilistic AES-CBC) with C32 encoding"
+);
+#[cfg(feature = "upbc")]
+impl_codec_class!(
+    UpbcHex,
+    ::oboron::UpbcHex,
+    "Upbc codec (probabilistic AES-CBC) with Hex encoding"
+);
+
+// Zrbcx variants
+// -------------
+#[cfg(feature = "zrbcx")]
+impl_zcodec_class!(
+    ZrbcxB32,
+    ::oboron::ztier::ZrbcxB32,
+    "Zrbcx codec (deterministic AES-CBC, constant IV) with B32 encoding "
+);
+#[cfg(feature = "zrbcx")]
+impl_zcodec_class!(
+    ZrbcxB64,
+    ::oboron::ztier::ZrbcxB64,
+    "Zrbcx codec (deterministic AES-CBC, constant IV) with B64 encoding"
+);
+#[cfg(feature = "zrbcx")]
+impl_zcodec_class!(
+    ZrbcxC32,
+    ::oboron::ztier::ZrbcxC32,
+    "Zrbcx codec (deterministic AES-CBC, constant IV) with C32 encoding"
+);
+#[cfg(feature = "zrbcx")]
+impl_zcodec_class!(
+    ZrbcxHex,
+    ::oboron::ztier::ZrbcxHex,
+    "Zrbcx codec (deterministic AES-CBC, constant IV) with Hex encoding"
+);
+
+// --- TESTING CLASSES ---
+
+// Mock1 variants
+// -------------
+impl_codec_class!(
+    Mock1B32,
+    ::oboron::Mock1B32,
+    "Mock1 codec (identity scheme, for testing) with B32 encoding"
+);
+impl_codec_class!(
+    Mock1B64,
+    ::oboron::Mock1B64,
+    "Mock1 codec (identity scheme, for testing) with B64 encoding"
+);
+impl_codec_class!(
+    Mock1C32,
+    ::oboron::Mock1C32,
+    "Mock1 codec (identity scheme, for testing) with C32 encoding"
+);
+impl_codec_class!(
+    Mock1Hex,
+    ::oboron::Mock1Hex,
+    "Mock1 codec (identity scheme, for testing) with Hex encoding"
+);
+
+// Mock2 variants
+// -------------
+impl_codec_class!(
+    Mock2B32,
+    ::oboron::Mock2B32,
+    "Mock2 codec (reverse plaintext scheme, for testing) with B32 encoding"
+);
+impl_codec_class!(
+    Mock2B64,
+    ::oboron::Mock2B64,
+    "Mock2 codec (reverse plaintext scheme, for testing) with B64 encoding"
+);
+impl_codec_class!(
+    Mock2C32,
+    ::oboron::Mock2C32,
+    "Mock2 codec (reverse plaintext scheme, for testing) with C32 encoding"
+);
+impl_codec_class!(
+    Mock2Hex,
+    ::oboron::Mock2Hex,
+    "Mock2 codec (reverse plaintext scheme, for testing) with Hex encoding"
+);
+
+// Zmock1 variants
+// -------------
+impl_zcodec_class!(
+    Zmock1B32,
+    ::oboron::ztier::Zmock1B32,
+    "Zmock1 codec (identity scheme, for testing) with B32 encoding"
+);
+impl_zcodec_class!(
+    Zmock1B64,
+    ::oboron::ztier::Zmock1B64,
+    "Zmock1 codec (identity scheme, for testing) with B64 encoding"
+);
+impl_zcodec_class!(
+    Zmock1C32,
+    ::oboron::ztier::Zmock1C32,
+    "Zmock1 codec (identity scheme, for testing) with C32 encoding"
+);
+impl_zcodec_class!(
+    Zmock1Hex,
+    ::oboron::ztier::Zmock1Hex,
+    "Zmock1 codec (identity scheme, for testing) with Hex encoding"
+);
+
+// Legacy - LEGACY variants
 // ----------------------
-#[cfg(feature = "ob00")]
-impl_cipher_class!(
-    Ob00Base32Crockford,
-    ::oboron::Ob00Base32Crockford,
-    "Ob00 cipher with Base32Crockford encoding (LEGACY AES-CBC with custom padding)\n\n\
+#[cfg(feature = "legacy")]
+impl_zcodec_class!(
+    LegacyB32,
+    ::oboron::ztier::LegacyB32,
+    "Legacy codec (deterministic AES-CBC, constant IV, custom padding) with B32 encoding\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
-     For new projects, use Ob01 or more secure schemes like Ob31/Ob32."
+     For new projects, use Zrbcx or more secure schemes like Aags/Aasv."
 );
-#[cfg(feature = "ob00")]
-impl_cipher_class!(
-    Ob00Base32Rfc,
-    ::oboron::Ob00Base32Rfc,
-    "Ob00 cipher with Base32Rfc encoding (LEGACY AES-CBC with custom padding)\n\n\
+#[cfg(feature = "legacy")]
+impl_zcodec_class!(
+    LegacyB64,
+    ::oboron::ztier::LegacyB64,
+    "Legacy codec (deterministic AES-CBC, constant IV, custom padding) with B64 encoding\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
-     For new projects, use Ob01 or more secure schemes like Ob31/Ob32."
+     For new projects, use Zrbcx or more secure schemes like Aags/Aasv."
 );
-#[cfg(feature = "ob00")]
-impl_cipher_class!(
-    Ob00,
-    ::oboron::Ob00,
-    "Ob00 cipher with default Base32Rfc encoding (LEGACY AES-CBC with custom padding)\n\n\
+#[cfg(feature = "legacy")]
+impl_zcodec_class!(
+    LegacyC32,
+    ::oboron::ztier::LegacyC32,
+    "Legacy codec (deterministic AES-CBC, constant IV, custom padding) with C32 encoding\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
-     For new projects, use Ob01 or more secure schemes like Ob31/Ob32."
+     For new projects, use Zrbcx or more secure schemes like Aags/Aasv."
 );
-#[cfg(feature = "ob00")]
-impl_cipher_class!(
-    Ob00Base64,
-    ::oboron::Ob00Base64,
-    "Ob00 cipher with Base64 encoding (LEGACY AES-CBC with custom padding)\n\n\
+#[cfg(feature = "legacy")]
+impl_zcodec_class!(
+    LegacyHex,
+    ::oboron::ztier::LegacyHex,
+    "Legacy codec (deterministic AES-CBC, constant IV, custom padding) with Hex encoding\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
-     For new projects, use Ob01 or more secure schemes like Ob31/Ob32."
-);
-#[cfg(feature = "ob00")]
-impl_cipher_class!(
-    Ob00Hex,
-    ::oboron::Ob00Hex,
-    "Ob00 cipher with Hex encoding (LEGACY AES-CBC with custom padding)\n\n\
-     **LEGACY**: This scheme is maintained for backward compatibility only.\n\
-     For new projects, use Ob01 or more secure schemes like Ob31/Ob32."
+     For new projects, use Zrbcx or more secure schemes like Aags/Aasv."
 );
 
-// Ob01 variants
-// -------------
-#[cfg(feature = "ob01")]
-impl_cipher_class!(
-    Ob01Base32Crockford,
-    ::oboron::Ob01Base32Crockford,
-    "Ob01 cipher with Base32Crockford encoding (AES-CBC, deterministic)"
-);
-#[cfg(feature = "ob01")]
-impl_cipher_class!(
-    Ob01Base32Rfc,
-    ::oboron::Ob01Base32Rfc,
-    "Ob01 cipher with Base32Rfc encoding (AES-CBC, deterministic)"
-);
-#[cfg(feature = "ob01")]
-impl_cipher_class!(
-    Ob01,
-    ::oboron::Ob01,
-    "Ob01 cipher with default Base32Crockford encoding (AES-CBC, deterministic)"
-);
-#[cfg(feature = "ob01")]
-impl_cipher_class!(
-    Ob01Base64,
-    ::oboron::Ob01Base64,
-    "Ob01 cipher with Base64 encoding (AES-CBC, deterministic)"
-);
-#[cfg(feature = "ob01")]
-impl_cipher_class!(
-    Ob01Hex,
-    ::oboron::Ob01Hex,
-    "Ob01 cipher with Hex encoding (AES-CBC, deterministic)"
-);
-
-// Ob21p variants
-// --------------
-#[cfg(feature = "ob21p")]
-impl_cipher_class!(
-    Ob21pBase32Crockford,
-    ::oboron::Ob21pBase32Crockford,
-    "Ob21p cipher with Base32Crockford encoding (Probabilistic AES-CBC)"
-);
-#[cfg(feature = "ob21p")]
-impl_cipher_class!(
-    Ob21pBase32Rfc,
-    ::oboron::Ob21pBase32Rfc,
-    "Ob21p cipher with Base32Rfc encoding (Probabilistic AES-CBC)"
-);
-#[cfg(feature = "ob21p")]
-impl_cipher_class!(
-    Ob21p,
-    ::oboron::Ob21p,
-    "Ob21p cipher with default Base32Crockford encoding (Probabilistic AES-CBC)"
-);
-#[cfg(feature = "ob21p")]
-impl_cipher_class!(
-    Ob21pBase64,
-    ::oboron::Ob21pBase64,
-    "Ob21p cipher with Base64 encoding (Probabilistic AES-CBC)"
-);
-#[cfg(feature = "ob21p")]
-impl_cipher_class!(
-    Ob21pHex,
-    ::oboron::Ob21pHex,
-    "Ob21p cipher with Hex encoding (Probabilistic AES-CBC)"
-);
-
-// Ob31 variants
-// -------------
-#[cfg(feature = "ob31")]
-impl_cipher_class!(
-    Ob31Base32Crockford,
-    ::oboron::Ob31Base32Crockford,
-    "Ob31 cipher with Base32Crockford encoding (AES-GCM-SIV, deterministic)"
-);
-#[cfg(feature = "ob31")]
-impl_cipher_class!(
-    Ob31Base32Rfc,
-    ::oboron::Ob31Base32Rfc,
-    "Ob31 cipher with Base32Rfc encoding (AES-GCM-SIV, deterministic)"
-);
-#[cfg(feature = "ob31")]
-impl_cipher_class!(
-    Ob31,
-    ::oboron::Ob31,
-    "Ob31 cipher with default Base32Crockford encoding (AES-GCM-SIV, deterministic)"
-);
-#[cfg(feature = "ob31")]
-impl_cipher_class!(
-    Ob31Base64,
-    ::oboron::Ob31Base64,
-    "Ob31 cipher with Base64 encoding (AES-GCM-SIV, deterministic)"
-);
-#[cfg(feature = "ob31")]
-impl_cipher_class!(
-    Ob31Hex,
-    ::oboron::Ob31Hex,
-    "Ob31 cipher with Hex encoding (AES-GCM-SIV, deterministic)"
-);
-
-// Ob31p variants
-// --------------
-#[cfg(feature = "ob31p")]
-impl_cipher_class!(
-    Ob31pBase32Crockford,
-    ::oboron::Ob31pBase32Crockford,
-    "Ob31p cipher with Base32Crockford encoding (Probabilistic AES-GCM-SIV)"
-);
-#[cfg(feature = "ob31p")]
-impl_cipher_class!(
-    Ob31pBase32Rfc,
-    ::oboron::Ob31pBase32Rfc,
-    "Ob31p cipher with Base32Rfc encoding (Probabilistic AES-GCM-SIV)"
-);
-#[cfg(feature = "ob31p")]
-impl_cipher_class!(
-    Ob31p,
-    ::oboron::Ob31p,
-    "Ob31p cipher with default Base32Crockford encoding (Probabilistic AES-GCM-SIV)"
-);
-#[cfg(feature = "ob31p")]
-impl_cipher_class!(
-    Ob31pBase64,
-    ::oboron::Ob31pBase64,
-    "Ob31p cipher with Base64 encoding (Probabilistic AES-GCM-SIV)"
-);
-#[cfg(feature = "ob31p")]
-impl_cipher_class!(
-    Ob31pHex,
-    ::oboron::Ob31pHex,
-    "Ob31p cipher with Hex encoding (Probabilistic AES-GCM-SIV)"
-);
-
-// Ob32 variants
-// -------------
-#[cfg(feature = "ob32")]
-impl_cipher_class!(
-    Ob32Base32Crockford,
-    ::oboron::Ob32Base32Crockford,
-    "Ob32 cipher with Base32Crockford encoding (AES-SIV, deterministic, nonce-misuse resistant)"
-);
-#[cfg(feature = "ob32")]
-impl_cipher_class!(
-    Ob32Base32Rfc,
-    ::oboron::Ob32Base32Rfc,
-    "Ob32 cipher with Base32Rfc encoding (AES-SIV, deterministic, nonce-misuse resistant)"
-);
-#[cfg(feature = "ob32")]
-impl_cipher_class!(
-    Ob32,
-    ::oboron::Ob32,
-    "Ob32 cipher with default Base32Crockford encoding (AES-SIV, deterministic, nonce-misuse resistant)"
-);
-#[cfg(feature = "ob32")]
-impl_cipher_class!(
-    Ob32Base64,
-    ::oboron::Ob32Base64,
-    "Ob32 cipher with Base64 encoding (AES-SIV, deterministic, nonce-misuse resistant)"
-);
-#[cfg(feature = "ob32")]
-impl_cipher_class!(
-    Ob32Hex,
-    ::oboron::Ob32Hex,
-    "Ob32 cipher with Hex encoding (AES-SIV, deterministic, nonce-misuse resistant)"
-);
-
-// Ob32p variants
-// --------------
-#[cfg(feature = "ob32p")]
-impl_cipher_class!(
-    Ob32pBase32Crockford,
-    ::oboron::Ob32pBase32Crockford,
-    "Ob32p cipher with Base32Crockford encoding (Probabilistic AES-SIV)"
-);
-#[cfg(feature = "ob32p")]
-impl_cipher_class!(
-    Ob32pBase32Rfc,
-    ::oboron::Ob32pBase32Rfc,
-    "Ob32p cipher with Base32Rfc encoding (Probabilistic AES-SIV)"
-);
-#[cfg(feature = "ob32p")]
-impl_cipher_class!(
-    Ob32p,
-    ::oboron::Ob32p,
-    "Ob32p cipher with default Base32Crockford encoding (Probabilistic AES-SIV)"
-);
-#[cfg(feature = "ob32p")]
-impl_cipher_class!(
-    Ob32pBase64,
-    ::oboron::Ob32pBase64,
-    "Ob32p cipher with Base64 encoding (Probabilistic AES-SIV)"
-);
-#[cfg(feature = "ob32p")]
-impl_cipher_class!(
-    Ob32pHex,
-    ::oboron::Ob32pHex,
-    "Ob32p cipher with Hex encoding (Probabilistic AES-SIV)"
-);
-
-// Ob70 variants
-// -------------
-impl_cipher_class!(
-    Ob70Base32Crockford,
-    ::oboron::Ob70Base32Crockford,
-    "Ob70 cipher with Base32Crockford encoding (Identity scheme, for testing)"
-);
-impl_cipher_class!(
-    Ob70Base32Rfc,
-    ::oboron::Ob70Base32Rfc,
-    "Ob70 cipher with Base32Rfc encoding (Identity scheme, for testing)"
-);
-impl_cipher_class!(
-    Ob70,
-    ::oboron::Ob70,
-    "Ob70 cipher with default Base32Crockford encoding (Identity scheme, for testing)"
-);
-impl_cipher_class!(
-    Ob70Base64,
-    ::oboron::Ob70Base64,
-    "Ob70 cipher with Base64 encoding (Identity scheme, for testing)"
-);
-impl_cipher_class!(
-    Ob70Hex,
-    ::oboron::Ob70Hex,
-    "Ob70 cipher with Hex encoding (Identity scheme, for testing)"
-);
-
-// Ob71 variants
-// -------------
-impl_cipher_class!(
-    Ob71Base32Crockford,
-    ::oboron::Ob71Base32Crockford,
-    "Ob71 cipher with Base32Crockford encoding (Reverse scheme, for testing)"
-);
-impl_cipher_class!(
-    Ob71Base32Rfc,
-    ::oboron::Ob71Base32Rfc,
-    "Ob71 cipher with Base32Rfc encoding (Reverse scheme, for testing)"
-);
-impl_cipher_class!(
-    Ob71,
-    ::oboron::Ob71,
-    "Ob71 cipher with default Base32Crockford encoding (Reverse scheme, for testing)"
-);
-impl_cipher_class!(
-    Ob71Base64,
-    ::oboron::Ob71Base64,
-    "Ob71 cipher with Base64 encoding (Reverse scheme, for testing)"
-);
-impl_cipher_class!(
-    Ob71Hex,
-    ::oboron::Ob71Hex,
-    "Ob71 cipher with Hex encoding (Reverse scheme, for testing)"
-);
-
-/// Ob - Flexible cipher with runtime format selection.   
+/// Ob - Flexible codec with runtime format selection.   
 ///
-/// This is the main interface for most use cases.  It wraps Rust's ObFlex
+/// This is the main interface for most use cases.  It wraps Rust's Ob
 /// and allows changing the format (scheme + encoding) at runtime.
-///
-/// Note: In Rust, there's both Ob (immutable) and ObFlex (mutable), but since
-/// Python doesn't have immutability, we expose ObFlex as "Ob" in Python.
 #[pyclass]
 struct Ob {
-    inner: ::oboron::ObFlex,
+    inner: ::oboron::Ob,
 }
 
 #[pymethods]
@@ -435,8 +531,8 @@ impl Ob {
     /// Create a new Ob instance.
     ///
     /// Args:
-    ///     format: Format string like "ob01:c32", "ob01:b32", "ob31:b64", "ob32p:hex", etc.
-    ///     key:     86-character base64 string key (512 bits). Optional if keyless=True.
+    ///     format: Format string like "aags.b64", "apsv.hex", "zrbcx.c32", "zrbcx.b32", etc.
+    ///     key:     86-character base64 string key (512 bits). Required if keyless=False.
     ///     keyless: If True, uses the hardcoded key (testing only, NOT SECURE).
     ///
     /// Returns:
@@ -448,9 +544,9 @@ impl Ob {
     #[pyo3(signature = (format, key=None, keyless=false))]
     fn new(format: &str, key: Option<String>, keyless: bool) -> PyResult<Self> {
         let inner = match (key, keyless) {
-            (Some(key), false) => ::oboron::ObFlex::new(format, &key)
+            (Some(key), false) => ::oboron::Ob::new(format, &key)
                 .map_err(|e| PyValueError::new_err(format!("Failed to create Ob: {}", e)))?,
-            (None, true) => ::oboron::ObFlex::new_keyless(format).map_err(|e| {
+            (None, true) => ::oboron::Ob::new_keyless(format).map_err(|e| {
                 PyValueError::new_err(format!("Failed to create Ob with hardcoded key: {}", e))
             })?,
             (Some(_), true) => {
@@ -470,49 +566,98 @@ impl Ob {
 
     /// Encrypt+encode a plaintext string.
     ///
-    /// Args:
+    /// Args:  
     ///     plaintext: The plaintext string to encrypt+encode.
     ///
-    /// Returns:
+    /// Returns:  
     ///     The obtext string.
     ///
-    /// Raises:
+    /// Raises:  
     ///     ValueError: If encoding fails.
     fn enc(&self, plaintext: &str) -> PyResult<String> {
-        self.inner
-            .enc(plaintext)
-            .map_err(|e| PyValueError::new_err(format!("Enc operation failed: {}", e)))
+        let result = self.inner.enc(plaintext);
+        result.map_err(|e| PyValueError::new_err(format!("Enc operation failed: {}", e)))
     }
 
     /// Decode+decrypt an obtext string back to plaintext.  
     ///
-    /// Args:
-    ///     obtext: The encrypted+encoded string to decode.
-    ///     strict: If True, only decrypt using this instance's scheme (no scheme autodetection).
-    ///             If False (default), automatically detects the scheme used for encryption.  
+    /// Args:  
+    ///     obtext: The encrypted+encoded string to decode.  
     ///
-    /// Returns:
+    /// Returns:  
     ///     The decoded plaintext string.
     ///
-    /// Raises:
-    ///     ValueError: If the dec operation fails, or if strict=True and the obtext
-    ///                 was created with a different scheme.  
-    #[pyo3(signature = (obtext, strict=false))]
-    fn dec(&self, obtext: &str, strict: bool) -> PyResult<String> {
-        let result = if strict {
-            self.inner.dec_strict(obtext)
-        } else {
-            self.inner.dec(obtext)
-        };
-        result.map_err(|e| PyValueError::new_err(format!("Decoding failed: {}", e)))
+    /// Raises:  
+    ///     ValueError: If the dec operation fails
+    #[pyo3(signature = (obtext))]
+    fn dec(&self, obtext: &str) -> PyResult<String> {
+        let result = self.inner.dec(obtext);
+        result.map_err(|e| PyValueError::new_err(format!("Dec operation failed: {}", e)))
     }
 
-    /// Change the format (scheme + encoding).   
+    /// Decode+decrypt with automatic scheme and encoding detection.
     ///
-    /// Args:
-    ///     format: Format string like "ob01:c32", "ob01:b32", "ob31:b64", "ob32p:hex", etc.
+    /// This method tries to decode with the instance's encoding, and if that fails
+    /// it does full format autodetection (`Omnib.autodec()` functionality as failover)
     ///
-    /// Raises:
+    /// Args:  
+    ///     obtext: The encrypted+encoded string to decode+decrypt.
+    ///
+    /// Returns:  
+    ///     The decoded+decrypted plaintext string.
+    ///
+    /// Raises:  
+    ///     ValueError: If the dec operation fails or format cannot be detected.
+    fn autodec(&self, obtext: &str) -> PyResult<String> {
+        let result = self.inner.autodec(obtext);
+        result.map_err(|e| PyValueError::new_err(format!("Autodec operation failed: {}", e)))
+    }
+
+    /// Get the current format string.
+    ///
+    /// Returns:
+    ///     Format string like "aags.b64", "apgs.c32", "aasv.b32", etc.
+    #[getter]
+    fn format(&self) -> String {
+        format!("{}", self.inner.format())
+    }
+
+    /// The scheme used by this instance.
+    #[getter]
+    fn scheme(&self) -> String {
+        self.inner.scheme().to_string()
+    }
+
+    /// The encoding format used by this instance.
+    #[getter]
+    fn encoding(&self) -> String {
+        self.inner.encoding().to_string()
+    }
+
+    /// Get the key used by this instance (as base64 string).
+    #[getter]
+    fn key(&self) -> String {
+        self.inner.key()
+    }
+
+    /// Get the key as hex used by this instance.
+    #[getter]
+    fn key_hex(&self) -> String {
+        self.inner.key_hex()
+    }
+
+    /// Get the key as bytes used by this instance.
+    #[getter]
+    fn key_bytes(&self, py: Python) -> PyResult<Py<PyBytes>> {
+        Ok(PyBytes::new_bound(py, self.inner.key_bytes()).into())
+    }
+
+    /// Change the format (scheme + encoding).  
+    ///
+    /// Args:  
+    ///     format: Format string like "aags.b64", "apsv.hex", "apgs.c32", "aasv.b32", etc.
+    ///
+    /// Raises:  
     ///     ValueError: If format is invalid.
     fn set_format(&mut self, format: &str) -> PyResult<()> {
         self.inner
@@ -522,110 +667,56 @@ impl Ob {
 
     /// Change the scheme while keeping the current encoding.
     ///
-    /// Args:
-    ///     scheme: Scheme name like "Ob01", "Ob31", "Ob32p", etc.  
+    /// Args:  
+    ///     scheme: Scheme name like "aags", "apsv", "apgs", etc.  
     ///
-    /// Raises:
+    /// Raises:  
     ///     ValueError: If scheme is invalid.
     fn set_scheme(&mut self, scheme: &str) -> PyResult<()> {
-        use ::oboron::Scheme;
-        let scheme = match scheme {
-            "Ob71" => Scheme::Ob71,
-            "Ob70" => Scheme::Ob70,
-            "Ob00" => Scheme::Ob00,
-            "Ob01" => Scheme::Ob01,
-            "Ob21p" => Scheme::Ob21p,
-            "Ob31" => Scheme::Ob31,
-            "Ob31p" => Scheme::Ob31p,
-            "Ob32" => Scheme::Ob32,
-            "Ob32p" => Scheme::Ob32p,
-            _ => return Err(PyValueError::new_err(format!("Unknown scheme: {}", scheme))),
-        };
+        let scheme_enum = ::oboron::Scheme::from_str(scheme)
+            .map_err(|e| PyValueError::new_err(format!("Invalid scheme: {}", e)))?;
         self.inner
-            .set_scheme(scheme)
+            .set_scheme(scheme_enum)
             .map_err(|e| PyValueError::new_err(format!("Failed to set scheme: {}", e)))
     }
 
     /// Change the encoding while keeping the current scheme.
     ///
-    /// Args:
-    ///     encoding: Encoding name: "base32crockford", "base32rfc", "base64", or "hex".
-    ///               Also accepts short forms: "c32", "b32", "b64", "hex".
+    /// Args:  
+    ///     encoding: Encoding name: "b32", "b64", "c32", "hex".
+    ///               Also accepts long forms: "base32rfc", "base64", "base32crockford", or "hex".
     ///
-    /// Raises:
+    /// Raises:  
     ///     ValueError: If encoding is invalid.
     fn set_encoding(&mut self, encoding: &str) -> PyResult<()> {
-        use ::oboron::Encoding;
-        let encoding = match encoding {
-            "Base32Crockford" | "base32crockford" | "c32" => Encoding::Base32Crockford,
-            "Base32Rfc" | "base32rfc" | "b32" => Encoding::Base32Rfc,
-            "Base64" | "base64" | "b64" => Encoding::Base64,
-            "Hex" | "hex" => Encoding::Hex,
-            _ => {
-                return Err(PyValueError::new_err(format!(
-                    "Unknown encoding: {}",
-                    encoding
-                )))
-            }
-        };
+        let encoding_enum = ::oboron::Encoding::from_str(encoding)
+            .map_err(|e| PyValueError::new_err(format!("Invalid encoding: {}", e)))?;
         self.inner
-            .set_encoding(encoding)
+            .set_encoding(encoding_enum)
             .map_err(|e| PyValueError::new_err(format!("Failed to set encoding: {}", e)))
-    }
-
-    /// Get the current format string.
-    ///
-    /// Returns:
-    ///     Format string like "ob01:c32", "ob01:b32", "ob31:b64", etc.
-    fn format(&self) -> String {
-        format!("{}", self.inner.format())
-    }
-
-    /// Get the key used by this instance (as base64 string).
-    #[getter]
-    fn key(&self) -> String {
-        self.inner.key()
-    }
-
-    /// Get the key as bytes used by this instance.
-    #[getter]
-    fn key_bytes(&self, py: Python) -> PyResult<Py<PyBytes>> {
-        Ok(PyBytes::new_bound(py, self.inner.key_bytes()).into())
-    }
-
-    /// The scheme used by this instance.  
-    #[getter]
-    fn scheme(&self) -> String {
-        format!("{:?}", self.inner.scheme())
-    }
-
-    /// The encoding format used by this instance.
-    #[getter]
-    fn encoding(&self) -> String {
-        format!("{:?}", self.inner.encoding())
     }
 }
 
-/// ObMulti - Multi-format cipher with full autodetection.
+/// Omnib - Multi-format codec with full autodetection.
 ///
-/// Unlike other ciphers, ObMulti doesn't store a format internally.
+/// Unlike other codecs, Omnib doesn't store a format internally.
 /// The format must be specified for each enc operation, and it can
 /// automatically detect both scheme and encoding on dec operations.
 #[pyclass]
-struct ObMulti {
-    inner: ::oboron::ObMulti,
+struct Omnib {
+    inner: ::oboron::Omnib,
 }
 
 #[pymethods]
-impl ObMulti {
-    /// Create a new ObMulti instance.
+impl Omnib {
+    /// Create a new Omnib instance.
     ///
     /// Args:
-    ///     key:     86-character base64 string key (512 bits).  Optional if keyless=True.
+    ///     key:     86-character base64 string key (512 bits).  Required if keyless=False.
     ///     keyless: If True, uses the hardcoded key (testing only, NOT SECURE).
     ///
     /// Returns:
-    ///     A new ObMulti instance.
+    ///     A new Omnib instance.
     ///
     /// Raises:
     ///     ValueError: If key is invalid.
@@ -633,13 +724,10 @@ impl ObMulti {
     #[pyo3(signature = (key=None, keyless=false))]
     fn new(key: Option<String>, keyless: bool) -> PyResult<Self> {
         let inner = match (key, keyless) {
-            (Some(key), false) => ::oboron::ObMulti::new(&key)
-                .map_err(|e| PyValueError::new_err(format!("Failed to create ObMulti: {}", e)))?,
-            (None, true) => ::oboron::ObMulti::new_keyless().map_err(|e| {
-                PyValueError::new_err(format!(
-                    "Failed to create ObMulti with hardcoded key: {}",
-                    e
-                ))
+            (Some(key), false) => ::oboron::Omnib::new(&key)
+                .map_err(|e| PyValueError::new_err(format!("Failed to create Omnib: {}", e)))?,
+            (None, true) => ::oboron::Omnib::new_keyless().map_err(|e| {
+                PyValueError::new_err(format!("Failed to create Omnib with hardcoded key: {}", e))
             })?,
             (Some(_), true) => {
                 return Err(PyValueError::new_err(
@@ -660,7 +748,7 @@ impl ObMulti {
     ///
     /// Args:
     ///     plaintext: The plaintext string to encrypt+encode.
-    ///     format: Format string like "ob01:c32", "ob01:b32", "ob31:b64", "ob32p:hex", etc.
+    ///     format: Format string like "aags.b64", "apsv.hex", etc.
     ///
     /// Returns:
     ///     The obtext string.
@@ -668,32 +756,30 @@ impl ObMulti {
     /// Raises:
     ///     ValueError: If the enc operation fails or format is invalid.
     fn enc(&self, plaintext: &str, format: &str) -> PyResult<String> {
-        self.inner
-            .enc(plaintext, format)
-            .map_err(|e| PyValueError::new_err(format!("Enc operation failed: {}", e)))
+        let result = self.inner.enc(plaintext, format);
+        result.map_err(|e| PyValueError::new_err(format!("Enc operation failed: {}", e)))
     }
 
     /// Decode+decrypt an obtext string with a specific format.
     ///
     /// Args:
     ///     obtext: The encrypted+encoded string to decode+decrypt.  
-    ///     format: Format string like "ob01:c32", "ob01:b32", "ob31:b64", "ob32p:hex", etc.
+    ///     format: Format string like "aags.b64", "apsv.hex", etc.
     ///
     /// Returns:
     ///     The decoded+decrypted plaintext string.
     ///
     /// Raises:
-    ///     ValueError: If the dec operation fails or format is invalid.  
+    ///     ValueError: If the dec operation fails or format is invalid.
     fn dec(&self, obtext: &str, format: &str) -> PyResult<String> {
-        self.inner
-            .dec(obtext, format)
-            .map_err(|e| PyValueError::new_err(format!("Dec operation failed: {}", e)))
+        let result = self.inner.dec(obtext, format);
+        result.map_err(|e| PyValueError::new_err(format!("Dec operation failed: {}", e)))
     }
 
     /// Decode+decrypt with automatic scheme and encoding detection.
     ///
     /// This is the only decoder that can automatically detect both the scheme
-    /// (ob01, ob31, etc.) AND the encoding (base32, base64, hex).   
+    /// (aags, apsv, etc.) AND the encoding (b32, b64, c32, hex).
     ///
     /// Args:
     ///     obtext: The encrypted+encoded string to decode+decrypt.
@@ -704,15 +790,20 @@ impl ObMulti {
     /// Raises:
     ///     ValueError: If the dec operation fails or format cannot be detected.
     fn autodec(&self, obtext: &str) -> PyResult<String> {
-        self.inner
-            .autodec(obtext)
-            .map_err(|e| PyValueError::new_err(format!("Autodec operation failed: {}", e)))
+        let result = self.inner.autodec(obtext);
+        result.map_err(|e| PyValueError::new_err(format!("Autodec operation failed: {}", e)))
     }
 
     /// Get the key used by this instance (as base64 string).
     #[getter]
     fn key(&self) -> String {
         self.inner.key()
+    }
+
+    /// Get the key as hex used by this instance.
+    #[getter]
+    fn key_hex(&self) -> String {
+        self.inner.key_hex()
     }
 
     /// Get the key as bytes used by this instance.
@@ -722,13 +813,311 @@ impl ObMulti {
     }
 }
 
+// Z-tier schemes - Obz
+#[pyclass]
+struct Obz {
+    inner: ::oboron::ztier::Obz,
+}
+
+#[pymethods]
+impl Obz {
+    /// Create a new Obz instance.
+    ///
+    /// Args:
+    ///     format: Format string like "aags.b64", "apsv.hex", "zrbcx.c32", "zrbcx.b32", etc.
+    ///     key:     86-character base64 string key (512 bits). Required if keyless=False.
+    ///     keyless: If True, uses the hardcoded key (testing only, NOT SECURE).
+    ///
+    /// Returns:
+    ///     A new Obz instance.
+    ///
+    /// Raises:
+    ///     ValueError: If key or format is invalid.
+    #[new]
+    #[pyo3(signature = (format, key=None, keyless=false))]
+    fn new(format: &str, key: Option<String>, keyless: bool) -> PyResult<Self> {
+        let inner = match (key, keyless) {
+            (Some(key), false) => ::oboron::ztier::Obz::new(format, &key)
+                .map_err(|e| PyValueError::new_err(format!("Failed to create Obz: {}", e)))?,
+            (None, true) => ::oboron::ztier::Obz::new_keyless(format).map_err(|e| {
+                PyValueError::new_err(format!("Failed to create Obz with hardcoded key: {}", e))
+            })?,
+            (Some(_), true) => {
+                return Err(PyValueError::new_err(
+                    "Cannot specify both key and keyless=True",
+                ));
+            }
+            (None, false) => {
+                return Err(PyValueError::new_err(
+                    "Must provide either key or set keyless=True",
+                ));
+            }
+        };
+
+        Ok(Self { inner })
+    }
+
+    /// Encrypt+encode a plaintext string.
+    ///
+    /// Args:  
+    ///     plaintext: The plaintext string to encrypt+encode.
+    ///
+    /// Returns:  
+    ///     The obtext string.
+    ///
+    /// Raises:  
+    ///     ValueError: If encoding fails.
+    fn enc(&self, plaintext: &str) -> PyResult<String> {
+        let result = self.inner.enc(plaintext);
+        result.map_err(|e| PyValueError::new_err(format!("Enc operation failed: {}", e)))
+    }
+
+    /// Decode+decrypt an obtext string back to plaintext.  
+    ///
+    /// Args:  
+    ///     obtext: The encrypted+encoded string to decode.  
+    ///
+    /// Returns:  
+    ///     The decoded plaintext string.
+    ///
+    /// Raises:  
+    ///     ValueError: If the dec operation fails
+    #[pyo3(signature = (obtext))]
+    fn dec(&self, obtext: &str) -> PyResult<String> {
+        let result = self.inner.dec(obtext);
+        result.map_err(|e| PyValueError::new_err(format!("Dec operation failed: {}", e)))
+    }
+
+    /// Decode+decrypt with automatic scheme and encoding detection.
+    ///
+    /// This method tries to decode with the instance's encoding, and if that fails
+    /// it does full format autodetection (`Omnib.autodec()` functionality as failover)
+    ///
+    /// Args:  
+    ///     obtext: The encrypted+encoded string to decode+decrypt.
+    ///
+    /// Returns:  
+    ///     The decoded+decrypted plaintext string.
+    ///
+    /// Raises:  
+    ///     ValueError: If the dec operation fails or format cannot be detected.
+    fn autodec(&self, obtext: &str) -> PyResult<String> {
+        let result = self.inner.autodec(obtext);
+        result.map_err(|e| PyValueError::new_err(format!("Autodec operation failed: {}", e)))
+    }
+
+    /// Get the current format string.
+    ///
+    /// Returns:
+    ///     Format string like "zrbcx.hex", "zrbcx.c32", "zrbcx.b32", etc.
+    #[getter]
+    fn format(&self) -> String {
+        format!("{}", self.inner.format())
+    }
+
+    /// The scheme used by this instance.
+    #[getter]
+    fn scheme(&self) -> String {
+        self.inner.scheme().to_string()
+    }
+
+    /// The encoding format used by this instance.
+    #[getter]
+    fn encoding(&self) -> String {
+        self.inner.encoding().to_string()
+    }
+
+    /// Get the secret used by this instance (as base64 string).
+    #[getter]
+    fn secret(&self) -> String {
+        self.inner.secret()
+    }
+
+    /// Get the secret as hex used by this instance.
+    #[getter]
+    fn secret_hex(&self) -> String {
+        self.inner.secret_hex()
+    }
+
+    /// Get the secret as bytes used by this instance.
+    #[getter]
+    fn secret_bytes(&self, py: Python) -> PyResult<Py<PyBytes>> {
+        Ok(PyBytes::new_bound(py, self.inner.secret_bytes()).into())
+    }
+
+    /// Change the format (scheme + encoding).  
+    ///
+    /// Args:  
+    ///     format: Format string like "zrbcx.b64", "zrbcx.hex", "zrbcx.c32", "zrbcx.b32", etc.
+    ///
+    /// Raises:  
+    ///     ValueError: If format is invalid.
+    fn set_format(&mut self, format: &str) -> PyResult<()> {
+        self.inner
+            .set_format(format)
+            .map_err(|e| PyValueError::new_err(format!("Failed to set format: {}", e)))
+    }
+
+    /// Change the scheme while keeping the current encoding.
+    ///
+    /// Args:  
+    ///     scheme: Scheme name like "zrbcx", "zmock1", etc.  
+    ///
+    /// Raises:  
+    ///     ValueError: If scheme is invalid.
+    fn set_scheme(&mut self, scheme: &str) -> PyResult<()> {
+        let scheme_enum = ::oboron::Scheme::from_str(scheme)
+            .map_err(|e| PyValueError::new_err(format!("Invalid scheme: {}", e)))?;
+        self.inner
+            .set_scheme(scheme_enum)
+            .map_err(|e| PyValueError::new_err(format!("Failed to set scheme: {}", e)))
+    }
+
+    /// Change the encoding while keeping the current scheme.
+    ///
+    /// Args:  
+    ///     encoding: Encoding name: "b32", "b64", "c32", "hex".
+    ///               Also accepts long forms: "base32rfc", "base64", "base32crockford", or "hex".
+    ///
+    /// Raises:  
+    ///     ValueError: If encoding is invalid.
+    fn set_encoding(&mut self, encoding: &str) -> PyResult<()> {
+        let encoding_enum = ::oboron::Encoding::from_str(encoding)
+            .map_err(|e| PyValueError::new_err(format!("Invalid encoding: {}", e)))?;
+        self.inner
+            .set_encoding(encoding_enum)
+            .map_err(|e| PyValueError::new_err(format!("Failed to set encoding: {}", e)))
+    }
+}
+
+// Z-tier schemes - Omnibz
+#[pyclass]
+struct Omnibz {
+    inner: ::oboron::ztier::Omnibz,
+}
+
+#[pymethods]
+impl Omnibz {
+    /// Create a new Omnibz instance.
+    ///
+    /// Args:
+    ///     secret:     43-character base64 string key (256 bits).  Required if keyless=False.
+    ///     keyless: If True, uses the hardcoded secret (testing only, NOT SECURE).
+    ///
+    /// Returns:
+    ///     A new Omnibz instance.
+    ///
+    /// Raises:
+    ///     ValueError: If secret is invalid.
+    #[new]
+    #[pyo3(signature = (secret=None, keyless=false))]
+    fn new(secret: Option<String>, keyless: bool) -> PyResult<Self> {
+        let inner = match (secret, keyless) {
+            (Some(secret), false) => ::oboron::ztier::Omnibz::new(&secret)
+                .map_err(|e| PyValueError::new_err(format!("Failed to create Omnibz: {}", e)))?,
+            (None, true) => ::oboron::ztier::Omnibz::new_keyless().map_err(|e| {
+                PyValueError::new_err(format!(
+                    "Failed to create Omnibz with hardcoded secret: {}",
+                    e
+                ))
+            })?,
+            (Some(_), true) => {
+                return Err(PyValueError::new_err(
+                    "Cannot specify both secret and keyless=True",
+                ));
+            }
+            (None, false) => {
+                return Err(PyValueError::new_err(
+                    "Must provide either secret or set keyless=True",
+                ));
+            }
+        };
+
+        Ok(Self { inner })
+    }
+
+    /// Ecrypt+encode a plaintext string with a specific format.
+    ///
+    /// Args:
+    ///     plaintext: The plaintext string to encrypt+encode.
+    ///     format: Format string like "zrbcx.c32", "zrbcx.b32", etc.
+    ///
+    /// Returns:
+    ///     The obtext string.
+    ///
+    /// Raises:
+    ///     ValueError: If the enc operation fails or format is invalid.
+    fn enc(&self, plaintext: &str, format: &str) -> PyResult<String> {
+        let result = self.inner.enc(plaintext, format);
+        result.map_err(|e| PyValueError::new_err(format!("Enc operation failed: {}", e)))
+    }
+
+    /// Decode+decrypt an obtext string with a specific format.
+    ///
+    /// Args:
+    ///     obtext: The encrypted+encoded string to decode+decrypt.  
+    ///     format: Format string like "zrbcx.c32", "zrbcx.b32", etc.
+    ///
+    /// Returns:
+    ///     The decoded+decrypted plaintext string.
+    ///
+    /// Raises:
+    ///     ValueError: If the dec operation fails or format is invalid.
+    fn dec(&self, obtext: &str, format: &str) -> PyResult<String> {
+        let result = self.inner.dec(obtext, format);
+        result.map_err(|e| PyValueError::new_err(format!("Dec operation failed: {}", e)))
+    }
+
+    /// Decode+decrypt with automatic scheme and encoding detection.
+    ///
+    /// This is the only decoder that can automatically detect both the scheme
+    /// (zrbcx, zmock1, etc.) AND the encoding (b32, b64, c32, hex).
+    ///
+    /// Args:
+    ///     obtext: The encrypted+encoded string to decode+decrypt.
+    ///
+    /// Returns:
+    ///     The decoded+decrypted plaintext string.
+    ///
+    /// Raises:
+    ///     ValueError: If the dec operation fails or format cannot be detected.
+    fn autodec(&self, obtext: &str) -> PyResult<String> {
+        let result = self.inner.autodec(obtext);
+        result.map_err(|e| PyValueError::new_err(format!("Autodec operation failed: {}", e)))
+    }
+
+    /// Get the secret used by this instance (as base64 string).
+    fn secret(&self) -> String {
+        self.inner.secret()
+    }
+
+    /// Get the secret as hex used by this instance.
+    fn secret_hex(&self) -> String {
+        self.inner.secret_hex()
+    }
+
+    /// Get the key as bytes used by this instance.
+    fn secret_bytes(&self, py: Python) -> PyResult<Py<PyBytes>> {
+        Ok(PyBytes::new_bound(py, self.inner.secret_bytes()).into())
+    }
+}
+
+/// Generate a random 64-byte key as a base64 string.
+///
+/// Returns:
+///     A random 64-byte key as a 86-character base64 string.
+#[pyfunction]
+fn generate_key() -> PyResult<String> {
+    Ok(::oboron::generate_key())
+}
+
 /// Generate a random 64-byte key as a hex string.
 ///
 /// Returns:
 ///     A random 64-byte key as a 128-character hex string.
 #[pyfunction]
-fn generate_key() -> PyResult<String> {
-    Ok(::oboron::generate_key())
+fn generate_key_hex() -> PyResult<String> {
+    Ok(::oboron::generate_key_hex())
 }
 
 /// Generate a random 64-byte key as bytes.
@@ -741,6 +1130,34 @@ fn generate_key_bytes(py: Python) -> PyResult<Py<PyBytes>> {
     Ok(PyBytes::new_bound(py, &key).into())
 }
 
+/// Generate a random 32-byte secret as a base64 string.
+///
+/// Returns:
+///     A random 64-byte key as a 43-character base64 string.
+#[pyfunction]
+fn generate_secret() -> PyResult<String> {
+    Ok(::oboron::generate_secret())
+}
+
+/// Generate a random 32-byte secret as a hex string.
+///
+/// Returns:
+///     A random 32-byte key as a 64-character hex string.
+#[pyfunction]
+fn generate_secret_hex() -> PyResult<String> {
+    Ok(::oboron::generate_secret_hex())
+}
+
+/// Generate a random 32-byte secret as bytes.
+///
+/// Returns:
+///     A random 32-byte secret as bytes.
+#[pyfunction]
+fn generate_secret_bytes(py: Python) -> PyResult<Py<PyBytes>> {
+    let secret = ::oboron::generate_secret_bytes();
+    Ok(PyBytes::new_bound(py, &secret).into())
+}
+
 // ============================================================================
 // Convenience Functions
 // ============================================================================
@@ -749,7 +1166,7 @@ fn generate_key_bytes(py: Python) -> PyResult<Py<PyBytes>> {
 ///
 /// Args:
 ///     plaintext: The plaintext string to encode.
-///     format: Format string like "ob01:b32", "ob31:b64", "ob32p:hex", etc.
+///     format: Format string like "aags.b64", "apsv.hex", "zrbcx.b32", etc.
 ///     key:     86-character base64 string key (512 bits).
 ///
 /// Returns:
@@ -767,7 +1184,7 @@ fn enc(plaintext: &str, format: &str, key: &str) -> PyResult<String> {
 ///
 /// Args:
 ///     plaintext: The plaintext string to encrypt+encode.
-///     format: Format string like "ob01:b32", "ob31:b64", "ob32p:hex", etc.
+///     format: Format string like "aags.b64", "apsv.hex", "zrbcx.b32", etc.
 ///
 /// Returns:
 ///     The obtext string.
@@ -781,11 +1198,11 @@ fn enc_keyless(plaintext: &str, format: &str) -> PyResult<String> {
         .map_err(|e| PyValueError::new_err(format!("Enc operation failed: {}", e)))
 }
 
-/// Decode+decrypt obtext with a specified format.  
+/// Decode+decrypt obtext with a specified format.
 ///
 /// Args:
-///     obtext: The encrypted+encoded string to decode+decrypt
-///     format: Format string like "ob01:b32", "ob31:b64", "ob32p:hex", etc.
+///     obtext: The encrypted+encoded string to decode+decrypt  
+///     format: Format string like "zrbcx.b32", "aags.b64", "apsv.hex", etc.  
 ///     key:    86-character base64 string key (512 bits).
 ///
 /// Returns:
@@ -802,8 +1219,8 @@ fn dec(obtext: &str, format: &str, key: &str) -> PyResult<String> {
 /// Decode+decrypt obtext with a specified format using the hardcoded key (testing only).
 ///
 /// Args:
-///     obtext: The encrypted+encoded string to decode+decrypt.
-///     format: Format string like "ob01:b32", "ob31:b64", "ob32p:hex", etc.
+///     obtext: The encrypted+encoded string to decode+decrypt.  
+///     format: Format string like "aags.b64", "apsv.hex", "zrbcx.b32", etc.
 ///
 /// Returns:
 ///     The decoded+decrypted plaintext string.
@@ -834,7 +1251,7 @@ fn autodec(obtext: &str, key: &str) -> PyResult<String> {
         .map_err(|e| PyValueError::new_err(format!("Autodec operation failed: {}", e)))
 }
 
-/// Decode+decrypt obtext with automatic format detection using the hardcoded key (testing only).  
+/// Decode+decrypt obtext with automatic format detection using the hardcoded key (testing only).
 ///
 /// Args:
 ///     obtext: The encrypted+encoded string to decode+decrypt.
@@ -854,99 +1271,122 @@ fn autodec_keyless(obtext: &str) -> PyResult<String> {
 /// Python module for Oboron (internal Rust extension)
 #[pymodule]
 fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
+    // Add version from Cargo.toml
+    m.add("__version__", env!("CARGO_PKG_VERSION"))?;
+
     // Main flexible interface
     m.add_class::<Ob>()?;
 
     // Multi-format interface
-    m.add_class::<ObMulti>()?;
+    m.add_class::<Omnib>()?;
 
-    // Ob00 variants (LEGACY)
-    #[cfg(feature = "ob00")]
+    // Aags variants
+    #[cfg(feature = "aags")]
     {
-        m.add_class::<Ob00>()?;
-        m.add_class::<Ob00Base32Crockford>()?;
-        m.add_class::<Ob00Base32Rfc>()?;
-        m.add_class::<Ob00Base64>()?;
-        m.add_class::<Ob00Hex>()?;
+        m.add_class::<AagsC32>()?;
+        m.add_class::<AagsB32>()?;
+        m.add_class::<AagsB64>()?;
+        m.add_class::<AagsHex>()?;
     }
 
-    // Ob01 variants
-    #[cfg(feature = "ob01")]
+    // Apgs variants
+    #[cfg(feature = "apgs")]
     {
-        m.add_class::<Ob01>()?;
-        m.add_class::<Ob01Base32Crockford>()?;
-        m.add_class::<Ob01Base32Rfc>()?;
-        m.add_class::<Ob01Base64>()?;
-        m.add_class::<Ob01Hex>()?;
+        m.add_class::<ApgsC32>()?;
+        m.add_class::<ApgsB32>()?;
+        m.add_class::<ApgsB64>()?;
+        m.add_class::<ApgsHex>()?;
     }
 
-    // Ob21p variants
-    #[cfg(feature = "ob21p")]
+    // Aasv variants
+    #[cfg(feature = "aasv")]
     {
-        m.add_class::<Ob21p>()?;
-        m.add_class::<Ob21pBase32Crockford>()?;
-        m.add_class::<Ob21pBase32Rfc>()?;
-        m.add_class::<Ob21pBase64>()?;
-        m.add_class::<Ob21pHex>()?;
+        m.add_class::<AasvC32>()?;
+        m.add_class::<AasvB32>()?;
+        m.add_class::<AasvB64>()?;
+        m.add_class::<AasvHex>()?;
     }
 
-    // Ob31 variants
-    #[cfg(feature = "ob31")]
+    // Apsv variants
+    #[cfg(feature = "apsv")]
     {
-        m.add_class::<Ob31>()?;
-        m.add_class::<Ob31Base32Crockford>()?;
-        m.add_class::<Ob31Base32Rfc>()?;
-        m.add_class::<Ob31Base64>()?;
-        m.add_class::<Ob31Hex>()?;
+        m.add_class::<ApsvC32>()?;
+        m.add_class::<ApsvB32>()?;
+        m.add_class::<ApsvB64>()?;
+        m.add_class::<ApsvHex>()?;
     }
 
-    // Ob31p variants
-    #[cfg(feature = "ob31p")]
+    // Upbc variants
+    #[cfg(feature = "upbc")]
     {
-        m.add_class::<Ob31p>()?;
-        m.add_class::<Ob31pBase32Crockford>()?;
-        m.add_class::<Ob31pBase32Rfc>()?;
-        m.add_class::<Ob31pBase64>()?;
-        m.add_class::<Ob31pHex>()?;
+        m.add_class::<UpbcC32>()?;
+        m.add_class::<UpbcB32>()?;
+        m.add_class::<UpbcB64>()?;
+        m.add_class::<UpbcHex>()?;
     }
 
-    // Ob32 variants
-    #[cfg(feature = "ob32")]
+    // TESTING =======================
+
+    // Mock variants
+    #[cfg(feature = "mock")]
     {
-        m.add_class::<Ob32>()?;
-        m.add_class::<Ob32Base32Crockford>()?;
-        m.add_class::<Ob32Base32Rfc>()?;
-        m.add_class::<Ob32Base64>()?;
-        m.add_class::<Ob32Hex>()?;
+        // Mock1 variants
+        m.add_class::<Mock1C32>()?;
+        m.add_class::<Mock1B32>()?;
+        m.add_class::<Mock1B64>()?;
+        m.add_class::<Mock1Hex>()?;
+        // Mock2 variants
+        m.add_class::<Mock2C32>()?;
+        m.add_class::<Mock2B32>()?;
+        m.add_class::<Mock2B64>()?;
+        m.add_class::<Mock2Hex>()?;
     }
 
-    // Ob32p variants
-    #[cfg(feature = "ob32p")]
+    // Z-TIER =========================
+    //
+    // Main flexible interface
+    m.add_class::<Obz>()?;
+
+    // Multi-format interface
+    m.add_class::<Omnibz>()?;
+
+    // Zrbcx variants
+    #[cfg(feature = "zrbcx")]
     {
-        m.add_class::<Ob32p>()?;
-        m.add_class::<Ob32pBase32Crockford>()?;
-        m.add_class::<Ob32pBase32Rfc>()?;
-        m.add_class::<Ob32pBase64>()?;
-        m.add_class::<Ob32pHex>()?;
+        m.add_class::<ZrbcxC32>()?;
+        m.add_class::<ZrbcxB32>()?;
+        m.add_class::<ZrbcxB64>()?;
+        m.add_class::<ZrbcxHex>()?;
     }
 
-    // Ob71 variants
-    m.add_class::<Ob71>()?;
-    m.add_class::<Ob71Base32Crockford>()?;
-    m.add_class::<Ob71Base32Rfc>()?;
-    m.add_class::<Ob71Base64>()?;
-    m.add_class::<Ob71Hex>()?;
+    // Zmock variants
+    #[cfg(feature = "zmock")]
+    {
+        // Zmock1 variants
+        m.add_class::<Zmock1C32>()?;
+        m.add_class::<Zmock1B32>()?;
+        m.add_class::<Zmock1B64>()?;
+        m.add_class::<Zmock1Hex>()?;
+    }
 
-    // Ob70 variants
-    m.add_class::<Ob70>()?;
-    m.add_class::<Ob70Base32Crockford>()?;
-    m.add_class::<Ob70Base32Rfc>()?;
-    m.add_class::<Ob70Base64>()?;
-    m.add_class::<Ob70Hex>()?;
+    // Legacy variants
+    #[cfg(feature = "legacy")]
+    {
+        m.add_class::<LegacyC32>()?;
+        m.add_class::<LegacyB32>()?;
+        m.add_class::<LegacyB64>()?;
+        m.add_class::<LegacyHex>()?;
+    }
+
+    // Functions =====================
 
     // Utility functions
     m.add_function(wrap_pyfunction!(generate_key, m)?)?;
+    m.add_function(wrap_pyfunction!(generate_key_hex, m)?)?;
     m.add_function(wrap_pyfunction!(generate_key_bytes, m)?)?;
+    m.add_function(wrap_pyfunction!(generate_secret, m)?)?;
+    m.add_function(wrap_pyfunction!(generate_secret_hex, m)?)?;
+    m.add_function(wrap_pyfunction!(generate_secret_bytes, m)?)?;
 
     // Convenience functions
     m.add_function(wrap_pyfunction!(enc, m)?)?;

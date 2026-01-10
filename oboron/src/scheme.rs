@@ -5,52 +5,58 @@ use crate::{constants, error::Error};
 /// Scheme identifier for oboron encoding schemes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Scheme {
-    #[cfg(feature = "ob01")]
-    Ob01,
-    #[cfg(feature = "ob21p")]
-    Ob21p,
-    #[cfg(feature = "ob31")]
-    Ob31,
-    #[cfg(feature = "ob31p")]
-    Ob31p,
-    #[cfg(feature = "ob32")]
-    Ob32,
-    #[cfg(feature = "ob32p")]
-    Ob32p,
+    #[cfg(feature = "aags")]
+    Aags,
+    #[cfg(feature = "apgs")]
+    Apgs,
+    #[cfg(feature = "aasv")]
+    Aasv,
+    #[cfg(feature = "apsv")]
+    Apsv,
+    #[cfg(feature = "upbc")]
+    Upbc,
+    // Z-tier
+    #[cfg(feature = "zrbcx")]
+    Zrbcx,
     // Testing
-    #[cfg(feature = "ob70")]
-    Ob70,
-    #[cfg(feature = "ob71")]
-    Ob71,
+    #[cfg(feature = "mock")]
+    Mock1,
+    #[cfg(feature = "mock")]
+    Mock2,
+    #[cfg(feature = "zmock")]
+    Zmock1,
     // Legacy
-    #[cfg(feature = "ob00")]
-    Ob00,
+    #[cfg(feature = "legacy")]
+    Legacy,
 }
 
 impl Scheme {
     /// Convert scheme to string representation.
     pub fn as_str(&self) -> &'static str {
         match self {
-            #[cfg(feature = "ob01")]
-            Scheme::Ob01 => "ob01",
-            #[cfg(feature = "ob21p")]
-            Scheme::Ob21p => "ob21p",
-            #[cfg(feature = "ob31")]
-            Scheme::Ob31 => "ob31",
-            #[cfg(feature = "ob31p")]
-            Scheme::Ob31p => "ob31p",
-            #[cfg(feature = "ob32")]
-            Scheme::Ob32 => "ob32",
-            #[cfg(feature = "ob32p")]
-            Scheme::Ob32p => "ob32p",
+            #[cfg(feature = "aags")]
+            Scheme::Aags => "aags",
+            #[cfg(feature = "apgs")]
+            Scheme::Apgs => "apgs",
+            #[cfg(feature = "aasv")]
+            Scheme::Aasv => "aasv",
+            #[cfg(feature = "apsv")]
+            Scheme::Apsv => "apsv",
+            #[cfg(feature = "upbc")]
+            Scheme::Upbc => "upbc",
+            // Z-tier
+            #[cfg(feature = "zrbcx")]
+            Scheme::Zrbcx => "zrbcx",
             // Testing
-            #[cfg(feature = "ob70")]
-            Scheme::Ob70 => "ob70",
-            #[cfg(feature = "ob71")]
-            Scheme::Ob71 => "ob71",
+            #[cfg(feature = "mock")]
+            Scheme::Mock1 => "mock1",
+            #[cfg(feature = "mock")]
+            Scheme::Mock2 => "mock2",
+            #[cfg(feature = "zmock")]
+            Scheme::Zmock1 => "zmock1",
             // Legacy
-            #[cfg(feature = "ob00")]
-            Scheme::Ob00 => "ob00",
+            #[cfg(feature = "legacy")]
+            Scheme::Legacy => "legacy",
         }
     }
 
@@ -62,26 +68,29 @@ impl Scheme {
     /// Check if this scheme is deterministic (produces the same output for the same input).
     pub fn is_deterministic(&self) -> bool {
         match self {
-            #[cfg(feature = "ob01")]
-            Scheme::Ob01 => true,
-            #[cfg(feature = "ob21p")]
-            Scheme::Ob21p => false,
-            #[cfg(feature = "ob31")]
-            Scheme::Ob31 => true,
-            #[cfg(feature = "ob31p")]
-            Scheme::Ob31p => false,
-            #[cfg(feature = "ob32")]
-            Scheme::Ob32 => true,
-            #[cfg(feature = "ob32p")]
-            Scheme::Ob32p => false,
+            #[cfg(feature = "aags")]
+            Scheme::Aags => true,
+            #[cfg(feature = "apgs")]
+            Scheme::Apgs => false,
+            #[cfg(feature = "aasv")]
+            Scheme::Aasv => true,
+            #[cfg(feature = "apsv")]
+            Scheme::Apsv => false,
+            #[cfg(feature = "upbc")]
+            Scheme::Upbc => false,
+            // Z-tier
+            #[cfg(feature = "zrbcx")]
+            Scheme::Zrbcx => true,
             // Testing
-            #[cfg(feature = "ob70")]
-            Scheme::Ob70 => true,
-            #[cfg(feature = "ob71")]
-            Scheme::Ob71 => true,
+            #[cfg(feature = "mock")]
+            Scheme::Mock1 => true,
+            #[cfg(feature = "mock")]
+            Scheme::Mock2 => true,
+            #[cfg(feature = "zmock")]
+            Scheme::Zmock1 => true,
             // Legacy
-            #[cfg(feature = "ob00")]
-            Scheme::Ob00 => true,
+            #[cfg(feature = "legacy")]
+            Scheme::Legacy => true,
         }
     }
 
@@ -90,35 +99,43 @@ impl Scheme {
         !self.is_deterministic()
     }
 
-    /// Only schemes that need byte reversal for prefix entropy maximization use it
-    pub fn is_ciphertext_reversed(&self) -> bool {
-        constants::REVERSED_SCHEME_BYTES.contains(&self.byte())
+    /// Get the 2-byte scheme marker for this scheme.
+    pub fn marker(&self) -> [u8; 2] {
+        match self {
+            #[cfg(feature = "aags")]
+            Scheme::Aags => constants::AAGS_MARKER,
+            #[cfg(feature = "apgs")]
+            Scheme::Apgs => constants::APGS_MARKER,
+            #[cfg(feature = "aasv")]
+            Scheme::Aasv => constants::AASV_MARKER,
+            #[cfg(feature = "apsv")]
+            Scheme::Apsv => constants::APSV_MARKER,
+            #[cfg(feature = "upbc")]
+            Scheme::Upbc => constants::UPBC_MARKER,
+            // Z-tier
+            #[cfg(feature = "zrbcx")]
+            Scheme::Zrbcx => constants::ZRBCX_MARKER,
+            // Testing
+            #[cfg(feature = "mock")]
+            Scheme::Mock1 => constants::MOCK1_MARKER,
+            #[cfg(feature = "mock")]
+            Scheme::Mock2 => constants::MOCK2_MARKER,
+            #[cfg(feature = "zmock")]
+            Scheme::Zmock1 => constants::ZMOCK1_MARKER,
+            // Legacy
+            #[cfg(feature = "legacy")]
+            Scheme::Legacy => unreachable!("legacy does not use a scheme marker"),
+        }
     }
 
-    /// Get the tail byte for this scheme.
+    /// Legacy compatibility:  get single byte representation (deprecated)
+    #[deprecated(
+        since = "1.0.0",
+        note = "Use marker() instead for 2-byte scheme markers"
+    )]
     pub fn byte(&self) -> u8 {
-        match self {
-            #[cfg(feature = "ob01")]
-            Scheme::Ob01 => constants::OB01_BYTE,
-            #[cfg(feature = "ob21p")]
-            Scheme::Ob21p => constants::OB21P_BYTE,
-            #[cfg(feature = "ob31")]
-            Scheme::Ob31 => constants::OB31_BYTE,
-            #[cfg(feature = "ob31p")]
-            Scheme::Ob31p => constants::OB31P_BYTE,
-            #[cfg(feature = "ob32")]
-            Scheme::Ob32 => constants::OB32_BYTE,
-            #[cfg(feature = "ob32p")]
-            Scheme::Ob32p => constants::OB32P_BYTE,
-            // Testing
-            #[cfg(feature = "ob70")]
-            Scheme::Ob70 => constants::OB70_BYTE,
-            #[cfg(feature = "ob71")]
-            Scheme::Ob71 => constants::OB71_BYTE,
-            // Legacy
-            #[cfg(feature = "ob00")]
-            Scheme::Ob00 => unreachable!("ob00 does not use a scheme byte"),
-        }
+        // Return second byte of marker for legacy compatibility
+        self.marker()[1]
     }
 }
 
@@ -127,26 +144,29 @@ impl std::str::FromStr for Scheme {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.to_lowercase().as_str() {
-            #[cfg(feature = "ob01")]
-            "ob01" => Ok(Scheme::Ob01),
-            #[cfg(feature = "ob21p")]
-            "ob21p" => Ok(Scheme::Ob21p),
-            #[cfg(feature = "ob31")]
-            "ob31" => Ok(Scheme::Ob31),
-            #[cfg(feature = "ob31p")]
-            "ob31p" => Ok(Scheme::Ob31p),
-            #[cfg(feature = "ob32")]
-            "ob32" => Ok(Scheme::Ob32),
-            #[cfg(feature = "ob32p")]
-            "ob32p" => Ok(Scheme::Ob32p),
+            #[cfg(feature = "aags")]
+            "aags" => Ok(Scheme::Aags),
+            #[cfg(feature = "apgs")]
+            "apgs" => Ok(Scheme::Apgs),
+            #[cfg(feature = "aasv")]
+            "aasv" => Ok(Scheme::Aasv),
+            #[cfg(feature = "apsv")]
+            "apsv" => Ok(Scheme::Apsv),
+            #[cfg(feature = "upbc")]
+            "upbc" => Ok(Scheme::Upbc),
+            // Z-tier
+            #[cfg(feature = "zrbcx")]
+            "zrbcx" => Ok(Scheme::Zrbcx),
             // Testing
-            #[cfg(feature = "ob70")]
-            "ob70" => Ok(Scheme::Ob70),
-            #[cfg(feature = "ob71")]
-            "ob71" => Ok(Scheme::Ob71),
+            #[cfg(feature = "mock")]
+            "mock1" => Ok(Scheme::Mock1),
+            #[cfg(feature = "mock")]
+            "mock2" => Ok(Scheme::Mock2),
+            #[cfg(feature = "zmock")]
+            "zmock1" => Ok(Scheme::Zmock1),
             // Legacy
-            #[cfg(feature = "ob00")]
-            "ob00" => Ok(Scheme::Ob00),
+            #[cfg(feature = "legacy")]
+            "legacy" => Ok(Scheme::Legacy),
             _ => Err(Error::UnknownScheme),
         }
     }

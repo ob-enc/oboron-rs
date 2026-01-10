@@ -1,8 +1,8 @@
 [package]
 name = "oboron-cli"
-version = "0.1.0"
+version = "1.0.0-rc.1"
 edition = "2021"
-rust-version = "1.74.0"
+rust-version = "1.77.0"
 authors = ["Bojan Đuričković"]
 license = "MIT"
 repository = "https://github.com/ob-enc/oboron-rs"
@@ -14,42 +14,37 @@ readme = "README.md"
 [features]
 default = ["all-schemes"]
 
-ob00 = ["oboron/ob00"]
-ob01 = ["oboron/ob01"]
-ob31 = ["oboron/ob31"]
-ob32 = ["oboron/ob32"]
-ob21p = ["oboron/ob21p"]
-ob31p = ["oboron/ob31p"]
-ob32p = ["oboron/ob32p"]
-ob70 = ["oboron/ob70"]
-ob71 = ["oboron/ob71"]
+legacy = ["oboron/legacy"]
+zrbcx = ["oboron/zrbcx"]
+zmock = ["oboron/zmock"]
+aags = ["oboron/aags"]
+aasv = ["oboron/aasv"]
+upbc = ["oboron/upbc"]
+apgs = ["oboron/apgs"]
+apsv = ["oboron/apsv"]
+mock = ["oboron/mock"]
 
 # Scheme categories
-# =================
-ob0x = ["ob01"] # insecure, not authenticated
-ob1x = []  # insecure, authenticated
-ob2x = ["ob21p"]  # secure, not authenticated
-ob3x = ["ob31", "ob31p", "ob32", "ob32p"]  # secure, authenticated
-ob7x = ["ob70", "ob71"]  # testing
-insecure-schemes = ["ob0x", "ob1x"]
-secure-schemes = ["ob2x", "ob3x"]
-authenticated-schemes = ["ob3x"]
-deterministic-schemes = ["ob01", "ob31", "ob32"]
-probabilistic-schemes = ["ob21p", "ob31p", "ob32p"]
-all-schemes = ["ob0x", "ob1x", "ob2x", "ob3x"]
-
-# Special purpose groups
-# ======================
-non-crypto = ["ob70", "ob71"]
-legacy = ["ob00"]  # For backward compatibility only -> use ob01 instead
-experimental = []  # Experimental algorithms
+atier = ["aags", "apgs", "aasv", "apsv", "oboron/atier"]
+utier = ["upbc", "oboron/utier"]
+ztier = ["zrbcx", "zmock", "legacy", "oboron/ztier"]
+secure-schemes = ["atier", "utier"]
+authenticated-schemes = ["atier"]
+deterministic-schemes = ["aags", "aasv"]
+probabilistic-schemes = ["apgs", "apsv", "upbc"]
+all-schemes = ["atier", "utier", "ztier"]
 
 [[bin]]
 name = "ob"
 path = "src/main.rs"
 
+[[bin]]
+name = "obz"
+path = "src/obz_main.rs"
+required-features = ["ztier"]
+
 [dependencies]
-oboron = { version = "0.3", path = "../oboron", features=["keyless"] }
+oboron = { version = "1.0.0-rc.1", path = "../oboron", features=["keyless"] }
 clap = { version = "4.5", features = ["derive", "cargo"] }
 clap_complete = "4.5"
 serde = { version = "1.0", features = ["derive"] }

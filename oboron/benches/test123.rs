@@ -1,182 +1,176 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use oboron::{Ob00, Ob01, Ob21p, Ob31, Ob31p, Ob32, Ob32p, Ob70, Ob71, ObMulti, Oboron};
+use oboron::Omnib;
+#[cfg(feature = "upbc")]
+use oboron::UpbcC32;
+#[cfg(feature = "aags")]
+use oboron::{AagsC32, ApgsC32};
+#[cfg(feature = "aasv")]
+use oboron::{AasvC32, ApsvC32};
+#[cfg(feature = "mock")]
+use oboron::{Mock1C32, Mock2C32};
 
 // Baseline benchmarks - no crypto, just encoding overhead
-fn benchmark_enob71(c: &mut Criterion) {
-    let ob = Ob71::new_keyless().unwrap();
-    c.bench_function("test123/Ob71/enc", |b| {
+
+#[cfg(feature = "mock")]
+fn benchmark_mock1_enc(c: &mut Criterion) {
+    let ob = Mock1C32::new_keyless().unwrap();
+    c.bench_function("test123/Mock2C32/enc", |b| {
         b.iter(|| ob.enc(black_box("test123")).unwrap());
     });
 }
 
-fn benchmark_enob70(c: &mut Criterion) {
-    let ob = Ob70::new_keyless().unwrap();
-    c.bench_function("test123/Ob71/enc", |b| {
+#[cfg(feature = "mock")]
+fn benchmark_mock1_dec(c: &mut Criterion) {
+    let ob = Mock1C32::new_keyless().unwrap();
+    let ot = ob.enc("test123").unwrap();
+    c.bench_function("test123/Mock1C32/dec", |b| {
+        b.iter(|| ob.dec(black_box(&ot)).unwrap());
+    });
+}
+
+#[cfg(feature = "mock")]
+fn benchmark_mock2_enc(c: &mut Criterion) {
+    let ob = Mock2C32::new_keyless().unwrap();
+    c.bench_function("test123/Mock2C32/enc", |b| {
         b.iter(|| ob.enc(black_box("test123")).unwrap());
     });
 }
 
-fn benchmark_deob71(c: &mut Criterion) {
-    let ob = Ob71::new_keyless().unwrap();
+#[cfg(feature = "mock")]
+fn benchmark_mock2_dec(c: &mut Criterion) {
+    let ob = Mock2C32::new_keyless().unwrap();
     let ot = ob.enc("test123").unwrap();
-    c.bench_function("deob71", |b| {
+    c.bench_function("test123/Mock2C32/dec", |b| {
         b.iter(|| ob.dec(black_box(&ot)).unwrap());
     });
 }
 
-fn benchmark_deob70(c: &mut Criterion) {
-    let ob = Ob70::new_keyless().unwrap();
-    let ot = ob.enc("test123").unwrap();
-    c.bench_function("deob70", |b| {
-        b.iter(|| ob.dec(black_box(&ot)).unwrap());
-    });
-}
+// Crypto schemes
 
-// Crypto scheme benchmarks
-fn benchmark_enob00(c: &mut Criterion) {
-    let ob = Ob00::new_keyless().unwrap();
-    c.bench_function("enob00", |b| {
+#[cfg(feature = "aags")]
+fn benchmark_aags_enc(c: &mut Criterion) {
+    let ob = AagsC32::new_keyless().unwrap();
+    c.bench_function("test123/AagsC32/enc", |b| {
         b.iter(|| ob.enc(black_box("test123")).unwrap());
     });
 }
 
-fn benchmark_enob01(c: &mut Criterion) {
-    let ob = Ob01::new_keyless().unwrap();
-    c.bench_function("enob01", |b| {
+#[cfg(feature = "aags")]
+fn benchmark_aags_dec(c: &mut Criterion) {
+    let ob = AagsC32::new_keyless().unwrap();
+    let ot = ob.enc("test123").unwrap();
+    c.bench_function("test123/AagsC32/dec", |b| {
+        b.iter(|| ob.dec(black_box(&ot)).unwrap());
+    });
+}
+
+#[cfg(feature = "aasv")]
+fn benchmark_aasv_enc(c: &mut Criterion) {
+    let ob = AasvC32::new_keyless().unwrap();
+    c.bench_function("test123/AasvC32/enc", |b| {
         b.iter(|| ob.enc(black_box("test123")).unwrap());
     });
 }
 
-fn benchmark_enob31(c: &mut Criterion) {
-    let ob = Ob31::new_keyless().unwrap();
-    c.bench_function("enob31", |b| {
+#[cfg(feature = "aasv")]
+fn benchmark_aasv_dec(c: &mut Criterion) {
+    let ob = AasvC32::new_keyless().unwrap();
+    let ot = ob.enc("test123/AasvC32/dec").unwrap();
+    c.bench_function("dec_aasv", |b| {
+        b.iter(|| ob.dec(black_box(&ot)).unwrap());
+    });
+}
+
+#[cfg(feature = "apgs")]
+fn benchmark_apgs_enc(c: &mut Criterion) {
+    let ob = ApgsC32::new_keyless().unwrap();
+    c.bench_function("test123/ApgsC32/enc", |b| {
         b.iter(|| ob.enc(black_box("test123")).unwrap());
     });
 }
 
-fn benchmark_enob32(c: &mut Criterion) {
-    let ob = Ob32::new_keyless().unwrap();
-    c.bench_function("enob32", |b| {
+#[cfg(feature = "apgs")]
+fn benchmark_apgs_dec(c: &mut Criterion) {
+    let ob = ApgsC32::new_keyless().unwrap();
+    let ot = ob.enc("test123").unwrap();
+    c.bench_function("test123/ApgsC32/dec", |b| {
+        b.iter(|| ob.dec(black_box(&ot)).unwrap());
+    });
+}
+
+#[cfg(feature = "apsv")]
+fn benchmark_apsv_enc(c: &mut Criterion) {
+    let ob = ApsvC32::new_keyless().unwrap();
+    c.bench_function("test123/ApsvC32/enc", |b| {
         b.iter(|| ob.enc(black_box("test123")).unwrap());
     });
 }
 
-fn benchmark_enob21p(c: &mut Criterion) {
-    let ob = Ob21p::new_keyless().unwrap();
-    c.bench_function("enob21p", |b| {
+#[cfg(feature = "apsv")]
+fn benchmark_apsv_dec(c: &mut Criterion) {
+    let ob = ApsvC32::new_keyless().unwrap();
+    let ot = ob.enc("test123").unwrap();
+    c.bench_function("test123/ApsvC32/dec", |b| {
+        b.iter(|| ob.dec(black_box(&ot)).unwrap());
+    });
+}
+
+#[cfg(feature = "upbc")]
+fn benchmark_upbc_enc(c: &mut Criterion) {
+    let ob = UpbcC32::new_keyless().unwrap();
+    c.bench_function("test123/UpbcC32/enc", |b| {
         b.iter(|| ob.enc(black_box("test123")).unwrap());
     });
 }
 
-fn benchmark_enob31p(c: &mut Criterion) {
-    let ob = Ob31p::new_keyless().unwrap();
-    c.bench_function("enob31p", |b| {
-        b.iter(|| ob.enc(black_box("test123")).unwrap());
-    });
-}
-
-fn benchmark_enob32p(c: &mut Criterion) {
-    let ob = Ob32p::new_keyless().unwrap();
-    c.bench_function("enob32p", |b| {
-        b.iter(|| ob.enc(black_box("test123")).unwrap());
-    });
-}
-
-fn benchmark_deob00(c: &mut Criterion) {
-    let ob = Ob00::new_keyless().unwrap();
+#[cfg(feature = "upbc")]
+fn benchmark_upbc_dec(c: &mut Criterion) {
+    let ob = UpbcC32::new_keyless().unwrap();
     let ot = ob.enc("test123").unwrap();
-    c.bench_function("deob00", |b| {
+    c.bench_function("test123/UpbcC32/dec", |b| {
         b.iter(|| ob.dec(black_box(&ot)).unwrap());
     });
 }
 
-fn benchmark_deob01(c: &mut Criterion) {
-    let ob = Ob01::new_keyless().unwrap();
-    let ot = ob.enc("test123").unwrap();
-    c.bench_function("deob01", |b| {
-        b.iter(|| ob.dec(black_box(&ot)).unwrap());
+// Omnib
+
+#[cfg(feature = "aasv")]
+fn benchmark_aasv_omb_enc(c: &mut Criterion) {
+    let ob = Omnib::new_keyless().unwrap();
+    c.bench_function("test123/Omnib_aasv.c32/enc", |b| {
+        b.iter(|| ob.enc(black_box("test123"), "aasv.c32").unwrap());
     });
 }
 
-fn benchmark_deob31(c: &mut Criterion) {
-    let ob = Ob31::new_keyless().unwrap();
-    let ot = ob.enc("test123").unwrap();
-    c.bench_function("deob31", |b| {
-        b.iter(|| ob.dec(black_box(&ot)).unwrap());
-    });
-}
-
-fn benchmark_deob32(c: &mut Criterion) {
-    let ob = Ob32::new_keyless().unwrap();
-    let ot = ob.enc("test123").unwrap();
-    c.bench_function("deob32", |b| {
-        b.iter(|| ob.dec(black_box(&ot)).unwrap());
-    });
-}
-
-fn benchmark_deob21p(c: &mut Criterion) {
-    let ob = Ob21p::new_keyless().unwrap();
-    let ot = ob.enc("test123").unwrap();
-    c.bench_function("deob21p", |b| {
-        b.iter(|| ob.dec(black_box(&ot)).unwrap());
-    });
-}
-
-fn benchmark_deob31p(c: &mut Criterion) {
-    let ob = Ob31p::new_keyless().unwrap();
-    let ot = ob.enc("test123").unwrap();
-    c.bench_function("deob31p", |b| {
-        b.iter(|| ob.dec(black_box(&ot)).unwrap());
-    });
-}
-
-fn benchmark_deob32p(c: &mut Criterion) {
-    let ob = Ob32p::new_keyless().unwrap();
-    let ot = ob.enc("test123").unwrap();
-    c.bench_function("deob32p", |b| {
-        b.iter(|| ob.dec(black_box(&ot)).unwrap());
-    });
-}
-
-fn benchmark_auto_encode_ob32(c: &mut Criterion) {
-    let ob = ObMulti::new_keyless().unwrap();
-    c.bench_function("auto_encode_ob32", |b| {
-        b.iter(|| ob.enc(black_box("test123"), "ob32:c32").unwrap());
-    });
-}
-
-fn benchmark_auto_decode_ob32(c: &mut Criterion) {
-    let ob = ObMulti::new_keyless().unwrap();
-    let ot = ob.enc("test123", "ob32:c32").unwrap();
-    c.bench_function("auto_decode_ob32", |b| {
+#[cfg(feature = "aasv")]
+fn benchmark_aasv_omb_autodec(c: &mut Criterion) {
+    let ob = Omnib::new_keyless().unwrap();
+    let ot = ob.enc("test123", "aasv.c32").unwrap();
+    c.bench_function("test123/Omnib_aasv.c32/autodec", |b| {
         b.iter(|| ob.autodec(black_box(&ot)).unwrap());
     });
 }
 
 criterion_group!(
     benches,
-    // Baseline - encoding overhead only (no crypto)
-    benchmark_enob71,
-    benchmark_enob70,
-    benchmark_deob71,
-    benchmark_deob70,
-    // Crypto schemes
-    benchmark_enob00,
-    benchmark_enob01,
-    benchmark_enob31,
-    benchmark_enob32,
-    benchmark_enob21p,
-    benchmark_enob31p,
-    benchmark_enob32p,
-    benchmark_deob00,
-    benchmark_deob01,
-    benchmark_deob31,
-    benchmark_deob32,
-    benchmark_deob21p,
-    benchmark_deob31p,
-    benchmark_deob32p,
-    // ObMulti
-    benchmark_auto_encode_ob32,
-    benchmark_auto_decode_ob32
+    // Mock
+    benchmark_mock1_enc,
+    benchmark_mock1_dec,
+    benchmark_mock2_enc,
+    benchmark_mock2_dec,
+    // Crypto
+    benchmark_aags_enc,
+    benchmark_aags_dec,
+    benchmark_aasv_enc,
+    benchmark_aasv_dec,
+    benchmark_apgs_enc,
+    benchmark_apgs_dec,
+    benchmark_apsv_enc,
+    benchmark_apsv_dec,
+    benchmark_upbc_enc,
+    benchmark_upbc_dec,
+    // Omnib
+    benchmark_aasv_omb_enc,
+    benchmark_aasv_omb_autodec,
 );
 criterion_main!(benches);

@@ -11,13 +11,13 @@ By default, **all secure production-ready schemes are enabled**:
 oboron = "1.0"
 ```
 
-This includes: `ob21p`, `ob31`, `ob31p`, `ob32`, `ob32p`.
+This includes: `upbc`, `aags`, `apgs`, `aasv`, `apsv`.
 
-All encodings (`:c32`-Crockford base32, `:b32`-standard base32, `:b64`-URL-safe base64, and `:hex`-hex) are always included.
+All encodings (`.c32`-Crockford base32, `.b32`-standard base32, `.b64`-URL-safe base64, and `.hex`-hex) are always included.
 
 ### NOT INCLUDED BY DEFAULT
 
-- `ob01` scheme (cryptographically broken)
+- `zrbcx` scheme (cryptographically broken)
 - the `keyless` feature providing Oboron functionality with the hardcoded
   key
 - alternative key input formats `hex-keys`, `bytes-keys`
@@ -31,7 +31,7 @@ To use only what you need:
 
 ```toml
 [dependencies]
-oboron = { version = "1.0", default-features = false, features = ["ob32"] }
+oboron = { version = "1.0", default-features = false, features = ["aasv"] }
 ```
 This minimal configuration includes only base64 key support and excludes
 hex/bytes key interfaces and the keyless testing feature.
@@ -40,16 +40,16 @@ hex/bytes key interfaces and the keyless testing feature.
 
 ### Individual Schemes
 
-- `ob01` - AES-CBC (deterministic)
-- `ob21p` - AES-CBC (probabilistic)
-- `ob31` - AES-GCM-SIV (deterministic)
-- `ob31p` - AES-GCM-SIV (probabilistic)
-- `ob32` - AES-SIV (deterministic)
-- `ob32p` - AES-SIV (probabilistic)
+- `zrbcx` - AES-CBC (deterministic)
+- `upbc` - AES-CBC (probabilistic)
+- `aags` - AES-GCM-SIV (deterministic)
+- `apgs` - AES-GCM-SIV (probabilistic)
+- `aasv` - AES-SIV (deterministic)
+- `apsv` - AES-SIV (probabilistic)
 
 Testing schemes (non-cryptographic):
-- `ob70` - identity transformation (ciphertext = plaintext bytes)
-- `ob71` - uses reversed `ob70` ciphertext
+- `mock1` - identity transformation (ciphertext = plaintext bytes)
+- `mock2` - reversed plaintext
 
 ### Unsafe Performance Enhancement
 
@@ -62,11 +62,11 @@ Testing schemes (non-cryptographic):
 
 Feature groups:
 - `experimental` - Group for experimental schemes
-- `legacy` - Includes `ob00` scheme for compatibility with existing
+- `legacy` - Includes `legacy` scheme for compatibility with existing
   deployments
 
-**Note:** `ob00` is a legacy scheme used internally by early adopters.
-New users should use `ob01` instead, which provides improved prefix
+**Note:** `legacy` is a legacy scheme used internally by early adopters.
+New users should use `zrbcx` instead, which provides improved prefix
 entropy and better padding. This feature is only for maintaining
 compatibility with existing encrypted data.
 
@@ -76,25 +76,25 @@ versioning guarantees and may change or be removed in patch releases.
 ### Scheme Groups
 
 By algorithm
-- `all-cbc-schemes` - Includes `ob01`, `ob21p`
-- `all-gcm-schemes` - Includes `ob31`, `ob31p`
-- `all-siv-schemes` - Includes `ob32`, `ob32p`
+- `all-cbc-schemes` - Includes `zrbcx`, `upbc`
+- `all-gcm-schemes` - Includes `aags`, `apgs`
+- `all-siv-schemes` - Includes `aasv`, `apsv`
 
 By properties:
-- `deterministic-schemes` - Includes `ob01`, `ob31`, `ob32`
-- `probabilistic-schemes` - Includes `ob21p`, `ob31p`, `ob32p`
-- `authenticated-schemes` - Includes `ob31`, `ob31p`, `ob32`, `ob32p`
-- `secure-schemes` - Includes all but `ob01`
-- `insecure-schemes` - Includes `ob01` only
+- `deterministic-schemes` - Includes `zrbcx`, `aags`, `aasv`
+- `probabilistic-schemes` - Includes `upbc`, `apgs`, `apsv`
+- `authenticated-schemes` - Includes `aags`, `apgs`, `aasv`, `apsv`
+- `secure-schemes` - Includes all but `zrbcx`
+- `insecure-schemes` - Includes `zrbcx` only
 
 By tier:
-- `ob0x` - Includes `ob01` only
+- `ob0x` - Includes `zrbcx` only
 - `ob1x` - No current members
-- `ob2x` - Includes `ob21p` only
+- `ob2x` - Includes `upbc` only
 - `ob3x` - Includes all authenticated schemes (= `authenticated-schemes`)
 
 Testing:
-- `non-crypto` - Includes `ob70` and `ob71`
+- `mock` - Includes `mock1` and `mock2`
 
 Comprehensive group
 - `all-schemes` - Includes all schemes (same as default)
@@ -121,16 +121,16 @@ All disabled by default:
 
 ### Quick Selection Guide
 
-- **General purpose**: `ob32` (deterministic) or `ob32p` (probabilistic)
-- **Maximum speed, most compact output**: `ob01` (insecure, deterministic
+- **General purpose**: `aasv` (deterministic) or `apsv` (probabilistic)
+- **Maximum speed, most compact output**: `zrbcx` (insecure, deterministic
   only)
-- **Testing/obfuscation**: `ob01` with `keyless` feature
+- **Testing/obfuscation**: `zrbcx` with `keyless` feature
 
 ### Binary Size Impact (WASM)
 
 For WebAssembly builds, the biggest size savings come from excluding
 entire algorithm families. For example, if you only need AES-SIV, use
-features = ["all-siv-schemes"] instead of individual ob32/ob32p features.
+features = ["all-siv-schemes"] instead of individual aasv/apsv features.
 
 ## Examples
 

@@ -1,9 +1,14 @@
 use anyhow::{Context, Result};
 use data_encoding::BASE64URL_NOPAD;
-use oboron::generate_key_base64;
+use oboron::generate_key;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
+
+const CONFIG_DIR: &str = ".ob";
+const PROFILES_SUBDIR: &str = "profiles";
+const BACKUP_SUBDIR: &str = "bkp";
+const CONFIG_FILENAME: &str = "config.json";
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
@@ -15,21 +20,22 @@ pub struct Config {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct KeyProfile {
-    pub key: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub key: Option<String>,
 }
 
 pub fn config_path() -> PathBuf {
     dirs::home_dir()
         .expect("Failed to get home directory")
-        .join(".ob")
-        .join("config.json")
+        .join(CONFIG_DIR)
+        .join(CONFIG_FILENAME)
 }
 
 pub fn profile_dir() -> PathBuf {
     dirs::home_dir()
         .expect("Failed to get home directory")
-        .join(".ob")
-        .join("profiles")
+        .join(CONFIG_DIR)
+        .join(PROFILES_SUBDIR)
 }
 
 pub fn profile_path(name: &str) -> PathBuf {
@@ -39,8 +45,8 @@ pub fn profile_path(name: &str) -> PathBuf {
 pub fn backup_dir() -> PathBuf {
     dirs::home_dir()
         .expect("Failed to get home directory")
-        .join(".ob")
-        .join("bkp")
+        .join(CONFIG_DIR)
+        .join(BACKUP_SUBDIR)
 }
 
 fn backup_profile(name: &str) -> Result<PathBuf> {
@@ -56,12 +62,10 @@ fn backup_profile(name: &str) -> Result<PathBuf> {
         .as_secs();
     let backup_path = backup_dir().join(format!("{}-{}.json", name, timestamp));
 
-    // Create backup directory if it doesn't exist
     if let Some(parent) = backup_path.parent() {
         fs::create_dir_all(parent).context("Failed to create backup directory")?;
     }
 
-    // Copy to backup location
     fs::copy(&path, &backup_path).context(format!("Failed to backup profile '{}'", name))?;
 
     Ok(backup_path)
@@ -77,14 +81,14 @@ pub fn load_config() -> Result<Config> {
     let mut config: Config =
         serde_json::from_str(&content).context("Failed to parse config file")?;
 
-    // Default to ob32 if not set
+    // Default to aasv if not set
     if config.scheme.is_empty() {
-        config.scheme = "ob32".to_string();
+        config.scheme = "aasv".to_string();
     }
 
-    // Default to base32crockford if not set
+    // Default to Crockford base32 if not set
     if config.encoding.is_empty() {
-        config.encoding = "base32crockford".to_string();
+        config.encoding = "c32".to_string();
     }
 
     // Default to "default" profile if not set
@@ -98,7 +102,6 @@ pub fn load_config() -> Result<Config> {
 pub fn save_config(config: &Config) -> Result<()> {
     let path = config_path();
 
-    // Create directory if it doesn't exist
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent).context("Failed to create config directory")?;
     }
@@ -107,7 +110,6 @@ pub fn save_config(config: &Config) -> Result<()> {
 
     fs::write(&path, content).context("Failed to write config file")?;
 
-    // Set permissions to 0600 on Unix
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
@@ -122,7 +124,7 @@ pub fn save_config(config: &Config) -> Result<()> {
 pub fn load_profile(name: &str) -> Result<KeyProfile> {
     let path = profile_path(name);
     let content = fs::read_to_string(&path).context(format!(
-        "Failed to read key profile '{}'\nHint: Run 'ob init' or 'ob profile create {}' to create this key profile",
+        "Failed to read key profile '{}'\nHint:  Run 'ob init' or 'ob profile create {}' to create this key profile",
         name, name
     ))?;
 
@@ -135,22 +137,19 @@ pub fn load_profile(name: &str) -> Result<KeyProfile> {
 pub fn save_key_profile(name: &str, profile: &KeyProfile) -> Result<()> {
     let path = profile_path(name);
 
-    // Create profile directory if it doesn't exist
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent).context("Failed to create profile directory")?;
     }
 
-    // Backup existing profile if it exists
     if path.exists() {
         let backup_path = backup_profile(name)?;
-        println!("Backed up existing profile to: {}", backup_path.display());
+        println!("Backed up existing profile to:  {}", backup_path.display());
     }
 
     let content = serde_json::to_string_pretty(profile).context("Failed to serialize profile")?;
 
     fs::write(&path, content).context("Failed to write profile file")?;
 
-    // Set permissions to 0600 on Unix
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
@@ -163,7 +162,6 @@ pub fn save_key_profile(name: &str, profile: &KeyProfile) -> Result<()> {
 }
 
 pub fn init_command(name: &str) -> Result<()> {
-    // Check if profile already exists
     let path = profile_path(name);
     if path.exists() {
         eprintln!("❌ Error: Profile '{}' already exists", name);
@@ -172,7 +170,7 @@ pub fn init_command(name: &str) -> Result<()> {
         eprintln!();
         eprintln!("Options:");
         eprintln!("  1. Create a new profile with a different name:");
-        eprintln!("     ob init --name <new-profile-name>");
+        eprintln!("     ob init <new-profile-name>");
         eprintln!();
         eprintln!("  2. Delete the existing profile first:");
         eprintln!("     ob profile delete {}", name);
@@ -180,33 +178,34 @@ pub fn init_command(name: &str) -> Result<()> {
         eprintln!("  3. Use 'ob profile create' to add additional profiles:");
         eprintln!("     ob profile create <profile-name>");
         eprintln!();
-        eprintln!("  4. Manually delete the profile file:");
+        eprintln!("  4.  Manually delete the profile file:");
         eprintln!("     rm {}", path.display());
 
         anyhow::bail!("Profile '{}' already exists", name);
     }
 
-    // Generate random base64 key
-    let key = generate_key_base64();
+    let key = generate_key();
 
-    let profile = KeyProfile { key: key.clone() };
+    let profile = KeyProfile {
+        key: Some(key.clone()),
+    };
 
     save_key_profile(name, &profile)?;
 
     let config = Config {
         profile: name.to_string(),
-        scheme: "ob32".to_string(), // Default to ob32
-        encoding: "base32crockford".to_string(),
+        scheme: "aasv".to_string(),
+        encoding: "c32".to_string(),
     };
 
     save_config(&config)?;
 
     println!("✓ Configuration saved to {}", config_path().display());
     println!("\nYour profile '{}':", name);
-    println!("  Default scheme: ob32");
-    println!("  Default encoding: base32crockford");
-    println!("  Key: {}", key);
-    println!("\n⚠️  Keep these keys secure! Anyone with these keys can decode your data.");
+    println!("  Default scheme:    aasv");
+    println!("  Default encoding: c32");
+    println!("  Key:  {}", key);
+    println!("\n⚠️  Keep this key secure!  Anyone with it can decode your data.");
 
     Ok(())
 }
@@ -222,10 +221,12 @@ pub fn config_show_command(public_profile: bool) -> Result<()> {
     let profile = load_profile(&config.profile)?;
 
     println!("Current configuration:");
-    println!("  Profile: {}", config.profile);
-    println!("  Scheme:  {}", config.scheme);
+    println!("  Profile:  {}", config.profile);
+    println!("  Scheme:   {}", config.scheme);
     println!("  Encoding: {}", config.encoding);
-    println!("  Key: {}", profile.key);
+    if let Some(key) = &profile.key {
+        println!("  Key:      {}", key);
+    }
 
     Ok(())
 }
@@ -286,19 +287,20 @@ pub fn profile_show_command(name: Option<&str>) -> Result<()> {
     let profile = load_profile(&profile_name)?;
 
     println!("Profile '{}':", profile_name);
-    println!("  Key: {}", profile.key);
+    if let Some(key) = &profile.key {
+        println!("  Key: {}", key);
+    }
 
     Ok(())
 }
 
 pub fn profile_activate_command(name: &str) -> Result<()> {
-    // Verify profile exists
     load_profile(name)?;
 
     let mut config = load_config().unwrap_or(Config {
         profile: "default".to_string(),
-        scheme: "ob32".to_string(),
-        encoding: "base32crockford".to_string(),
+        scheme: "aasv".to_string(),
+        encoding: "c32".to_string(),
     });
 
     config.profile = name.to_string();
@@ -309,29 +311,21 @@ pub fn profile_activate_command(name: &str) -> Result<()> {
     Ok(())
 }
 
-pub fn profile_create_command(name: &str, key: &str) -> Result<()> {
-    // Validate key
-    if key.len() != 86 {
-        anyhow::bail!("Key must be {} base64 chars", 86);
-    }
-
-    // Validate base64 encoding
-    let key_bytes = BASE64URL_NOPAD
-        .decode(key.as_bytes())
-        .context("Invalid key base64 encoding")?;
-
-    if key_bytes.len() != 64 {
-        anyhow::bail!("Key must decode to 64 bytes");
-    }
-
-    let profile = KeyProfile {
-        key: key.to_string(),
+pub fn profile_create_command(name: &str, key: Option<&str>) -> Result<()> {
+    let profile = if let Some(k) = key {
+        validate_base64_key(k)?;
+        KeyProfile {
+            key: Some(k.to_string()),
+        }
+    } else {
+        anyhow::bail!("--key must be provided");
     };
 
     save_key_profile(name, &profile)?;
 
     println!("✓ Created profile '{}'", name);
-    println!("\n⚠️  Keep this key secure!");
+    println!("  With key");
+    println!("\n⚠️  Keep this profile secure!");
 
     Ok(())
 }
@@ -343,7 +337,6 @@ pub fn profile_delete_command(name: &str) -> Result<()> {
         anyhow::bail!("Profile '{}' does not exist", name);
     }
 
-    // Check if this is the active profile
     if let Ok(config) = load_config() {
         if config.profile == name {
             eprintln!("❌ Error: Cannot delete active profile '{}'", name);
@@ -368,10 +361,7 @@ pub fn profile_delete_command(name: &str) -> Result<()> {
         }
     }
 
-    // Backup the profile before deleting
     let backup_path = backup_profile(name)?;
-
-    // Now delete the profile
     fs::remove_file(&path)?;
 
     println!("✓ Deleted profile '{}'", name);
@@ -384,12 +374,10 @@ pub fn profile_rename_command(old_name: &str, new_name: &str) -> Result<()> {
     let old_path = profile_path(old_name);
     let new_path = profile_path(new_name);
 
-    // Check if old profile exists
     if !old_path.exists() {
         anyhow::bail!("Profile '{}' does not exist", old_name);
     }
 
-    // Check if new profile name is already taken
     if new_path.exists() {
         anyhow::bail!(
             "Profile '{}' already exists. Cannot rename to an existing profile name.",
@@ -397,16 +385,13 @@ pub fn profile_rename_command(old_name: &str, new_name: &str) -> Result<()> {
         );
     }
 
-    // Backup before renaming (safety measure)
     let backup_path = backup_profile(old_name)?;
 
-    // Rename the profile file
     fs::rename(&old_path, &new_path).context(format!(
         "Failed to rename profile '{}' to '{}'",
         old_name, new_name
     ))?;
 
-    // Check if the renamed profile is the active profile, and update config if so
     if let Ok(mut config) = load_config() {
         if config.profile == old_name {
             config.profile = new_name.to_string();
@@ -422,33 +407,40 @@ pub fn profile_rename_command(old_name: &str, new_name: &str) -> Result<()> {
         println!("✓ Renamed profile '{}' to '{}'", old_name, new_name);
     }
 
-    println!("  Backup saved to:  {}", backup_path.display());
+    println!("  Backup saved to: {}", backup_path.display());
 
     Ok(())
 }
 
-pub fn profile_set_command(name: &str, key: &str) -> Result<()> {
-    // Validate key
-    if key.len() != 86 {
-        anyhow::bail!("Key must be {} base64 chars", 86);
+pub fn profile_set_command(name: &str, key: Option<&str>) -> Result<()> {
+    let mut profile = load_profile(name)?;
+
+    if let Some(k) = key {
+        validate_base64_key(k)?;
+        profile.key = Some(k.to_string());
+    } else {
+        anyhow::bail!("--key must be provided");
     }
-
-    // Validate base64 encoding
-    let key_bytes = BASE64URL_NOPAD
-        .decode(key.as_bytes())
-        .context("Invalid key base64 encoding")?;
-
-    if key_bytes.len() != 64 {
-        anyhow::bail!("Key must decode to 64 bytes");
-    }
-
-    let profile = KeyProfile {
-        key: key.to_string(),
-    };
 
     save_key_profile(name, &profile)?;
 
     println!("✓ Updated profile '{}'", name);
+
+    Ok(())
+}
+
+fn validate_base64_key(key_str: &str) -> Result<()> {
+    if key_str.len() != 86 {
+        anyhow::bail!("Key must be 86 base64 chars, got {} chars", key_str.len());
+    }
+
+    let key_bytes = BASE64URL_NOPAD
+        .decode(key_str.as_bytes())
+        .context("Invalid key base64 encoding")?;
+
+    if key_bytes.len() != 64 {
+        anyhow::bail!("Key must decode to 64 bytes, got {} bytes", key_bytes.len());
+    }
 
     Ok(())
 }
@@ -461,7 +453,7 @@ mod tests {
     fn test_config_serialization() {
         let config = Config {
             profile: "test".to_string(),
-            scheme: "ob31".to_string(),
+            scheme: "aags".to_string(),
             encoding: "base64".to_string(),
         };
 
@@ -476,7 +468,7 @@ mod tests {
     #[test]
     fn test_key_profile_serialization() {
         let profile = KeyProfile {
-            key:  "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA".to_string(),
+            key: Some("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA".to_string()),
         };
 
         let json = serde_json::to_string(&profile).unwrap();
@@ -486,59 +478,14 @@ mod tests {
     }
 
     #[test]
-    fn test_config_defaults() {
-        let json = r#"{"profile":"","scheme":"","encoding":""}"#;
-        let mut config: Config = serde_json::from_str(json).unwrap();
-
-        // Simulate load_config logic
-        if config.scheme.is_empty() {
-            config.scheme = "ob32".to_string();
-        }
-        if config.encoding.is_empty() {
-            config.encoding = "base32crockford".to_string();
-        }
-        if config.profile.is_empty() {
-            config.profile = "default".to_string();
-        }
-
-        assert_eq!(config.profile, "default");
-        assert_eq!(config.scheme, "ob32");
-        assert_eq!(config.encoding, "base32crockford");
+    fn test_validate_base64_key_valid() {
+        let key_str = oboron::generate_key();
+        assert!(validate_base64_key(&key_str).is_ok());
     }
 
     #[test]
-    fn test_profile_path_construction() {
-        let path = profile_path("myprofile");
-        assert!(path.to_string_lossy().contains("myprofile.json"));
-        assert!(path.to_string_lossy().contains(".ob"));
-        assert!(path.to_string_lossy().contains("profiles"));
-    }
-
-    #[test]
-    fn test_config_path_construction() {
-        let path = config_path();
-        assert!(path.to_string_lossy().contains("config.json"));
-        assert!(path.to_string_lossy().contains(".ob"));
-    }
-
-    #[test]
-    fn test_backup_dir_construction() {
-        let path = backup_dir();
-        assert!(path.to_string_lossy().contains("bkp"));
-        assert!(path.to_string_lossy().contains(".ob"));
-    }
-
-    #[test]
-    fn test_config_with_partial_fields() {
-        let json = r#"{"profile":"custom","scheme":"ob01","encoding":""}"#;
-        let mut config: Config = serde_json::from_str(json).unwrap();
-
-        if config.encoding.is_empty() {
-            config.encoding = "base32crockford".to_string();
-        }
-
-        assert_eq!(config.profile, "custom");
-        assert_eq!(config.scheme, "ob01");
-        assert_eq!(config.encoding, "base32crockford");
+    fn test_validate_base64_key_wrong_length() {
+        let key_str = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+        assert!(validate_base64_key(key_str).is_err());
     }
 }

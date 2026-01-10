@@ -2,35 +2,37 @@
 
 [![Crates.io](https://img.shields.io/crates/v/oboron.svg)](https://crates.io/crates/oboron)
 [![Documentation](https://docs.rs/oboron/badge.svg)](https://docs.rs/oboron)
-[![License:  MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![MSRV](https://img.shields.io/badge/MSRV-1.74-blue.svg)](https://blog.rust-lang.org/2023/11/16/Rust-1.74.0.html)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![MSRV](https://img.shields.io/badge/MSRV-1.77-blue.svg)](https://blog.rust-lang.org/2023/11/16/Rust-1.77.0.html)
 
-Oboron is a general-purpose encryption library focused on developer
-ergonomics:
-- **String in, string out**: Encryption and encoding are bundled into
+Oboron is a general-purpose symmetric encryption library focused on
+developer ergonomics:
+- *String in, string out*: Encryption and encoding are bundled into
   one seamless process
-- **Standardized interface**: Multiple encryption algorithms accessible
+- *Standardized interface*: Multiple encryption algorithms accessible
   through the same API
-- **[Unified key management](#key-management)**: A single 512-bit key
+- *[Unified key management](#key-management)*: A single 512-bit key
   works across all schemes with internal extraction to algorithm-specific
   keys
-- **[Prefix-focused entropy](#referenceable-prefixes)**: Maximizes
+- *[Prefix-focused entropy](#referenceable-prefixes)*: Maximizes
   entropy in initial characters for referenceable short prefixes (similar
   to Git commit hashes)
 
 In essence, Oboron provides an accessible interface over established
 cryptographic primitives—implementing AES-CBC, AES-GCM-SIV, and AES-SIV—
-with careful attention to output characteristics.  By reversing
-ciphertext in select schemes, entropy is concentrated in the output's
-prefix, enabling short, unique references.
+with a focus on developer ergonomics and output characteristics. Each
+scheme follows a consistent naming pattern that encodes its security
+properties, making it easier to choose the right tool without deep
+cryptographic expertise: e.g., `aasv` = Authenticated + Avalanche
+property + SiV algorithm (AES-SIV).
 
-**Key Advantages:**
-- **Referenceable prefixes**: High initial entropy enables Git-like short
+Key Advantages:
+- *Referenceable prefixes*: High initial entropy enables Git-like short
   IDs
-- **Simplified workflow**: No manual encoding/decoding between encryption
-  stages
-- **Performance optimized** for short-string use cases
-- **Compact outputs**
+- *Simplified workflow*:
+  - No manual encoding/decoding between encryption stages
+  - No decoding encryption keys from env vars to bytes
+- *Performance optimized*
 
 ## Contents
 
@@ -39,11 +41,12 @@ prefix, enabling short, unique references.
 - [Algorithm](#algorithm)
 - [Key Management](#key-management)
 - [Properties](#properties)
-- [Applications](#applications)
 - [Rust API Overview](#rust-api-overview)
+- [Applications](#applications)
 - [Compatibility](#compatibility)
 - [Getting Help](#getting-help)
 - [License](#license)
+- [Appendix: Obtext Lengths](#appendix-obtext-lengths)
 
 ## Quick Start
 
@@ -52,7 +55,7 @@ Add to your `Cargo.toml`:
 [dependencies]
 oboron = "1.0" # default features
 # or with minimal features:
-# oboron = { version = "1.0", features = ["ob32", "ob32p"] }
+# oboron = { version = "1.0", features = ["aasv", "apsv"] }
 ```
 
 Generate your 512-bit key (86 base64 characters) using the keygen script
@@ -66,171 +69,155 @@ let key = oboron::generate_key();
 ```
 then save the key as an environment variable.
 
-Use Ob32 (a secure scheme, 256-bit encrypted with AES-SIV, encoded using
-Crockford's base32 variant) for enc/dec:
+Use AasvC32 (a secure scheme, 256-bit encrypted with AES-SIV, encoded
+using Crockford's base32 variant) for enc/dec:
 ```rust
-use oboron::{Ob32, Oboron};
+use oboron::AasvC32;
 
-let key = env::var("OBORON_KEY")?;  // get the key
+let key = env::var("OBORON_KEY")?; // get the key
 
-let ob = Ob32::new(&key)?;          // create Oboron instance
+let ob = AasvC32::new(&key)?; // create codec instance
 
-let ot = ob.enc("Hello World")?;    // encrypt+encode
-let pt2 = ob.dec(&ot)?;             // decode+decrypt
+let ot = ob.enc("hello, world")?; // encrypt+encode
+let pt2 = ob.dec(&ot)?; // decode+decrypt
 
-println!("obtext: {}", ot);  // e.g., "uf2glao2xd7fnbq5..."
-assert_eq!(pt2, "Hello World");
+println!("obtext: {}", ot);
+// "obtext: cbv74r1m7a7cf8n6gzdy6tf2vjddkhwdtwa5ssgv78v5c1g"
+
+assert_eq!(pt2, "hello, world");
 ```
+
+*Version 1.0*: This release marks API stability. Oboron follows semantic
+versioning, so 1.x releases will maintain backward compatibility.
 
 ## Formats
 
-Oboron encoding is a multi-stage process:
-1. **Encryption**: Plaintext UTF-8 string encrypted to ciphertext bytes
-2. **Byte Reversal** (select schemes only): Ciphertext bytes are reversed
-   to maximize entropy in output prefixes
-3. **Scheme byte**: A byte identifying the encryption scheme is appended
-   (enabling scheme auto-detection on decoding)
-4. **Encoding**: The binary payload is encoded to a string
+An Oboron *format* represents the full transformation of the plaintext to
+the encrypted text (obtext), including:
 
-The encryption stage is implemented using standard cryptographic
-algorithms, each variant termed an Oboron *scheme*.  The *encoding*
-stage offers several supported string encodings.  A combination of a
-scheme and encoding is referred to as an Oboron *format*.  Given an
-encryption key, the format thus uniquely specifies the complete
-transformation from a plaintext string to an encoded "obtext" string.
-Formats are represented by compact identifiers: `{scheme}:{encoding}`,
-for example:
-- `ob01:c32` - ob01 scheme, Crockford base32 encoding
-- `ob21p:b32` - ob21p scheme, standard RFC 4648 base32 encoding
-- `ob31:hex` - ob31 scheme, hex encoding
-- `ob32p:b64` - ob32p scheme (`p`=probabilistic), base64 encoding
+1. *Encryption*: Plaintext UTF-8 string encrypted to ciphertext bytes
+   using a cryptographic algorithm
+2. *Encoding*: The binary payload is encoded to a string representation
 
-A format thus defines the complete transformation, specifying not just
-the output encoding but also the encryption algorithm and payload byte
-arrangement.
+### Scheme + Encoding = Format
 
-**API Note**: The public interface uses `enc`/`dec` names for methods
-and functions. Thus the `enc` operation comprises the full process,
-including the encryption and encoding stages.
+Formats combine a scheme (cryptographic algorithm) with an encoding
+(string representation):
+- *Scheme*: Cryptographic algorithm + mode + parameters (e.g., `aasv`)
+- *Encoding*: String representation method (e.g., `c32`)
+- *Format*: Scheme + encoding = complete transformation (e.g.,
+  `aasv.c32`)
+
+
+Given an encryption key, the format thus uniquely specifies the complete
+transformation from a plaintext string to an encoded *obtext* string.
+
+Formats are represented by identifiers:
+- `ob:{scheme}.{encoding}`, (URI-like syntax, e.g., `ob:aasv.c32`),
+- `{scheme}.{encoding}`, when the context is clear
+
+**API Notes**:
+- The `ob:` namespace prefix is not used in the `oboron` API.
+  Formats like `aasv.c32` are used directly.
+- The public interface uses `enc`/`dec` names for methods and functions.
+  Thus the `enc` operation comprises the full process, including the
+  encryption and encoding stages.
 
 ### Encodings
 
-- **base32crockford** (default): Balanced compactness and readability,
-  alphanumeric, lowercase; designed to avoid accidental obscenity
-- **base32rfc**: Balanced compactness and readability, alphanumeric,
-  uppercase; standard base32 (RFC 4648 Section 6)
-- **base64**: Most compact, case-sensitive, includes `-` and `\_`
-  characters; standard URL-safe base64 (RFC 4648 Section 5)
-- **hexadecimal**: Slightly faster performance (~2-3%), longest output
+- `b32` - standard base32: Balanced compactness and readability,
+  uppercase alphanumeric (RFC 4648 Section 6)
+- `c32` - Crockford base32: Balanced compactness and readability,
+  lowercase alphanumeric; designed to avoid accidental obscenity
+- `b64` - standard URL-safe base64: Most compact, case-sensitive,
+  includes `-` and `_` characters (RFC 4648 Section 5)
+- `hex` - hexadecimal: Slightly faster performance (~2-3%), longest
+  output
 
-> **FAQ:** *Why does Oboron use Crockford's base32?*
+> **FAQ:** *Why use Crockford's base32 instead of the RFC standard one?*
 >
 > Crockford's base32 alphabet minimizes the probability of accidental
-> obscenity words.  Whereas accidental obscenity is not an issue when
-> working with full encrypted outputs (as any such words would be buried
-> as substrings of a 28+ character long obtext), it does become a
-> concern when using short prefixes.  While the hexadecimal encoding is
-> safe in this regard, the standard base32 is not.
-
-Even though Crockford's base32 encoding is recommended, the standard
-base32 encoding (RFC 4648) is also fully supported (`*:b32` formats),
-just like base64url (`*:b64`) and hex (`*:hex`).
+> obscenity words, which is important when using with short prefixes:
+> Whereas accidental obscenity is not an issue when working with full
+> encrypted outputs (as any such words would be buried as substrings of a
+> 28+ character long obtext), it may become a concern when using short
+> prefixes as references or quasi-hash identifiers.
 
 ### Schemes
 
-A scheme defines the encryption algorithm and its properties
-(deterministic vs. probabilistic, authenticated).
+Schemes define the encryption algorithm and its properties, classified
+into *tiers*:
 
 #### Scheme Tiers
 
-Schemes are classified into tiers:
-- ob0x - insecure, non-authenticated
-- ob1x - insecure, authenticated
-- ob2x - secure, non-authenticated
-- ob3x - secure, authenticated
+- **`a` - Authenticated**
+  - Provide both confidentiality and integrity protection
+  - Examples: `ob:aasv`, `ob:aags`, `ob:apsv`, `ob:apgs`
+  - *Always prefer `a`-tier schemes for security-critical applications*
 
-**Note:** The ob1x tier (insecure, authenticated) currently has
-no implementations. It is reserved for potential future additions,
-maintaining the pattern: even scheme tiers = non-authenticated;
-odd = authenticated.
+- **`u` - Unauthenticated**
+  - Provide confidentiality only (no integrity protection)
+  - Example: `ob:upbc`
+  - Suitable when integrity is verified externally or not required
+  - *Warning*: Vulnerable to ciphertext tampering
 
-| Scheme  | Algorithm   | Deterministic? | Authenticated? | Notes |
-| :------ | :---------- | :------------- | :------------- | :--- |
-| `ob01`  | AES-CBC     | Yes            | No             | Legacy; uses constant IV. Prioritizes determinism and performance over security. |
-| `ob21p` | AES-CBC     | No             | No             | |
-| `ob31`  | AES-GCM-SIV | Yes            | Yes            | |
-| `ob31p` | AES-GCM-SIV | No             | Yes            | |
-| `ob32`  | AES-SIV     | Yes            | Yes            | |
-| `ob32p` | AES-SIV     | No             | Yes            | |
+- **`z` - Obfuscation tier**
+  - *Not cryptographically secure* - for non-security use only
+  - Example: `ob:zrbcx` - deterministic obfuscation with constant IV
+  - Requires explicit `ztier` feature flag (not enabled by default)
+  - See [Z_TIER.md](Z_TIER.md) for details and warnings
 
-**Key Concepts:**
-* **Deterministic:** Same input (key + plaintext) always produces same
-  output. Useful for idempotent operations, lookup keys, caching,
-  or hash-like references.
-* **Probabilistic (`p` suffix):** Incorporates a random nonce,
-  producing different ciphertexts for identical plaintexts.
-  Standard for most cryptographic use cases.
-* **Authenticated:** Ciphertext is tamper-proof.
-  Any modification results in decryption failure.
+#### Scheme Properties
 
-#### Important Scheme Security Notes
+The second letter of the scheme ID further describe the properties of the
+scheme:
+- **`.a..` - avalanche, deterministic**
+  - *deterministic* => same plaintext always produces same obtext
+  - *avalanche* => entropy uniformly distributed; change in any byte of
+    plaintext completely changes the entire obtext (hash-like property)
+  - Examples: `ob:aasv`, `ob:aags`
+- **`.p..` - probabilistic**
+  - Different output each time
+  - Examples: `ob:apsv`, `ob:apgs`, `ob:upbc`
 
-All schemes use well-regarded cryptographic primitives. However, note
-the following:
+#### Scheme Cryptographic Algorithms
 
-* **`ob01` and `ob21p` are not authenticated** and vulnerable to
-  tampering.
-* **SECURITY WARNING:** **`ob01` is cryptographically broken** due to
-  its use of a constant IV (by design, in order to achieve deterministic
-  output).  This scheme leaks equality and prefix structure and is
-  vulnerable to chosen-plaintext attacks.  
-  **Do not use `ob01` for encrypting sensitive data** or any application
-  where confidentiality or integrity matters.
-  **Use `ob01` only for** maximum compactness and strong prefix entropy
-  in non-security-critical contexts (e.g., development or obfuscation).
-  For sensitive data, **always use authenticated schemes** (ob3x tier:
-  ob31 or ob32).
+The remaining two letters in scheme IDs indicate the algorithm:
+- `gs` = AES-GCM-SIV
+- `sv` = AES-SIV
+- `bc` = AES-CBC
 
-We reiterate that the first digit in the scheme is a critically important
-one (see [Scheme Tiers](#scheme-tiers) above):
-- ***`ob0x` and `ob1x` scheme tiers should be viewed as obfuscation, not
-  encryption.***
-- ***For encryption applications, always use ob2x or ob3x tier schemes***
+#### Summary Table
 
+| Scheme     | Algorithm   | Deterministic? | Authenticated? | Notes                              |
+| :--------- | :---------- | :------------- | :------------- | :--------------------------------- |
+| `ob:aasv`  | AES-SIV     | Yes            | Yes            | General purpose, deterministic |
+| `ob:aags`  | AES-GCM-SIV | Yes            | Yes            | Deterministic alternative |
+| `ob:apsv`  | AES-SIV     | No             | Yes            | Maximum privacy protection |
+| `ob:apgs`  | AES-GCM-SIV | No             | Yes            | Probabilistic alternative |
+| `ob:upbc`  | AES-CBC     | No             | No             | Unauthenticated - use with caution |
 
-> **FAQ:** *Why include an insecure scheme?*
-> 
-> Oboron is a general purpose library whose utility and application
-> domain extend beyond encryption.  For applications such as obfuscation
-> or hashing alternative (see Application section below), ob0x schemes
-> are sufficient, while outperforming ob2x and ob3x schemes by 2x to 4x.
-> In our benchmarks, `ob01` shows ~40% lower latency than SHA256 for
-> short inputs on modern x86 CPUs.
+Key Concepts:
+* *Deterministic:* Same input (key + plaintext) always produces same
+  output. Useful for idempotent operations, lookup keys, caching, or
+  hash-like references.
+* *Probabilistic:* Incorporates a random nonce, producing different
+  ciphertexts for identical plaintexts.  Standard for most cryptographic
+  use cases (non-cached, not used as hidden references).
+* *Authenticated:* Ciphertext is tamper-proof.  Any modification (even a
+  single bit flipped) results in decryption failure.
 
-> **FAQ:** *Why use numeric identifiers (e.g., `ob01`) instead of
-> algorithm names (e.g., `AES-CBC`)?*
->
-> Oboron's main target audience is developers who are not cryptography
-> experts, to whom algorithm names are not likely to mean much.  For
-> them, Oboron hopes to provide value by making the algorithm's main
-> properties obvious from the tier (e.g., `ob3x`) and optional suffix
-> (`p` = probabilistic), while relegating actual algorithm names to the
-> documentation.  Besides, each algorithm is used in two different
-> variants: deterministic and probabilistic, so to identify a scheme one
-> would have to speak of "deterministic AES-CBC", as opposed to "ob01",
-> or "probabilistic AES-CBC" as opposed to "ob21p", which is a mouthful.
+#### Choosing a Scheme
 
+- `ob:aasv`: General-purpose secure encryption with deterministic output
+  and compact size
+- `ob:apsv`: Maximum privacy with probabilistic output (larger size due
+  to nonce)
+- `ob:upbc`: Only when integrity is handled externally
 
-### Secure Defaults
-
-Oboron presets (default features) only include secure schemes.  In order
-to use `ob0x` or `ob1x` schemes, you need to enable them explicitly in
-your `Cargo.toml`.
-
-The same holds for the `keyless` feature: while it is handy for
-development and quick obfuscation (using a hard-coded key), this feature
-is not enabled by default, and must be included explicitly in your
-`Cargo.toml`.
+> *Note on encryption strength*: All `a`-tier and `u`-tier schemes use
+  256-bit AES encryption. The `z`-tier uses 128-bit AES for performance
+  in non-security contexts.
 
 
 ## Algorithm
@@ -256,8 +243,9 @@ dec operation:
 ```
 
 The above diagram is conceptual; actual implementation includes
-scheme-specific steps like scheme byte appending and optional ciphertext
-reversal. With this middle-step included, the diagram becomes:
+scheme-specific steps like scheme byte appending and (for `z`-tier
+schemes only) optional ciphertext prefix restructuring. With this
+middle-step included, the diagram becomes:
 ```
 enc operation:
     [plaintext] -> encryption -> [ciphertext] -> oboron pack -> [payload] -> encoding -> [obtext] 
@@ -266,45 +254,9 @@ dec operation:
     [obtext] -> decoding -> [payload] -> oboron unpack -> [ciphertext] -> decryption -> [plaintext]
 ```
 
-### Payload Structure
-
-The payload construction is what gives the obtext its Oboron flavor. The
-two goals achieved with the payload structure are:
-1. Reversing the ciphertext for schemes in which this improves the
-   prefix entropy
-2. Including a scheme marker which allows scheme autodetection in
-   decoding
-
-The first step gives a transformed ciphertext:
-- `[ciphertext'] = [reverse(ciphertext)]` for reversed schemes (`ob01`,
-  `ob21p`),
-- `[ciphertext'] = [ciphertext]` for all other schemes (no change).
-
-The second step is achieved by appending a single byte marker to the
-payload prior to encoding.
-
-- `[payload] = [ciphertext'][marker]`
-
-This marker byte is the result of an XOR operation on a constant byte
-identifier for the scheme (e.g., `oboron::constants::OB01_BYTE = 0x02`),
-and the first byte of the transformed ciphertext (`ciphertext'[0]`).
-
-- `marker = ciphertext'[0] XOR scheme-byte`
-
-The purpose of this XOR is entropy mix-in: by using the constant scheme
-byte directly, all `ob01` obtexts would have a constant suffix.
-
-
-> **FAQ:** *Why do some schemes reverse the ciphertext, while others
-> don't?*
->
-> The reversal step in `ob01` and `ob21p` schemes moves the final AES
-> block to the beginning of the output, ensuring maximal entropy in the
-> encoded prefix.  Both of these schemes use AES-CBC, a block-chaining
-> algorithm: each 16-byte block's ciphertext becomes the IV for the next.
-> Thus, while the first ciphertext block contains only the entropy from
-> the first plaintext block, the final block accumulates entropy from the
-> entire message.
+In `a`-tier and `u`-tier schemes, the difference between the payload and
+the ciphertext is in the 2-byte scheme marker that is appended to the
+ciphertext, enabling scheme autodetection in decoding.
 
 ### Padding Design
 
@@ -329,52 +281,34 @@ eliminating padding ambiguity errors at runtime.
 
 ## Key Management
 
-### Key Partitioning Model
+### Single Master Key Model
 
-Oboron uses a single 512-bit master key that is partitioned, not
-cryptographically derived, into algorithm-specific subkeys.
+Oboron uses a single 512-bit master key partitioned into
+algorithm-specific subkeys:
 
-This design is intentional and prioritizes low latency for short-string
-encryption. No hash-based KDF (e.g., HKDF) is used, as this would
-increase per-operation latency by several multiples and dominate runtime
-for the intended workloads.
+- `ob:aags`, `ob:apgs`: use the first 32 bytes (256 bits) for AES-GCM-SIV
+  key
+- `ob:aasv`, `ob:apsv`: use the full 64 bytes (512 bits) for AES-SIV key
+- `ob:upbc` uses the last 32 bytes (256 bits) for AES-CBC key
 
-Subkeys are fixed, non-adaptive slices of the master key. With the
-exception of `ob32` / `ob32p` (AES-SIV schemes), which intentionally use
-the full 512-bit key, subkeys do not overlap.
-
-This implies related-key structure by construction. Oboron does not claim
-formal related-key security. The design assumes:
-- The master key is generated uniformly at random
-- Keys are never attacker-controlled
-- Ciphertext oracles are not mixed across schemes
-
-Under these assumptions, related-key attacks are not considered practical
-for Oboron’s threat model.
-
-The master-key is partitioned into algorithm-specific keys in the
-following way:
-- `ob01`, `ob21p`: use the first 16 bytes (128 bits) for AES key
-- `ob01`: uses the second 16 bytes for IV
-- `ob31`, `ob31p`: use the last 32 bytes (256 bits) for AES-GCM-SIV key
-- `ob32`, `ob32p`: use the full 64 bytes (512 bits) for AES-SIV key
+**Design Rationale:** This approach prioritizes low latency for
+short-string encryption.  No hash-based KDF (e.g., HKDF) is used, as this
+would dominate runtime for intended workloads.
 
 The master key never leaves your application. Algorithm-specific keys
 are extracted on-the-fly and never cached or stored.
 
 > **FAQ:** *Why use a single key across all schemes?*
 >
-> Oboron uses key extraction to generate algorithm-specific keys from a
-> single master key.  This approach:
 > - Simplifies deployment: Store one key instead of multiple
 > - Reduces errors: No risk of mismatching keys to algorithms
 
 ### Key Format
 
 The default key input format is base64. This is consistent with Oboron's
-strings-first API design. As any production use will typically read
-the key from an environment variable, this allows the string format
-to be directly fed into the constructor.
+strings-first API design. As any production use will typically read the
+key from an environment variable, this allows the string format to be
+directly fed into the constructor.
 
 The base64 format was chosen for its compactness, as an 86-character
 base64 key is easier to handle manually (in secrets or environment
@@ -390,13 +324,20 @@ selectable, and to avoid any human visual parsing due to underscores.
 **Important technical detail:** Not every 86-character base64 string is a
 valid 512-bit key.  Since 512 bits requires 85.3 bytes when
 base64-encoded, the final character is constrained by padding
-requirements. For correct encoding, the last character must be one of
-`A`, `Q`, `g`, or `w`.  Always use `oboron::generate_key()` to create
-valid keys rather than attempting to construct them manually.
+requirements. When generating keys, it is recommended to use one of the
+following methods:
+1. use Oboron's key generator (`oboron::generate_key()` or
+  `cargo run --bin keygen`)
+2. generate random 64 bytes, then encode as base64
+3. generate random 128 hex characters, then convert hexadecimal to base64
 
-While base64 keys are used in the primary interface, Oboron also provides
-full support for working with keys in hexadecimal or raw bytes formats
-via `*from_bytes*` and `*from_hex_key*` method and function variants.
+#### Alternative Key Interfaces
+
+For specialized use-cases:
+- Enable `hex-keys` feature for hexadecimal key input
+- Enable `bytes-keys` feature for raw byte key input
+- Enable `keyless` feature for testing/development (uses hardcoded key -
+  no security)
 
 ## Properties
 
@@ -407,7 +348,7 @@ reference commits with just the first 7 characters of their SHA1 hash
 (like `git show a1b2c3d`). This works because cryptographic hashes
 distribute entropy evenly across all characters.
 
-Oboron achieves similar prefix quality through careful byte arrangement.
+Oboron schemes exhibit similar prefix quality.
 Consider these comparisons:
 
 **Short Reference Strength:**
@@ -440,8 +381,8 @@ and standard hashing algorithms were compared against each other.  But
 when we consider the full output, then they are not on the same plane:
 while SHA1 and SHA256 collision probabilities are astronomically small,
 they are never zero, and the birthday paradox risk can become a factor
-in large systems even with the full hash.  Oboron, on the other hand,
-is a symmetric encryption library, and as such it is collision free
+in large systems even with the full hash.  Oboron, on the other hand, is
+a symmetric encryption library, and as such it is collision free
 (although applying this label to an encryption library is awkward):
 for a fixed key and within the block-cipher domain limits, Oboron is
 injective (one-to-one), i.e. two different inputs can never result in the
@@ -455,68 +396,185 @@ both SHA256 and JWT performance while providing reversible encryption.
 > **Note:** As a general-purpose encryption library, Oboron is not a
 > replacement for either JWT or SHA256.  We use those two for baseline
 > comparison, as they are both standard and highly optimized libraries.
-> However, as we show in the [Applications](#applications) section below,
-> overlaps in applications with JWT and SHA256 are possible.
 
-| Scheme | 8B Encode | 8B Decode | Security      | Use Case                        |
-|--------|----------:|-----------|---------------|---------------------------------|
-| ob01   | 132 ns    | 126 ns    | Insecure      | Maximum speed + compactness     |
-| ob32   | 334 ns    | 364 ns    | Secure + Auth | Balanced performance + security |
-| JWT    | 550 ns    | 846 ns    | Auth only`*`  | Signature without encryption    |
-| SHA256 | 191 ns    | N/A       | One-way       | Hashing only                    |
+| Scheme     | 8B Encode | 8B Decode | Security      | Use Case                        |
+|------------|----------:|-----------|---------------|---------------------------------|
+| `ob:aasv`  | 334 ns    | 364 ns    | Secure + Auth | Balanced performance + security |
+| JWT        | 550 ns    | 846 ns    | Auth only`*`  | Signature without encryption    |
+| SHA256     | 191 ns    | N/A       | One-way       | Hashing only                    |
 
 `*` **Note**: JWT baseline (HMAC-SHA256) provides authentication without
-encryption, comparable to Oboron's unimplemented **ob1x tier**.  Despite
-comparing against our stronger **ob3x tier** (secure + authenticated),
-Oboron maintains performance advantages while providing full
-confidentiality.
+encryption.  Despite comparing against our stronger **`a`-tier** (secure
++ authenticated), Oboron maintains performance advantages while providing
+full confidentiality.
 
 More detailed benchmark results are presented in a separate document:
 - [BENCHMARKS.md](BENCHMARKS.md).
-Data from JWT and SHA256 benchmarks
-performed on the same machine is available here:
+Data from JWT and SHA256 benchmarks performed on the same machine is
+available here:
 - [BASELINE_BENCHMARKS.md](BASELINE_BENCHMARKS.md)
 
 **Performance advantages:**
-- ob01 encoding is 4.1x faster than JWT with 4.5x smaller output
-- All Oboron schemes outperform JWT for both encoding and decoding
-- ob01 shows lower latency than SHA256+hex for short strings while
-  providing reversible (cryptographically insecure) encryption
+- All Oboron authenticated schemes outperform JWT for both encoding and
+  decoding
 
 ### Output Length Comparison
 
 | Method        | Small string output length |
 |---------------|----------------------------|
-| Oboron ob01:  | 28 characters              |
-| Oboron ob32:  | 34-47 characters           |
-| Oboron ob32p: | 60-72 characters           |
-| SHA256:       | 64 characters              |
-| JWT:          | 150+ characters            |
+| `ob:aasv`     | 31-48 characters           |
+| `ob:apsv`     | 56-74 characters           |
+| SHA256        | 64 characters              |
+| JWT           | 150+ characters            |
 
 A more complete output length comparison is given in the
 [Appendix](#appendix-obtext-lengths).
 
-### Scheme Selection Guidelines
+## Rust API Overview
 
-- **ob01**: Non-security-critical applications prioritizing speed and
-  compactness
-- **ob32**: General-purpose secure encryption with deterministic output
-  and compact size
-- **ob32p**: Maximum privacy protection with probabilistic output
-  (larger size due to nonce)
+Oboron provides multiple API styles supporting different use cases.  For
+most production applications, *compile-time format selection* (option 1
+below) offers the best combination of performance, type safety, and
+clarity.
 
-**Choose ob01 when:**
-- Performance and compactness are primary requirements (~28 chars)
-- Security requirements are minimal (obfuscation contexts)
+### 1. Compile-time Format Selection (Recommended for Production)
 
-**Choose ob32 when:**  
-- Cryptographic security with compact output is needed (~34-47 chars)
-- Deterministic behavior is beneficial (lookup keys, caching)
+Use fixed-format types when formats are known at compile time for optimal
+performance and type safety:
+```rust
+use oboron::ApgsB64;
 
-**Choose ob32p when:**
-- Cryptographic security with maximum privacy is required (~60-72 chars)
-- Hiding plaintext relationships is critical
+let key = env::var("OBORON_KEY")?;
+let apgs = ApgsB64::new(&key)?;
 
+let ot = apgs.enc("hello")?;
+let pt2 = apgs.dec(&ot)?;
+assert_eq!(pt2, "hello");
+```
+
+Available types include all combinations of scheme variants (e.g.,
+`Upbc`, `Aags`, `Apgs`, `Aasv`, `Apsv`) with encoding specifications
+(`B64`, `Hex`, `B32`, or `C32`), and concatenates the two in struct
+names, for example:
+- `UpbcHex` - encoder for `ob:upbc.hex` format
+- `AagsB64` - encoder for `ob:aags.b64` format
+- `AasvC32` - encoder for `ob:aasv.c32` format.
+
+### 2. Runtime Format Selection (`Ob`)
+
+When format specification at runtime is required, use `Ob`:
+```rust
+use oboron::Ob;
+
+let key = env::var("OBORON_KEY")?;
+let ob = Ob::new("aasv.b64", &key)?;
+
+let ot = ob.enc("hello")?;
+let pt2 = ob.dec(&ot)?;
+assert_eq!(pt2, "hello");
+```
+The format can also be changed with mutable instances:
+```rust
+let mut ob = Ob::new("aags.b64", &key)?;
+let ot = ob.enc("hello")?; // aags.b64 obtext
+
+// Format modification
+ob.set_format("apsv.hex")?;
+let ot_hex = ob.enc("world")?; // apsv.hex obtext
+```
+
+`Ob` offers another advantage over fixed-format types like `AasvC32`:
+the `autodec()` method.
+```rust
+let ob = Ob::new("aasv.c32, &key);
+let pt2 = ob.autodec(&some_ot)
+```
+This method will decode the obtext in any format, as long as it was
+encrypted with the same key.
+
+Note:
+While `Omnib` (described below) also has an `autodec()` method, `Ob`'s
+variant will try the current encoding first (`c32` in the example above),
+before resorting to a heuristic logic combined with a trial and error
+guessing the encoding that `Omnib` uses exclusively, and will therefore
+have better performance than `Omnib::autodec()` if the encoding is known.
+
+### 3. Multiple Format Support (`Omnib`)
+
+`Omnib` differs in format management and provides comprehensive
+`autodec()` functionality.
+
+**Multi-Format Workflow:** Designed for simultaneous work with different
+formats, requiring format specification in each operation:
+```rust
+use oboron::Omnib;
+
+let omb = Omnib::new(&key)?;
+
+// Format specification per operation
+let ot = omb.enc("test", "apsv.b64");
+let pt2 = omb.dec(&ot, "apsv.b64");
+let pt_other = omb.dec(&other, "aasv.c32");
+
+// Autodecode when format is unknown
+let pt2 = omb.autodec(&ot);
+```
+
+Note performance implications: autodetection uses trial-and-error across
+encodings, with worst-case performance ~3x slower than known-format dec
+operations.
+
+### Using Format Constants
+
+For type safety and discoverability, use the provided format constants
+instead of string literals:
+
+```rust
+use oboron::{Ob, Omnib, AASV_B64, AASV_HEX};
+
+let key = oboron::generate_key();
+
+// With Ob (runtime format selection)
+let ob = Ob::new(AASV_B64, &key)?;
+
+// With Omnib (multi-format operations)
+let omb = Omnib::new(&key)?;
+let ot_b64 = omb.enc("data", AASV_B64)?;
+let ot_hex = omb.enc("data", AASV_HEX)?;
+```
+
+Available constants:
+- `UPBC_C32`, `UPBC_B32`, `UPBC_B64`, `UPBC_HEX`
+- `AAGS_C32`, `AAGS_B32`, `AAGS_B64`, `AAGS_HEX`
+- `APGS_C32`, `APGS_B32`, `APGS_B64`, `APGS_HEX`
+- `AASV_C32`, `AASV_B32`, `AASV_B64`, `AASV_HEX`
+- `APSV_C32`, `APSV_B32`, `APSV_B64`, `APSV_HEX`
+- Testing:  `MOCK1_C32`, `MOCK2_B32`, etc.
+- Legacy: `LEGACY_B32`, `LEGACY_C32`, etc.
+
+### Advanced: `Format` Objects
+
+`Format` structs provide a more fine-grained type safety than format
+string constants:
+```rust
+use oboron::{Ob, Format, Scheme, Encoding};
+
+let format = Format::new(Scheme::Aasv, Encoding::B64);
+let ob = Ob::new(format, &key)?;
+```
+
+### Typical Production Use
+
+For compile-time known schemes and encodings, however, static types
+provide optimal performance, concise syntax, and strongest type
+guarantees:
+```rust
+use oboron::AasvB64;
+let ob = AasvB64::new(&key)?;
+let ot = ob.enc("secret")?;
+```
+The format is built into the struct, no format strings, constants, or
+Format structs are needed.
 
 ### Feature Flags
 
@@ -524,29 +582,53 @@ Oboron supports optional feature flags to reduce binary size by including
 only necessary encryption schemes. This is especially useful for
 WebAssembly builds where bundle size matters.
 
-**Default:** All secure production-ready schemes are enabled; `ob01` is
-not-it has to be enabled explicitly in your application.
+**Default:** All secure production-ready schemes are enabled (`a`-tier).
 
 For details on available features, scheme groups, and optimization
 guidance, see [README_FEATURES.md](README_FEATURES.md).
 
 Quick examples:
 ```toml
-# Minimal: only ob32 (deterministic AES-SIV)
-oboron = { version = "1.0", default-features = false, features = ["ob32"] }
+# Minimal: only aasv (deterministic AES-SIV)
+oboron = { version = "1.0", default-features = false, features = ["aasv"] }
 
-# All authenticated schemes (ob3x tier)
+# All authenticated schemes (`a`-tier)
 oboron = { version = "1.0", default-features = false, features = ["authenticated-schemes"] }
 
 # All SIV schemes for WebAssembly
 oboron = { version = "1.0", default-features = false, features = ["all-siv-schemes"] }
 ```
 
+### The `ObtextCodec` Trait
 
-### Versioning
+All types except `Omnib` implement the `ObtextCodec` trait, providing a
+consistent interface:
 
-This crate follows semantic versioning.  Version 1.0 signifies a stable,
-production-ready API with no anticipated breaking changes.
+- `enc(plaintext: &str) -> Result<String, Error>` - Encode plaintext to
+  obtext
+- `dec(obtext: &str) -> Result<String, Error>` - Decode with automatic
+  scheme detection
+- `scheme() -> Scheme` - Current scheme
+- `encoding() -> Encoding` - Current encoding
+- `format() -> Format` - Current format (scheme + encoding)
+
+### Working with Keys
+
+```rust
+// main interface:
+let ob = AagsB64::new(&env::var("OBORON_KEY")?);       // base64 key
+// with "hex-keys" feature enabled:
+let ob = AagsB64::from_hex_key(&env::var("HEX_KEY")?); // hex key
+// with "bytes-keys" feature enabled:
+let ob = AagsB64::from_bytes(&key_bytes)?;             // raw bytes key
+// with "keyless" feature enabled:
+let ob = AagsB64::new_keyless()?;              // insecure/testing only
+```
+
+**Warning**: `new_keyless()` uses the publicly available hardcoded key
+providing no security. Use only for testing or obfuscation contexts where
+encryption is not required.  The `keyless` feature must be enabled to use
+the hardcoded key.
 
 
 ## Applications
@@ -555,26 +637,25 @@ While Oboron serves as a general-purpose encryption library with its
 "string in, string out" API, its combination of properties—particularly
 prefix entropy and compactness—enables specialized applications:
 
-- **Git-like short IDs** - High-entropy prefixes for unique references
-- **URL-friendly state tokens** - Encrypt web application state into
+- *Git-like short IDs* - High-entropy prefixes for unique references
+- *URL-friendly state tokens* - Encrypt web application state into
   compact URLs
-- **No-lookup captcha systems** - Server issues encrypted challenge,
+- *No-lookup captcha systems* - Server issues encrypted challenge,
   verifies without database lookup
-- **Database ID obfuscation** - Hide sequential IDs while maintaining
+- *Database ID obfuscation* - Hide sequential IDs while maintaining
   reversibility
-- **Compact authentication tokens** - Efficient alternative to JWT for
+- *Compact authentication tokens* - Efficient alternative to JWT for
   simple use cases where JWT may be overkill
-- **General-purpose symmetric encryption** - Straightforward string-based
+- *General-purpose symmetric encryption* - Straightforward string-based
   API
 
 ### Comparison with Alternatives
 
-| Use Case            | Traditional Solution | Oboron Approach |
-|---------------------|----------------------|------------------|
-| Short unique IDs    | UUIDv4 (36 chars)    | ob01:c32 (28 chars, reversible) |
-| URL parameters      | JWT (150+ chars)     | ob32:b64 (4.5x smaller, 4x faster) |
-| Database ID masking | Hashids (not secure) | Proper encryption |
-| Simple encryption   | Libsodium (complex)  | String in, string out API |
+| Use Case            | Traditional Solution | Oboron Approach                         |
+|---------------------|----------------------|-----------------------------------------|
+| Short unique IDs    | UUIDv4 (36 chars)    | `ob:aasv.c32` (34-47 chars, reversible) |
+| URL parameters      | JWT (150+ chars)     | `ob:aasv.b64` (4.5x smaller, 4x faster) |
+| Database ID masking | Hashids (not secure) | Proper encryption                       |
 
 ### API Simplification
 
@@ -594,8 +675,8 @@ let encoded = base64::encode(ciphertext);
 
 **After (Oboron - simplified, string-oriented):**
 ```rust
-let ob = Ob32::new(&env::var("OBORON_KEY")?);
-let ot = ob.enc("Hello World")?; // "uf2glao2xd7fnbq5z53cb63ukc"
+let ob = AasvC32::new(&env::var("OBORON_KEY")?);
+let ot = ob.enc("Hello World")?;
 ```
 
 **Benefits:**
@@ -629,7 +710,7 @@ let obfuscated = hashids.encode(&[123]); // "k2d3e4"
 
 **After (Oboron - encrypted, reversible, secure):**
 ```rust
-let ob = Ob32::new(&env::var("OBORON_KEY")?);
+let ob = AasvC32::new(&env::var("OBORON_KEY")?);
 let ot = ob.enc("user:123")?; // "uf2glao2xd7f"
 // Can include namespace prefixes to prevent type confusion
 ```
@@ -652,10 +733,10 @@ let token = encode(&Header::default(), &claims, &EncodingKey)?;
 
 **After (Oboron - compact, simple):**
 ```rust
-let ob = Ob31::new(&env::var("OBORON_KEY")?);
+let ob = AagsC32::new(&env::var("OBORON_KEY")?);
 let state = serde_json::to_string(&claims)?;
 let token = ob.enc(&state)?; // ~50 characters
-// "ob31:b4g9lao2xd7fnbq5z53cb63ukc"
+// "b4g9lao2xd7fnbq5z53cb63ukc"
 ```
 
 **When to prefer Oboron over JWT:**
@@ -668,308 +749,6 @@ let token = ob.enc(&state)?; // ~50 characters
 - Industry-standard tokens required
 - Public/private key signatures needed
 - Complex claims with registered names
-
-#### ID Generation and Hash-like Applications
-
-Oboron provides efficient alternatives to UUIDs and SHA256 for
-generating unique, referenceable identifiers.
-
-The examples in this section use `ob01` and `keyless` features, which are
-not included by default as cryptographically insecure.  Enable
-the required features explicitly in your `Cargo.toml`.
-
-##### Approach 1: Full Oboron Output (Reversible)
-```rust
-let ob = Ob01::new_keyless(); // Obfuscation context
-let full_id = ob.enc(format!("user:{}", user_id))?;
-// "uf2glao2xd7fnbq5z53cb63ukc" (28 base32 chars, reversible)
-```
-
-- **Pros:** Reversible (decodes to "user:123"), full Oboron functionality
-- **Cons:** With hardcoded key: Anyone can decode; reveals structure
-- **Best for:** Internal systems where reversibility is useful and
-  structure transparency acceptable.
-
-Alternatively, keep the payload securely encrypted by having a shared
-secret (`env::var("OBORON_KEY")`).
-
-##### Approach 2: Trimmed Prefix (Hash-like, Non-reversible)
-```rust
-let ob = Ob01::new_keyless();
-// Domain separator for multiple blocks
-let full = ob.enc(format!("myapp:user:{}", user_id))?;
-let short_id = &full[0..20]; // "uf2glao2xd7fnbq5z53" (28 base32 chars)
-```
-
-- **Pros:** Non-reversible even with hardcoded key, no key management,
-  adjustable length
-- **Best for:** Public-facing identifiers requiring opacity and
-  referenceable prefixes.
-
-#### Oboron for Hash-like Identifier Generation
-
-SHA256 is the ubiquitous go-to solution for hash identifiers. However,
-it is not optimized for short strings.  Hashing a 6-digit ID or an
-10-character parameter is a very common use-case, however reaching for
-SHA256 in this context may have drawbacks:
-- the output is much longer than the input (always 64 hex characters)
-- cutting the output down to a short prefix requires weighing odds of
-  the birthday paradox problem
-- performance is not optimal (optimized for large files)
-
-**Performance considerations:**
-- **SHA256 + hex:** ~190 ns, 64 hex characters (128-bit collision
-  resistance)
-- **Oboron ob01 (one block):** ~130 ns, 28 base32/34 hex chars (37%
-  faster)
-- **Oboron ob01 (two blocks):** ~147 ns, 53 base32/66 hex chars (27%
-  faster, stronger than SHA256)
-(Times from benchmarks run on an Intel i5 laptop.)
-
-**Collision resistance comparison:**
-- 6 base32 chars (30 bits): Exceeds 7 hex chars (28 bits) for short
-  references
-- 20 base32 chars (100 bits): Comparable to SHA1 collision resistance
-- 28 base32 chars (136 bits): Slightly stronger than SHA256's 128 bits
-- 53 base32 chars (264 bits): Substantially stronger than SHA256
-Note that the consideration of Oboron's 28- and 53-bit outputs in the
-context of collision resistance only makes sense in a global namespace;
-when using a fixed key, the collision problem for full Oboron outputs
-[disappears altogether](#deterministic-injectivity).
-
-**Oboron advantages:**
-1. **Better performance** - 27-37% faster than SHA256 for short strings
-2. **More compact encoding** - Base32 provides 5 bits per char vs hex's 4
-   bits
-3. **Referenceable prefixes** - High entropy from initial characters
-4. **Tunable security** - Select prefix length for specific collision
-   resistance requirements
-5. **Deterministic guarantee** - Different inputs always produce
-   different outputs
-
-**When to choose which approach:**
-- **Oboron (28 chars)**: General-purpose quasi-hashing with deterministic
-  non-collision guarantee, and improved performance over SHA256
-- **Oboron (53 chars)**: Stronger-than-SHA256 collision resistance
-  (in a scenario without a fixed key)
-- **Shorter prefixes (6 chars)**: Git-like short references
-
-**Note:** Oboron provides strong collision resistance for identifier
-generation but is not a comprehensive replacement for cryptographic
-hashing in all contexts (e.g., password hashing where slow hashes are
-desirable).
-
-## Rust API Overview
-
-Oboron provides multiple API styles supporting different use cases. For
-most production applications, **compile-time format selection** (option 1
-below) offers the best combination of performance, type safety, and
-clarity.
-
-### 1. **Compile-time Format Selection** (Recommended for Production)
-
-Use scheme-specific types when formats are known at compile time for
-optimal performance and type safety:
-
-```rust
-use oboron::{Ob31pBase64, Oboron};
-
-let key = env::var("OBORON_KEY")?;
-let ob31p = Ob31pBase64::new(&key)?;
-
-let ot = ob31p.enc("hello")?;
-let pt2 = ob31p.dec(&ot)?;
-assert_eq!(pt2, "hello");
-```
-
-Available types include all combinations of scheme variants (e.g.,
-`Ob01`, `Ob21p`, `Ob31`, `Ob31p`, `Ob32`, `Ob32p`) with encoding
-specifications (`Base64`, `Hex`, `Base32Rfc`, or `Base32Crockford`),
-and concatenates the two in struct names, for example:
-- `Ob01Base32Rfc` - encoder for `ob01:b32` format
-- `Ob21pHex` - encoder for `ob21p:hex` format
-- `Ob31Base64` - encoder for `ob31:b64` format
-- `Ob32Base32Crockford = Ob32` - encoder for `ob32:c32` format.
-
-All Base32Crockford-encoding (default) variants have short aliases with
-no explicit encoding (defaulting to `c32`): `Ob01`, `Ob21p`, etc.
-
-Note that the `ob01` scheme is not included by default as
-cryptographically insecure.  In order to use the associated structs
-`Ob01 = Ob01Base32Crockford`, `Ob01Base32Rfc`, `Ob01Base64`, or `Ob01Hex`,
-you need to enable the `ob01` feature in your `Cargo.toml`
-
-### 2. **Runtime Format Selection** (`Ob`)
-
-When format specification at runtime is required but format changes are
-unnecessary, use `Ob`:
-
-```rust
-use oboron::{Ob, Oboron};
-
-let key = env::var("OBORON_KEY")?;
-let ob = Ob::new("ob32:b64", &key)?;
-
-let ot = ob.enc("hello")?;
-let pt2 = ob.dec(&ot)?;
-assert_eq!(pt2, "hello");
-```
-
-Format is fixed at construction, providing intermediate flexibility
-between compile-time selection and full mutability.
-
-### 3. **Mutable Runtime Format** (`ObFlex`)
-
-Similar to `Ob` but with mutable format specification:
-
-```rust
-use oboron::{ObFlex, Oboron};
-
-let mut ob = ObFlex::new("ob31:b64", &key)?;
-let ot = ob.enc("hello")?; // ob31:b64 obtext
-
-// Format modification
-ob.set_format("ob32p:hex")?;
-let ot_hex = ob.enc("world")?; // ob32p:hex obtext
-```
-
-### 4. **Multiple Format Support** (`ObMulti`)
-
-`ObMulti` differs in format management and provides comprehensive
-`autodec()` functionality.
-
-**Multi-Format Workflow:** Designed for simultaneous work with different
-formats, requiring format specification in each operation:
-```rust
-use oboron::{ObMulti, Oboron};
-
-let obm = ObMulti::new(&key)?;
-
-// Format specification per operation
-let ot = obm.enc("test", "ob32p:b64");
-let pt2 = obm.dec(&ot, "ob32p:b64");
-let pt_other = obm.dec(&other, "ob01:c32");
-```
-
-**Autodecode:** While other interfaces perform *scheme* autodetection in
-`dec()` methods, only `ObMulti` provides full format autodetection
-including encoding (base32rfc, base32crockford, base64, or hex).  Other
-structs decode only encodings matching their format.
-```rust
-// Autodecode when format is unknown
-let pt2 = obm.autodec(&ot);
-```
-
-Note performance implications: autodetection uses trial-and-error across
-encodings, with worst-case performance ~3x slower than known-format
-dec operations. Meanwhile, scheme autodetection in other interfaces (e.g.,
-`Ob.dec()`, `ObFlex.dec()`, `Ob32Base64.dec()`) has negligible overhead
-as the scheme is detected based on the scheme byte in the payload, and
-the logic follows a direct path with no retries.
-
-### Using Format Constants
-
-For type safety and discoverability, use the provided format constants
-instead of string literals:
-
-```rust
-use oboron: :{Ob, ObMulti, Oboron, OB32_B64, OB32_HEX};
-
-let key = oboron:: generate_key();
-
-// With Ob (runtime format selection)
-let ob = Ob::new(OB32_B64, &key)?;
-
-// With ObMulti (multi-format operations)
-let obm = ObMulti::new(&key)?;
-let ot_b64 = obm.enc("data", OB32_B64)?;
-let ot_hex = obm.enc("data", OB32_HEX)?;
-```
-
-**Available constants:**
-- `OB01_C32`, `OB01_B32`, `OB01_B64`, `OB01_HEX`
-- `OB21P_C32`, `OB21P_B32`, `OB21P_B64`, `OB21P_HEX`
-- `OB31_C32`, `OB31_B32`, `OB31_B64`, `OB31_HEX`
-- `OB31P_C32`, `OB31P_B32`, `OB31P_B64`, `OB31P_HEX`
-- `OB32_C32`, `OB32_B32`, `OB32_B64`, `OB32_HEX`
-- `OB32P_C32`, `OB32P_B32`, `OB32P_B64`, `OB32P_HEX`
-- Testing:  `OB70_*`, `OB71_*`
-- Legacy: `OB00_*`
-
-### Advanced: `Format` Objects
-
-`Format` structs provide a more fine-grained type safety than format
-string constants:
-
-```rust
-use oboron::{Ob, Format, Scheme, Encoding};
-
-let format = Format::new(Scheme::Ob32, Encoding::Base64);
-let ob = Ob::new_with_format(format, &key)?;
-```
-
-### Typical Production Use
-
-For compile-time known schemes and encodings, however, static types
-provide optimal performance, concise syntax, and strongest type
-guarantees:
-```rust
-use oboron::{Ob32Base64, Oboron};
-let ob = Ob32Base64::new(&key)?;
-let ot = ob.enc("secret")?;
-```
-The format is built into the struct, no format strings, constants,
-or Format structs are needed.
-
-### The `Oboron` Trait
-
-All types except `ObMulti` implement the `Oboron` trait, providing a
-consistent interface:
-
-- `enc(plaintext: &str) -> Result<String, Error>` - Encode plaintext to
-  obtext
-- `dec(obtext: &str) -> Result<String, Error>` - Decode with automatic
-  scheme detection
-- `dec_strict(obtext: &str) -> Result<String, Error>` - Decode only
-  matching configured scheme (no autodetection; error if not matching)
-- `scheme() -> Scheme` - Current scheme
-- `encoding() -> Encoding` - Current encoding
-- `key() -> String` - Base64 key access
-- `key_hex() -> String` - Hex key access (gated by `hex-keys` feature,
-  not enabled by default)
-- `key_bytes() -> &[u8; 64]` - Raw key bytes access (gated by
-  `bytes-keys` feature, not enabled by default)
-
-### Working with Keys
-
-```rust
-// main interface:
-let ob = Ob31Base64::new(&env::var("OBORON_KEY")?);       // base64 key
-// with "hex-keys" feature enabled:
-let ob = Ob31Base64::from_hex_key(&env::var("HEX_KEY")?); // hex key
-// with "bytes-keys" feature enabled:
-let ob = Ob31Base64::from_bytes(&key_bytes)?;             // raw bytes key
-// with "keyless" feature enabled:
-let ob = Ob31Base64::new_keyless()?;              // insecure/testing only
-```
-
-**Warning**: `new_keyless()` uses the publicly available hardcoded key
-providing no security. Use only for testing or obfuscation contexts where
-encryption is not required.  The `keyless` feature must be enabled to use
-the hardcoded key.
-
-
-### Common Issues
-
-- **Key errors**: Ensure keys are exactly 86 base64 characters characters
-  properly encoded from 512 bits (see note about
-  [valid base64 keys](#valid-base64-keys))
-- **Format strings**: Must match exactly, e.g., "ob32:b64" not "ob32-b64"
-- **Decoding errors**: Use `autodec()` when format is unknown
-
-### Minimum Supported Rust Version (MSRV)
-
-This crate requires Rust 1.74.0 or later.
 
 ## Compatibility
 
@@ -993,47 +772,45 @@ Licensed under the MIT license ([LICENSE](LICENSE)).
 
 ## Appendix: Obtext Lengths
 
-`ob70` is a non-cryptographic scheme used for testing, whose ciphertext
+`mock1` is a non-cryptographic scheme used for testing, whose ciphertext
 is equal to the plaintext bytes (identity transformation). It is
 included in the tables below as baseline.
 
-(Note: the `ob70` scheme is feature gated: use it by enabling the `ob70`
-feature, or the `ob7x` testing feature group, or the `non-crypto` feature
-group.)
+(Note: the `mock1` scheme is feature gated: use it by enabling the `mock`
+feature)
 
 ## Base32 encoding (b32/c32)
 
-| Scheme | Encoding | 4B  | 8B  | 12B | 16B | 24B | 32B | 64B  | 128B |
-|--------|----------|----:|----:|----:|----:|----:|----:|-----:|-----:|
-| ob70   | b32/c32  | 8   | 15  | 21  | 28  | 40  | 53  | 104  | 207  |
-| ob01   | b32/c32  | 28  | 28  | 28  | 28  | 53  | 53  | 104  | 207  |
-| ob31   | b32/c32  | 34  | 40  | 47  | 53  | 66  | 79  | 130  | 232  |
-| ob32   | b32/c32  | 34  | 40  | 47  | 53  | 66  | 79  | 130  | 232  |
-| ob21p  | b32/c32  | 53  | 53  | 53  | 53  | 79  | 79  | 130  | 232  |
-| ob31p  | b32/c32  | 53  | 60  | 66  | 72  | 85  | 98  | 149  | 252  |
-| ob32p  | b32/c32  | 60  | 66  | 72  | 79  | 92  | 104 | 156  | 258  |
+| Format    | 4B | 8B | 12B | 16B | 24B | 32B | 64B | 128B |
+|-----------|---:|---:|----:|----:|----:|----:|----:|-----:|
+| mock1.b32 | 10 | 16 |  23 |  29 |  42 |  55 | 106 |  208 |
+|  aags.b32 | 36 | 42 |  48 |  55 |  68 |  80 | 132 |  234 |
+|  aasv.b32 | 36 | 42 |  48 |  55 |  68 |  80 | 132 |  234 |
+|  apgs.b32 | 55 | 61 |  68 |  74 |  87 | 100 | 151 |  253 |
+|  apsv.b32 | 61 | 68 |  74 |  80 |  93 | 106 | 157 |  260 |
+|  upbc.b32 | 55 | 55 |  55 |  55 |  80 |  80 | 132 |  234 |
+| zrbcx.b32 | 29 | 29 |  29 |  29 |  55 |  55 | 106 |  208 |
 
 ## Base64 Encoding (b64)
 
-| Scheme | Encoding | 4B  | 8B  | 12B | 16B | 24B | 32B | 64B  | 128B |
-|--------|----------|----:|----:|----:|----:|----:|----:|-----:|-----:|
-| ob70   | b64      | 7   | 12  | 18  | 23  | 34  | 44  | 87   | 172  |
-| ob01   | b64      | 23  | 23  | 23  | 23  | 44  | 44  | 87   | 172  |
-| ob31   | b64      | 28  | 34  | 39  | 44  | 55  | 66  | 108  | 194  |
-| ob32   | b64      | 28  | 34  | 39  | 44  | 55  | 66  | 108  | 194  |
-| ob21p  | b64      | 44  | 44  | 44  | 44  | 66  | 66  | 108  | 215  |
-| ob31p  | b64      | 40  | 50  | 55  | 60  | 71  | 82  | 124  | 210  |
-| ob32p  | b64      | 46  | 55  | 60  | 66  | 76  | 87  | 130  | 215  |
+| Format    | 4B | 8B | 12B | 16B | 24B | 32B | 64B | 128B |
+|-----------|---:|---:|----:|----:|----:|----:|----:|-----:|
+| mock1.b64 |  8 | 14 |  19 |  24 |  35 |  46 |  88 |  174 |
+|  aags.b64 | 30 | 35 |  40 |  46 |  56 |  67 | 110 |  195 |
+|  aasv.b64 | 30 | 35 |  40 |  46 |  56 |  67 | 110 |  195 |
+|  upbc.b64 | 46 | 46 |  46 |  46 |  67 |  67 | 110 |  195 |
+|  apgs.b64 | 46 | 51 |  56 |  62 |  72 |  83 | 126 |  211 |
+|  apsv.b64 | 51 | 56 |  62 |  67 |  78 |  88 | 131 |  216 |
+| zrbcx.b64 | 24 | 24 |  24 |  24 |  46 |  46 |  88 |  174 |
 
 ## Hex Encoding (hex)
 
-| Scheme | Encoding | 4B  | 8B  | 12B | 16B | 24B | 32B | 64B  | 128B |
-|--------|---------:|----:|----:|----:|----:|----:|----:|-----:|-----:|
-| ob70   | hex      | 10  | 18  | 26  | 34  | 50  | 66  | 130  | 258  |
-| ob01   | hex      | 34  | 34  | 34  | 34  | 66  | 66  | 130  | 258  |
-| ob31   | hex      | 42  | 50  | 58  | 66  | 82  | 98  | 162  | 290  |
-| ob32   | hex      | 42  | 50  | 58  | 66  | 82  | 98  | 162  | 290  |
-| ob21p  | hex      | 66  | 66  | 66  | 66  | 98  | 98  | 162  | 290  |
-| ob31p  | hex      | 66  | 74  | 82  | 90  | 106 | 122 | 186  | 314  |
-| ob32p  | hex      | 74  | 82  | 90  | 98  | 114 | 130 | 194  | 322  |
-
+| Format    | 4B | 8B | 12B | 16B | 24B | 32B | 64B | 128B |
+| ----------|---:|---:|----:|----:|----:|----:|----:|-----:|
+| mock1.hex | 12 | 20 |  28 |  36 |  52 |  68 | 132 |  260 |
+|  aags.hex | 44 | 52 |  60 |  68 |  84 | 100 | 164 |  292 |
+|  aasv.hex | 44 | 52 |  60 |  68 |  84 | 100 | 164 |  292 |
+|  upbc.hex | 68 | 68 |  68 |  68 | 100 | 100 | 164 |  292 |
+|  apgs.hex | 68 | 76 |  84 |  92 | 108 | 124 | 188 |  316 |
+|  apsv.hex | 76 | 84 |  92 | 100 | 116 | 132 | 196 |  324 |
+| zrbcx.hex | 36 | 36 |  36 |  36 |  68 |  68 | 132 |  260 |

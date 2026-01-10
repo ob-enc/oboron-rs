@@ -12,24 +12,23 @@ pub enum Error {
     // ---------------
     #[error("invalid hex encoding")]
     InvalidHex,
-
     #[error("invalid base64 encoding")]
-    InvalidBase64,
-
+    InvalidB64,
     #[error("invalid base32rfc encoding")]
-    InvalidBase32Rfc,
-
+    InvalidB32,
     #[error("invalid base32crockford encoding")]
-    InvalidBase32Crockford,
+    InvalidC32,
+    #[error("invalid UTF-8")]
+    InvalidUtf8,
 
     // Format/scheme errors
     // --------------------
     #[error("invalid format string")]
     InvalidFormat,
-
+    #[error("invalid scheme")]
+    InvalidScheme,
     #[error("unknown scheme")]
     UnknownScheme,
-
     #[error("unknown encoding")]
     UnknownEncoding,
 
@@ -37,13 +36,10 @@ pub enum Error {
     // -----------------
     #[error("enc failed")]
     EncryptionFailed,
-
     #[error("enc failed: empty plaintext")]
     EmptyPlaintext,
-
     #[error("dec failed: empty payload")]
     EmptyPayload,
-
     #[error("dec failed: payload too short")]
     PayloadTooShort,
 
@@ -51,16 +47,13 @@ pub enum Error {
     // -----------------
     #[error("decryption failed")]
     DecryptionFailed,
-
     #[error("invalid block length")]
     InvalidBlockLength,
-
-    #[error("decoding failed: scheme byte mismatch")]
-    SchemeByteMismatch,
-
-    #[cfg(feature = "ob00")]
-    #[error("ob00 fallback produced invalid output (likely encoding mismatch)")]
-    InvalidOb00Output,
+    #[error("decoding failed: scheme marker mismatch")]
+    SchemeMarkerMismatch,
+    #[cfg(feature = "legacy")]
+    #[error("legacy fallback produced invalid output (likely encoding mismatch)")]
+    InvalidLegacyOutput,
 }
 
 impl From<hex::FromHexError> for Error {

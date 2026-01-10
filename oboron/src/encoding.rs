@@ -5,29 +5,29 @@ use crate::error::Error;
 /// Encoding identifier for text representation.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Encoding {
-    Base32Rfc,
-    Base32Crockford,
-    Base64,
+    B32,
+    C32,
+    B64,
     Hex,
 }
 
 impl Encoding {
     /// Convert encoding to string representation.
-    pub fn as_str(&self) -> &'static str {
+    pub fn as_long_str(&self) -> &'static str {
         match self {
-            Encoding::Base32Crockford => "base32crockford",
-            Encoding::Base32Rfc => "base32rfc",
-            Encoding::Base64 => "base64",
+            Encoding::C32 => "base32crockford",
+            Encoding::B32 => "base32rfc",
+            Encoding::B64 => "base64",
             Encoding::Hex => "hex",
         }
     }
 
     /// Convert encoding to abbreviated string representation (for format strings).
-    pub fn as_short_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &'static str {
         match self {
-            Encoding::Base32Crockford => "c32",
-            Encoding::Base32Rfc => "b32",
-            Encoding::Base64 => "b64",
+            Encoding::C32 => "c32",
+            Encoding::B32 => "b32",
+            Encoding::B64 => "b64",
             Encoding::Hex => "hex",
         }
     }
@@ -43,15 +43,14 @@ impl std::str::FromStr for Encoding {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.to_lowercase().as_str() {
-            // Full names
-            "base32crockford" => Ok(Encoding::Base32Crockford),
-            "base32rfc" => Ok(Encoding::Base32Rfc),
-            "base64" => Ok(Encoding::Base64),
+            "b32" => Ok(Encoding::B32),
+            "c32" => Ok(Encoding::C32),
+            "b64" => Ok(Encoding::B64),
             "hex" => Ok(Encoding::Hex),
-            // Abbreviations (for format strings)
-            "b32" => Ok(Encoding::Base32Rfc),
-            "c32" => Ok(Encoding::Base32Crockford),
-            "b64" => Ok(Encoding::Base64),
+            // Long names
+            "base32crockford" => Ok(Encoding::C32),
+            "base32rfc" => Ok(Encoding::B32),
+            "base64" => Ok(Encoding::B64),
             _ => Err(Error::UnknownEncoding),
         }
     }

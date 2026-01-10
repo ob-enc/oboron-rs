@@ -1,6 +1,7 @@
-#![cfg(feature = "ob00")]
+#![cfg(feature = "legacy")]
 
-use oboron::{Ob00, Ob00Base32Rfc, Ob00Base64, Ob00Hex, Oboron};
+use oboron::ztier::{LegacyB32, LegacyB64, LegacyC32, LegacyHex, Obz};
+use oboron::ObtextCodec;
 use serde::Deserialize;
 use std::fs;
 use std::path::PathBuf;
@@ -24,7 +25,7 @@ fn load_test_vectors() -> Vec<TestVector> {
 
     for path in &possible_paths {
         if path.exists() {
-            println!("Found ob00 test vectors at: {:?}", path);
+            println!("Found legacy test vectors at: {:?}", path);
             let data = fs::read_to_string(path).expect("Failed to read legacy-test-vectors.jsonl");
             return data
                 .lines()
@@ -34,21 +35,21 @@ fn load_test_vectors() -> Vec<TestVector> {
         }
     }
 
-    panic!("test-vectors_ob00.jsonl not found");
+    panic!("legacy-test-vectors.jsonl not found");
 }
 
-fn get_ob_for_format(format: &str) -> Box<dyn Oboron> {
+fn get_obz_for_format(format: &str) -> Box<dyn ObtextCodec> {
     match format {
-        "ob00:base32crockford" | "ob00:c32" => Box::new(Ob00::new_keyless().unwrap()),
-        "ob00:base32rfc" | "ob00:b32" => Box::new(Ob00Base32Rfc::new_keyless().unwrap()),
-        "ob00:base64" | "ob00:b64" => Box::new(Ob00Base64::new_keyless().unwrap()),
-        "ob00:hex" => Box::new(Ob00Hex::new_keyless().unwrap()),
-        _ => panic!("Unsupported ob00 format: {}", format),
+        "legacy:base32crockford" | "legacy.c32" => Box::new(LegacyC32::new_keyless().unwrap()),
+        "legacy:base32rfc" | "legacy.b32" => Box::new(LegacyB32::new_keyless().unwrap()),
+        "legacy:base64" | "legacy.b64" => Box::new(LegacyB64::new_keyless().unwrap()),
+        "legacy.hex" => Box::new(LegacyHex::new_keyless().unwrap()),
+        _ => panic!("Unsupported legacy format: {}", format),
     }
 }
 #[test]
-fn test_ob00_vectors() {
-    println!("Starting test_ob00_vectors");
+fn test_legacy_vectors() {
+    println!("Starting test_legacy_vectors");
 
     let vectors = match std::panic::catch_unwind(|| load_test_vectors()) {
         Ok(v) => {
@@ -64,16 +65,16 @@ fn test_ob00_vectors() {
     for (index, vector) in vectors.iter().enumerate() {
         println!("Testing vector {}: format={}", index, vector.format);
 
-        let ob = match std::panic::catch_unwind(|| get_ob_for_format(&vector.format)) {
+        let obz = match std::panic::catch_unwind(|| get_obz_for_format(&vector.format)) {
             Ok(c) => c,
             Err(_) => {
-                println!("Panic while creating ob at vector {}", index);
-                panic!("Failed to create ob at vector {}", index);
+                println!("Panic while creating obz at vector {}", index);
+                panic!("Failed to create obz at vector {}", index);
             }
         };
 
         // Test encoding
-        let ot = match ob.enc(&vector.plaintext) {
+        let ot = match obz.enc(&vector.plaintext) {
             Ok(e) => e,
             Err(e) => {
                 println!("Failed to enc at vector {}: {}", index, e);
@@ -87,10 +88,10 @@ fn test_ob00_vectors() {
         }
 
         // Test strict decoding
-        let pt2 = match ob.dec_strict(&vector.obtext) {
+        let pt2 = match obz.dec(&vector.obtext) {
             Ok(d) => d,
             Err(e) => {
-                println!("Failed to dec_strict at vector {}: {}", index, e);
+                println!("Failed to dec at vector {}: {}", index, e);
                 continue;
             }
         };
@@ -100,10 +101,13 @@ fn test_ob00_vectors() {
             continue;
         }
 
+        // Change the code to use Obz instead of Box<dyn ObtextCodec>
         // Test autodetection
-        let autodetected = match ob.dec(&vector.obtext) {
-            Ok(a) => a,
+        let obz1 = Obz::new_keyless(&format!("{}", obz.format())).unwrap();
+        let autodetected = match obz1.autodec(&vector.obtext) {
+            Ok(pt) => pt,
             Err(e) => {
+                eprintln!("Autodetection failed:  {}", e);
                 println!("Failed to autodetect at vector {}: {}", index, e);
                 println!("Obtext was: '{}'", vector.obtext);
                 continue;

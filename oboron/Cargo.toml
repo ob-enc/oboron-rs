@@ -1,6 +1,6 @@
 [package]
 name = "oboron"
-version = "0.3.0"
+version = "1.0.0-rc.1"
 edition = "2021"
 rust-version = "1.77.0"
 license = "MIT"
@@ -18,8 +18,11 @@ default = ["std"]
 # Core configurations
 # ===================
 std = ["secure-schemes"]
-secure-min = ["ob32"]  # Minimum secure setup
-full = ["all-schemes", "all-alt-keys", "keyless", "legacy", "non-crypto"]
+secure-min = ["aasv"]  # Minimum secure setup
+full = ["secure-schemes", "zrbcx", "all-alt-keys", "keyless", "legacy", "mock", "zmock", "convenience"]
+
+
+ztier = []  # Z-tier infrastructure
 
 dev = ["full"]  # Development setup
 
@@ -33,47 +36,38 @@ keyless = []  # Hardcoded key methods (dev/testing only)
 
 # Algorithm family groups (BINARY SIZE OPTIMIZATION)
 # ==================================================
-all-cbc-schemes = ["ob01", "ob21p"]  # Shares AES+CBC deps
-all-gcm-schemes = ["ob31", "ob31p"]  # Shares AES-GCM-SIV deps  
-all-siv-schemes = ["ob32", "ob32p"]  # Shares AES-SIV deps
+all-cbc-schemes = ["zrbcx", "upbc"]  # Shares AES+CBC deps
+all-gcm-schemes = ["aags", "apgs"]  # Shares AES-GCM-SIV deps  
+all-siv-schemes = ["aasv", "apsv"]  # Shares AES-SIV deps
 
 # Individual schemes
 # ==================
-ob01 = ["aes", "cipher", "cbc"]
-ob21p = ["aes", "cipher", "cbc"]
-ob31 = ["aes-gcm-siv"]
-ob31p = ["aes-gcm-siv"]
-ob32 = ["aes-siv"]
-ob32p = ["aes-siv"]
+zrbcx = ["aes", "cipher", "cbc", "keyless", "ztier"]
+upbc = ["aes", "cipher", "cbc"]
+aags = ["aes-gcm-siv"]
+apgs = ["aes-gcm-siv"]
+aasv = ["aes-siv"]
+apsv = ["aes-siv"]
 # Testing only
-ob70 = []  # identity, non-crypto
-ob71 = []  # string reversal, non-crypto
+mock = []
+zmock = ["ztier"]
 # Legacy
-ob00 = ["aes", "cipher", "cbc"]  # backward compatibility
+legacy = ["aes", "cipher", "cbc", "ztier"]  # backward compatibility
 
-# Unsafe performance enhacement
-# =============================
-unchecked-utf8 = []
+# Misc features
+# =============
+convenience = [] # Convenience functions
+experimental = [] # Experimental algorithms
+unchecked-utf8 = [] # Unsafe performance enhacement
 
 # Scheme categories
 # =================
-ob0x = ["ob01"] # insecure, not authenticated
-ob1x = []  # insecure, authenticated
-ob2x = ["ob21p"]  # secure, not authenticated
-ob3x = ["ob31", "ob31p", "ob32", "ob32p"]  # secure, authenticated
-ob7x = ["ob70", "ob71"]  # testing
-insecure-schemes = ["ob0x", "ob1x"]
-secure-schemes = ["ob2x", "ob3x"]
-authenticated-schemes = ["ob3x"]
-deterministic-schemes = ["ob01", "ob31", "ob32"]
-probabilistic-schemes = ["ob21p", "ob31p", "ob32p"]
-all-schemes = ["ob0x", "ob1x", "ob2x", "ob3x"]
+atier = ["aags", "apgs", "aasv", "apsv"]  # secure, authenticated
+utier = ["upbc"]  # secure, not authenticated
 
-# Special purpose groups
-# ======================
-non-crypto = ["ob70", "ob71"]
-legacy = ["ob00"]  # For backward compatibility only -> use ob01 instead
-experimental = []  # Experimental algorithms
+secure-schemes = ["atier", "utier"]
+deterministic-schemes = ["aags", "aasv"]
+probabilistic-schemes = ["upbc", "apgs", "apsv"]
 
 [dependencies]
 # Always needed
@@ -108,6 +102,10 @@ crate-type = ["rlib"]  # Standard Rust library crate (WASM compatible)
 name = "keygen"
 path = "src/bin/keygen.rs"
 
+[[bin]]
+name = "secretgen"
+path = "src/bin/secretgen.rs"
+
 [dev-dependencies]
 oboron = { path = ".", features = ["dev"]}
 criterion = { version = "0.5", features = ["html_reports"] }
@@ -117,9 +115,17 @@ serde_json = "1.0"
 sha2 = "0.10"
 jsonwebtoken = "9.3"
 
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+
+[profile.bench]
+inherits = "release"
+
 [[test]]
-name = "test_ob70"
-path = "tests/test_ob70.rs"
+name = "test_mock1"
+path = "tests/test_mock1.rs"
 harness = true
 
 [[test]]
@@ -127,132 +133,128 @@ name = "integration_test"
 path = "tests/integration_tests.rs"
 harness = true
 
-# [[bench]]
-# name = "obstatic"
-# harness = false
-
-[[bench]]
-name = "obflex"
-harness = false
-
 [[bench]]
 name = "ob"
 harness = false
 
 [[bench]]
-name = "obmulti"
+name = "obz"
 harness = false
 
 [[bench]]
-name = "ob01"
+name = "omnib"
 harness = false
 
 [[bench]]
-name = "ob01_b32"
+name = "zrbcx_c32"
 harness = false
 
 [[bench]]
-name = "ob01_b64"
+name = "zrbcx_b32"
 harness = false
 
 [[bench]]
-name = "ob01_hex"
+name = "zrbcx_b64"
 harness = false
 
 [[bench]]
-name = "ob21p"
+name = "zrbcx_hex"
 harness = false
 
 [[bench]]
-name = "ob21p_b32"
+name = "upbc_c32"
 harness = false
 
 [[bench]]
-name = "ob21p_b64"
+name = "upbc_b32"
 harness = false
 
 [[bench]]
-name = "ob21p_hex"
+name = "upbc_b64"
 harness = false
 
 [[bench]]
-name = "ob31"
+name = "upbc_hex"
 harness = false
 
 [[bench]]
-name = "ob31_b32"
+name = "aags_c32"
 harness = false
 
 [[bench]]
-name = "ob31_b64"
+name = "aags_b32"
 harness = false
 
 [[bench]]
-name = "ob31_hex"
+name = "aags_b64"
 harness = false
 
 [[bench]]
-name = "ob31p"
+name = "aags_hex"
 harness = false
 
 [[bench]]
-name = "ob31p_b32"
+name = "apgs_c32"
 harness = false
 
 [[bench]]
-name = "ob31p_b64"
+name = "apgs_b32"
 harness = false
 
 [[bench]]
-name = "ob31p_hex"
+name = "apgs_b64"
 harness = false
 
 [[bench]]
-name = "ob32"
+name = "apgs_hex"
 harness = false
 
 [[bench]]
-name = "ob32_b32"
+name = "aasv_c32"
 harness = false
 
 [[bench]]
-name = "ob32_b64"
+name = "aasv_b32"
 harness = false
 
 [[bench]]
-name = "ob32_hex"
+name = "aasv_b64"
 harness = false
 
 [[bench]]
-name = "ob32p"
+name = "aasv_hex"
 harness = false
 
 [[bench]]
-name = "ob32p_b32"
+name = "apsv_c32"
 harness = false
 
 [[bench]]
-name = "ob32p_b64"
+name = "apsv_b32"
 harness = false
 
 [[bench]]
-name = "ob32p_hex"
+name = "apsv_b64"
 harness = false
 
 [[bench]]
-name = "ob00"
+name = "apsv_hex"
 harness = false
 
 [[bench]]
-name = "ob00_b32"
+name = "legacy_c32"
 harness = false
 
 [[bench]]
-name = "ob00_b64"
+name = "legacy_b32"
 harness = false
 
 [[bench]]
-name = "ob00_hex"
+name = "legacy_b64"
+harness = false
+
+[[bench]]
+name = "legacy_hex"
 harness = false
 
 [[bench]]
