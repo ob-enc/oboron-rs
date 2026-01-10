@@ -4,13 +4,38 @@ build-backend = "maturin"
 
 [project]
 name = "oboron"
+dynamic = ["version"]
 requires-python = ">=3.8"
+description = "Python bindings for Oboron - general purpose encryption and encoding library"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [
+    { name = "Bojan Đuričković" }
+]
+keywords = ["python", "encryption", "obfuscation", "encoding", "base32"]
 classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Programming Language :: Rust",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
+    "Topic :: Security :: Cryptography",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
 ]
-dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://www.oboron.org/"
+Repository = "https://github.com/grkteam/oboron-rs"
+Documentation = "https://www.oboron.org/"
 
 [tool.maturin]
 python-source = "python"
