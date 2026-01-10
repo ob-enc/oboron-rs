@@ -2,6 +2,14 @@
 name = "oboron-py"
 version = "0.1.0"
 edition = "2021"
+rust-version = "1.77.0"
+authors = ["Bojan Đuričković"]
+license = "MIT"
+repository = "https://github.com/ob-enc/oboron-rs"
+description = "Python bindings for Oboron - general purpose encryption and encoding library"
+keywords = ["python", "encryption", "obfuscation", "encoding", "base32"]
+categories = ["cryptography", "api-bindings"]
+readme = "README.md"
 
 [lib]
 name = "_oboron"
