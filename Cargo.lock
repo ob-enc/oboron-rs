@@ -760,7 +760,7 @@ dependencies = [
 
 [[package]]
 name = "oboron"
-version = "1.0.0-rc.1"
+version = "0.4.0"
 dependencies = [
  "aes",
  "aes-gcm-siv",
@@ -804,7 +804,7 @@ dependencies = [
 
 [[package]]
 name = "oboron-py"
-version = "1.0.0-rc.1"
+version = "0.1.0"
 dependencies = [
  "hex",
  "oboron",
