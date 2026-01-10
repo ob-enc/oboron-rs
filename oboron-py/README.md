@@ -1,9 +1,9 @@
 # Oboron
 
+[![PyPI](https://img.shields.io/pypi/v/oboron)](https://pypi.org/project/oboron/)
+[![Python Versions](https://img.shields.io/pypi/pyversions/oboron)](https://pypi.org/project/oboron/)
 [![Crates.io](https://img.shields.io/crates/v/oboron-py.svg)](https://crates.io/crates/oboron-py)
-[![Documentation](https://docs.rs/oboron-py/badge.svg)](https://docs.rs/oboron-py)
 [![License:  MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![MSRV](https://img.shields.io/badge/MSRV-1.77-blue.svg)](https://blog.rust-lang.org/2023/11/16/Rust-1.77.0.html)
 
 Oboron is a general-purpose symmetric encryption library focused on
 developer ergonomics:
