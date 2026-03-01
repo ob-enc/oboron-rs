@@ -122,6 +122,10 @@ macro_rules! impl_codec_class {
             fn key_bytes(&self, py: Python) -> PyResult<Py<PyBytes>> {
                 Ok(PyBytes::new_bound(py, self.inner.key_bytes()).into())
             }
+
+            fn __repr__(&self) -> String {
+                format!("{}(format='{}')", stringify!($py_name), self.inner.format())
+            }
         }
     };
 }
@@ -140,14 +144,14 @@ macro_rules! impl_zcodec_class {
             /// Create a new codec instance.
             ///
             /// Args:
-            ///     key:     43-character base64 string secret (256 bits).  Required if keyless=False.
+            ///     secret:  43-character base64 string secret (256 bits).  Required if keyless=False.
             ///     keyless: If True, uses the hardcoded secret (testing only, NOT SECURE).
             ///
             /// Returns:
             ///     A new codec instance.
             ///
             /// Raises:
-            ///     ValueError: If key is invalid or both key and keyless are provided.
+            ///     ValueError: If secret is invalid or both secret and keyless are provided.
             #[new]
             #[pyo3(signature = (secret=None, keyless=false))]
             fn new(secret: Option<String>, keyless: bool) -> PyResult<Self> {
@@ -234,7 +238,7 @@ macro_rules! impl_zcodec_class {
                 self.inner.secret()
             }
 
-            /// Get the secret as bytes used by this instance.
+            /// Get the secret as a hex string used by this instance.
             #[getter]
             fn secret_hex(&self) -> String {
                 self.inner.secret_hex()
@@ -244,6 +248,10 @@ macro_rules! impl_zcodec_class {
             #[getter]
             fn secret_bytes(&self, py: Python) -> PyResult<Py<PyBytes>> {
                 Ok(PyBytes::new_bound(py, self.inner.secret_bytes()).into())
+            }
+
+            fn __repr__(&self) -> String {
+                format!("{}(format='{}')", stringify!($py_name), self.inner.format())
             }
         }
     };
@@ -671,6 +679,10 @@ impl Ob {
             .set_encoding(encoding_enum)
             .map_err(|e| PyValueError::new_err(format!("Failed to set encoding: {}", e)))
     }
+
+    fn __repr__(&self) -> String {
+        format!("Ob(format='{}')", self.inner.format())
+    }
 }
 
 /// Omnib - Multi-format codec with full autodetection.
@@ -720,7 +732,7 @@ impl Omnib {
         Ok(Self { inner })
     }
 
-    /// Ecrypt+encode a plaintext string with a specific format.
+    /// Encrypt+encode a plaintext string with a specific format.
     ///
     /// Args:
     ///     plaintext: The plaintext string to encrypt+encode.
@@ -786,6 +798,10 @@ impl Omnib {
     #[getter]
     fn key_bytes(&self, py: Python) -> PyResult<Py<PyBytes>> {
         Ok(PyBytes::new_bound(py, self.inner.key_bytes()).into())
+    }
+
+    fn __repr__(&self) -> String {
+        "Omnib()".to_string()
     }
 }
 
@@ -964,6 +980,10 @@ impl Obz {
             .set_encoding(encoding_enum)
             .map_err(|e| PyValueError::new_err(format!("Failed to set encoding: {}", e)))
     }
+
+    fn __repr__(&self) -> String {
+        format!("Obz(format='{}')", self.inner.format())
+    }
 }
 
 // Z-tier schemes - Omnibz
@@ -1012,7 +1032,7 @@ impl Omnibz {
         Ok(Self { inner })
     }
 
-    /// Ecrypt+encode a plaintext string with a specific format.
+    /// Encrypt+encode a plaintext string with a specific format.
     ///
     /// Args:
     ///     plaintext: The plaintext string to encrypt+encode.
@@ -1072,9 +1092,13 @@ impl Omnibz {
         self.inner.secret_hex()
     }
 
-    /// Get the key as bytes used by this instance.
+    /// Get the secret as bytes used by this instance.
     fn secret_bytes(&self, py: Python) -> PyResult<Py<PyBytes>> {
         Ok(PyBytes::new_bound(py, self.inner.secret_bytes()).into())
+    }
+
+    fn __repr__(&self) -> String {
+        "Omnibz()".to_string()
     }
 }
 
