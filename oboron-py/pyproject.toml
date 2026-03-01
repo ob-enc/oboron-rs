@@ -34,7 +34,7 @@ classifiers = [
 
 [project.urls]
 Homepage = "https://www.oboron.org/"
-Repository = "https://github.com/grkteam/oboron-rs"
+Repository = "https://github.com/ob-enc/oboron-rs"
 Documentation = "https://www.oboron.org/"
 
 [tool.maturin]

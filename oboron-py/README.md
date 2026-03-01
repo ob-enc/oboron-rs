@@ -60,7 +60,7 @@ Generate your 512-bit key (86 base64 characters) using the keygen script:
 python -m oboron.keygen
 ```
 or in your code:
-```rust
+```python
 key = oboron.generate_key()
 ```
 then save the key as an environment variable.
@@ -440,7 +440,7 @@ Choose `ob:aasv` when:
 - Cryptographic security with compact output is needed (~34-47 chars)
 - Deterministic behavior is beneficial (lookup keys, caching)
 
-Choose ob:apsv` when:
+Choose `ob:apsv` when:
 - Cryptographic security with maximum privacy is required (~60-72 chars)
 - Hiding plaintext relationships is critical
 
@@ -498,7 +498,7 @@ assert pt2 == "hello"
 ob.set_encoding("c32")  # switch format to aasv.c32
 ob.enc("hello")  # now aasv.c32-encoded obtext
 
-ob.set_scheme("aags")  # switch wormat to aags.c32
+ob.set_scheme("aags")  # switch format to aags.c32
 ob.enc("hello")  # now aags.c32-encoded obtext
 
 ob.set_format("upbc.b64")
