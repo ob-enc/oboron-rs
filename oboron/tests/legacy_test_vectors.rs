@@ -1,6 +1,6 @@
 #![cfg(feature = "legacy")]
 
-use oboron::ztier::{LegacyB32, LegacyB64, LegacyC32, LegacyHex, Obz};
+use oboron::ztier::{Legacy, Obz};
 use oboron::ObtextCodec;
 use serde::Deserialize;
 use std::fs;
@@ -38,13 +38,10 @@ fn load_test_vectors() -> Vec<TestVector> {
     panic!("legacy-test-vectors.jsonl not found");
 }
 
-fn get_obz_for_format(format: &str) -> Box<dyn ObtextCodec> {
+fn get_obz_for_format(format: &str) -> Option<Box<dyn ObtextCodec>> {
     match format {
-        "legacy:base32crockford" | "legacy.c32" => Box::new(LegacyC32::new_keyless().unwrap()),
-        "legacy:base32rfc" | "legacy.b32" => Box::new(LegacyB32::new_keyless().unwrap()),
-        "legacy:base64" | "legacy.b64" => Box::new(LegacyB64::new_keyless().unwrap()),
-        "legacy.hex" => Box::new(LegacyHex::new_keyless().unwrap()),
-        _ => panic!("Unsupported legacy format: {}", format),
+        "legacy:base32rfc" | "legacy.b32" => Some(Box::new(Legacy::new_keyless().unwrap())),
+        _ => None,
     }
 }
 #[test]
@@ -65,11 +62,11 @@ fn test_legacy_vectors() {
     for (index, vector) in vectors.iter().enumerate() {
         println!("Testing vector {}: format={}", index, vector.format);
 
-        let obz = match std::panic::catch_unwind(|| get_obz_for_format(&vector.format)) {
-            Ok(c) => c,
-            Err(_) => {
-                println!("Panic while creating obz at vector {}", index);
-                panic!("Failed to create obz at vector {}", index);
+        let obz = match get_obz_for_format(&vector.format) {
+            Some(c) => c,
+            None => {
+                println!("Skipping unsupported format at vector {}: {}", index, vector.format);
+                continue;
             }
         };
 

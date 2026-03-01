@@ -40,4 +40,4 @@ pub(crate) use zmock1::{decrypt_zmock1, encrypt_zmock1};
 pub(crate) use zrbcx::{decrypt_zrbcx, encrypt_zrbcx};
 
 #[cfg(feature = "legacy")]
-pub use legacy::{LegacyB32, LegacyB64, LegacyC32, LegacyHex};
+pub use legacy::Legacy;

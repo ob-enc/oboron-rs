@@ -75,11 +75,8 @@ ZtierBase.register(_oboron.ZrbcxB32)
 ZtierBase.register(_oboron.ZrbcxB64)
 ZtierBase.register(_oboron.ZrbcxHex)
 
-# Legacy variants
-ZtierBase.register(_oboron.LegacyC32)
-ZtierBase.register(_oboron.LegacyB32)
-ZtierBase.register(_oboron.LegacyB64)
-ZtierBase.register(_oboron.LegacyHex)
+# Legacy variant
+ZtierBase.register(_oboron.Legacy)
 
 # Zmock1 variants
 ZtierBase.register(_oboron.Zmock1C32)
@@ -105,11 +102,8 @@ ZrbcxB32 = _oboron.ZrbcxB32
 ZrbcxB64 = _oboron.ZrbcxB64
 ZrbcxHex = _oboron.ZrbcxHex
 
-# Legacy variants
-LegacyC32 = _oboron.LegacyC32
-LegacyB32 = _oboron.LegacyB32
-LegacyB64 = _oboron.LegacyB64
-LegacyHex = _oboron.LegacyHex
+# Legacy variant
+Legacy = _oboron.Legacy
 
 # Zmock1 (testing)
 Zmock1C32 = _oboron.Zmock1C32
@@ -134,10 +128,7 @@ __all__ = [
     'ZrbcxHex',
 
     # Legacy
-    'LegacyC32',
-    'LegacyB32',
-    'LegacyB64',
-    'LegacyHex',
+    'Legacy',
 
     # Zmock1
     'Zmock1C32',

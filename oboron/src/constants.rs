@@ -172,10 +172,7 @@ pub(crate) mod zmock_constants {
 
 #[cfg(feature = "legacy")]
 pub(crate) mod legacy_constants {
-    pub const LEGACY_C32_STR: &str = "legacy.c32";
     pub const LEGACY_B32_STR: &str = "legacy.b32";
-    pub const LEGACY_HEX_STR: &str = "legacy.hex";
-    pub const LEGACY_B64_STR: &str = "legacy.b64";
 }
 
 #[cfg(test)]

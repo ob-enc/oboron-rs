@@ -1,5 +1,5 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use oboron::ztier::LegacyB32;
+use oboron::ztier::Legacy;
 use serde::Deserialize;
 use std::fs;
 use std::path::PathBuf;
@@ -60,7 +60,7 @@ fn run_legacy_b32_benchmarks(c: &mut Criterion) {
     }
 
     // Create ob once, OUTSIDE the timed loop
-    let ob = LegacyB32::new_keyless().unwrap();
+    let ob = Legacy::new_keyless().unwrap();
 
     let mut bench_count = 0;
     for spec in specs {

@@ -139,7 +139,7 @@ impl Obz {
     /// # use oboron::{Format, Scheme, Encoding};
     /// # let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
     /// let mut obz = Obz::new("zrbcx.c32", secret)?;
-    /// obz.set_format("legacy.b64")?; // switch using string
+    /// obz.set_format("legacy.b32")?; // switch using string
     /// obz.set_format(Format::new(Scheme::Zrbcx, Encoding::Hex))?; // switch using Format
     /// # }
     /// # Ok(())

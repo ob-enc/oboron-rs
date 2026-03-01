@@ -83,10 +83,7 @@ pub(crate) mod apsv_formats {
 #[cfg(feature = "legacy")]
 pub(crate) mod legacy_formats {
     use super::{Encoding, Format, Scheme};
-    pub const LEGACY_C32: Format = Format::new(Scheme::Legacy, Encoding::C32);
     pub const LEGACY_B32: Format = Format::new(Scheme::Legacy, Encoding::B32);
-    pub const LEGACY_B64: Format = Format::new(Scheme::Legacy, Encoding::B64);
-    pub const LEGACY_HEX: Format = Format::new(Scheme::Legacy, Encoding::Hex);
 }
 
 #[cfg(feature = "mock")]
@@ -206,13 +203,7 @@ impl Format {
 
             // legacy variants
             #[cfg(feature = "legacy")]
-            crate::LEGACY_C32_STR => legacy_formats::LEGACY_C32,
-            #[cfg(feature = "legacy")]
             crate::LEGACY_B32_STR => legacy_formats::LEGACY_B32,
-            #[cfg(feature = "legacy")]
-            crate::LEGACY_B64_STR => legacy_formats::LEGACY_B64,
-            #[cfg(feature = "legacy")]
-            crate::LEGACY_HEX_STR => legacy_formats::LEGACY_HEX,
 
             _ => return Err(Error::InvalidFormat),
         })
@@ -316,6 +307,12 @@ mod tests {
 
         for scheme in &schemes {
             for encoding in &encodings {
+                // Legacy only supports B32
+                #[cfg(feature = "legacy")]
+                if *scheme == Scheme::Legacy && *encoding != Encoding::B32 {
+                    continue;
+                }
+
                 // Test short string identifiers (e.g., "zrbcx.c32", "zrbcx.b32")
                 let format_str = format!("{}.{}", scheme.as_str(), encoding.as_str());
                 let result = Format::from_str(&format_str);
@@ -364,10 +361,7 @@ mod tests {
 
         #[cfg(feature = "legacy")]
         test_cases.extend(vec![
-            (Scheme::Legacy, Encoding::C32, "legacy.c32"),
             (Scheme::Legacy, Encoding::B32, "legacy.b32"),
-            (Scheme::Legacy, Encoding::B64, "legacy.b64"),
-            (Scheme::Legacy, Encoding::Hex, "legacy.hex"),
         ]);
 
         #[cfg(feature = "zrbcx")]
@@ -447,15 +441,11 @@ mod tests {
 
     #[test]
     #[cfg(feature = "legacy")]
-    fn test_legacy_supports_both_base32_variants() {
-        // legacy should support both B32 and C32
+    fn test_legacy_b32_format() {
+        // legacy should support B32
         let format_rfc = Format::from_str("legacy.b32").unwrap();
         assert_eq!(format_rfc.scheme(), Scheme::Legacy);
         assert_eq!(format_rfc.encoding(), Encoding::B32);
-
-        let format_crock = Format::from_str("legacy.c32").unwrap();
-        assert_eq!(format_crock.scheme(), Scheme::Legacy);
-        assert_eq!(format_crock.encoding(), Encoding::C32);
     }
 
     #[test]

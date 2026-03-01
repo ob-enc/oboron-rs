@@ -14,8 +14,6 @@ use crate::{constants::ZRBCX_MARKER, decrypt_zrbcx};
 
 #[cfg(feature = "legacy")]
 use super::legacy::decrypt_legacy;
-#[cfg(feature = "legacy")]
-use crate::{Format, Scheme};
 
 /// Decode the given encoding, then decrypt autodetecting the z-tier scheme
 ///
@@ -34,8 +32,7 @@ pub(crate) fn dec_any_scheme_ztier(
             // Decoding failed - try legacy fallback
             #[cfg(feature = "legacy")]
             {
-                let format = Format::new(Scheme::Legacy, encoding);
-                return dec_legacy_fallback(zsecret, obtext, format).or(Err(decode_err));
+                return dec_legacy_fallback(zsecret, obtext).or(Err(decode_err));
             }
             #[cfg(not(feature = "legacy"))]
             return Err(decode_err);
@@ -46,8 +43,7 @@ pub(crate) fn dec_any_scheme_ztier(
         // Payload too short for modern scheme - try legacy
         #[cfg(feature = "legacy")]
         {
-            let format = Format::new(Scheme::Legacy, encoding);
-            return dec_legacy_fallback(zsecret, obtext, format).or(Err(Error::PayloadTooShort));
+            return dec_legacy_fallback(zsecret, obtext).or(Err(Error::PayloadTooShort));
         }
         #[cfg(not(feature = "legacy"))]
         return Err(Error::PayloadTooShort);
@@ -77,8 +73,7 @@ pub(crate) fn dec_any_scheme_ztier(
     // Unknown scheme marker - try legacy as fallback
     #[cfg(feature = "legacy")]
     {
-        let format = Format::new(Scheme::Legacy, encoding);
-        let legacy_result = dec_legacy_fallback(zsecret, obtext, format)?;
+        let legacy_result = dec_legacy_fallback(zsecret, obtext)?;
         // Only validate legacy fallback results to avoid false positives
         validate_legacy_output(&legacy_result)?;
         return Ok(legacy_result);
@@ -104,11 +99,11 @@ fn bytes_to_string(plaintext_bytes: Vec<u8>) -> Result<String, Error> {
 
 /// Helper function to attempt legacy decryption
 #[cfg(feature = "legacy")]
-fn dec_legacy_fallback(zsecret: &ZSecret, obtext: &str, format: Format) -> Result<String, Error> {
+fn dec_legacy_fallback(zsecret: &ZSecret, obtext: &str) -> Result<String, Error> {
     use crate::dec::decode_obtext_to_payload;
 
-    // Decode using the specified encoding
-    let ciphertext = decode_obtext_to_payload(obtext, format.encoding())?;
+    // Decode using lowercase RFC base32 (the only encoding legacy uses)
+    let ciphertext = decode_obtext_to_payload(obtext, Encoding::B32)?;
 
     // Decrypt using legacy scheme
     let plaintext_bytes = decrypt_legacy(zsecret.legacy(), &ciphertext)?;
