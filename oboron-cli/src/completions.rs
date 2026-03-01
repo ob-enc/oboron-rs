@@ -1,4 +1,4 @@
-use clap::{Command, Subcommand};
+use clap::{Arg, Command, Subcommand};
 use clap_complete::{generate, Shell as ClapShell};
 use std::io;
 
@@ -33,31 +33,63 @@ fn build_cli() -> Command {
         .subcommand_required(true)
         .arg_required_else_help(true)
         .subcommands(vec![
-            Command::new("enc").alias("e").about("Encode a string"),
+            Command::new("enc")
+                .visible_alias("e")
+                .about("Encrypt+encode a plaintext string")
+                .arg(Arg::new("text").help("Plaintext string (reads from stdin if not provided)"))
+                .arg(Arg::new("key").short('k').long("key").help("Encryption key (86 base64 chars)").conflicts_with("profile").conflicts_with("keyless"))
+                .arg(Arg::new("profile").short('p').long("profile").help("Use named key profile").conflicts_with("key").conflicts_with("keyless"))
+                .arg(Arg::new("keyless").short('K').long("keyless").action(clap::ArgAction::SetTrue).help("Use hardcoded key (INSECURE - testing only)").conflicts_with("key").conflicts_with("profile"))
+                .arg(Arg::new("format").short('f').long("format").help("Format specification (e.g., \"zrbcx.b64\", \"aags.b32\")")),
             Command::new("dec")
-                .alias("d")
-                .about("Decode an encoded string"),
+                .visible_alias("d")
+                .about("Decode+decrypt an obtext string")
+                .arg(Arg::new("text").help("Obtext string (reads from stdin if not provided)"))
+                .arg(Arg::new("key").short('k').long("key").help("Encryption key (86 base64 chars)").conflicts_with("profile").conflicts_with("keyless"))
+                .arg(Arg::new("profile").short('p').long("profile").help("Use named key profile").conflicts_with("key").conflicts_with("keyless"))
+                .arg(Arg::new("keyless").short('K').long("keyless").action(clap::ArgAction::SetTrue).help("Use hardcoded key (INSECURE - testing only)").conflicts_with("key").conflicts_with("profile"))
+                .arg(Arg::new("format").short('f').long("format").help("Format specification (e.g., \"zrbcx.b64\", \"aags.b32\")")),
             Command::new("init")
-                .alias("i")
-                .about("Initialize configuration with random profile"),
+                .visible_alias("i")
+                .about("Initialize configuration with random profile")
+                .arg(Arg::new("name").default_value("default").help("Name for the key profile")),
             Command::new("config")
-                .alias("c")
+                .visible_alias("c")
                 .about("Manage configuration")
+                .arg(Arg::new("keyless").short('K').long("keyless").action(clap::ArgAction::SetTrue).help("Use hardcoded key (INSECURE - testing only)"))
                 .subcommands(vec![
                     Command::new("show").about("Show current configuration"),
-                    Command::new("set").about("Set configuration values"),
+                    Command::new("set")
+                        .about("Set configuration values")
+                        .arg(Arg::new("profile").short('p').long("profile").help("Set default key profile")),
                 ]),
             Command::new("profile")
-                .alias("k")
+                .visible_alias("p")
                 .about("Manage key profiles")
                 .subcommands(vec![
-                    Command::new("list").about("List all key profiles"),
-                    Command::new("show").about("Show a specific key profile"),
-                    Command::new("activate").about("Set a profile as the default"),
-                    Command::new("create").about("Create a new key profile"),
-                    Command::new("delete").about("Delete a key profile"),
-                    Command::new("set").about("Set key and IV for a profile"),
+                    Command::new("list").visible_alias("l").about("List all key profiles"),
+                    Command::new("show").visible_alias("g").about("Show a specific key profile")
+                        .arg(Arg::new("name").help("Profile name")),
+                    Command::new("activate").visible_alias("a").about("Set a profile as the default")
+                        .arg(Arg::new("name").required(true).help("Profile name")),
+                    Command::new("create").visible_alias("c").about("Create a new key profile")
+                        .arg(Arg::new("name").required(true).help("Profile name"))
+                        .arg(Arg::new("key").short('k').long("key").help("Encryption key (86 base64 chars)")),
+                    Command::new("delete").visible_alias("d").about("Delete a key profile")
+                        .arg(Arg::new("name").required(true).help("Profile name")),
+                    Command::new("rename").visible_alias("r").about("Rename a key profile")
+                        .arg(Arg::new("old_name").required(true).help("Current profile name"))
+                        .arg(Arg::new("new_name").required(true).help("New profile name")),
+                    Command::new("set").about("Set key for a profile")
+                        .arg(Arg::new("name").required(true).help("Profile name"))
+                        .arg(Arg::new("key").short('k').long("key").help("Encryption key (86 base64 chars)")),
                 ]),
+            Command::new("key")
+                .visible_alias("k")
+                .about("Output the encryption key")
+                .arg(Arg::new("profile").short('p').long("profile").help("Use named key profile"))
+                .arg(Arg::new("keyless").short('K').long("keyless").action(clap::ArgAction::SetTrue).help("Use hardcoded key (INSECURE - testing only)"))
+                .arg(Arg::new("hex").short('x').long("hex").action(clap::ArgAction::SetTrue).help("Output key as hex instead of base64")),
             Command::new("completion")
                 .about("Generate shell completion script")
                 .subcommands(vec![

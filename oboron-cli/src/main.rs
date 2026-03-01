@@ -19,6 +19,7 @@ struct Cli {
 
 #[derive(Args, Debug)]
 struct SchemeFlags {
+    /// Use upbc scheme (probabilistic unauthenticated)
     #[cfg(feature = "upbc")]
     #[arg(short = 'B', long, alias = "21p")]
     upbc: bool,
@@ -230,10 +231,12 @@ impl FormatSpec {
 
         Ok(Self { scheme, encoding })
     }
+}
 
-    /// Convert to format string (e.g., "zrbcx.b64")
-    fn to_string(&self) -> String {
-        format!("{}.{}", self.scheme.as_str(), self.encoding.as_str())
+impl std::fmt::Display for FormatSpec {
+    /// Format as a format string (e.g., "zrbcx.b64")
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}.{}", self.scheme.as_str(), self.encoding.as_str())
     }
 }
 
@@ -246,18 +249,18 @@ enum Commands {
         text: Option<String>,
 
         /// Encryption key (86 base64 chars, for non-ztier schemes)
-        #[arg(short, long)]
+        #[arg(short, long, conflicts_with = "profile", conflicts_with = "keyless")]
         key: Option<String>,
 
         /// Use named key profile
-        #[arg(short, long)]
+        #[arg(short, long, conflicts_with = "key", conflicts_with = "keyless")]
         profile: Option<String>,
 
         /// Use hardcoded key (INSECURE - testing only)
-        #[arg(short = 'K', long)]
+        #[arg(short = 'K', long, conflicts_with = "key", conflicts_with = "profile")]
         keyless: bool,
 
-        /// Format specification (e.g., "zrbcx. b64", "aags.b32")
+        /// Format specification (e.g., "zrbcx.b64", "aags.b32")
         /// Cannot be combined with scheme or encoding flags
         #[arg(short, long)]
         format: Option<String>,
@@ -278,15 +281,15 @@ enum Commands {
         text: Option<String>,
 
         /// Encryption key (86 base64 chars, for non-ztier schemes)
-        #[arg(short, long)]
+        #[arg(short, long, conflicts_with = "profile", conflicts_with = "keyless")]
         key: Option<String>,
 
         /// Use named key profile
-        #[arg(short, long)]
+        #[arg(short, long, conflicts_with = "key", conflicts_with = "keyless")]
         profile: Option<String>,
 
         /// Use hardcoded key (INSECURE - testing only)
-        #[arg(short = 'K', long)]
+        #[arg(short = 'K', long, conflicts_with = "key", conflicts_with = "profile")]
         keyless: bool,
 
         /// Format specification (e.g., "zrbcx.b64", "aags.b32")
@@ -355,11 +358,7 @@ enum Commands {
 #[derive(Subcommand)]
 enum ConfigCommands {
     /// Show current configuration
-    Show {
-        /// Use hardcoded key
-        #[arg(short = 'K', long)]
-        keyless: bool,
-    },
+    Show,
     /// Set configuration values
     Set {
         /// Scheme selection
@@ -447,7 +446,7 @@ fn main() -> Result<()> {
         } => {
             let cfg = config::load_config().ok();
             let format_spec = FormatSpec::parse(format, &scheme, &encoding, cfg.as_ref())?;
-            enc_command(text, key, profile, keyless, format_spec)
+            enc_command(text, key, profile, keyless, format_spec, cfg)
         }
 
         Commands::Dec {
@@ -462,13 +461,13 @@ fn main() -> Result<()> {
             let cfg = config::load_config().ok();
             let scheme_is_explicit = scheme.is_set() || format.is_some();
             let format_spec = FormatSpec::parse(format, &scheme, &encoding, cfg.as_ref())?;
-            dec_command(text, key, profile, keyless, format_spec, scheme_is_explicit)
+            dec_command(text, key, profile, keyless, format_spec, scheme_is_explicit, cfg)
         }
 
         Commands::Init { name } => config::init_command(&name),
 
         Commands::Config { command, keyless } => match command {
-            Some(ConfigCommands::Show { keyless: _ }) | None => {
+            Some(ConfigCommands::Show) | None => {
                 config::config_show_command(keyless)
             }
             Some(ConfigCommands::Set {
@@ -517,12 +516,10 @@ fn enc_command(
     profile: Option<String>,
     keyless: bool,
     format_spec: FormatSpec,
+    cfg: Option<Config>,
 ) -> Result<()> {
     // Get text from argument or stdin
     let text = get_text_input(text)?;
-
-    // Get config for key/secret resolution
-    let cfg = config::load_config().ok();
 
     // Create format
     let format = format_spec.to_string();
@@ -549,12 +546,10 @@ fn dec_command(
     keyless: bool,
     format_spec: FormatSpec,
     scheme_is_explicit: bool,
+    cfg: Option<Config>,
 ) -> Result<()> {
     // Get text from argument or stdin
     let text = get_text_input(text)?;
-
-    // Get config for key/secret resolution
-    let cfg = config::load_config().ok();
 
     // Create format
     let format = format_spec.to_string();
@@ -654,6 +649,8 @@ fn key_command(profile: Option<String>, keyless: bool, hex: bool) -> Result<()> 
                     k.clone()
                 }
             );
+        } else {
+            anyhow::bail!("Profile '{}' has no key", prof);
         }
     } else {
         anyhow::bail!("No key specified:  provide --profile, or run 'ob init'");
@@ -779,7 +776,7 @@ fn validate_secure_scheme(scheme: Scheme) -> Result<()> {
         Scheme::Mock1 => Ok(()),
         #[cfg(feature = "mock")]
         Scheme::Mock2 => Ok(()),
-        _ => Err(anyhow:: anyhow!(
+        _ => Err(anyhow::anyhow!(
             "Invalid secure scheme: {}.  Use ob for secure schemes (aags, aasv, etc.) or obz for z-tier schemes",
             scheme.as_str()
         )),

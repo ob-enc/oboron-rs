@@ -22,14 +22,17 @@ struct Cli {
 
 #[derive(Args, Debug)]
 struct SchemeFlags {
+    /// Use legacy scheme (Base32-based obfuscation)
     #[cfg(feature = "legacy")]
     #[arg(short = 'l', long)]
     legacy: bool,
 
+    /// Use zrbcx scheme (XOR-based obfuscation)
     #[cfg(feature = "zrbcx")]
     #[arg(short = 'b', long)]
     zrbcx: bool,
 
+    /// Use zmock1 scheme (testing, identity)
     #[cfg(feature = "zmock")]
     #[arg(long, hide = true)]
     zmock1: bool,
@@ -82,15 +85,19 @@ impl SchemeFlags {
 
 #[derive(Args, Debug)]
 struct EncodingFlags {
+    /// Use c32 encoding
     #[arg(long, alias = "base32crockford")]
     c32: bool,
 
+    /// Use b32 encoding
     #[arg(long, alias = "base32rfc")]
     b32: bool,
 
+    /// Use b64 encoding
     #[arg(long, alias = "base64")]
     b64: bool,
 
+    /// Use hex encoding
     #[arg(short = 'x', long)]
     hex: bool,
 }
@@ -171,97 +178,128 @@ impl FormatSpec {
 
         Ok(Self { scheme, encoding })
     }
+}
 
-    fn to_string(&self) -> String {
+impl std::fmt::Display for FormatSpec {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         // Use Format::Display so Legacy emits "legacy" (not "legacy.b32")
-        Format::new(self.scheme, self.encoding).to_string()
+        write!(f, "{}", Format::new(self.scheme, self.encoding))
     }
 }
 
 #[derive(Subcommand)]
 enum Commands {
+    /// Encrypt+encode a plaintext string
     #[command(visible_alias = "e")]
     Enc {
+        /// Plaintext string (reads from stdin if not provided)
         text: Option<String>,
 
-        #[arg(short = 's', long)]
+        /// Secret key (43 base64 chars)
+        #[arg(short = 's', long, conflicts_with = "profile", conflicts_with = "keyless")]
         secret: Option<String>,
 
-        #[arg(short, long)]
+        /// Use named secret profile
+        #[arg(short, long, conflicts_with = "secret", conflicts_with = "keyless")]
         profile: Option<String>,
 
-        #[arg(short = 'K', long)]
+        /// Use hardcoded key (INSECURE - testing only)
+        #[arg(short = 'K', long, conflicts_with = "secret", conflicts_with = "profile")]
         keyless: bool,
 
+        /// Format specification (e.g., "zrbcx.b64")
+        /// Cannot be combined with scheme or encoding flags
         #[arg(short, long)]
         format: Option<String>,
 
+        /// Scheme selection
         #[command(flatten)]
         scheme: SchemeFlags,
 
+        /// Encoding selection
         #[command(flatten)]
         encoding: EncodingFlags,
     },
 
+    /// Decode+decrypt an obtext string
     #[command(visible_alias = "d")]
     Dec {
+        /// Obtext string (reads from stdin if not provided)
         text: Option<String>,
 
-        #[arg(short = 's', long)]
+        /// Secret key (43 base64 chars)
+        #[arg(short = 's', long, conflicts_with = "profile", conflicts_with = "keyless")]
         secret: Option<String>,
 
-        #[arg(short, long)]
+        /// Use named secret profile
+        #[arg(short, long, conflicts_with = "secret", conflicts_with = "keyless")]
         profile: Option<String>,
 
-        #[arg(short = 'K', long)]
+        /// Use hardcoded key (INSECURE - testing only)
+        #[arg(short = 'K', long, conflicts_with = "secret", conflicts_with = "profile")]
         keyless: bool,
 
+        /// Format specification (e.g., "zrbcx.b64")
+        /// Cannot be combined with scheme or encoding flags
         #[arg(short, long)]
         format: Option<String>,
 
+        /// Scheme selection
         #[command(flatten)]
         scheme: SchemeFlags,
 
+        /// Encoding selection
         #[command(flatten)]
         encoding: EncodingFlags,
     },
 
+    /// Initialize configuration with random profile
     #[command(visible_alias = "i")]
     Init {
+        /// Name for the secret profile (default: "default")
         #[arg(default_value = "default")]
         name: String,
     },
 
+    /// Manage configuration
     #[command(visible_alias = "c")]
     Config {
         #[command(subcommand)]
         command: Option<ConfigCommands>,
 
+        /// Use hardcoded key (INSECURE - testing only)
         #[arg(short = 'K', long)]
         keyless: bool,
     },
 
+    /// Manage secret profiles
     #[command(visible_alias = "p")]
     Profile {
         #[command(subcommand)]
         command: ProfileCommands,
     },
 
+    /// Output the secret key
     #[command(visible_alias = "s")]
     Secret {
+        /// Secret key (43 base64 chars)
         #[arg(short = 's', long)]
         secret: Option<String>,
 
+        /// Use named secret profile
         #[arg(short, long)]
         profile: Option<String>,
 
+        /// Use hardcoded key (INSECURE - testing only)
         #[arg(short = 'K', long)]
         keyless: bool,
 
+        /// Output secret as hex instead of base64
         #[arg(short = 'x', long)]
         hex: bool,
     },
 
+    /// Generate shell completion script
     Completion {
         #[command(subcommand)]
         shell: obz_completions::Shell,
@@ -270,17 +308,19 @@ enum Commands {
 
 #[derive(Subcommand)]
 enum ConfigCommands {
-    Show {
-        #[arg(short = 'K', long)]
-        keyless: bool,
-    },
+    /// Show current configuration
+    Show,
+    /// Set configuration values
     Set {
+        /// Scheme selection
         #[command(flatten)]
         scheme: SchemeFlags,
 
+        /// Encoding selection
         #[command(flatten)]
         encoding: EncodingFlags,
 
+        /// Set default secret profile
         #[arg(short, long)]
         profile: Option<String>,
     },
@@ -288,35 +328,60 @@ enum ConfigCommands {
 
 #[derive(Subcommand)]
 enum ProfileCommands {
+    /// List all secret profiles
     #[command(visible_alias = "l")]
     List,
 
+    /// Show a specific secret profile
     #[command(visible_alias = "get")]
     #[command(visible_alias = "g")]
-    Show { name: Option<String> },
+    Show {
+        /// Profile name (shows default if not provided)
+        name: Option<String>,
+    },
 
+    /// Set a profile as the default
     #[command(visible_alias = "a")]
     #[command(visible_alias = "use")]
-    Activate { name: String },
+    Activate {
+        /// Profile name
+        name: String,
+    },
 
+    /// Create a new secret profile
     #[command(visible_alias = "c")]
     Create {
+        /// Profile name
         name: String,
 
+        /// Secret key (43 base64 chars)
         #[arg(short = 's', long)]
         secret: Option<String>,
     },
 
+    /// Delete a secret profile
     #[command(visible_alias = "d")]
-    Delete { name: String },
+    Delete {
+        /// Profile name
+        name: String,
+    },
 
+    /// Rename a secret profile
     #[command(visible_alias = "r")]
     #[command(visible_alias = "mv")]
-    Rename { old_name: String, new_name: String },
+    Rename {
+        /// Current profile name
+        old_name: String,
+        /// New profile name
+        new_name: String,
+    },
 
+    /// Set secret for a profile
     Set {
+        /// Profile name
         name: String,
 
+        /// Secret key (43 base64 chars)
         #[arg(short = 's', long)]
         secret: Option<String>,
     },
@@ -337,7 +402,7 @@ fn main() -> Result<()> {
         } => {
             let cfg = obz_config::load_config().ok();
             let format_spec = FormatSpec::parse(format, &scheme, &encoding, cfg.as_ref())?;
-            enc_command(text, secret, profile, keyless, format_spec)
+            enc_command(text, secret, profile, keyless, format_spec, cfg)
         }
 
         Commands::Dec {
@@ -359,13 +424,14 @@ fn main() -> Result<()> {
                 keyless,
                 format_spec,
                 scheme_is_explicit,
+                cfg,
             )
         }
 
         Commands::Init { name } => obz_config::init_command(&name),
 
         Commands::Config { command, keyless } => match command {
-            Some(ConfigCommands::Show { keyless: _ }) | None => {
+            Some(ConfigCommands::Show) | None => {
                 obz_config::config_show_command(keyless)
             }
             Some(ConfigCommands::Set {
@@ -415,9 +481,9 @@ fn enc_command(
     profile: Option<String>,
     keyless: bool,
     format_spec: FormatSpec,
+    cfg: Option<Config>,
 ) -> Result<()> {
     let text = get_text_input(text)?;
-    let cfg = obz_config::load_config().ok();
     let format = format_spec.to_string();
 
     if keyless {
@@ -441,9 +507,9 @@ fn dec_command(
     keyless: bool,
     format_spec: FormatSpec,
     scheme_is_explicit: bool,
+    cfg: Option<Config>,
 ) -> Result<()> {
     let text = get_text_input(text)?;
-    let cfg = obz_config::load_config().ok();
     let format = format_spec.to_string();
 
     if keyless {
@@ -495,9 +561,9 @@ fn config_set_command(
     obz_config::save_config(&config)?;
 
     println!("✓ Configuration updated");
-    println!("  Profile: {}", config.profile);
+    println!("  Profile:  {}", config.profile);
     println!("  Scheme:   {}", config.scheme);
-    println!("  Encoding:  {}", config.encoding);
+    println!("  Encoding: {}", config.encoding);
 
     Ok(())
 }
@@ -554,6 +620,8 @@ fn secret_command(
                     s.clone()
                 }
             );
+        } else {
+            anyhow::bail!("Profile '{}' has no secret", prof);
         }
     } else {
         anyhow::bail!("No secret specified:  provide --secret, --profile, or run 'obz init'");
