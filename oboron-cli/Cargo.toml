@@ -10,6 +10,9 @@ description = "CLI tool for Oboron - general purpose encryption and encoding lib
 keywords = ["cli", "encryption", "obfuscation", "encoding", "base32"]
 categories = ["command-line-utilities", "cryptography"]
 readme = "README.md"
+homepage = "https://github.com/ob-enc/oboron-rs/tree/master/oboron-cli"
+documentation = "https://github.com/ob-enc/oboron-rs/tree/master/oboron-cli"
+exclude = ["tests/", ".github/"]
 
 [features]
 default = ["all-schemes"]
