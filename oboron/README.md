@@ -550,7 +550,7 @@ Available constants:
 - `AASV_C32`, `AASV_B32`, `AASV_B64`, `AASV_HEX`
 - `APSV_C32`, `APSV_B32`, `APSV_B64`, `APSV_HEX`
 - Testing:  `MOCK1_C32`, `MOCK2_B32`, etc.
-- Legacy: `LEGACY_B32`, `LEGACY_C32`, etc.
+- Legacy: `LEGACY`
 
 ### Advanced: `Format` Objects
 

@@ -480,6 +480,10 @@ and concatenates the two in class names, for example:
 - `AagsB64` - encoder for `aags.b64` format
 - `AasvC32` - encoder for `aasv.c32` format.
 
+The `legacy` scheme is a special case: it is a single class `Legacy`
+(not `LegacyB32`, `LegacyC32`, etc.), using lowercase RFC base32
+encoding, and its format identifier is `"legacy"` (not `"legacy.b32"`).
+
 ### 2. Runtime Format Selection (`Ob`)
 
 When format specification at runtime is required, use `Ob`:
@@ -564,7 +568,7 @@ Available constants:
 - `AASV_C32`, `AASV_B32`, `AASV_B64`, `AASV_HEX`
 - `APSV_C32`, `APSV_B32`, `APSV_B64`, `APSV_HEX`
 - Testing:  `MOCK1_*`, `MOCK2_*`
-- Legacy: `LEGACY_*`
+- Legacy: `LEGACY`
 
 ### Typical Production Use
 
