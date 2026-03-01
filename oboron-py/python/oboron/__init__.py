@@ -195,6 +195,10 @@ generate_key = _oboron.generate_key
 generate_key_hex = _oboron.generate_key_hex
 generate_key_bytes = _oboron.generate_key_bytes
 
+generate_secret = _oboron.generate_secret
+generate_secret_hex = _oboron.generate_secret_hex
+generate_secret_bytes = _oboron.generate_secret_bytes
+
 # Convenience functions
 enc = _oboron.enc
 dec = _oboron.dec
@@ -210,6 +214,7 @@ autodec_keyless = _oboron.autodec_keyless
 __all__ = [
     # Base classes
     'OboronBase',
+    'ObtextCodec',
 
     # Main interfaces
     'Ob',
@@ -264,6 +269,10 @@ __all__ = [
     'generate_key',
     'generate_key_hex',
     'generate_key_bytes',
+
+    'generate_secret',
+    'generate_secret_hex',
+    'generate_secret_bytes',
 
     # Convenience functions
     'enc',
