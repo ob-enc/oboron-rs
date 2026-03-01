@@ -79,28 +79,36 @@ macro_rules! impl_legacy_codec {
                 let ciphertext = encrypt_legacy(self.zsecret.master_secret(), plaintext_bytes)?;
 
                 // Encode based on encoding type
-                match $encoding {
-                    Encoding::C32 => Ok(crate::base32::BASE32_CROCKFORD.encode(&ciphertext)),
-                    Encoding::B32 => Ok(crate::base32::BASE32_RFC.encode(&ciphertext)),
-                    Encoding::B64 => Ok(data_encoding::BASE64URL_NOPAD.encode(&ciphertext)),
-                    Encoding::Hex => Ok(data_encoding::HEXLOWER.encode(&ciphertext)),
-                }
+                let mut s = match $encoding {
+                    Encoding::C32 => crate::base32::BASE32_CROCKFORD.encode(&ciphertext),
+                    Encoding::B32 => crate::base32::BASE32_RFC.encode(&ciphertext),
+                    Encoding::B64 => data_encoding::BASE64URL_NOPAD.encode(&ciphertext),
+                    Encoding::Hex => data_encoding::HEXLOWER.encode(&ciphertext),
+                };
+                // Reverse the obtext string in-place for prefix entropy (all encodings are ASCII)
+                // SAFETY: all four encodings produce ASCII-only output, so byte-level reversal
+                // cannot split any multi-byte UTF-8 sequence.
+                debug_assert!(s.is_ascii(), "encoding produced non-ASCII output");
+                unsafe { s.as_bytes_mut() }.reverse();
+                Ok(s)
             }
 
             fn dec(&self, obtext: &str) -> Result<String, Error> {
+                // Reverse the obtext before decoding (single allocation; all encodings are ASCII)
+                let reversed: Vec<u8> = obtext.bytes().rev().collect();
                 // Decode based on encoding type
                 let ciphertext = match $encoding {
                     Encoding::C32 => crate::base32::BASE32_CROCKFORD
-                        .decode(obtext.as_bytes())
+                        .decode(&reversed)
                         .map_err(|_| Error::InvalidC32)?,
                     Encoding::B32 => crate::base32::BASE32_RFC
-                        .decode(obtext.as_bytes())
+                        .decode(&reversed)
                         .map_err(|_| Error::InvalidB32)?,
                     Encoding::B64 => data_encoding::BASE64URL_NOPAD
-                        .decode(obtext.as_bytes())
+                        .decode(&reversed)
                         .map_err(|_| Error::InvalidB64)?,
                     Encoding::Hex => data_encoding::HEXLOWER
-                        .decode(obtext.as_bytes())
+                        .decode(&reversed)
                         .map_err(|_| Error::InvalidHex)?,
                 };
 
