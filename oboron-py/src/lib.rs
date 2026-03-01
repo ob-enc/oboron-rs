@@ -482,37 +482,13 @@ impl_zcodec_class!(
     "Zmock1 codec (identity scheme, for testing) with Hex encoding"
 );
 
-// Legacy - LEGACY variants
+// Legacy - single Legacy variant
 // ----------------------
 #[cfg(feature = "legacy")]
 impl_zcodec_class!(
-    LegacyB32,
-    ::oboron::ztier::LegacyB32,
+    Legacy,
+    ::oboron::ztier::Legacy,
     "Legacy codec (deterministic AES-CBC, constant IV, custom padding) with B32 encoding\n\n\
-     **LEGACY**: This scheme is maintained for backward compatibility only.\n\
-     For new projects, use Zrbcx or more secure schemes like Aags/Aasv."
-);
-#[cfg(feature = "legacy")]
-impl_zcodec_class!(
-    LegacyB64,
-    ::oboron::ztier::LegacyB64,
-    "Legacy codec (deterministic AES-CBC, constant IV, custom padding) with B64 encoding\n\n\
-     **LEGACY**: This scheme is maintained for backward compatibility only.\n\
-     For new projects, use Zrbcx or more secure schemes like Aags/Aasv."
-);
-#[cfg(feature = "legacy")]
-impl_zcodec_class!(
-    LegacyC32,
-    ::oboron::ztier::LegacyC32,
-    "Legacy codec (deterministic AES-CBC, constant IV, custom padding) with C32 encoding\n\n\
-     **LEGACY**: This scheme is maintained for backward compatibility only.\n\
-     For new projects, use Zrbcx or more secure schemes like Aags/Aasv."
-);
-#[cfg(feature = "legacy")]
-impl_zcodec_class!(
-    LegacyHex,
-    ::oboron::ztier::LegacyHex,
-    "Legacy codec (deterministic AES-CBC, constant IV, custom padding) with Hex encoding\n\n\
      **LEGACY**: This scheme is maintained for backward compatibility only.\n\
      For new projects, use Zrbcx or more secure schemes like Aags/Aasv."
 );
@@ -1369,13 +1345,10 @@ fn _oboron(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m.add_class::<Zmock1Hex>()?;
     }
 
-    // Legacy variants
+    // Legacy variant
     #[cfg(feature = "legacy")]
     {
-        m.add_class::<LegacyC32>()?;
-        m.add_class::<LegacyB32>()?;
-        m.add_class::<LegacyB64>()?;
-        m.add_class::<LegacyHex>()?;
+        m.add_class::<Legacy>()?;
     }
 
     // Functions =====================

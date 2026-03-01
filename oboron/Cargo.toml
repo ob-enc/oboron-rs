@@ -246,19 +246,7 @@ name = "apsv_hex"
 harness = false
 
 [[bench]]
-name = "legacy_c32"
-harness = false
-
-[[bench]]
 name = "legacy_b32"
-harness = false
-
-[[bench]]
-name = "legacy_b64"
-harness = false
-
-[[bench]]
-name = "legacy_hex"
 harness = false
 
 [[bench]]

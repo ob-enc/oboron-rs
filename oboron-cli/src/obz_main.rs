@@ -159,13 +159,22 @@ impl FormatSpec {
         }
 
         let scheme = get_scheme(scheme_flags.to_scheme()?, config)?;
+        // Legacy has a fixed encoding (B32/RFC lowercase) — no need to specify one explicitly
+        #[cfg(feature = "legacy")]
+        if scheme == Scheme::Legacy {
+            return Ok(Self {
+                scheme,
+                encoding: Encoding::B32,
+            });
+        }
         let encoding = get_encoding(encoding_flags.to_encoding()?, config)?;
 
         Ok(Self { scheme, encoding })
     }
 
     fn to_string(&self) -> String {
-        format!("{}.{}", self.scheme.as_str(), self.encoding.as_str())
+        // Use Format::Display so Legacy emits "legacy" (not "legacy.b32")
+        Format::new(self.scheme, self.encoding).to_string()
     }
 }
 
