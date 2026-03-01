@@ -12,6 +12,7 @@ pub(crate) static BASE32_CROCKFORD: Lazy<Encoding> = Lazy::new(|| {
     spec.encoding().unwrap()
 });
 
+#[cfg(feature = "legacy")]
 pub(crate) static BASE32_RFC_LOWER: Lazy<Encoding> = Lazy::new(|| {
     let mut spec = Specification::new();
     spec.symbols.push_str("abcdefghijklmnopqrstuvwxyz234567"); // RFC 4648 lowercase
