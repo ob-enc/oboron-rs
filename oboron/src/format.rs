@@ -83,7 +83,7 @@ pub(crate) mod apsv_formats {
 #[cfg(feature = "legacy")]
 pub(crate) mod legacy_formats {
     use super::{Encoding, Format, Scheme};
-    pub const LEGACY_B32: Format = Format::new(Scheme::Legacy, Encoding::B32);
+    pub const LEGACY: Format = Format::new(Scheme::Legacy, Encoding::B32);
 }
 
 #[cfg(feature = "mock")]
@@ -200,10 +200,8 @@ impl Format {
             crate::ZMOCK1_HEX_STR => zmock_formats::ZMOCK1_HEX,
 
             // Legacy
-
-            // legacy variants
             #[cfg(feature = "legacy")]
-            crate::LEGACY_B32_STR => legacy_formats::LEGACY_B32,
+            crate::LEGACY_STR => legacy_formats::LEGACY,
 
             _ => return Err(Error::InvalidFormat),
         })
@@ -220,6 +218,11 @@ impl std::str::FromStr for Format {
 
 impl std::fmt::Display for Format {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        // Legacy has a single format with no encoding suffix
+        #[cfg(feature = "legacy")]
+        if self.scheme == Scheme::Legacy {
+            return write!(f, "legacy");
+        }
         write!(f, "{}.{}", self.scheme.as_str(), self.encoding.as_str())
     }
 }
@@ -306,14 +309,13 @@ mod tests {
         let encodings = vec![Encoding::C32, Encoding::B32, Encoding::B64, Encoding::Hex];
 
         for scheme in &schemes {
-            for encoding in &encodings {
-                // Legacy only supports B32
-                #[cfg(feature = "legacy")]
-                if *scheme == Scheme::Legacy && *encoding != Encoding::B32 {
-                    continue;
-                }
+            // Legacy uses a single "legacy" format string (no encoding suffix) — tested separately
+            #[cfg(feature = "legacy")]
+            if *scheme == Scheme::Legacy {
+                continue;
+            }
 
-                // Test short string identifiers (e.g., "zrbcx.c32", "zrbcx.b32")
+            for encoding in &encodings {
                 let format_str = format!("{}.{}", scheme.as_str(), encoding.as_str());
                 let result = Format::from_str(&format_str);
                 assert!(result.is_ok(), "Failed to parse: {}", format_str);
@@ -361,7 +363,7 @@ mod tests {
 
         #[cfg(feature = "legacy")]
         test_cases.extend(vec![
-            (Scheme::Legacy, Encoding::B32, "legacy.b32"),
+            (Scheme::Legacy, Encoding::B32, "legacy"),
         ]);
 
         #[cfg(feature = "zrbcx")]
@@ -441,11 +443,12 @@ mod tests {
 
     #[test]
     #[cfg(feature = "legacy")]
-    fn test_legacy_b32_format() {
-        // legacy should support B32
-        let format_rfc = Format::from_str("legacy.b32").unwrap();
-        assert_eq!(format_rfc.scheme(), Scheme::Legacy);
-        assert_eq!(format_rfc.encoding(), Encoding::B32);
+    fn test_legacy_format() {
+        // legacy uses a single format string "legacy" with no encoding suffix
+        let format = Format::from_str("legacy").unwrap();
+        assert_eq!(format.scheme(), Scheme::Legacy);
+        assert_eq!(format.encoding(), Encoding::B32);
+        assert_eq!(format.to_string(), "legacy");
     }
 
     #[test]

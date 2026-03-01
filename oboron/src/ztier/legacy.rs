@@ -14,7 +14,7 @@ const LEGACY_PADDING_BYTE: u8 = b'=';
 /// ⚠️ This scheme exists for compatibility only.
 /// Use secure schemes for new code.
 ///
-/// Format: `"legacy.b32"`
+/// Format: `"legacy"`
 pub struct Legacy {
     zsecret: ZSecret,
 }
@@ -24,6 +24,13 @@ impl Legacy {
     pub fn new(secret: &str) -> Result<Self, Error> {
         Ok(Self {
             zsecret: ZSecret::from_base64(secret)?,
+        })
+    }
+
+    /// Create from raw 32-byte master secret (used internally by Obz routing)
+    pub(crate) fn from_master_secret(secret: &[u8; 32]) -> Result<Self, Error> {
+        Ok(Self {
+            zsecret: ZSecret::from_bytes(secret)?,
         })
     }
 

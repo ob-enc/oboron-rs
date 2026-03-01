@@ -139,7 +139,7 @@ impl Obz {
     /// # use oboron::{Format, Scheme, Encoding};
     /// # let secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
     /// let mut obz = Obz::new("zrbcx.c32", secret)?;
-    /// obz.set_format("legacy.b32")?; // switch using string
+    /// obz.set_format("legacy")?; // switch using string
     /// obz.set_format(Format::new(Scheme::Zrbcx, Encoding::Hex))?; // switch using Format
     /// # }
     /// # Ok(())
@@ -349,11 +349,21 @@ impl Obz {
 
 impl ObtextCodec for Obz {
     fn enc(&self, plaintext: &str) -> Result<String, Error> {
+        #[cfg(feature = "legacy")]
+        if self.format.scheme() == Scheme::Legacy {
+            let legacy = super::legacy::Legacy::from_master_secret(self.zsecret.master_secret())?;
+            return <super::legacy::Legacy as ObtextCodec>::enc(&legacy, plaintext);
+        }
         // Pass full 32-byte secret - z-tier enc function uses it directly
         crate::ztier::enc_to_format_ztier(plaintext, self.format, self.zsecret.master_secret())
     }
 
     fn dec(&self, obtext: &str) -> Result<String, Error> {
+        #[cfg(feature = "legacy")]
+        if self.format.scheme() == Scheme::Legacy {
+            let legacy = super::legacy::Legacy::from_master_secret(self.zsecret.master_secret())?;
+            return <super::legacy::Legacy as ObtextCodec>::dec(&legacy, obtext);
+        }
         // Pass full 32-byte secret - z-tier dec function uses it directly
         crate::ztier::dec_from_format_ztier(obtext, self.format, self.zsecret.master_secret())
     }

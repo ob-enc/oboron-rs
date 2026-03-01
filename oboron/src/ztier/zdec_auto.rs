@@ -103,14 +103,14 @@ fn bytes_to_string(plaintext_bytes: Vec<u8>) -> Result<String, Error> {
 /// so this function always decodes with B32 regardless of the caller's encoding context.
 #[cfg(feature = "legacy")]
 fn dec_legacy_fallback(zsecret: &ZSecret, obtext: &str) -> Result<String, Error> {
-    use crate::dec::decode_obtext_to_payload;
-
+    // Reverse the obtext before decoding (matches Legacy::dec behaviour)
+    let reversed: Vec<u8> = obtext.bytes().rev().collect();
     // Decode using lowercase RFC base32 (the only encoding legacy uses)
-    let ciphertext = decode_obtext_to_payload(obtext, Encoding::B32)?;
-
-    // Decrypt using legacy scheme
+    let ciphertext = crate::base32::BASE32_RFC_LOWER
+        .decode(&reversed)
+        .map_err(|_| Error::InvalidB32)?;
+    // Decrypt using legacy AES-CBC
     let plaintext_bytes = decrypt_legacy(zsecret.legacy(), &ciphertext)?;
-
     bytes_to_string(plaintext_bytes)
 }
 

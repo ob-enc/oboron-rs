@@ -64,7 +64,7 @@ MOCK2_C32: str = "mock2.c32"
 MOCK2_HEX: str = "mock2.hex"
 
 # Legacy (legacy - insecure - obfuscation only; backwards compatibility only - use zrbcx instead)
-LEGACY_B32: str = "legacy.b32"
+LEGACY: str = "legacy"
 
 __all__ = [
     # aags
@@ -80,7 +80,7 @@ __all__ = [
     # upbc
     "UPBC_B32", "UPBC_B64", "UPBC_C32", "UPBC_HEX",
     # Legacy
-    "LEGACY_B32",
+    "LEGACY",
     # Testing
     "MOCK1_B32", "MOCK1_B64", "MOCK1_C32", "MOCK1_HEX",
     "MOCK2_B32", "MOCK2_B64", "MOCK2_C32", "MOCK2_HEX",
