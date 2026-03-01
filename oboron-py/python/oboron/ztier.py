@@ -4,17 +4,17 @@ from . import _oboron
 
 class ZtierBase(ABC):
     """
-    Abstract base class for all Ztier codec implementations.
+    Abstract base class for all Z-tier codec implementations.
 
-    All cipher classes (AasvB32, AasvC32, etc.) are registered as virtual
-    subclasses, enabling isinstance() and issubclass() checks.
+    All Z-tier cipher classes (ZrbcxC32, ZrbcxB32, etc.) are registered as
+    virtual subclasses, enabling isinstance() and issubclass() checks.
 
     Example:
-        >>> cipher = AasvC32(key=key)
-        >>> isinstance(cipher, OboronBase)
+        >>> cipher = ZrbcxC32(secret=secret)
+        >>> isinstance(cipher, ZtierBase)
         True
 
-        >>> def process_cipher(cipher:  OboronBase) -> str:
+        >>> def process_cipher(cipher: ZtierBase) -> str:
         ...     return cipher.enc("hello")
     """
 
@@ -31,13 +31,13 @@ class ZtierBase(ABC):
     @property
     @abstractmethod
     def format(self) -> str:
-        """Get the format identifier (e.g., 'aasv.b64')."""
+        """Get the format identifier (e.g., 'zrbcx.b64')."""
         ...
 
     @property
     @abstractmethod
     def scheme(self) -> str:
-        """Get the scheme identifier (e.g., 'aasv')."""
+        """Get the scheme identifier (e.g., 'zrbcx')."""
         ...
 
     @property
@@ -117,6 +117,9 @@ generate_secret_hex = _oboron.generate_secret_hex
 generate_secret_bytes = _oboron.generate_secret_bytes
 
 __all__ = [
+    # Base class
+    'ZtierBase',
+
     # Z-tier interfaces
     'Obz',
     'Omnibz',
