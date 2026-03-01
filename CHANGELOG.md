@@ -17,6 +17,64 @@ but note that pre-1.0 releases may not adhere strictly to all guidelines.
 ### Changed
 
 
+[oboron-py v0.2.0] - 2026-03-01
+---------------------------------
+
+### Changed (Breaking)
+
+- **Legacy scheme simplified to a single format.**
+  - The four legacy encoding variants (`LegacyB32`, `LegacyC32`, `LegacyB64`,
+    `LegacyHex`) have been replaced by a single `Legacy` class.
+  - `Legacy` uses lowercase RFC base32 encoding (matching production obtext).
+  - Format identifier changed from `"legacy.b32"` to `"legacy"`.
+  - Python format constant renamed: `formats.LEGACY_B32` → `formats.LEGACY`.
+
+### Fixed
+
+- `Omnib.autodec()` / `Obz.autodec()` legacy fallback now correctly decodes
+  lowercase RFC base32 obtext (was erroneously using uppercase alphabet).
+- `Obz` instances configured with the legacy format no longer panic on
+  `enc()`/`dec()` calls.
+
+
+[oboron v0.5.0] - 2026-03-01
+------------------------------
+
+### Changed (Breaking)
+
+- **Legacy scheme simplified to a single format.**
+  - The four legacy encoding types (`LegacyB32`, `LegacyC32`, `LegacyB64`,
+    `LegacyHex`) have been replaced by a single `Legacy` struct
+    (`oboron::ztier::Legacy`).
+  - `Legacy` uses a new `BASE32_RFC_LOWER` lowercase RFC base32 alphabet
+    for both encoding and decoding, producing lowercase obtext that matches
+    the production format.
+  - The format string for the legacy scheme is now `"legacy"` (was `"legacy.b32"`).
+    `Format::from_str("legacy")` resolves to
+    `Format::new(Scheme::Legacy, Encoding::B32)`.
+  - `Format::Display` for `Scheme::Legacy` now emits `"legacy"` instead of
+    `"legacy.b32"`.
+  - Format constant renamed: `LEGACY_B32` / `LEGACY_B32_STR` →
+    `LEGACY` / `LEGACY_STR`.
+  - `Obz::set_format("legacy")` and `Obz::set_scheme(Scheme::Legacy)` now
+    work correctly without requiring `--b32` in the CLI.
+
+### Fixed
+
+- `zdec_auto` legacy fallback used the wrong (uppercase) base32 alphabet;
+  fixed to use `BASE32_RFC_LOWER` matching `Legacy::dec`.
+- `Obz::enc` / `Obz::dec` with `Scheme::Legacy` no longer hit
+  `unreachable!()` panic; now dispatches through `Legacy::from_master_secret`.
+
+### Added
+
+- `oboron::base32::BASE32_RFC_LOWER`: lowercase RFC 4648 base32 alphabet
+  (no padding), used internally by the `Legacy` scheme.
+- Production test vectors for the legacy scheme: `tests/test-vectors-legacy.jsonl`
+  with 165 vectors tied to the actual production secret (embedded as a
+  self-contained `meta` entry in the JSONL file).
+
+
 [1.0.0-rc.1] - 2026-01-09
 -------------------------
 
