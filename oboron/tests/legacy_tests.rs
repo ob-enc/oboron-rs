@@ -217,6 +217,6 @@ fn test_legacy_lowercase_obtext() {
     // Legacy should produce lowercase obtext
     let ob = Legacy::new_keyless().unwrap();
     let ot = ob.enc("test").unwrap();
-    assert!(ot.chars().all(|c| c.is_ascii_lowercase() || c.is_ascii_digit()),
-        "Legacy obtext should be lowercase: {}", ot);
+    assert!(ot.chars().all(|c| matches!(c, 'a'..='z' | '2'..='7')),
+        "Legacy obtext should be lowercase RFC base32 (a-z, 2-7): {}", ot);
 }

@@ -97,7 +97,10 @@ fn bytes_to_string(plaintext_bytes: Vec<u8>) -> Result<String, Error> {
     }
 }
 
-/// Helper function to attempt legacy decryption
+/// Helper function to attempt legacy decryption using B32 encoding.
+///
+/// Legacy always uses lowercase RFC base32 (BASE32_RFC_LOWER) for encoding,
+/// so this function always decodes with B32 regardless of the caller's encoding context.
 #[cfg(feature = "legacy")]
 fn dec_legacy_fallback(zsecret: &ZSecret, obtext: &str) -> Result<String, Error> {
     use crate::dec::decode_obtext_to_payload;
