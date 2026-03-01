@@ -1,6 +1,6 @@
 [package]
 name = "oboron-py"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 rust-version = "1.77.0"
 authors = ["Bojan Đuričković"]
@@ -34,7 +34,7 @@ ztier-schemes = ["zrbcx", "zmock"]
 keyless = ["oboron/keyless"]
 
 [dependencies]
-oboron = { version = "0.4.0", path = "../oboron", default-features = false, features=["full", "bytes-keys"] }
+oboron = { version = "0.5.0", path = "../oboron", default-features = false, features=["full", "bytes-keys"] }
 pyo3 = { version = "0.22", features = ["extension-module"] }
 hex = "0.4"
 
