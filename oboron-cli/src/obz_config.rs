@@ -42,6 +42,27 @@ pub fn profile_path(name: &str) -> PathBuf {
     profile_dir().join(format!("{}.json", name))
 }
 
+/// Validate that a profile name is safe and contains no path traversal characters.
+/// Only allows alphanumeric characters, hyphens, and underscores.
+pub fn validate_profile_name(name: &str) -> Result<()> {
+    if name.is_empty() {
+        anyhow::bail!("Profile name cannot be empty");
+    }
+    if name.contains('/') || name.contains('\\') || name.contains("..") {
+        anyhow::bail!("Profile name '{}' contains invalid path characters", name);
+    }
+    if !name
+        .chars()
+        .all(|c| c.is_alphanumeric() || c == '-' || c == '_')
+    {
+        anyhow::bail!(
+            "Profile name '{}' contains invalid characters. Only alphanumeric characters, hyphens, and underscores are allowed",
+            name
+        );
+    }
+    Ok(())
+}
+
 pub fn backup_dir() -> PathBuf {
     dirs::home_dir()
         .expect("Failed to get home directory")
@@ -119,6 +140,7 @@ pub fn save_config(config: &Config) -> Result<()> {
 }
 
 pub fn load_profile(name: &str) -> Result<SecretProfile> {
+    validate_profile_name(name)?;
     let path = profile_path(name);
     let content = fs::read_to_string(&path).context(format!(
         "Failed to read secret profile '{}'\nHint: Run 'obz init' or 'obz profile create {}' to create this profile",
@@ -132,6 +154,7 @@ pub fn load_profile(name: &str) -> Result<SecretProfile> {
 }
 
 pub fn save_profile(name: &str, profile: &SecretProfile) -> Result<()> {
+    validate_profile_name(name)?;
     let path = profile_path(name);
 
     if let Some(parent) = path.parent() {
@@ -193,6 +216,7 @@ pub fn validate_base64_secret(secret_str: &str) -> Result<()> {
 }
 
 pub fn init_command(name: &str) -> Result<()> {
+    validate_profile_name(name)?;
     let path = profile_path(name);
     if path.exists() {
         eprintln!("❌ Error: Profile '{}' already exists", name);
@@ -330,6 +354,7 @@ pub fn profile_show_command(name: Option<&str>) -> Result<()> {
 }
 
 pub fn profile_activate_command(name: &str) -> Result<()> {
+    validate_profile_name(name)?;
     load_profile(name)?;
 
     let mut config = load_config().unwrap_or(Config {
@@ -347,25 +372,26 @@ pub fn profile_activate_command(name: &str) -> Result<()> {
 }
 
 pub fn profile_create_command(name: &str, secret: Option<&str>) -> Result<()> {
-    let profile = if let Some(s) = secret {
+    validate_profile_name(name)?;
+    let (profile, secret_str) = if let Some(s) = secret {
         validate_base64_secret(s)?;
-        SecretProfile {
-            secret: Some(s.to_string()),
-        }
+        (SecretProfile { secret: Some(s.to_string()) }, s.to_string())
     } else {
-        anyhow::bail!("--secret must be provided");
+        let generated = generate_secret();
+        (SecretProfile { secret: Some(generated.clone()) }, generated)
     };
 
     save_profile(name, &profile)?;
 
     println!("✓ Created profile '{}'", name);
-    println!("  With secret");
+    println!("  Secret: {}", secret_str);
     println!("\n⚠️  Keep this profile secure!");
 
     Ok(())
 }
 
 pub fn profile_delete_command(name: &str) -> Result<()> {
+    validate_profile_name(name)?;
     let path = profile_path(name);
 
     if !path.exists() {
@@ -406,6 +432,8 @@ pub fn profile_delete_command(name: &str) -> Result<()> {
 }
 
 pub fn profile_rename_command(old_name: &str, new_name: &str) -> Result<()> {
+    validate_profile_name(old_name)?;
+    validate_profile_name(new_name)?;
     let old_path = profile_path(old_name);
     let new_path = profile_path(new_name);
 
@@ -447,6 +475,7 @@ pub fn profile_rename_command(old_name: &str, new_name: &str) -> Result<()> {
 }
 
 pub fn profile_set_command(name: &str, secret: Option<&str>) -> Result<()> {
+    validate_profile_name(name)?;
     let mut profile = load_profile(name)?;
 
     if let Some(s) = secret {
