@@ -373,13 +373,13 @@ pub fn profile_activate_command(name: &str) -> Result<()> {
 
 pub fn profile_create_command(name: &str, secret: Option<&str>) -> Result<()> {
     validate_profile_name(name)?;
-    let (profile, secret_str) = if let Some(s) = secret {
+    let secret_str = if let Some(s) = secret {
         validate_base64_secret(s)?;
-        (SecretProfile { secret: Some(s.to_string()) }, s.to_string())
+        s.to_string()
     } else {
-        let generated = generate_secret();
-        (SecretProfile { secret: Some(generated.clone()) }, generated)
+        generate_secret()
     };
+    let profile = SecretProfile { secret: Some(secret_str.clone()) };
 
     save_profile(name, &profile)?;
 

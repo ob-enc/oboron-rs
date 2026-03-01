@@ -338,13 +338,13 @@ pub fn profile_activate_command(name: &str) -> Result<()> {
 
 pub fn profile_create_command(name: &str, key: Option<&str>) -> Result<()> {
     validate_profile_name(name)?;
-    let (profile, key_str) = if let Some(k) = key {
+    let key_str = if let Some(k) = key {
         validate_base64_key(k)?;
-        (KeyProfile { key: Some(k.to_string()) }, k.to_string())
+        k.to_string()
     } else {
-        let generated = generate_key();
-        (KeyProfile { key: Some(generated.clone()) }, generated)
+        generate_key()
     };
+    let profile = KeyProfile { key: Some(key_str.clone()) };
 
     save_key_profile(name, &profile)?;
 
