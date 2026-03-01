@@ -220,3 +220,15 @@ fn test_legacy_lowercase_obtext() {
     assert!(ot.chars().all(|c| matches!(c, 'a'..='z' | '2'..='7')),
         "Legacy obtext should be lowercase RFC base32 (a-z, 2-7): {}", ot);
 }
+
+#[test]
+fn test_vector_check() {
+    let ob = Legacy::new_keyless().unwrap();
+    let r = ob.enc("a").unwrap();
+    println!("enc(a) = {}", r);
+    println!("expected = uf2glao2xd7fnbq5z53cb63ukc");
+    assert_eq!(r, "uf2glao2xd7fnbq5z53cb63ukc", "enc(a) mismatch");
+    let r2 = ob.enc("b").unwrap();
+    println!("enc(b) = {}", r2);
+    assert_eq!(r2, "er7w6mqvencizpy6adc6du2yny", "enc(b) mismatch");
+}
