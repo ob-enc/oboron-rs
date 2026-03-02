@@ -15,6 +15,7 @@ encoding.  Provides two binaries:
 
 - [Installation](#installation)
 - [Quick Start](#quick-start)
+- [Environment Variables](#environment-variables)
 - [Commands Reference](#commands-reference)
   - [ob enc / ob e](#ob-enc--ob-e)
   - [ob dec / ob d](#ob-dec--ob-d)
@@ -89,6 +90,36 @@ Encrypt with a specific format:
 ob enc -f aasv.b64 "hello, world"
 ```
 
+## Environment Variables
+
+Both CLIs support environment variables for key/secret resolution, enabling use without
+`ob init` / `obz init` (e.g., in CI/CD or containerized environments).
+
+| Variable | CLI | Description |
+|---|---|---|
+| `OBORON_KEY` | `ob` | 86-character base64url-nopad encryption key (512-bit) |
+| `OBORON_SECRET` | `obz` | 43-character base64url-nopad obfuscation secret (256-bit) |
+
+**Precedence order (highest to lowest):**
+
+1. `--key` / `--secret` CLI flag (explicit, one-shot)
+2. `$OBORON_KEY` / `$OBORON_SECRET` env var
+3. `--profile <NAME>` → profile file lookup
+4. Default profile from `~/.ob/config.json` / `~/.obz/config.json`
+5. Error with helpful message
+
+**CI/CD example — no `ob init` required:**
+
+```shell
+export OBORON_KEY="$(ob key)"   # or inject from your secret store
+ob enc --aasv --b32 "data"      # works without ob init
+echo "data" | ob enc -sB        # piping also works
+```
+
+**Security note:** Environment variables are visible to child processes and in
+`/proc/*/environ` on Linux. For ephemeral/CI contexts they are convenient; for persistent
+workstation use, `ob init` with file-based profiles (written with `chmod 600`) is more secure.
+
 ## Commands Reference
 
 ### `ob enc` / `ob e`
@@ -112,7 +143,7 @@ OPTIONS:
     -S, --apsv              Use apsv scheme (probabilistic AES-SIV)
     -g, --aags              Use aags scheme (deterministic AES-GCM-SIV)
     -G, --apgs              Use apgs scheme (probabilistic AES-GCM-SIV)
-        --upbc              Use upbc scheme (probabilistic unauthenticated AES-CBC)
+    -u, --upbc              Use upbc scheme (probabilistic unauthenticated AES-CBC)
     -c, --c32               Use Crockford base32 encoding
     -b, --b32               Use RFC base32 encoding
     -B, --b64               Use base64 encoding
@@ -142,8 +173,8 @@ OPTIONS:
     -s, --aasv              Use aasv scheme
     -S, --apsv              Use apsv scheme
     -g, --aags              Use aags scheme
-    -G, --apgs              Use apgs scheme
-        --upbc              Use upbc scheme
+    -G, --apgs              Use apgs scheme (probabilistic AES-GCM-SIV)
+    -u, --upbc              Use upbc scheme
     -c, --c32               Use Crockford base32 encoding
     -b, --b32               Use RFC base32 encoding
     -B, --b64               Use base64 encoding
@@ -204,7 +235,7 @@ OPTIONS:
     -S, --apsv              Set default scheme to apsv
     -g, --aags              Set default scheme to aags
     -G, --apgs              Set default scheme to apgs
-        --upbc              Set default scheme to upbc
+    -u, --upbc              Set default scheme to upbc
     -c, --c32               Set default encoding to c32
     -b, --b32               Set default encoding to b32
     -B, --b64               Set default encoding to b64

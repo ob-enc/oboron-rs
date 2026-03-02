@@ -652,19 +652,39 @@ fn key_command(profile: Option<String>, keyless: bool, hex: bool) -> Result<()> 
         } else {
             anyhow::bail!("Profile '{}' has no key", prof);
         }
+    } else if let Ok(env_key) = std::env::var("OBORON_KEY") {
+        println!(
+            "{}",
+            if hex {
+                let key_bytes = BASE64URL_NOPAD.decode(env_key.as_bytes())?;
+                HEXLOWER.encode(&key_bytes)
+            } else {
+                env_key
+            }
+        );
     } else {
-        anyhow::bail!("No key specified:  provide --profile, or run 'ob init'");
+        anyhow::bail!(
+            "No key specified: provide --profile, set $OBORON_KEY, or run 'ob init'"
+        );
     }
 
     Ok(())
 }
 
 fn get_key(key: Option<&String>, profile: Option<&str>, config: Option<&Config>) -> Result<String> {
+    // 1. Explicit --key flag
     if let Some(key_str) = key {
         validate_base64_key(key_str)?;
         return Ok(key_str.clone());
     }
 
+    // 2. Environment variable
+    if let Ok(env_key) = std::env::var("OBORON_KEY") {
+        validate_base64_key(&env_key)?;
+        return Ok(env_key);
+    }
+
+    // 3-4. Profile (explicit --profile or default from config)
     let profile_name = profile.or_else(|| config.map(|c| c.profile.as_str()));
 
     if let Some(name) = profile_name {
@@ -677,7 +697,7 @@ fn get_key(key: Option<&String>, profile: Option<&str>, config: Option<&Config>)
     }
 
     Err(anyhow::anyhow!(
-        "No key specified: provide --key, --profile, or run 'ob init'"
+        "No key specified: provide --key, set $OBORON_KEY, use --profile, or run 'ob init'"
     ))
 }
 

@@ -28,7 +28,7 @@ ob enc [OPTIONS] [TEXT]
 | `--apsv` | `-S` | Use apsv scheme (probabilistic AES-SIV) |
 | `--aags` | `-g` | Use aags scheme (deterministic AES-GCM-SIV) |
 | `--apgs` | `-G` | Use apgs scheme (probabilistic AES-GCM-SIV) |
-| `--upbc` | | Use upbc scheme (probabilistic AES-CBC, unauthenticated) |
+| `--upbc` | `-u` | Use upbc scheme (probabilistic AES-CBC, unauthenticated) |
 | `--c32` | `-c` | Use Crockford base32 encoding |
 | `--b32` | `-b` | Use RFC base32 encoding |
 | `--b64` | `-B` | Use base64 encoding |
@@ -57,7 +57,7 @@ ob dec [OPTIONS] [TEXT]
 | `--apsv` | `-S` | Use apsv scheme |
 | `--aags` | `-g` | Use aags scheme |
 | `--apgs` | `-G` | Use apgs scheme |
-| `--upbc` | | Use upbc scheme |
+| `--upbc` | `-u` | Use upbc scheme |
 | `--c32` | `-c` | Use Crockford base32 encoding |
 | `--b32` | `-b` | Use RFC base32 encoding |
 | `--b64` | `-B` | Use base64 encoding |
@@ -118,7 +118,7 @@ ob config set [OPTIONS]
 | `--apsv` | `-S` | Set default scheme to apsv |
 | `--aags` | `-g` | Set default scheme to aags |
 | `--apgs` | `-G` | Set default scheme to apgs |
-| `--upbc` | | Set default scheme to upbc |
+| `--upbc` | `-u` | Set default scheme to upbc |
 | `--c32` | `-c` | Set default encoding to c32 |
 | `--b32` | `-b` | Set default encoding to b32 |
 | `--b64` | `-B` | Set default encoding to b64 |
@@ -287,4 +287,27 @@ obz e -rB 'abc'
 # Instead of: obz enc --zrbcx --c32 'abc'
 obz e -rc 'abc'
 ```
+
+---
+
+## Environment Variables
+
+Both CLIs support environment variables for key/secret resolution.
+
+| Variable | CLI | Description |
+|---|---|---|
+| `$OBORON_KEY` | `ob` | 86-character base64url-nopad encryption key (512-bit) |
+| `$OBORON_SECRET` | `obz` | 43-character base64url-nopad obfuscation secret (256-bit) |
+
+**Precedence order (highest to lowest):**
+
+| Priority | Source |
+|---|---|
+| 1 | `--key` / `--secret` CLI flag |
+| 2 | `$OBORON_KEY` / `$OBORON_SECRET` env var |
+| 3 | `--profile <NAME>` → profile file |
+| 4 | Default profile from config file |
+
+When `$OBORON_KEY` (or `$OBORON_SECRET`) is set and the format is explicitly given,
+the CLI works without any config or profile on disk.
 
