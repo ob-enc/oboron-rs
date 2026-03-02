@@ -27,7 +27,7 @@ const TEST_KEY_B64_ALT: &str =
 #[test]
 fn test_ob_enc_keyless_aasv() {
     let test_home = test_home_dir();
-    let mut cmd = Command::new("ob").unwrap();
+    let mut cmd = Command::new("ob");
     cmd.env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("-K")
@@ -44,7 +44,7 @@ fn test_ob_enc_keyless_aasv() {
 #[test]
 fn test_ob_enc_keyless_apsv() {
     let test_home = test_home_dir();
-    let mut cmd = Command::new("ob").unwrap();
+    let mut cmd = Command::new("ob");
     cmd.env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("-K")
@@ -61,7 +61,7 @@ fn test_ob_enc_keyless_apsv() {
 #[test]
 fn test_ob_enc_keyless_aags() {
     let test_home = test_home_dir();
-    let mut cmd = Command::new("ob").unwrap();
+    let mut cmd = Command::new("ob");
     cmd.env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("-K")
@@ -78,7 +78,7 @@ fn test_ob_enc_keyless_aags() {
 #[test]
 fn test_ob_enc_keyless_apgs() {
     let test_home = test_home_dir();
-    let mut cmd = Command::new("ob").unwrap();
+    let mut cmd = Command::new("ob");
     cmd.env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("-K")
@@ -95,7 +95,7 @@ fn test_ob_enc_keyless_apgs() {
 #[test]
 fn test_ob_enc_keyless_upbc() {
     let test_home = test_home_dir();
-    let mut cmd = Command::new("ob").unwrap();
+    let mut cmd = Command::new("ob");
     cmd.env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("-K")
@@ -112,7 +112,7 @@ fn test_ob_enc_keyless_upbc() {
 #[test]
 fn test_ob_enc_with_explicit_key_aasv() {
     let test_home = test_home_dir();
-    let mut cmd = Command::new("ob").unwrap();
+    let mut cmd = Command::new("ob");
     cmd.env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("--key")
@@ -130,7 +130,7 @@ fn test_ob_enc_with_explicit_key_aasv() {
 #[test]
 fn test_ob_enc_with_explicit_key_aags() {
     let test_home = test_home_dir();
-    let mut cmd = Command::new("ob").unwrap();
+    let mut cmd = Command::new("ob");
     cmd.env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("--key")
@@ -148,7 +148,7 @@ fn test_ob_enc_with_explicit_key_aags() {
 #[test]
 fn test_ob_enc_with_explicit_key_apgs() {
     let test_home = test_home_dir();
-    let mut cmd = Command::new("ob").unwrap();
+    let mut cmd = Command::new("ob");
     cmd.env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("--key")
@@ -166,7 +166,7 @@ fn test_ob_enc_with_explicit_key_apgs() {
 #[test]
 fn test_ob_enc_with_explicit_key_apsv() {
     let test_home = test_home_dir();
-    let mut cmd = Command::new("ob").unwrap();
+    let mut cmd = Command::new("ob");
     cmd.env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("--key")
@@ -184,7 +184,7 @@ fn test_ob_enc_with_explicit_key_apsv() {
 #[test]
 fn test_ob_enc_with_explicit_key_upbc() {
     let test_home = test_home_dir();
-    let mut cmd = Command::new("ob").unwrap();
+    let mut cmd = Command::new("ob");
     cmd.env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("--key")
@@ -203,7 +203,7 @@ fn test_ob_enc_with_explicit_key_upbc() {
 fn test_ob_enc_dec_roundtrip_aasv() {
     let test_home = test_home_dir();
 
-    let mut enc_cmd = Command::new("ob").unwrap();
+    let mut enc_cmd = Command::new("ob");
     let enc_output = enc_cmd
         .env("HOME", test_home.as_os_str())
         .arg("enc")
@@ -221,7 +221,7 @@ fn test_ob_enc_dec_roundtrip_aasv() {
         .to_string();
     assert!(!encd.is_empty());
 
-    let mut dec_cmd = Command::new("ob").unwrap();
+    let mut dec_cmd = Command::new("ob");
     dec_cmd
         .env("HOME", test_home.as_os_str())
         .arg("dec")
@@ -241,7 +241,7 @@ fn test_ob_enc_dec_roundtrip_aasv() {
 fn test_ob_enc_dec_roundtrip_aags() {
     let test_home = test_home_dir();
 
-    let mut enc_cmd = Command::new("ob").unwrap();
+    let mut enc_cmd = Command::new("ob");
     let enc_output = enc_cmd
         .env("HOME", test_home.as_os_str())
         .arg("enc")
@@ -260,7 +260,7 @@ fn test_ob_enc_dec_roundtrip_aags() {
         .to_string();
     assert!(!encd.is_empty());
 
-    let mut dec_cmd = Command::new("ob").unwrap();
+    let mut dec_cmd = Command::new("ob");
     dec_cmd
         .env("HOME", test_home.as_os_str())
         .arg("dec")
@@ -281,7 +281,7 @@ fn test_ob_enc_dec_roundtrip_aags() {
 fn test_ob_enc_dec_roundtrip_apgs() {
     let test_home = test_home_dir();
 
-    let mut enc_cmd = Command::new("ob").unwrap();
+    let mut enc_cmd = Command::new("ob");
     let enc_output = enc_cmd
         .env("HOME", test_home.as_os_str())
         .arg("enc")
@@ -299,7 +299,7 @@ fn test_ob_enc_dec_roundtrip_apgs() {
         .to_string();
     assert!(!encd.is_empty());
 
-    let mut dec_cmd = Command::new("ob").unwrap();
+    let mut dec_cmd = Command::new("ob");
     dec_cmd
         .env("HOME", test_home.as_os_str())
         .arg("dec")
@@ -319,7 +319,7 @@ fn test_ob_enc_dec_roundtrip_apgs() {
 fn test_ob_enc_dec_roundtrip_apsv() {
     let test_home = test_home_dir();
 
-    let mut enc_cmd = Command::new("ob").unwrap();
+    let mut enc_cmd = Command::new("ob");
     let enc_output = enc_cmd
         .env("HOME", test_home.as_os_str())
         .arg("enc")
@@ -337,7 +337,7 @@ fn test_ob_enc_dec_roundtrip_apsv() {
         .to_string();
     assert!(!encd.is_empty());
 
-    let mut dec_cmd = Command::new("ob").unwrap();
+    let mut dec_cmd = Command::new("ob");
     dec_cmd
         .env("HOME", test_home.as_os_str())
         .arg("dec")
@@ -357,7 +357,7 @@ fn test_ob_enc_dec_roundtrip_apsv() {
 fn test_ob_enc_dec_roundtrip_upbc() {
     let test_home = test_home_dir();
 
-    let mut enc_cmd = Command::new("ob").unwrap();
+    let mut enc_cmd = Command::new("ob");
     let enc_output = enc_cmd
         .env("HOME", test_home.as_os_str())
         .arg("enc")
@@ -375,7 +375,7 @@ fn test_ob_enc_dec_roundtrip_upbc() {
         .to_string();
     assert!(!encd.is_empty());
 
-    let mut dec_cmd = Command::new("ob").unwrap();
+    let mut dec_cmd = Command::new("ob");
     dec_cmd
         .env("HOME", test_home.as_os_str())
         .arg("dec")
@@ -401,7 +401,7 @@ fn test_ob_enc_all_schemes() {
     let schemes = vec!["--aags", "--aasv", "--upbc", "--apgs", "--apsv"];
 
     for scheme in schemes {
-        let mut cmd = Command::new("ob").unwrap();
+        let mut cmd = Command::new("ob");
         cmd.env("HOME", test_home.as_os_str())
             .arg("enc")
             .arg("-K")
@@ -423,7 +423,7 @@ fn test_ob_enc_all_encodings() {
     let encodings = vec!["--b32", "--b64", "--hex"];
 
     for encoding in encodings {
-        let mut cmd = Command::new("ob").unwrap();
+        let mut cmd = Command::new("ob");
         cmd.env("HOME", test_home.as_os_str())
             .arg("enc")
             .arg("-K")
@@ -442,7 +442,7 @@ fn test_ob_enc_all_encodings() {
 #[test]
 fn test_ob_enc_short_alias_aasv() {
     let test_home = test_home_dir();
-    let mut cmd = Command::new("ob").unwrap();
+    let mut cmd = Command::new("ob");
     cmd.env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("-K")
@@ -459,7 +459,7 @@ fn test_ob_enc_short_alias_aasv() {
 #[test]
 fn test_ob_enc_short_alias_apsv() {
     let test_home = test_home_dir();
-    let mut cmd = Command::new("ob").unwrap();
+    let mut cmd = Command::new("ob");
     cmd.env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("-K")
@@ -476,7 +476,7 @@ fn test_ob_enc_short_alias_apsv() {
 #[test]
 fn test_ob_enc_short_alias_upbc() {
     let test_home = test_home_dir();
-    let mut cmd = Command::new("ob").unwrap();
+    let mut cmd = Command::new("ob");
     cmd.env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("-K")
@@ -494,7 +494,7 @@ fn test_ob_enc_short_alias_upbc() {
 fn test_ob_dec_short_alias_upbc() {
     let test_home = test_home_dir();
 
-    let mut enc_cmd = Command::new("ob").unwrap();
+    let mut enc_cmd = Command::new("ob");
     let enc_output = enc_cmd
         .env("HOME", test_home.as_os_str())
         .arg("enc")
@@ -510,7 +510,7 @@ fn test_ob_dec_short_alias_upbc() {
         .trim()
         .to_string();
 
-    let mut dec_cmd = Command::new("ob").unwrap();
+    let mut dec_cmd = Command::new("ob");
     dec_cmd
         .env("HOME", test_home.as_os_str())
         .arg("dec")
@@ -528,7 +528,7 @@ fn test_ob_dec_short_alias_upbc() {
 #[test]
 fn test_ob_enc_invalid_key_too_short() {
     let test_home = test_home_dir();
-    let mut cmd = Command::new("ob").unwrap();
+    let mut cmd = Command::new("ob");
     cmd.env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("--key")
@@ -545,7 +545,7 @@ fn test_ob_enc_invalid_key_too_short() {
 #[test]
 fn test_ob_enc_invalid_key_empty() {
     let test_home = test_home_dir();
-    let mut cmd = Command::new("ob").unwrap();
+    let mut cmd = Command::new("ob");
     cmd.env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("--key")
@@ -562,7 +562,7 @@ fn test_ob_enc_invalid_key_empty() {
 #[test]
 fn test_ob_dec_garbage_input() {
     let test_home = test_home_dir();
-    let mut cmd = Command::new("ob").unwrap();
+    let mut cmd = Command::new("ob");
     cmd.env("HOME", test_home.as_os_str())
         .arg("dec")
         .arg("-K")
@@ -578,7 +578,7 @@ fn test_ob_dec_garbage_input() {
 #[test]
 fn test_ob_enc_missing_plaintext() {
     let test_home = test_home_dir();
-    let mut cmd = Command::new("ob").unwrap();
+    let mut cmd = Command::new("ob");
     cmd.env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("-K")
@@ -594,7 +594,7 @@ fn test_ob_enc_missing_plaintext() {
 fn test_ob_enc_dec_roundtrip_with_explicit_key_aasv() {
     let test_home = test_home_dir();
 
-    let mut enc_cmd = Command::new("ob").unwrap();
+    let mut enc_cmd = Command::new("ob");
     let enc_output = enc_cmd
         .env("HOME", test_home.as_os_str())
         .arg("enc")
@@ -613,7 +613,7 @@ fn test_ob_enc_dec_roundtrip_with_explicit_key_aasv() {
         .to_string();
     assert!(!encd.is_empty());
 
-    let mut dec_cmd = Command::new("ob").unwrap();
+    let mut dec_cmd = Command::new("ob");
     dec_cmd
         .env("HOME", test_home.as_os_str())
         .arg("dec")
@@ -634,7 +634,7 @@ fn test_ob_enc_dec_roundtrip_with_explicit_key_aasv() {
 fn test_ob_enc_dec_roundtrip_with_explicit_key_apsv() {
     let test_home = test_home_dir();
 
-    let mut enc_cmd = Command::new("ob").unwrap();
+    let mut enc_cmd = Command::new("ob");
     let enc_output = enc_cmd
         .env("HOME", test_home.as_os_str())
         .arg("enc")
@@ -653,7 +653,7 @@ fn test_ob_enc_dec_roundtrip_with_explicit_key_apsv() {
         .to_string();
     assert!(!encd.is_empty());
 
-    let mut dec_cmd = Command::new("ob").unwrap();
+    let mut dec_cmd = Command::new("ob");
     dec_cmd
         .env("HOME", test_home.as_os_str())
         .arg("dec")
@@ -674,7 +674,7 @@ fn test_ob_enc_dec_roundtrip_with_explicit_key_apsv() {
 fn test_ob_enc_dec_roundtrip_with_explicit_key_upbc() {
     let test_home = test_home_dir();
 
-    let mut enc_cmd = Command::new("ob").unwrap();
+    let mut enc_cmd = Command::new("ob");
     let enc_output = enc_cmd
         .env("HOME", test_home.as_os_str())
         .arg("enc")
@@ -693,7 +693,7 @@ fn test_ob_enc_dec_roundtrip_with_explicit_key_upbc() {
         .to_string();
     assert!(!encd.is_empty());
 
-    let mut dec_cmd = Command::new("ob").unwrap();
+    let mut dec_cmd = Command::new("ob");
     dec_cmd
         .env("HOME", test_home.as_os_str())
         .arg("dec")
@@ -714,7 +714,7 @@ fn test_ob_enc_dec_roundtrip_with_explicit_key_upbc() {
 fn test_ob_enc_dec_roundtrip_b64_aasv() {
     let test_home = test_home_dir();
 
-    let mut enc_cmd = Command::new("ob").unwrap();
+    let mut enc_cmd = Command::new("ob");
     let enc_output = enc_cmd
         .env("HOME", test_home.as_os_str())
         .arg("enc")
@@ -732,7 +732,7 @@ fn test_ob_enc_dec_roundtrip_b64_aasv() {
         .to_string();
     assert!(!encd.is_empty());
 
-    let mut dec_cmd = Command::new("ob").unwrap();
+    let mut dec_cmd = Command::new("ob");
     dec_cmd
         .env("HOME", test_home.as_os_str())
         .arg("dec")
@@ -752,7 +752,7 @@ fn test_ob_enc_dec_roundtrip_b64_aasv() {
 fn test_ob_enc_dec_roundtrip_hex_aasv() {
     let test_home = test_home_dir();
 
-    let mut enc_cmd = Command::new("ob").unwrap();
+    let mut enc_cmd = Command::new("ob");
     let enc_output = enc_cmd
         .env("HOME", test_home.as_os_str())
         .arg("enc")
@@ -770,7 +770,7 @@ fn test_ob_enc_dec_roundtrip_hex_aasv() {
         .to_string();
     assert!(!encd.is_empty());
 
-    let mut dec_cmd = Command::new("ob").unwrap();
+    let mut dec_cmd = Command::new("ob");
     dec_cmd
         .env("HOME", test_home.as_os_str())
         .arg("dec")
@@ -790,7 +790,7 @@ fn test_ob_enc_dec_roundtrip_hex_aasv() {
 fn test_ob_dec_short_alias_aasv() {
     let test_home = test_home_dir();
 
-    let mut enc_cmd = Command::new("ob").unwrap();
+    let mut enc_cmd = Command::new("ob");
     let enc_output = enc_cmd
         .env("HOME", test_home.as_os_str())
         .arg("enc")
@@ -806,7 +806,7 @@ fn test_ob_dec_short_alias_aasv() {
         .trim()
         .to_string();
 
-    let mut dec_cmd = Command::new("ob").unwrap();
+    let mut dec_cmd = Command::new("ob");
     dec_cmd
         .env("HOME", test_home.as_os_str())
         .arg("dec")
@@ -825,7 +825,7 @@ fn test_ob_dec_short_alias_aasv() {
 fn test_ob_dec_short_alias_apsv() {
     let test_home = test_home_dir();
 
-    let mut enc_cmd = Command::new("ob").unwrap();
+    let mut enc_cmd = Command::new("ob");
     let enc_output = enc_cmd
         .env("HOME", test_home.as_os_str())
         .arg("enc")
@@ -841,7 +841,7 @@ fn test_ob_dec_short_alias_apsv() {
         .trim()
         .to_string();
 
-    let mut dec_cmd = Command::new("ob").unwrap();
+    let mut dec_cmd = Command::new("ob");
     dec_cmd
         .env("HOME", test_home.as_os_str())
         .arg("dec")
@@ -860,7 +860,7 @@ fn test_ob_dec_short_alias_apsv() {
 fn test_ob_enc_different_keys_produce_different_output() {
     let test_home = test_home_dir();
 
-    let mut enc_cmd_a = Command::new("ob").unwrap();
+    let mut enc_cmd_a = Command::new("ob");
     let enc_output_a = enc_cmd_a
         .env("HOME", test_home.as_os_str())
         .arg("enc")
@@ -877,7 +877,7 @@ fn test_ob_enc_different_keys_produce_different_output() {
         .trim()
         .to_string();
 
-    let mut enc_cmd_b = Command::new("ob").unwrap();
+    let mut enc_cmd_b = Command::new("ob");
     let enc_output_b = enc_cmd_b
         .env("HOME", test_home.as_os_str())
         .arg("enc")
@@ -903,7 +903,7 @@ fn test_ob_enc_different_keys_produce_different_output() {
 #[test]
 fn test_ob_enc_empty_plaintext_aasv() {
     let test_home = test_home_dir();
-    let mut cmd = Command::new("ob").unwrap();
+    let mut cmd = Command::new("ob");
     cmd.env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("-K")
@@ -917,7 +917,7 @@ fn test_ob_enc_empty_plaintext_aasv() {
 
 #[test]
 fn test_ob_help() {
-    let mut cmd = Command::new("ob").unwrap();
+    let mut cmd = Command::new("ob");
     cmd.arg("--help")
         .assert()
         .success()

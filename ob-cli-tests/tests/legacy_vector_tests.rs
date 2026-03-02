@@ -79,7 +79,6 @@ fn test_all_vectors() {
 
         // Test encoding: plaintext → obtext (exact match)
         let enc_output = Command::new("obz")
-            .unwrap()
             .arg("enc")
             .arg("-s")
             .arg(&secret)
@@ -106,7 +105,6 @@ fn test_all_vectors() {
 
         // Test decoding: obtext → plaintext (trailing '=' stripped by legacy bug)
         let dec_output = Command::new("obz")
-            .unwrap()
             .arg("dec")
             .arg("-s")
             .arg(&secret)

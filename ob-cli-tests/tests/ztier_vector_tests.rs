@@ -54,7 +54,6 @@ fn test_all_vectors() {
         if !deterministic {
             // For probabilistic schemes: test decoding with explicit format
             let dec_output = Command::new("obz")
-                .unwrap()
                 .arg("dec")
                 .arg("-K")
                 .arg("--format")
@@ -80,7 +79,6 @@ fn test_all_vectors() {
 
             // Roundtrip: enc then dec
             let enc_output = Command::new("obz")
-                .unwrap()
                 .arg("enc")
                 .arg("-K")
                 .arg("--format")
@@ -100,7 +98,6 @@ fn test_all_vectors() {
             let new_obtext = strip_trailing_newline(String::from_utf8(enc_output.stdout).unwrap());
 
             let roundtrip_output = Command::new("obz")
-                .unwrap()
                 .arg("dec")
                 .arg("-K")
                 .arg("--format")
@@ -129,7 +126,6 @@ fn test_all_vectors() {
 
             // Test encoding: plaintext → obtext (exact match)
             let enc_output = Command::new("obz")
-                .unwrap()
                 .arg("enc")
                 .arg("-K")
                 .arg("--format")
@@ -155,7 +151,6 @@ fn test_all_vectors() {
 
             // Test decoding: obtext → plaintext
             let dec_output = Command::new("obz")
-                .unwrap()
                 .arg("dec")
                 .arg("-K")
                 .arg("--format")
