@@ -12,9 +12,34 @@ but note that pre-1.0 releases may not adhere strictly to all guidelines.
 
 ### Added
 
+### Changed
+
+### Fixed
+
+
+[oboron v0.7.0] - 2026-03-02
+------------------------------
+
+### Added
+
 - Batch and iter versions of all `enc*()`/`dec*()` methods and functions.
 
+### Security
+
+- **`MasterKey` now zeroizes key material on drop.**
+  - Added `Zeroize` and `ZeroizeOnDrop` derives (via `zeroize` crate) to `MasterKey`,
+    ensuring the 512-bit key is securely wiped from memory when the struct is dropped.
+  - New dependency: `zeroize = { version = "1", features = ["derive"] }`.
+
 ### Changed
+
+- **`dec_any_format`: single-pass encoding classification.**
+  - Replaced multiple `chars().any(...)` passes with a single byte-scan loop, improving
+    performance of auto-format detection.
+- **`upbc::decrypt`: in-place CBC decryption.**
+  - Changed signature to `decrypt(master_key: &[u8; 64], data: &mut [u8])`.
+  - Decryption now operates directly on the decode buffer, eliminating one intermediate
+    heap allocation per `upbc` decrypt call.
 
 
 [oboron v0.6.0] - 2026-03-01
