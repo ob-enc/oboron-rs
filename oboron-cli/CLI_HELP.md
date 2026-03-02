@@ -24,8 +24,8 @@ ob enc [OPTIONS] [TEXT]
 | `--profile <NAME>` | `-p` | Use named key profile; conflicts with `--key`/`--keyless` |
 | `--keyless` | `-K` | Use hardcoded key (INSECURE — testing only); conflicts with `--key`/`--profile` |
 | `--format <FORMAT>` | `-f` | Format string, e.g. `aasv.b64`; cannot combine with scheme/encoding flags |
-| `--aasv` | | Use aasv scheme (deterministic AES-SIV) |
-| `--apsv` | | Use apsv scheme (probabilistic AES-SIV) |
+| `--aasv` | `-s` | Use aasv scheme (deterministic AES-SIV) |
+| `--apsv` | `-S` | Use apsv scheme (probabilistic AES-SIV) |
 | `--aags` | `-g` | Use aags scheme (deterministic AES-GCM-SIV) |
 | `--apgs` | `-G` | Use apgs scheme (probabilistic AES-GCM-SIV) |
 | `--upbc` | `-B` | Use upbc scheme (probabilistic AES-CBC, unauthenticated) |
@@ -53,8 +53,8 @@ ob dec [OPTIONS] [TEXT]
 | `--profile <NAME>` | `-p` | Use named key profile; conflicts with `--key`/`--keyless` |
 | `--keyless` | `-K` | Use hardcoded key (INSECURE — testing only); conflicts with `--key`/`--profile` |
 | `--format <FORMAT>` | `-f` | Format string, e.g. `aasv.b64`; cannot combine with scheme/encoding flags |
-| `--aasv` | | Use aasv scheme |
-| `--apsv` | | Use apsv scheme |
+| `--aasv` | `-s` | Use aasv scheme |
+| `--apsv` | `-S` | Use apsv scheme |
 | `--aags` | `-g` | Use aags scheme |
 | `--apgs` | `-G` | Use apgs scheme |
 | `--upbc` | `-B` | Use upbc scheme |
@@ -114,8 +114,8 @@ ob config set [OPTIONS]
 
 | Flag / Option | Short | Description |
 |---|---|---|
-| `--aasv` | | Set default scheme to aasv |
-| `--apsv` | | Set default scheme to apsv |
+| `--aasv` | `-s` | Set default scheme to aasv |
+| `--apsv` | `-S` | Set default scheme to apsv |
 | `--aags` | `-g` | Set default scheme to aags |
 | `--apgs` | `-G` | Set default scheme to apgs |
 | `--upbc` | `-B` | Set default scheme to upbc |

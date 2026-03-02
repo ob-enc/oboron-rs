@@ -108,8 +108,8 @@ OPTIONS:
     -K, --keyless           Use hardcoded key (INSECURE - testing only)
     -f, --format <FORMAT>   Format specification, e.g. "aasv.b64"
                             Cannot be combined with scheme or encoding flags
-        --aasv              Use aasv scheme (deterministic AES-SIV)
-        --apsv              Use apsv scheme (probabilistic AES-SIV)
+    -s, --aasv              Use aasv scheme (deterministic AES-SIV)
+    -S, --apsv              Use apsv scheme (probabilistic AES-SIV)
     -g, --aags              Use aags scheme (deterministic AES-GCM-SIV)
     -G, --apgs              Use apgs scheme (probabilistic AES-GCM-SIV)
     -B, --upbc              Use upbc scheme (probabilistic unauthenticated AES-CBC)
@@ -139,8 +139,8 @@ OPTIONS:
     -p, --profile <NAME>    Use named key profile
     -K, --keyless           Use hardcoded key (INSECURE - testing only)
     -f, --format <FORMAT>   Format specification, e.g. "aasv.b64"
-        --aasv              Use aasv scheme
-        --apsv              Use apsv scheme
+    -s, --aasv              Use aasv scheme
+    -S, --apsv              Use apsv scheme
     -g, --aags              Use aags scheme
     -G, --apgs              Use apgs scheme
     -B, --upbc              Use upbc scheme
@@ -200,8 +200,8 @@ USAGE:
     ob config set [OPTIONS]
 
 OPTIONS:
-        --aasv              Set default scheme to aasv
-        --apsv              Set default scheme to apsv
+    -s, --aasv              Set default scheme to aasv
+    -S, --apsv              Set default scheme to apsv
     -g, --aags              Set default scheme to aags
     -G, --apgs              Set default scheme to apgs
     -B, --upbc              Set default scheme to upbc

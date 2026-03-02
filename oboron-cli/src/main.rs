@@ -36,12 +36,12 @@ struct SchemeFlags {
 
     /// Use aasv scheme (deterministic AES-SIV)
     #[cfg(feature = "aasv")]
-    #[arg(long, alias = "32")]
+    #[arg(short = 's', long, alias = "32")]
     aasv: bool,
 
     /// Use apsv scheme (probabilistic AES-SIV)
     #[cfg(feature = "apsv")]
-    #[arg(long, alias = "32p")]
+    #[arg(short = 'S', long, alias = "32p")]
     apsv: bool,
 
     /// Use mock1 scheme (testing, identity)
