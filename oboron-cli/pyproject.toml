@@ -31,3 +31,4 @@ Documentation = "https://github.com/ob-enc/oboron-rs/tree/master/oboron-cli"
 [tool.maturin]
 bindings = "bin"
 manifest-path = "Cargo.toml"
+include = [{ path = "LICENSE", format = "sdist" }]
