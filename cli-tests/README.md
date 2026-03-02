@@ -1,6 +1,6 @@
 # Oboron CLI Test Suite
 
-Language-agnostic CLI integration test suite for [oboron-cli](../oboron-cli).  Each test file
+Language-agnostic CLI integration test suite for the Oboron CLI.  Each test file
 exercises a binary (`ob` or `obz`) end-to-end — spawn the real binary, feed it inputs, and
 assert on stdout — making the tests valid for **any** conforming Oboron CLI implementation, not
 just the Rust one.
@@ -66,21 +66,12 @@ extracted from the meta line and passed to `obz` via `-s <secret>`.
 
 ## Running the Tests
 
-The `oboron-cli` binaries (`ob` and `obz`) must be built before the integration tests will
-pass — `cargo test` for this crate invokes `assert_cmd::Command::cargo_bin`, which looks for
-the binary in `target/debug/`.
+The `ob` and `obz` binaries must be installed and available on `PATH` before running the tests.
+Install any conforming Oboron CLI implementation (e.g. `cargo install oboron-cli`) and ensure `ob` and `obz` are on your `PATH`.
 
 ### Run all test suites
 
 ```shell
-# From the workspace root — builds binaries then runs all cli-tests
-cargo test -p cli-tests
-```
-
-Or, build the binaries first if you want to separate the steps:
-
-```shell
-cargo build -p oboron-cli
 cargo test -p cli-tests
 ```
 
@@ -114,8 +105,7 @@ cargo test -p cli-tests --no-default-features --features aasv,apsv
 
 ## Feature Flags
 
-The `cli-tests` crate mirrors the scheme features of `oboron-cli`.  Tests gated with
-`#[cfg(feature = "...")]` are skipped automatically when the feature is not enabled.
+Tests gated with `#[cfg(feature = "...")]` are skipped automatically when the feature is not enabled.
 
 | Feature | Enabled schemes |
 |---------|-----------------|

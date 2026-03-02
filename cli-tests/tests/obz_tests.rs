@@ -25,7 +25,7 @@ const TEST_SECRET_ALT: &str = "ZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 #[test]
 fn test_obz_enc_keyless() {
     let test_home = test_home_dir();
-    let mut cmd = Command::cargo_bin("obz").unwrap();
+    let mut cmd = Command::new("obz").unwrap();
     cmd.env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("-K")
@@ -42,7 +42,7 @@ fn test_obz_enc_keyless() {
 #[test]
 fn test_obz_enc_with_explicit_key() {
     let test_home = test_home_dir();
-    let mut cmd = Command::cargo_bin("obz").unwrap();
+    let mut cmd = Command::new("obz").unwrap();
     cmd.env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("--secret")
@@ -61,7 +61,7 @@ fn test_obz_enc_with_explicit_key() {
 fn test_obz_enc_dec_roundtrip() {
     let test_home = test_home_dir();
 
-    let mut enc_cmd = Command::cargo_bin("obz").unwrap();
+    let mut enc_cmd = Command::new("obz").unwrap();
     let enc_output = enc_cmd
         .env("HOME", test_home.as_os_str())
         .arg("enc")
@@ -79,7 +79,7 @@ fn test_obz_enc_dec_roundtrip() {
         .to_string();
     assert!(!encd.is_empty());
 
-    let mut dec_cmd = Command::cargo_bin("obz").unwrap();
+    let mut dec_cmd = Command::new("obz").unwrap();
     dec_cmd
         .env("HOME", test_home.as_os_str())
         .arg("dec")
@@ -99,7 +99,7 @@ fn test_obz_enc_dec_roundtrip() {
 fn test_obz_enc_dec_roundtrip_b64() {
     let test_home = test_home_dir();
 
-    let mut enc_cmd = Command::cargo_bin("obz").unwrap();
+    let mut enc_cmd = Command::new("obz").unwrap();
     let enc_output = enc_cmd
         .env("HOME", test_home.as_os_str())
         .arg("enc")
@@ -117,7 +117,7 @@ fn test_obz_enc_dec_roundtrip_b64() {
         .to_string();
     assert!(!encd.is_empty());
 
-    let mut dec_cmd = Command::cargo_bin("obz").unwrap();
+    let mut dec_cmd = Command::new("obz").unwrap();
     dec_cmd
         .env("HOME", test_home.as_os_str())
         .arg("dec")
@@ -137,7 +137,7 @@ fn test_obz_enc_dec_roundtrip_b64() {
 fn test_obz_enc_dec_roundtrip_hex() {
     let test_home = test_home_dir();
 
-    let mut enc_cmd = Command::cargo_bin("obz").unwrap();
+    let mut enc_cmd = Command::new("obz").unwrap();
     let enc_output = enc_cmd
         .env("HOME", test_home.as_os_str())
         .arg("enc")
@@ -155,7 +155,7 @@ fn test_obz_enc_dec_roundtrip_hex() {
         .to_string();
     assert!(!encd.is_empty());
 
-    let mut dec_cmd = Command::cargo_bin("obz").unwrap();
+    let mut dec_cmd = Command::new("obz").unwrap();
     dec_cmd
         .env("HOME", test_home.as_os_str())
         .arg("dec")
@@ -175,7 +175,7 @@ fn test_obz_enc_dec_roundtrip_hex() {
 fn test_obz_enc_dec_roundtrip_with_explicit_key() {
     let test_home = test_home_dir();
 
-    let mut enc_cmd = Command::cargo_bin("obz").unwrap();
+    let mut enc_cmd = Command::new("obz").unwrap();
     let enc_output = enc_cmd
         .env("HOME", test_home.as_os_str())
         .arg("enc")
@@ -194,7 +194,7 @@ fn test_obz_enc_dec_roundtrip_with_explicit_key() {
         .to_string();
     assert!(!encd.is_empty());
 
-    let mut dec_cmd = Command::cargo_bin("obz").unwrap();
+    let mut dec_cmd = Command::new("obz").unwrap();
     dec_cmd
         .env("HOME", test_home.as_os_str())
         .arg("dec")
@@ -214,7 +214,7 @@ fn test_obz_enc_dec_roundtrip_with_explicit_key() {
 #[test]
 fn test_obz_enc_invalid_key_too_short() {
     let test_home = test_home_dir();
-    let mut cmd = Command::cargo_bin("obz").unwrap();
+    let mut cmd = Command::new("obz").unwrap();
     cmd.env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("--secret")
@@ -231,7 +231,7 @@ fn test_obz_enc_invalid_key_too_short() {
 #[test]
 fn test_obz_enc_invalid_key_empty() {
     let test_home = test_home_dir();
-    let mut cmd = Command::cargo_bin("obz").unwrap();
+    let mut cmd = Command::new("obz").unwrap();
     cmd.env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("--secret")
@@ -248,7 +248,7 @@ fn test_obz_enc_invalid_key_empty() {
 #[test]
 fn test_obz_dec_garbage_input() {
     let test_home = test_home_dir();
-    let mut cmd = Command::cargo_bin("obz").unwrap();
+    let mut cmd = Command::new("obz").unwrap();
     cmd.env("HOME", test_home.as_os_str())
         .arg("dec")
         .arg("-K")
@@ -264,7 +264,7 @@ fn test_obz_dec_garbage_input() {
 #[test]
 fn test_obz_enc_missing_plaintext() {
     let test_home = test_home_dir();
-    let mut cmd = Command::cargo_bin("obz").unwrap();
+    let mut cmd = Command::new("obz").unwrap();
     cmd.env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("-K")
@@ -280,7 +280,7 @@ fn test_obz_enc_missing_plaintext() {
 fn test_obz_enc_different_keys_produce_different_output() {
     let test_home = test_home_dir();
 
-    let mut enc_cmd_a = Command::cargo_bin("obz").unwrap();
+    let mut enc_cmd_a = Command::new("obz").unwrap();
     let enc_output_a = enc_cmd_a
         .env("HOME", test_home.as_os_str())
         .arg("enc")
@@ -297,7 +297,7 @@ fn test_obz_enc_different_keys_produce_different_output() {
         .trim()
         .to_string();
 
-    let mut enc_cmd_b = Command::cargo_bin("obz").unwrap();
+    let mut enc_cmd_b = Command::new("obz").unwrap();
     let enc_output_b = enc_cmd_b
         .env("HOME", test_home.as_os_str())
         .arg("enc")
@@ -323,7 +323,7 @@ fn test_obz_enc_different_keys_produce_different_output() {
 #[test]
 fn test_obz_enc_empty_plaintext() {
     let test_home = test_home_dir();
-    let mut cmd = Command::cargo_bin("obz").unwrap();
+    let mut cmd = Command::new("obz").unwrap();
     cmd.env("HOME", test_home.as_os_str())
         .arg("enc")
         .arg("-K")
@@ -337,7 +337,7 @@ fn test_obz_enc_empty_plaintext() {
 
 #[test]
 fn test_obz_help() {
-    let mut cmd = Command::cargo_bin("obz").unwrap();
+    let mut cmd = Command::new("obz").unwrap();
     cmd.arg("--help")
         .assert()
         .success()
