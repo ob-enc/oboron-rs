@@ -20,10 +20,6 @@ but note that pre-1.0 releases may not adhere strictly to all guidelines.
 [oboron v0.7.0] - 2026-03-02
 ------------------------------
 
-### Added
-
-- Batch and iter versions of all `enc*()`/`dec*()` methods and functions.
-
 ### Security
 
 - **`MasterKey` now zeroizes key material on drop.**
