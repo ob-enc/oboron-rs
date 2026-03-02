@@ -6,6 +6,7 @@
 [![License:  MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![oboron](https://img.shields.io/crates/v/oboron?label=oboron)](https://crates.io/crates/oboron)
 [![oboron-cli](https://img.shields.io/crates/v/oboron-cli?label=oboron-cli)](https://crates.io/crates/oboron-cli)
+[![PyPI oboron-cli](https://img.shields.io/pypi/v/oboron-cli?label=oboron-cli)](https://pypi.org/project/oboron-cli/)
 
 Oboron is a general-purpose symmetric encryption library focused on
 developer ergonomics:
@@ -995,7 +996,9 @@ All implementations must pass the common
 ## Related Crates
 
 - [`oboron`](https://crates.io/crates/oboron) — Core Rust library ([docs.rs](https://docs.rs/oboron))
-- [`oboron-cli`](https://crates.io/crates/oboron-cli) — Command-line interface (`ob` and `obz` binaries)
+- [`oboron-cli`](https://crates.io/crates/oboron-cli) — Command-line interface (`ob` and `obz` binaries); installable both as a Rust crate and a Python package:
+  - `cargo install oboron-cli`
+  - `pip install oboron-cli` 
 
 ## Getting Help
 
