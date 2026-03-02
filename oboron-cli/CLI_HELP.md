@@ -28,10 +28,10 @@ ob enc [OPTIONS] [TEXT]
 | `--apsv` | `-S` | Use apsv scheme (probabilistic AES-SIV) |
 | `--aags` | `-g` | Use aags scheme (deterministic AES-GCM-SIV) |
 | `--apgs` | `-G` | Use apgs scheme (probabilistic AES-GCM-SIV) |
-| `--upbc` | `-B` | Use upbc scheme (probabilistic AES-CBC, unauthenticated) |
-| `--c32` | | Use Crockford base32 encoding |
-| `--b32` | | Use RFC base32 encoding |
-| `--b64` | | Use base64 encoding |
+| `--upbc` | | Use upbc scheme (probabilistic AES-CBC, unauthenticated) |
+| `--c32` | `-c` | Use Crockford base32 encoding |
+| `--b32` | `-b` | Use RFC base32 encoding |
+| `--b64` | `-B` | Use base64 encoding |
 | `--hex` | `-x` | Use hex encoding |
 | `--help` | `-h` | Print help |
 
@@ -57,10 +57,10 @@ ob dec [OPTIONS] [TEXT]
 | `--apsv` | `-S` | Use apsv scheme |
 | `--aags` | `-g` | Use aags scheme |
 | `--apgs` | `-G` | Use apgs scheme |
-| `--upbc` | `-B` | Use upbc scheme |
-| `--c32` | | Use Crockford base32 encoding |
-| `--b32` | | Use RFC base32 encoding |
-| `--b64` | | Use base64 encoding |
+| `--upbc` | | Use upbc scheme |
+| `--c32` | `-c` | Use Crockford base32 encoding |
+| `--b32` | `-b` | Use RFC base32 encoding |
+| `--b64` | `-B` | Use base64 encoding |
 | `--hex` | `-x` | Use hex encoding |
 | `--help` | `-h` | Print help |
 
@@ -118,10 +118,10 @@ ob config set [OPTIONS]
 | `--apsv` | `-S` | Set default scheme to apsv |
 | `--aags` | `-g` | Set default scheme to aags |
 | `--apgs` | `-G` | Set default scheme to apgs |
-| `--upbc` | `-B` | Set default scheme to upbc |
-| `--c32` | | Set default encoding to c32 |
-| `--b32` | | Set default encoding to b32 |
-| `--b64` | | Set default encoding to b64 |
+| `--upbc` | | Set default scheme to upbc |
+| `--c32` | `-c` | Set default encoding to c32 |
+| `--b32` | `-b` | Set default encoding to b32 |
+| `--b64` | `-B` | Set default encoding to b64 |
 | `--hex` | `-x` | Set default encoding to hex |
 | `--profile <NAME>` | `-p` | Set default key profile |
 | `--help` | `-h` | Print help |
