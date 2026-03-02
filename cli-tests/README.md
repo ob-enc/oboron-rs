@@ -20,7 +20,8 @@ just the Rust one.
 
 | File | Binary | Vector file | Description |
 |------|--------|-------------|-------------|
-| `ob_tests.rs` | `ob` | *(inline)* | Smoke tests for all `ob` enc/dec operations, profile flags, scheme flags, encoding flags, and roundtrips |
+| `ob_tests.rs` | `ob` | *(inline)* | Smoke/interface tests: profile flags, scheme flags, encoding flags, roundtrips, error handling |
+| `obz_tests.rs` | `obz` | *(inline)* | Smoke/interface tests for `obz`: scheme flags, encoding flags, roundtrips, error handling |
 | `vector_tests.rs` | `ob` | `test-vectors.jsonl` | Vector-driven enc/dec tests for all secure schemes (`aags`, `aasv`, `apgs`, `apsv`, `upbc`) |
 | `ztier_vector_tests.rs` | `obz` | `ztier-test-vectors.jsonl` | Vector-driven enc/dec tests for z-tier schemes (`zrbcx`) |
 | `legacy_vector_tests.rs` | `obz` | `legacy-test-vectors.jsonl` | Vector-driven enc/dec tests for the `legacy` scheme; secret is read from the file's meta line |
@@ -97,6 +98,9 @@ cargo test -p cli-tests --test ztier_vector_tests
 
 # Smoke tests (atier)
 cargo test -p cli-tests --test ob_tests
+
+# Smoke tests (obz)
+cargo test -p cli-tests --test obz_tests
 ```
 
 ### Run with a specific feature set
@@ -135,3 +139,9 @@ plaintext so failures are easy to diagnose.
 
 Avoid round-trip tests with the `legacy` scheme on inputs that end with `=` — the decoded
 output will not match the original plaintext.
+
+### Empty-string plaintext is rejected
+
+Both `ob enc` and `obz enc` reject empty-string plaintext with a non-zero exit code
+(`Error: enc failed: empty plaintext`).  The `test_ob_enc_empty_plaintext_aasv` and
+`test_obz_enc_empty_plaintext` tests assert **failure** for this input rather than success.
