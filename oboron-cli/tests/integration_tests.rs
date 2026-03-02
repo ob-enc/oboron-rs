@@ -464,3 +464,142 @@ fn test_obz_enc_combined_short_aliases() {
         .stdout(predicate::str::is_empty().not());
     cleanup_test_home(&test_home);
 }
+
+#[cfg(feature = "upbc")]
+#[test]
+fn test_enc_short_alias_upbc() {
+    let test_home = test_home_dir();
+    let mut cmd = Command::cargo_bin("ob").unwrap();
+    cmd.env("HOME", test_home.as_os_str())
+        .arg("enc")
+        .arg("-K")
+        .arg("-u")
+        .arg("--b32")
+        .arg("test123")
+        .assert()
+        .success()
+        .stdout(predicate::str::is_empty().not());
+    cleanup_test_home(&test_home);
+}
+
+#[cfg(feature = "upbc")]
+#[test]
+fn test_dec_short_alias_upbc() {
+    let test_home = test_home_dir();
+
+    // First encode
+    let mut enc_cmd = Command::cargo_bin("ob").unwrap();
+    let enc_output = enc_cmd
+        .env("HOME", test_home.as_os_str())
+        .arg("enc")
+        .arg("-K")
+        .arg("-u")
+        .arg("--b32")
+        .arg("hello123")
+        .output()
+        .unwrap();
+    assert!(enc_output.status.success());
+    let encd = String::from_utf8(enc_output.stdout)
+        .unwrap()
+        .trim()
+        .to_string();
+
+    // Decode with -u alias
+    let mut dec_cmd = Command::cargo_bin("ob").unwrap();
+    dec_cmd
+        .env("HOME", test_home.as_os_str())
+        .arg("dec")
+        .arg("-K")
+        .arg("-u")
+        .arg("--b32")
+        .arg(&encd)
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("hello123"));
+    cleanup_test_home(&test_home);
+}
+
+#[cfg(feature = "legacy")]
+#[test]
+fn test_obz_enc_legacy_rejects_b32_flag() {
+    let test_home = test_home_dir();
+    let mut cmd = Command::cargo_bin("obz").unwrap();
+    cmd.env("HOME", test_home.as_os_str())
+        .arg("enc")
+        .arg("-K")
+        .arg("--legacy")
+        .arg("--b32")
+        .arg("test123")
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("--legacy is incompatible with encoding flags"));
+    cleanup_test_home(&test_home);
+}
+
+#[cfg(feature = "legacy")]
+#[test]
+fn test_obz_enc_legacy_rejects_b64_flag() {
+    let test_home = test_home_dir();
+    let mut cmd = Command::cargo_bin("obz").unwrap();
+    cmd.env("HOME", test_home.as_os_str())
+        .arg("enc")
+        .arg("-K")
+        .arg("--legacy")
+        .arg("--b64")
+        .arg("test123")
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("--legacy is incompatible with encoding flags"));
+    cleanup_test_home(&test_home);
+}
+
+#[cfg(feature = "legacy")]
+#[test]
+fn test_obz_enc_legacy_rejects_hex_flag() {
+    let test_home = test_home_dir();
+    let mut cmd = Command::cargo_bin("obz").unwrap();
+    cmd.env("HOME", test_home.as_os_str())
+        .arg("enc")
+        .arg("-K")
+        .arg("--legacy")
+        .arg("--hex")
+        .arg("test123")
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("--legacy is incompatible with encoding flags"));
+    cleanup_test_home(&test_home);
+}
+
+#[cfg(feature = "legacy")]
+#[test]
+fn test_obz_enc_legacy_rejects_c32_flag() {
+    let test_home = test_home_dir();
+    let mut cmd = Command::cargo_bin("obz").unwrap();
+    cmd.env("HOME", test_home.as_os_str())
+        .arg("enc")
+        .arg("-K")
+        .arg("--legacy")
+        .arg("--c32")
+        .arg("test123")
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("--legacy is incompatible with encoding flags"));
+    cleanup_test_home(&test_home);
+}
+
+#[cfg(feature = "legacy")]
+#[test]
+fn test_obz_dec_legacy_rejects_encoding_flags() {
+    let test_home = test_home_dir();
+    let mut cmd = Command::cargo_bin("obz").unwrap();
+    cmd.env("HOME", test_home.as_os_str())
+        .arg("dec")
+        .arg("-K")
+        .arg("--legacy")
+        .arg("--b64")
+        .arg("sometext")
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("--legacy is incompatible with encoding flags"));
+    cleanup_test_home(&test_home);
+}
