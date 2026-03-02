@@ -311,11 +311,39 @@ Key differences from `ob`:
 | Feature flag | always available (a/u-tier) | requires `ztier` |
 
 Available `obz` scheme flags:
-- `-b`, `--zrbcx` — XOR-based obfuscation (deterministic)
+- `-r`, `--zrbcx` — XOR-based obfuscation (deterministic)
 - `-l`, `--legacy` — Base32-based legacy obfuscation (fixed encoding)
+
+`obz` encoding short flags match `ob`: `-c`/`--c32`, `-b`/`--b32`, `-B`/`--b64`, `-x`/`--hex`.
 
 Commands and subcommands are otherwise identical to `ob`, substituting `obz` for `ob`,
 `secret` for `key`, and using `--secret`/`-s` instead of `--key`/`-k`.
+
+**Short-alias convenience examples:**
+
+`ob enc/dec`:
+```shell
+# Instead of: ob enc --aasv --b32 'abc'
+ob e -sb 'abc'
+
+# Instead of: ob enc --aasv --b64 'abc'
+ob e -sB 'abc'
+
+# Instead of: ob enc --aasv --c32 'abc'
+ob e -sc 'abc'
+```
+
+`obz enc/dec`:
+```shell
+# Instead of: obz enc --zrbcx --b32 'abc'
+obz e -rb 'abc'
+
+# Instead of: obz enc --zrbcx --b64 'abc'
+obz e -rB 'abc'
+
+# Instead of: obz enc --zrbcx --c32 'abc'
+obz e -rc 'abc'
+```
 
 Example:
 ```shell
