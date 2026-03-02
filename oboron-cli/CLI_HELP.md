@@ -255,9 +255,36 @@ ob completion <SHELL>
 - Uses "secret" (`--secret`/`-s`, 43 base64 chars) instead of "key" (`--key`/`-k`)
 - Config stored in `~/.obz/` instead of `~/.ob/`
 - Default scheme is `zrbcx` instead of `aasv`
-- Scheme flags: `--zrbcx`/`-b`, `--legacy`/`-l`
+- Scheme flags: `--zrbcx`/`-r`, `--legacy`/`-l`
+- Encoding flags: `--c32`/`-c`, `--b32`/`-b`, `--b64`/`-B`, `--hex`/`-x`
 - `secret` command (alias: `s`) instead of `key`/`k`
 
 All subcommands (`enc`/`e`, `dec`/`d`, `init`/`i`, `config`/`c`, `profile`/`p`,
 `completion`) accept the same flags as their `ob` counterparts.
+
+**Short-alias convenience examples:**
+
+`ob enc/dec`:
+```
+# Instead of: ob enc --aasv --b32 'abc'
+ob e -sb 'abc'
+
+# Instead of: ob enc --aasv --b64 'abc'
+ob e -sB 'abc'
+
+# Instead of: ob enc --aasv --c32 'abc'
+ob e -sc 'abc'
+```
+
+`obz enc/dec`:
+```
+# Instead of: obz enc --zrbcx --b32 'abc'
+obz e -rb 'abc'
+
+# Instead of: obz enc --zrbcx --b64 'abc'
+obz e -rB 'abc'
+
+# Instead of: obz enc --zrbcx --c32 'abc'
+obz e -rc 'abc'
+```
 

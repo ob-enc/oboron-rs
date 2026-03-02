@@ -371,3 +371,96 @@ fn test_enc_short_alias_c32() {
         .stdout(predicate::str::is_empty().not());
     cleanup_test_home(&test_home);
 }
+
+// Valid 43-character base64 secret (32 bytes)
+const TEST_SECRET_B64: &str = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+
+#[cfg(feature = "zrbcx")]
+#[test]
+fn test_obz_enc_short_alias_zrbcx() {
+    let test_home = test_home_dir();
+    let mut cmd = Command::cargo_bin("obz").unwrap();
+    cmd.env("HOME", test_home.as_os_str())
+        .arg("enc")
+        .arg("-s")
+        .arg(TEST_SECRET_B64)
+        .arg("-r")
+        .arg("--b32")
+        .arg("test123")
+        .assert()
+        .success()
+        .stdout(predicate::str::is_empty().not());
+    cleanup_test_home(&test_home);
+}
+
+#[cfg(feature = "zrbcx")]
+#[test]
+fn test_obz_enc_short_alias_b32() {
+    let test_home = test_home_dir();
+    let mut cmd = Command::cargo_bin("obz").unwrap();
+    cmd.env("HOME", test_home.as_os_str())
+        .arg("enc")
+        .arg("-s")
+        .arg(TEST_SECRET_B64)
+        .arg("--zrbcx")
+        .arg("-b")
+        .arg("test123")
+        .assert()
+        .success()
+        .stdout(predicate::str::is_empty().not());
+    cleanup_test_home(&test_home);
+}
+
+#[cfg(feature = "zrbcx")]
+#[test]
+fn test_obz_enc_short_alias_b64() {
+    let test_home = test_home_dir();
+    let mut cmd = Command::cargo_bin("obz").unwrap();
+    cmd.env("HOME", test_home.as_os_str())
+        .arg("enc")
+        .arg("-s")
+        .arg(TEST_SECRET_B64)
+        .arg("--zrbcx")
+        .arg("-B")
+        .arg("test123")
+        .assert()
+        .success()
+        .stdout(predicate::str::is_empty().not());
+    cleanup_test_home(&test_home);
+}
+
+#[cfg(feature = "zrbcx")]
+#[test]
+fn test_obz_enc_short_alias_c32() {
+    let test_home = test_home_dir();
+    let mut cmd = Command::cargo_bin("obz").unwrap();
+    cmd.env("HOME", test_home.as_os_str())
+        .arg("enc")
+        .arg("-s")
+        .arg(TEST_SECRET_B64)
+        .arg("--zrbcx")
+        .arg("-c")
+        .arg("test123")
+        .assert()
+        .success()
+        .stdout(predicate::str::is_empty().not());
+    cleanup_test_home(&test_home);
+}
+
+#[cfg(feature = "zrbcx")]
+#[test]
+fn test_obz_enc_combined_short_aliases() {
+    // Test the convenience combined-flag usage: obz e -rb 'abc'
+    let test_home = test_home_dir();
+    let mut cmd = Command::cargo_bin("obz").unwrap();
+    cmd.env("HOME", test_home.as_os_str())
+        .arg("e")
+        .arg("-s")
+        .arg(TEST_SECRET_B64)
+        .arg("-rb")
+        .arg("test123")
+        .assert()
+        .success()
+        .stdout(predicate::str::is_empty().not());
+    cleanup_test_home(&test_home);
+}
