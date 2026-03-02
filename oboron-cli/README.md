@@ -112,10 +112,10 @@ OPTIONS:
     -S, --apsv              Use apsv scheme (probabilistic AES-SIV)
     -g, --aags              Use aags scheme (deterministic AES-GCM-SIV)
     -G, --apgs              Use apgs scheme (probabilistic AES-GCM-SIV)
-    -B, --upbc              Use upbc scheme (probabilistic unauthenticated AES-CBC)
-        --c32               Use Crockford base32 encoding
-        --b32               Use RFC base32 encoding
-        --b64               Use base64 encoding
+        --upbc              Use upbc scheme (probabilistic unauthenticated AES-CBC)
+    -c, --c32               Use Crockford base32 encoding
+    -b, --b32               Use RFC base32 encoding
+    -B, --b64               Use base64 encoding
     -x, --hex               Use hex encoding
     -h, --help              Print help
 ```
@@ -143,10 +143,10 @@ OPTIONS:
     -S, --apsv              Use apsv scheme
     -g, --aags              Use aags scheme
     -G, --apgs              Use apgs scheme
-    -B, --upbc              Use upbc scheme
-        --c32               Use Crockford base32 encoding
-        --b32               Use RFC base32 encoding
-        --b64               Use base64 encoding
+        --upbc              Use upbc scheme
+    -c, --c32               Use Crockford base32 encoding
+    -b, --b32               Use RFC base32 encoding
+    -B, --b64               Use base64 encoding
     -x, --hex               Use hex encoding
     -h, --help              Print help
 ```
@@ -204,10 +204,10 @@ OPTIONS:
     -S, --apsv              Set default scheme to apsv
     -g, --aags              Set default scheme to aags
     -G, --apgs              Set default scheme to apgs
-    -B, --upbc              Set default scheme to upbc
-        --c32               Set default encoding to c32
-        --b32               Set default encoding to b32
-        --b64               Set default encoding to b64
+        --upbc              Set default scheme to upbc
+    -c, --c32               Set default encoding to c32
+    -b, --b32               Set default encoding to b32
+    -B, --b64               Set default encoding to b64
     -x, --hex               Set default encoding to hex
     -p, --profile <NAME>    Set default key profile
     -h, --help              Print help

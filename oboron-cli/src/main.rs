@@ -21,7 +21,7 @@ struct Cli {
 struct SchemeFlags {
     /// Use upbc scheme (probabilistic unauthenticated)
     #[cfg(feature = "upbc")]
-    #[arg(short = 'B', long, alias = "21p")]
+    #[arg(long, alias = "21p")]
     upbc: bool,
 
     /// Use aags scheme (deterministic AES-GCM-SIV)
@@ -139,15 +139,15 @@ impl SchemeFlags {
 #[derive(Args, Debug)]
 struct EncodingFlags {
     /// Use c32 encoding
-    #[arg(long, alias = "base32crockford")]
+    #[arg(short = 'c', long, alias = "base32crockford")]
     c32: bool,
 
     /// Use b32 encoding
-    #[arg(long, alias = "base32rfc")]
+    #[arg(short = 'b', long, alias = "base32rfc")]
     b32: bool,
 
     /// Use b64 encoding
-    #[arg(long, alias = "base64")]
+    #[arg(short = 'B', long, alias = "base64")]
     b64: bool,
 
     /// Use hex encoding

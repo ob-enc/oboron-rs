@@ -320,3 +320,54 @@ fn test_enc_with_format_string() {
 
     cleanup_test_home(&test_home);
 }
+
+#[cfg(feature = "aasv")]
+#[test]
+fn test_enc_short_alias_b64() {
+    let test_home = test_home_dir();
+    let mut cmd = Command::cargo_bin("ob").unwrap();
+    cmd.env("HOME", test_home.as_os_str())
+        .arg("enc")
+        .arg("-K")
+        .arg("--aasv")
+        .arg("-B")
+        .arg("test123")
+        .assert()
+        .success()
+        .stdout(predicate::str::is_empty().not());
+    cleanup_test_home(&test_home);
+}
+
+#[cfg(feature = "aasv")]
+#[test]
+fn test_enc_short_alias_b32() {
+    let test_home = test_home_dir();
+    let mut cmd = Command::cargo_bin("ob").unwrap();
+    cmd.env("HOME", test_home.as_os_str())
+        .arg("enc")
+        .arg("-K")
+        .arg("--aasv")
+        .arg("-b")
+        .arg("test123")
+        .assert()
+        .success()
+        .stdout(predicate::str::is_empty().not());
+    cleanup_test_home(&test_home);
+}
+
+#[cfg(feature = "aasv")]
+#[test]
+fn test_enc_short_alias_c32() {
+    let test_home = test_home_dir();
+    let mut cmd = Command::cargo_bin("ob").unwrap();
+    cmd.env("HOME", test_home.as_os_str())
+        .arg("enc")
+        .arg("-K")
+        .arg("--aasv")
+        .arg("-c")
+        .arg("test123")
+        .assert()
+        .success()
+        .stdout(predicate::str::is_empty().not());
+    cleanup_test_home(&test_home);
+}
