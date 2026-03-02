@@ -38,6 +38,7 @@ fn load_test_vectors() -> Vec<TestVector> {
 }
 
 fn is_deterministic(format: &str) -> bool {
+    // aags and aasv are the secure deterministic schemes
     let scheme = format.split('.').next().unwrap_or("");
     matches!(scheme, "aags" | "aasv")
 }

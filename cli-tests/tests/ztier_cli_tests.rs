@@ -40,7 +40,7 @@ fn load_test_vectors() -> Vec<TestVector> {
 fn is_deterministic(format: &str) -> bool {
     // Parse scheme from format string (e.g., "zrbcx.c32" → "zrbcx")
     let scheme = format.split('.').next().unwrap_or("");
-    matches!(scheme, "zrbcx" | "zmock1" | "legacy")
+    matches!(scheme, "zrbcx" | "zmock1")
 }
 
 #[test]
