@@ -97,9 +97,9 @@ ob enc -f aasv.b64 "hello, world"
 Both CLIs support environment variables for key/secret resolution, enabling use without
 `ob init` / `obz init` (e.g., in CI/CD or containerized environments).
 
-| Variable | CLI | Description |
-|---|---|---|
-| `OBORON_KEY` | `ob` | 86-character base64url-nopad encryption key (512-bit) |
+| Variable        | CLI   | Description                                               |
+|-----------------|-------|-----------------------------------------------------------|
+| `OBORON_KEY`    | `ob`  | 86-character base64url-nopad encryption key (512-bit)     |
 | `OBORON_SECRET` | `obz` | 43-character base64url-nopad obfuscation secret (256-bit) |
 
 **Precedence order (highest to lowest):**
