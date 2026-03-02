@@ -4,6 +4,8 @@
 [![Python Versions](https://img.shields.io/pypi/pyversions/oboron)](https://pypi.org/project/oboron/)
 [![Crates.io](https://img.shields.io/crates/v/oboron-py.svg)](https://crates.io/crates/oboron-py)
 [![License:  MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![oboron](https://img.shields.io/crates/v/oboron?label=oboron)](https://crates.io/crates/oboron)
+[![oboron-cli](https://img.shields.io/crates/v/oboron-cli?label=oboron-cli)](https://crates.io/crates/oboron-cli)
 
 Oboron is a general-purpose symmetric encryption library focused on
 developer ergonomics:
@@ -44,6 +46,7 @@ Key Advantages:
 - [Python API Overview](#python-api-overview)
 - [Applications](#applications)
 - [Compatibility](#compatibility)
+- [Related Crates](#related-crates)
 - [Getting Help](#getting-help)
 - [License](#license)
 - [Appendix: Obtext Lengths](#appendix-obtext-lengths)
@@ -988,6 +991,11 @@ Oboron implementations maintain full cross-language compatibility:
 
 All implementations must pass the common
 [test vectors](../oboron/tests/test-vectors.jsonl)
+
+## Related Crates
+
+- [`oboron`](https://crates.io/crates/oboron) — Core Rust library ([docs.rs](https://docs.rs/oboron))
+- [`oboron-cli`](https://crates.io/crates/oboron-cli) — Command-line interface (`ob` and `obz` binaries)
 
 ## Getting Help
 
