@@ -1,5 +1,5 @@
 [package]
-name = "cli-tests"
+name = "oboron-cli-tests"
 version = "0.1.0"
 edition = "2021"
 publish = false

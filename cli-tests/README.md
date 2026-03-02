@@ -20,10 +20,10 @@ just the Rust one.
 
 | File | Binary | Vector file | Description |
 |------|--------|-------------|-------------|
-| `atier_cli_tests.rs` | `ob` | *(inline)* | Smoke tests for all `ob` enc/dec operations, profile flags, scheme flags, encoding flags, and roundtrips |
-| `secure_scheme_cli_tests.rs` | `ob` | `test-vectors.jsonl` | Vector-driven enc/dec tests for all secure schemes (`aags`, `aasv`, `apgs`, `apsv`, `upbc`) |
-| `ztier_cli_tests.rs` | `obz` | `ztier-test-vectors.jsonl` | Vector-driven enc/dec tests for z-tier schemes (`zrbcx`) |
-| `legacy_cli_tests.rs` | `obz` | `legacy-test-vectors.jsonl` | Vector-driven enc/dec tests for the `legacy` scheme; secret is read from the file's meta line |
+| `ob_tests.rs` | `ob` | *(inline)* | Smoke tests for all `ob` enc/dec operations, profile flags, scheme flags, encoding flags, and roundtrips |
+| `vector_tests.rs` | `ob` | `test-vectors.jsonl` | Vector-driven enc/dec tests for all secure schemes (`aags`, `aasv`, `apgs`, `apsv`, `upbc`) |
+| `ztier_vector_tests.rs` | `obz` | `ztier-test-vectors.jsonl` | Vector-driven enc/dec tests for z-tier schemes (`zrbcx`) |
+| `legacy_vector_tests.rs` | `obz` | `legacy-test-vectors.jsonl` | Vector-driven enc/dec tests for the `legacy` scheme; secret is read from the file's meta line |
 
 ### Test strategy per scheme type
 
@@ -45,11 +45,11 @@ line is a JSON object:
 {"format": "aags.c32", "plaintext": "hello", "obtext": "..."}
 ```
 
-No meta line.  Used by `secure_scheme_cli_tests.rs` with `-K` (keyless / hardcoded key).
+No meta line.  Used by `vector_tests.rs` with `-K` (keyless / hardcoded key).
 
 ### `ztier-test-vectors.jsonl`
 
-Z-tier vectors for `obz` (`zrbcx`).  Same plain JSONL format.  Used by `ztier_cli_tests.rs`
+Z-tier vectors for `obz` (`zrbcx`).  Same plain JSONL format.  Used by `ztier_vector_tests.rs`
 with `-K`.
 
 ### `legacy-test-vectors.jsonl`
@@ -60,7 +60,7 @@ Legacy-scheme vectors for `obz`.  The **first line** is a meta object carrying t
 {"type": "meta", "secret": "<43-char base64url secret>"}
 ```
 
-Subsequent lines are standard vector objects.  Used by `legacy_cli_tests.rs`; the secret is
+Subsequent lines are standard vector objects.  Used by `legacy_vector_tests.rs`; the secret is
 extracted from the meta line and passed to `obz` via `-s <secret>`.
 
 ## Running the Tests
@@ -87,16 +87,16 @@ cargo test -p cli-tests
 
 ```shell
 # Secure-scheme vector tests only
-cargo test -p cli-tests --test secure_scheme_cli_tests
+cargo test -p cli-tests --test vector_tests
 
 # Legacy vector tests only
-cargo test -p cli-tests --test legacy_cli_tests
+cargo test -p cli-tests --test legacy_vector_tests
 
 # Z-tier vector tests only
-cargo test -p cli-tests --test ztier_cli_tests
+cargo test -p cli-tests --test ztier_vector_tests
 
 # Smoke tests (atier)
-cargo test -p cli-tests --test atier_cli_tests
+cargo test -p cli-tests --test ob_tests
 ```
 
 ### Run with a specific feature set
@@ -129,7 +129,7 @@ The default feature set enables all of the above.
 ### Legacy scheme: trailing `=` stripped on decode
 
 The `legacy` scheme has a known bug: `obz dec` strips trailing `=` characters from the
-decoded plaintext.  The `legacy_cli_tests.rs` file accounts for this by trimming trailing `=`
+decoded plaintext.  The `legacy_vector_tests.rs` file accounts for this by trimming trailing `=`
 from the expected value before asserting, and annotates the assertion message with the original
 plaintext so failures are easy to diagnose.
 
