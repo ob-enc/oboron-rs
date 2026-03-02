@@ -629,8 +629,22 @@ fn secret_command(
         } else {
             anyhow::bail!("Profile '{}' has no secret", prof);
         }
+    } else if let Ok(env_secret) = std::env::var("OBORON_SECRET") {
+        println!(
+            "{}",
+            if hex {
+                let secret_bytes = BASE64URL_NOPAD
+                    .decode(env_secret.as_bytes())
+                    .context("Failed to decode base64 secret")?;
+                HEXLOWER.encode(&secret_bytes)
+            } else {
+                env_secret
+            }
+        );
     } else {
-        anyhow::bail!("No secret specified:  provide --secret, --profile, or run 'obz init'");
+        anyhow::bail!(
+            "No secret specified: provide --secret, set $OBORON_SECRET, use --profile, or run 'obz init'"
+        );
     }
 
     Ok(())
@@ -641,11 +655,19 @@ fn get_secret(
     profile: Option<&str>,
     config: Option<&Config>,
 ) -> Result<String> {
+    // 1. Explicit --secret flag
     if let Some(secret_str) = secret {
         validate_base64_secret(secret_str)?;
         return Ok(secret_str.clone());
     }
 
+    // 2. Environment variable
+    if let Ok(env_secret) = std::env::var("OBORON_SECRET") {
+        validate_base64_secret(&env_secret)?;
+        return Ok(env_secret);
+    }
+
+    // 3-4. Profile (explicit or default from config)
     let profile_name = profile.or_else(|| config.map(|c| c.profile.as_str()));
 
     if let Some(name) = profile_name {
@@ -658,7 +680,7 @@ fn get_secret(
     }
 
     Err(anyhow::anyhow!(
-        "No secret specified: provide --secret, --profile, or run 'obz init'"
+        "No secret specified: provide --secret, set $OBORON_SECRET, use --profile, or run 'obz init'"
     ))
 }
 
