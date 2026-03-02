@@ -778,6 +778,10 @@ All implementations must pass the common
 
 Licensed under the MIT license ([LICENSE](LICENSE)).
 
+## Changelog
+
+See [CHANGELOG.md](https://github.com/ob-enc/oboron-rs/blob/master/CHANGELOG.md) for release history.
+
 ## Appendix: Obtext Lengths
 
 `mock1` is a non-cryptographic scheme used for testing, whose ciphertext
