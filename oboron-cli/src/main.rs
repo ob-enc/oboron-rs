@@ -21,7 +21,7 @@ struct Cli {
 struct SchemeFlags {
     /// Use upbc scheme (probabilistic unauthenticated)
     #[cfg(feature = "upbc")]
-    #[arg(long, alias = "21p")]
+    #[arg(short = 'u', long, alias = "21p")]
     upbc: bool,
 
     /// Use aags scheme (deterministic AES-GCM-SIV)

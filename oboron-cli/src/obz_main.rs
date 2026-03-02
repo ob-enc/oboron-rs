@@ -166,9 +166,15 @@ impl FormatSpec {
         }
 
         let scheme = get_scheme(scheme_flags.to_scheme()?, config)?;
-        // Legacy has a fixed encoding (B32/RFC lowercase) — no need to specify one explicitly
+        // Legacy has a fixed encoding (B32/RFC lowercase) — encoding flags are incompatible
         #[cfg(feature = "legacy")]
         if scheme == Scheme::Legacy {
+            if encoding_flags.is_set() {
+                anyhow::bail!(
+                    "--legacy is incompatible with encoding flags (--b32, --b64, --hex, --c32): \
+                     legacy has a fixed encoding"
+                );
+            }
             return Ok(Self {
                 scheme,
                 encoding: Encoding::B32,
