@@ -29,8 +29,8 @@ fn strip_trailing_newline(s: String) -> String {
 
 fn load_test_vectors() -> Vec<TestVector> {
     let path =
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/vectors/ztier-test-vectors.jsonl");
-    let data = fs::read_to_string(&path).expect("Failed to read ztier-test-vectors.jsonl");
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/vectors/test-vectors.jsonl");
+    let data = fs::read_to_string(&path).expect("Failed to read test-vectors.jsonl");
     data.lines()
         .filter(|line| !line.trim().is_empty())
         .map(|line| serde_json::from_str(line).expect("Failed to parse test vector"))
@@ -38,9 +38,9 @@ fn load_test_vectors() -> Vec<TestVector> {
 }
 
 fn is_deterministic(format: &str) -> bool {
-    // Parse scheme from format string (e.g., "zrbcx.c32" → "zrbcx")
+    // aags and aasv are the secure deterministic schemes
     let scheme = format.split('.').next().unwrap_or("");
-    matches!(scheme, "zrbcx" | "zmock1")
+    matches!(scheme, "aags" | "aasv")
 }
 
 #[test]
@@ -53,7 +53,7 @@ fn test_all_vectors() {
 
         if !deterministic {
             // For probabilistic schemes: test decoding with explicit format
-            let dec_output = Command::cargo_bin("obz")
+            let dec_output = Command::cargo_bin("ob")
                 .unwrap()
                 .arg("dec")
                 .arg("-K")
@@ -62,11 +62,11 @@ fn test_all_vectors() {
                 .arg("--")
                 .arg(&vector.obtext)
                 .output()
-                .unwrap_or_else(|e| panic!("Failed to run obz dec: {}", e));
+                .unwrap_or_else(|e| panic!("Failed to run ob dec: {}", e));
 
             assert!(
                 dec_output.status.success(),
-                "obz dec failed for '{}' with format '{}': {}",
+                "ob dec failed for '{}' with format '{}': {}",
                 vector.obtext,
                 vector.format,
                 String::from_utf8_lossy(&dec_output.stderr)
@@ -79,7 +79,7 @@ fn test_all_vectors() {
             );
 
             // Roundtrip: enc then dec
-            let enc_output = Command::cargo_bin("obz")
+            let enc_output = Command::cargo_bin("ob")
                 .unwrap()
                 .arg("enc")
                 .arg("-K")
@@ -88,18 +88,18 @@ fn test_all_vectors() {
                 .arg("--")
                 .arg(&vector.plaintext)
                 .output()
-                .unwrap_or_else(|e| panic!("Failed to run obz enc: {}", e));
+                .unwrap_or_else(|e| panic!("Failed to run ob enc: {}", e));
 
             assert!(
                 enc_output.status.success(),
-                "obz enc failed for '{}' with format '{}': {}",
+                "ob enc failed for '{}' with format '{}': {}",
                 vector.plaintext,
                 vector.format,
                 String::from_utf8_lossy(&enc_output.stderr)
             );
             let new_obtext = strip_trailing_newline(String::from_utf8(enc_output.stdout).unwrap());
 
-            let roundtrip_output = Command::cargo_bin("obz")
+            let roundtrip_output = Command::cargo_bin("ob")
                 .unwrap()
                 .arg("dec")
                 .arg("-K")
@@ -108,11 +108,11 @@ fn test_all_vectors() {
                 .arg("--")
                 .arg(&new_obtext)
                 .output()
-                .unwrap_or_else(|e| panic!("Failed to run obz dec (roundtrip): {}", e));
+                .unwrap_or_else(|e| panic!("Failed to run ob dec (roundtrip): {}", e));
 
             assert!(
                 roundtrip_output.status.success(),
-                "obz dec roundtrip failed for '{}' with format '{}': {}",
+                "ob dec roundtrip failed for '{}' with format '{}': {}",
                 new_obtext,
                 vector.format,
                 String::from_utf8_lossy(&roundtrip_output.stderr)
@@ -128,7 +128,7 @@ fn test_all_vectors() {
             // For deterministic schemes: test encoding (exact match) and decoding
 
             // Test encoding: plaintext → obtext (exact match)
-            let enc_output = Command::cargo_bin("obz")
+            let enc_output = Command::cargo_bin("ob")
                 .unwrap()
                 .arg("enc")
                 .arg("-K")
@@ -137,11 +137,11 @@ fn test_all_vectors() {
                 .arg("--")
                 .arg(&vector.plaintext)
                 .output()
-                .unwrap_or_else(|e| panic!("Failed to run obz enc: {}", e));
+                .unwrap_or_else(|e| panic!("Failed to run ob enc: {}", e));
 
             assert!(
                 enc_output.status.success(),
-                "obz enc failed for '{}' with format '{}': {}",
+                "ob enc failed for '{}' with format '{}': {}",
                 vector.plaintext,
                 vector.format,
                 String::from_utf8_lossy(&enc_output.stderr)
@@ -154,7 +154,7 @@ fn test_all_vectors() {
             );
 
             // Test decoding: obtext → plaintext
-            let dec_output = Command::cargo_bin("obz")
+            let dec_output = Command::cargo_bin("ob")
                 .unwrap()
                 .arg("dec")
                 .arg("-K")
@@ -163,11 +163,11 @@ fn test_all_vectors() {
                 .arg("--")
                 .arg(&vector.obtext)
                 .output()
-                .unwrap_or_else(|e| panic!("Failed to run obz dec: {}", e));
+                .unwrap_or_else(|e| panic!("Failed to run ob dec: {}", e));
 
             assert!(
                 dec_output.status.success(),
-                "obz dec failed for '{}' with format '{}': {}",
+                "ob dec failed for '{}' with format '{}': {}",
                 vector.obtext,
                 vector.format,
                 String::from_utf8_lossy(&dec_output.stderr)
