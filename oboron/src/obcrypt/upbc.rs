@@ -42,7 +42,7 @@ pub fn encrypt(master_key: &[u8; 64], plaintext_bytes: &[u8]) -> Result<Vec<u8>,
 }
 
 #[inline]
-pub fn decrypt(master_key: &[u8; 64], data: &[u8]) -> Result<Vec<u8>, Error> {
+pub fn decrypt(master_key: &[u8; 64], data: &mut [u8]) -> Result<Vec<u8>, Error> {
     if data.len() < 32 {
         return Err(Error::PayloadTooShort);
     }
@@ -50,25 +50,23 @@ pub fn decrypt(master_key: &[u8; 64], data: &[u8]) -> Result<Vec<u8>, Error> {
     let key_slice = &master_key[KEY_OFFSET..KEY_OFFSET + KEY_LEN];
     let key: &[u8; 32] = key_slice.try_into().unwrap();
 
-    let iv = &data[..IV_SIZE];
-    let ciphertext = &data[IV_SIZE..];
+    let (iv, ciphertext) = data.split_at_mut(IV_SIZE);
 
     if ciphertext.len() % AES_BLOCK_SIZE != 0 {
         return Err(Error::InvalidBlockLength);
     }
 
-    let cipher = Aes256CbcDec::new(key.into(), iv.into());
-    let mut plaintext = ciphertext.to_vec();
+    let cipher = Aes256CbcDec::new(key.into(), (&*iv).into());
 
     cipher
-        .decrypt_padded_mut::<cipher::block_padding::NoPadding>(&mut plaintext)
+        .decrypt_padded_mut::<cipher::block_padding::NoPadding>(ciphertext)
         .map_err(|_| Error::DecryptionFailed)?;
 
-    let mut end = plaintext.len();
-    while end > 0 && plaintext[end - 1] == CBC_PADDING_BYTE {
+    // Strip custom padding
+    let mut end = ciphertext.len();
+    while end > 0 && ciphertext[end - 1] == CBC_PADDING_BYTE {
         end -= 1;
     }
-    plaintext.truncate(end);
 
-    Ok(plaintext)
+    Ok(ciphertext[..end].to_vec())
 }

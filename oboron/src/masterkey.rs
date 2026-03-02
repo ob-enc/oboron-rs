@@ -1,6 +1,8 @@
 use crate::Error;
 use data_encoding::BASE64URL_NOPAD;
+use zeroize::{Zeroize, ZeroizeOnDrop};
 
+#[derive(Zeroize, ZeroizeOnDrop)]
 pub struct MasterKey {
     key: [u8; 64],
 }

@@ -159,7 +159,7 @@ macro_rules! impl_codec_32 {
                 buffer.truncate(len - 2);
 
                 // Decrypt directly
-                let plaintext_bytes = $decrypt_fn(self.masterkey.key(), &buffer)?;
+                let plaintext_bytes = $decrypt_fn(self.masterkey.key(), &mut buffer)?;
 
                 // Convert to string
                 #[cfg(feature = "unchecked-utf8")]
@@ -348,7 +348,7 @@ macro_rules! impl_codec_64 {
                 buffer.truncate(len - 2);
 
                 // Decrypt directly
-                let plaintext_bytes = $decrypt_fn(self.masterkey.key(), &buffer)?;
+                let plaintext_bytes = $decrypt_fn(self.masterkey.key(), &mut buffer)?;
 
                 // Convert to string
                 #[cfg(feature = "unchecked-utf8")]

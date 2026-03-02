@@ -41,7 +41,7 @@ pub fn dec_any_scheme(
     // Step 4: Match scheme marker and decrypt with available SECURE schemes only
     let plaintext_bytes = match scheme_marker {
         #[cfg(feature = "upbc")]
-        UPBC_MARKER => decrypt_upbc(masterkey.key(), &buffer)?,
+        UPBC_MARKER => decrypt_upbc(masterkey.key(), &mut buffer)?,
         #[cfg(feature = "aags")]
         AAGS_MARKER => decrypt_aags(masterkey.key(), &buffer)?,
         #[cfg(feature = "apgs")]
@@ -106,19 +106,36 @@ pub(crate) fn dec_any_scheme_hex(masterkey: &MasterKey, obtext: &str) -> Result<
 /// 2. Else if text contains non-hex lowercase letters (g-z) -> Try Base32, fallback to B64
 /// 3. Else -> Try Hex, fallback to Base32, then B64
 pub fn dec_any_format(masterkey: &MasterKey, obtext: &str) -> Result<String, Error> {
-    // Check for B64 indicators:   '-', '_', or mixed case letters (definitive)
-    if obtext.contains('-')
-        || obtext.contains('_')
-        || (obtext.chars().any(|c| c.is_ascii_lowercase())
-            && obtext.chars().any(|c| c.is_ascii_uppercase()))
-    {
+    // Single-pass classification
+    let mut has_dash = false;
+    let mut has_underscore = false;
+    let mut has_upper = false;
+    let mut has_lower = false;
+    let mut has_non_hex_lower = false;
+
+    for b in obtext.bytes() {
+        match b {
+            b'-' => has_dash = true,
+            b'_' => has_underscore = true,
+            b'A'..=b'Z' => has_upper = true,
+            b'a'..=b'f' => has_lower = true,
+            b'g'..=b'z' => {
+                has_lower = true;
+                has_non_hex_lower = true;
+            }
+            _ => {}
+        }
+    }
+
+    // Check for B64 indicators: '-', '_', or mixed case letters (definitive)
+    if has_dash || has_underscore || (has_lower && has_upper) {
         if let Ok(result) = dec_any_scheme_b64(masterkey, obtext) {
             return Ok(result);
         }
     }
 
     // Check for uppercase letters, indicating B32
-    if obtext.chars().any(|c| c.is_ascii_uppercase()) {
+    if has_upper {
         // Try B32 first, fallback to B64 (no point trying hex)
         if let Ok(result) = dec_any_scheme_b32(masterkey, obtext) {
             return Ok(result);
@@ -129,7 +146,7 @@ pub fn dec_any_format(masterkey: &MasterKey, obtext: &str) -> Result<String, Err
     }
 
     // Check for non-hex lowercase letters (g-z), indicating C32
-    if obtext.chars().any(|c| c.is_ascii_lowercase() && c > 'f') {
+    if has_non_hex_lower {
         // Try C32 first, fallback to B64 (no point trying hex)
         if let Ok(result) = dec_any_scheme_c32(masterkey, obtext) {
             return Ok(result);

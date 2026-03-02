@@ -71,6 +71,7 @@ probabilistic-schemes = ["upbc", "apgs", "apsv"]
 
 [dependencies]
 # Always needed
+zeroize = { version = "1", features = ["derive"] }
 data-encoding = "2.5"
 generic-array = "1.0"
 num-bigint = "0.4.6"
