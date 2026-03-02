@@ -17,6 +17,23 @@ but note that pre-1.0 releases may not adhere strictly to all guidelines.
 ### Changed
 
 
+[oboron v0.6.0] - 2026-03-01
+------------------------------
+
+### Changed
+
+- **`Error` enum hardened for forward compatibility.**
+  - Added `#[non_exhaustive]` attribute so new error variants can be added in
+    future minor versions without breaking downstream `match` exhaustiveness.
+  - Added `Clone`, `PartialEq`, and `Eq` derives for ergonomic error comparison
+    in tests and application code.
+
+### Fixed
+
+- Fixed typo in `Cargo.toml` feature comment: `unchecked-utf8` description
+  corrected from "enhacement" to "enhancement".
+
+
 [oboron-py v0.2.0] - 2026-03-01
 ---------------------------------
 
