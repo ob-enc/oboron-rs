@@ -3,6 +3,8 @@
 [![Crates.io](https://img.shields.io/crates/v/oboron-cli.svg)](https://crates.io/crates/oboron-cli)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![MSRV](https://img.shields.io/badge/MSRV-1.77-blue.svg)](https://blog.rust-lang.org/2023/11/16/Rust-1.77.0.html)
+[![oboron](https://img.shields.io/crates/v/oboron?label=oboron)](https://crates.io/crates/oboron)
+[![oboron-py](https://img.shields.io/crates/v/oboron-py?label=oboron-py)](https://crates.io/crates/oboron-py)
 
 CLI for [Oboron](https://crates.io/crates/oboron) — general-purpose symmetric encryption and
 encoding.  Provides two binaries:
@@ -532,8 +534,8 @@ cryptographically secure.
 
 ## Related Crates
 
-- [`oboron`](https://crates.io/crates/oboron) — Core Rust library
-- [`oboron-py`](https://crates.io/crates/oboron-py) — Python bindings
+- [`oboron`](https://crates.io/crates/oboron) — Core Rust library ([docs.rs](https://docs.rs/oboron))
+- [`oboron-py`](https://crates.io/crates/oboron-py) — Python bindings ([PyPI](https://pypi.org/project/oboron/))
 
 ## License
 
