@@ -28,7 +28,8 @@ fn strip_trailing_newline(s: String) -> String {
 }
 
 fn load_test_vectors() -> Vec<TestVector> {
-    let path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/ztier-test-vectors.jsonl");
+    let path =
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/vectors/ztier-test-vectors.jsonl");
     let data = fs::read_to_string(&path).expect("Failed to read ztier-test-vectors.jsonl");
     data.lines()
         .filter(|line| !line.trim().is_empty())
