@@ -67,7 +67,7 @@ pub(crate) fn dec_from_format(
         #[cfg(feature = "apsv")]
         Scheme::Apsv => decrypt_apsv(master_key, &buffer)?,
         #[cfg(feature = "upbc")]
-        Scheme::Upbc => decrypt_upbc(master_key, &buffer)?,
+        Scheme::Upbc => decrypt_upbc(master_key, &mut buffer)?,
         #[cfg(feature = "mock")]
         Scheme::Mock1 => decrypt_mock1(master_key, &buffer)?,
         #[cfg(feature = "mock")]
