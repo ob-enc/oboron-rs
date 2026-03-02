@@ -1,5 +1,5 @@
 [workspace]
-members = ["oboron", "oboron-cli", "oboron-py", "cli-tests"]
+members = ["oboron", "oboron-cli", "oboron-py", "ob-cli-tests"]
 resolver = "2"
 
 [workspace.dependencies]

@@ -759,6 +759,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "ob-cli-tests"
+version = "0.1.0"
+dependencies = [
+ "assert_cmd",
+ "predicates",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "oboron"
 version = "0.6.0"
 dependencies = [
@@ -800,17 +810,6 @@ dependencies = [
  "serde",
  "serde_json",
  "tempfile",
-]
-
-[[package]]
-name = "oboron-cli-tests"
-version = "0.1.0"
-dependencies = [
- "assert_cmd",
- "oboron-cli",
- "predicates",
- "serde",
- "serde_json",
 ]
 
 [[package]]
