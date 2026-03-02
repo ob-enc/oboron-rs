@@ -78,7 +78,7 @@ fn test_all_vectors() {
         let expected_dec = vector.plaintext.trim_end_matches('=').to_string();
 
         // Test encoding: plaintext → obtext (exact match)
-        let enc_output = Command::cargo_bin("obz")
+        let enc_output = Command::new("obz")
             .unwrap()
             .arg("enc")
             .arg("-s")
@@ -105,7 +105,7 @@ fn test_all_vectors() {
         );
 
         // Test decoding: obtext → plaintext (trailing '=' stripped by legacy bug)
-        let dec_output = Command::cargo_bin("obz")
+        let dec_output = Command::new("obz")
             .unwrap()
             .arg("dec")
             .arg("-s")

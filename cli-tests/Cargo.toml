@@ -14,7 +14,6 @@ upbc = []
 ztier = []
 
 [dev-dependencies]
-oboron-cli = { path = "../oboron-cli", features = ["ztier", "aags", "aasv", "apgs", "apsv", "upbc"] }
 assert_cmd = "2.0"
 predicates = "3.0"
 serde = { version = "1.0", features = ["derive"] }
