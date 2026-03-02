@@ -58,7 +58,7 @@ legacy = ["aes", "cipher", "cbc", "ztier"]  # backward compatibility
 # =============
 convenience = [] # Convenience functions
 experimental = [] # Experimental algorithms
-unchecked-utf8 = [] # Unsafe performance enhacement
+unchecked-utf8 = [] # Unsafe performance enhancement
 
 # Scheme categories
 # =================

@@ -1,7 +1,8 @@
 use thiserror::Error;
 
 /// All errors that can occur in oboron operations.
-#[derive(Debug, Error)]
+#[non_exhaustive]
+#[derive(Debug, Clone, PartialEq, Eq, Error)]
 pub enum Error {
     // Key errors
     // ----------
