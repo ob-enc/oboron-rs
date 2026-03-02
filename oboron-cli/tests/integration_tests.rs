@@ -58,6 +58,40 @@ fn test_enc_keyless_apsv() {
     cleanup_test_home(&test_home);
 }
 
+#[cfg(feature = "aasv")]
+#[test]
+fn test_enc_short_alias_aasv() {
+    let test_home = test_home_dir();
+    let mut cmd = Command::cargo_bin("ob").unwrap();
+    cmd.env("HOME", test_home.as_os_str())
+        .arg("enc")
+        .arg("-K")
+        .arg("-s")
+        .arg("--b32")
+        .arg("test123")
+        .assert()
+        .success()
+        .stdout(predicate::str::is_empty().not());
+    cleanup_test_home(&test_home);
+}
+
+#[cfg(feature = "apsv")]
+#[test]
+fn test_enc_short_alias_apsv() {
+    let test_home = test_home_dir();
+    let mut cmd = Command::cargo_bin("ob").unwrap();
+    cmd.env("HOME", test_home.as_os_str())
+        .arg("enc")
+        .arg("-K")
+        .arg("-S")
+        .arg("--b32")
+        .arg("test123")
+        .assert()
+        .success()
+        .stdout(predicate::str::is_empty().not());
+    cleanup_test_home(&test_home);
+}
+
 #[cfg(feature = "apsv")]
 #[test]
 fn test_enc_dec_roundtrip_keyless() {
