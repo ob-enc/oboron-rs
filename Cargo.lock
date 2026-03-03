@@ -771,6 +771,27 @@ dependencies = [
 [[package]]
 name = "oboron"
 version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5f8b082d352eea3ad198ce767aa4d9503d73444e30b79e1f7639ab1600425679"
+dependencies = [
+ "aes",
+ "aes-gcm-siv",
+ "aes-siv",
+ "cbc",
+ "cipher",
+ "data-encoding",
+ "generic-array 1.3.5",
+ "getrandom 0.2.16",
+ "hex",
+ "num-bigint",
+ "once_cell",
+ "rand",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "oboron"
+version = "0.7.0"
 dependencies = [
  "aes",
  "aes-gcm-siv",
@@ -784,7 +805,7 @@ dependencies = [
  "hex",
  "jsonwebtoken",
  "num-bigint",
- "oboron",
+ "oboron 0.7.0",
  "once_cell",
  "rand",
  "serde",
@@ -805,7 +826,7 @@ dependencies = [
  "clap_complete",
  "data-encoding",
  "dirs",
- "oboron",
+ "oboron 0.6.0",
  "predicates",
  "rand",
  "serde",
@@ -818,7 +839,7 @@ name = "oboron-py"
 version = "0.2.1"
 dependencies = [
  "hex",
- "oboron",
+ "oboron 0.6.0",
  "pyo3",
 ]
 
