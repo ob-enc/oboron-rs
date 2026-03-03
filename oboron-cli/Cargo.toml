@@ -1,6 +1,6 @@
 [package]
 name = "oboron-cli"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 rust-version = "1.77.0"
 authors = ["Bojan Đuričković"]
@@ -47,7 +47,7 @@ path = "src/obz_main.rs"
 required-features = ["ztier"]
 
 [dependencies]
-oboron = { version = "0.6.0", features=["keyless"] }
+oboron = { version = "0.7.0", features=["keyless"] }
 clap = { version = "4.5", features = ["derive", "cargo"] }
 clap_complete = "4.5"
 serde = { version = "1.0", features = ["derive"] }
