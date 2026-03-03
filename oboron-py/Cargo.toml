@@ -10,6 +10,8 @@ description = "Python bindings for Oboron - general purpose encryption and encod
 keywords = ["python", "encryption", "obfuscation", "encoding", "base32"]
 categories = ["cryptography", "api-bindings"]
 readme = "README.md"
+homepage = "https://oboron.org/"
+documentation = "https://oboron.org/spec"
 
 [lib]
 name = "_oboron"

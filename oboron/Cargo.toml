@@ -10,6 +10,8 @@ description = "Encryption and encoding library for developer ergonomics: prefix 
 keywords = ["encryption", "obfuscation", "encoding", "base32", "identifiers"]
 categories = ["cryptography", "encoding"]
 readme = "README.md"
+homepage = "https://oboron.org/"
+documentation = "https://oboron.org/spec"
 
 [features]
 # Default: Secure, production-ready defaults
